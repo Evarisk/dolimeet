@@ -83,11 +83,8 @@ class modDoliMeet extends DolibarrModules
 			),
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
 			'hooks' => array(
-				//   'data' => array(
-				//       'hookcontext1',
-				//       'hookcontext2',
-				//   ),
-				//   'entity' => '0',
+				'category',
+				'categoryindex'
 			),
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 0,
@@ -104,7 +101,7 @@ class modDoliMeet extends DolibarrModules
 		// A condition to hide module
 		$this->hidden = false;
 		// List of module class names as string that must be enabled if this module is enabled. Example: array('always1'=>'modModuleToEnable1','always2'=>'modModuleToEnable2', 'FR1'=>'modModuleToEnableFR'...)
-		$this->depends = array();
+		$this->depends = array('modCategorie');
 		$this->requiredby = array(); // List of module class names as string to disable if this one is disabled. Example: array('modModuleToDisable1', ...)
 		$this->conflictwith = array(); // List of module class names as string this module is in conflict with. Example: array('modModuleToDisable1', ...)
 
@@ -225,6 +222,20 @@ class modDoliMeet extends DolibarrModules
 			'target'=>'',
 			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
 		);
+		$this->menu[$r++] = array(
+			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=meeting_list',
+			'type'     => 'left',
+			'titre'    => '<i class="fas fa-tags"></i>  ' . $langs->trans('Categories'),
+			'mainmenu' => 'dolimeet',
+			'leftmenu' => 'dolimeet_meeting',
+			'url'      => '/categories/index.php?type=meeting',
+			'langs'    => 'ticket',
+			'position' => 1100 + $r,
+			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled',
+			'perms'    => '1',
+			'target'   => '',
+			'user'     => 0,
+		);
 		/* END MODULEBUILDER TOPMENU */
 		/* BEGIN MODULEBUILDER LEFTMENU MYOBJECT
 		$this->menu[$r++]=array(
@@ -336,7 +347,16 @@ class modDoliMeet extends DolibarrModules
 		global $conf, $langs;
 
 		//$result = $this->_load_tables('/install/mysql/tables/', 'dolimeet');
-		$result = $this->_load_tables('/dolimeet/sql/');
+		$sql = array();
+		// Load sql sub folders
+		$sqlFolder = scandir(__DIR__ . '/../../sql');
+		foreach ($sqlFolder as $subFolder) {
+			if ( ! preg_match('/\./', $subFolder)) {
+				$this->_load_tables('/dolimeet/sql/' . $subFolder . '/');
+			}
+		}
+
+		$this->_load_tables('/dolimeet/sql/');
 		if ($result < 0) {
 			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
 		}

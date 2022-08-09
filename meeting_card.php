@@ -217,10 +217,13 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-				// Creation meeting OK
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
+				// Creation OK
+				// Category association
+				$categories = GETPOST('categories', 'array');
+				$object->setCategories($categories);
+				$urltogo = $backtopage ? str_replace('__ID__', $result, $backtopage) : $backurlforlist;
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $object->id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: ".$urltogo);
 				exit;
 			}
 			else {
@@ -251,11 +254,11 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
-				$signatory->deleteSignatoriesSignatures($object->id, 0);
-				$object->setStatusCommon($user, 0);
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
+				$categories = GETPOST('categories', 'array');
+				$object->setCategories($categories);
+				$urltogo = $backtopage ? str_replace('__ID__', $result, $backtopage) : $backurlforlist;
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $object->id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: ".$urltogo);
 				exit;
 			}
 			else
@@ -836,6 +839,15 @@ if ($action == 'create') {
 	$doleditor->Create();
 	print '</td></tr>';
 
+	// Categories
+	if (!empty($conf->categorie->enabled)) {
+		print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+		$cate_arbo = $form->select_all_categories('meeting', '', 'parent', 64, 0, 1);
+		print img_picto('', 'category').$form->multiselectarray('categories', $cate_arbo, GETPOST('categories', 'array'), '', 0, 'quatrevingtpercent widthcentpercentminusx', 0, 0);
+		print "</td></tr>";
+	}
+
+
 //	//PublicNote -- Note publique
 //	print '<tr class="content_field"><td><label for="note_public">'.$langs->trans("PublicNote").'</label></td><td>';
 //	$doleditor = new DolEditor('note_public', GETPOST('note_public'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
@@ -905,30 +917,27 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 	print '<input name="label" id="label" value="'. $object->label .'" >';
 	print '</td></tr>';
 
-	//Society -- Société
-	print '<tr><td class="fieldrequired">'.$langs->trans("Society").'</td><td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($object->fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-	print '</td></tr>';
-
-	//Contact -- Contact
-	print '<tr><td class="fieldrequired">'.$langs->trans("Contact").'</td><td>';
-	print $form->selectcontacts(GETPOST('fk_soc', 'int'), $object->fk_contact, 'fk_contact', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'fk_contact');
-	print '</td></tr>';
-
-	//Contact -- Contact
-	print '<tr class="oddeven"><td><label for="ACCProject">' . $langs->trans("ProjectLinked") . '</label></td><td>';
-	$numprojet = $formproject->select_projects(0,  $object->fk_project, 'fk_project', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
-	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
-	print '</td></tr>';
-
 	//Content -- Contenu
 	print '<tr class="content_field"><td><label for="content">'.$langs->trans("Content").'</label></td><td>';
 	$doleditor = new DolEditor('content', $object->content, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
+
+	// Tags-Categories
+	if ($conf->categorie->enabled) {
+		print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+		$cate_arbo = $form->select_all_categories('meeting', '', 'parent', 64, 0, 1);
+		$c = new Categorie($db);
+		$cats = $c->containing($object->id, 'meeting');
+		$arrayselected = array();
+		if (is_array($cats)) {
+			foreach ($cats as $cat) {
+				$arrayselected[] = $cat->id;
+			}
+		}
+		print img_picto('', 'category').$form->multiselectarray('categories', $cate_arbo, $arrayselected, '', 0, 'quatrevingtpercent widthcentpercentminusx', 0, 0);
+		print "</td></tr>";
+	}
 
 	print '</table>';
 
@@ -987,8 +996,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	$linkback = '<a href="'.dol_buildpath('/dolimeet/meeting_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 	// Project
 	$project->fetch($object->fk_project);
-	$morehtmlref = '<div class="refidno">';
-
+	$morehtmlref = '- ' . $object->label;
+	$morehtmlref .= '<div class="refidno">';
 	$morehtmlref .= $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
 	$morehtmlref .= '</tr>';
 	$morehtmlref .=  '</td><br>';
@@ -1009,6 +1018,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	print dol_htmlentitiesbr($object->content); //wrap -> middle?
 	print '</div>';
 	print '</td></tr>';
+
+	// Categories
+	if ($conf->categorie->enabled) {
+		print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
+		print $form->showCategories($object->id, 'meeting', 1);
+		print "</td></tr>";
+	}
 
 	//unused display of information
 	unset($object->fields['fk_soc']);

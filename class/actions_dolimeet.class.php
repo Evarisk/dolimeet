@@ -16,15 +16,15 @@
  */
 
 /**
- * \file    class/actions_dolismq.class.php
- * \ingroup dolismq
- * \brief   DoliSMQ hook overload.
+ * \file    class/actions_dolimeet.class.php
+ * \ingroup dolimeet
+ * \brief   DoliMeet hook overload.
  */
 
 /**
- * Class ActionsDolismq
+ * Class ActionsDolimeet
  */
-class ActionsDolismq
+class ActionsDolimeet
 {
 	/**
 	 * @var DoliDB Database handler.
@@ -75,17 +75,11 @@ class ActionsDolismq
 
 		if (in_array($parameters['currentcontext'], array('category', 'somecontext2'))) { // do something only for the context 'somecontext1' or 'somecontext2'
 			$tags = array(
-				'question' => array(
+				'meeting' => array(
 					'id' => 50,
-					'code' => 'question',
+					'code' => 'meeting',
 					'obj_class' => 'Question',
-					'obj_table' => 'dolismq_question',
-				),
-				'sheet' => array(
-					'id' => 51,
-					'code' => 'sheet',
-					'obj_class' => 'Sheet',
-					'obj_table' => 'dolismq_sheet',
+					'obj_table' => 'dolimeet_meeting',
 				),
 			);
 		}
@@ -110,7 +104,7 @@ class ActionsDolismq
 		$error = 0; // Error counter
 
 		if (preg_match('/categoryindex/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			print '<script src="../custom/dolismq/js/dolismq.js.php"></script>';
+			print '<script src="../custom/dolimeet/js/dolimeet.js.php"></script>';
 		}
 
 		if (!$error) {
