@@ -42,12 +42,38 @@ DoliMeetAbout = About DoliMeet
 DoliMeetAboutPage = DoliMeet about page
 
 #
-# Sample page
-#
-MyPageName = My page name
-
-#
-# Sample widget
+# Session
 #
 MyWidget = My widget
 MyWidgetDescription = My widget description
+Tags = Catégories
+Thirdparty = Tiers
+ExternalIntervenants = Intervenants extérieurs
+Name = Nom
+Role = Rôle
+SignatureLink = Lien de signature
+SignatureDate = Date de signature
+LastEmailSentDate = Date d'envoi du mail de signature
+ContactLinked = Contact
+
+#
+# Meeting
+#
+Meeting = Réunion
+MeetingList = Liste des réunions
+MeetingCreate = Créer une réunion
+
+
+#
+# Training Session
+#
+TrainingSession = Session de formation
+TrainingSessionList = Liste des sessions de formation
+TrainingSessionCreate = Créer une session de formation
+
+#
+# Audit
+#
+Audit = Audit
+AuditList = Liste des audits
+AuditCreate = Créer un audit
