@@ -1,6 +1,6 @@
 <?php
 if (!empty($fromtype)) {
-print dol_get_fiche_head($head, 'meetingList', $langs->trans("Meeting"), -1, $objectLinked->picto);
+print dol_get_fiche_head($head, $object->type . 'List', $langs->trans($object->type), -1, $objectLinked->picto);
 dol_banner_tab($objectLinked, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 }
 
@@ -67,14 +67,15 @@ $fromurl = '';
 if (!empty($fromtype)) {
 $fromurl = '&fromtype='.$fromtype.'&fromid='.$fromid;
 }
-$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/dolimeet/meeting_card.php', 1).'?action=create'.$fromurl, '', $permissiontoadd);
+$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/'. $object->type .'/'. $object->type .'_card.php', 1).'?action=create'.$fromurl, '', $permissiontoadd);
 $object->picto ='dolimeet32px@dolimeet';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_'.$object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 $object->picto ='dolimeet16px@dolimeet';
 // Add code for pre mass action (confirmation or email presend form)
-$topicmail = "SendMeetingRef";
+$topicmail = "Send". $object->type ."Ref";
 $modelmail = "document";
-$objecttmp = new Meeting($db);
+
+$objecttmp = new $object->type($db);
 $trackid = 'xxxx'.$object->id;
 include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
@@ -360,5 +361,5 @@ $filedir = $diroutputmassaction;
 $genallowed = $permissiontoread;
 $delallowed = $permissiontoadd;
 
-print $formfile->showdocuments('massfilesarea_meeting', '', $filedir, $urlsource, 0, $delallowed, '', 1, 1, 0, 48, 1, $param, $title, '', '', '', null, $hidegeneratedfilelistifempty);
+print $formfile->showdocuments('massfilesarea_' .$object->type, '', $filedir, $urlsource, 0, $delallowed, '', 1, 1, 0, 48, 1, $param, $title, '', '', '', null, $hidegeneratedfilelistifempty);
 }

@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/meeting.class.php
+ * \file        class/trainingsession.class.php
  * \ingroup     dolimeet
  * \brief       This file is a CRUD class file for Document (Create/Read/Update/Delete)
  */
@@ -27,9 +27,9 @@ require_once __DIR__ . '/dolimeetsignature.class.php';
 require_once __DIR__ . '/session.class.php';
 
 /**
- * Class for Meeting
+ * Class for TrainingSession
  */
-class Meeting extends Session
+class TrainingSession extends Session
 {
 	/**
 	 * @var string ID of module.
@@ -39,7 +39,7 @@ class Meeting extends Session
 	/**
 	 * @var string ID to identify managed object.
 	 */
-	public $element = 'meeting';
+	public $element = 'trainingsession';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -67,7 +67,7 @@ class Meeting extends Session
 		global $conf, $langs;
 
 		$this->db = $db;
-		$this->type = 'Meeting';
+		$this->type = 'TrainingSession';
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
 		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
@@ -93,16 +93,16 @@ class Meeting extends Session
 }
 
 /**
- * Class MeetingSignature
+ * Class TrainingSessionSignature
  */
 
-class MeetingSignature extends DolimeetSignature
+class TrainingSessionSignature extends DolimeetSignature
 {
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
 
-	public $object_type = 'meeting';
+	public $object_type = 'trainingsession';
 
 	/**
 	 * @var array Context element object
@@ -147,11 +147,11 @@ class MeetingSignature extends DolimeetSignature
 	 *
 	 * @param User $user User that creates
 	 * @param int $fromid Id of object to clone
-	 * @param $meetingid
+	 * @param $trainingsessionid
 	 * @return    mixed                New object created, <0 if KO
 	 * @throws Exception
 	 */
-	public function createFromClone(User $user, $fromid, $meetingid)
+	public function createFromClone(User $user, $fromid, $trainingsessionid)
 	{
 		$error = 0;
 
@@ -177,7 +177,7 @@ class MeetingSignature extends DolimeetSignature
 			$object->date_creation = dol_now();
 		}
 		if (property_exists($object, 'fk_object')) {
-			$object->fk_object = $meetingid;
+			$object->fk_object = $trainingsessionid;
 		}
 		if (property_exists($object, 'status')) {
 			$object->status = 1;

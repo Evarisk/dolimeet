@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       view/meeting/meeting_attendants.php
+ *   	\file       view/trainingsession/trainingsession_attendants.php
  *		\ingroup    dolimeet
- *		\brief      Page to add/edit/view meeting_signature
+ *		\brief      Page to add/edit/view trainingsession_signature
  */
 
 // Load Dolibarr environment
@@ -34,6 +34,7 @@ if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main
 if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
 if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if ( ! $res && file_exists("../../../../../main.inc.php")) $res = @include "../../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -41,9 +42,9 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 
-require_once __DIR__ . '/class/meeting.class.php';
-require_once __DIR__ . '/lib/dolimeet_meeting.lib.php';
-require_once __DIR__ . '/lib/dolimeet_function.lib.php';
+require_once __DIR__ . '/../../class/trainingsession.class.php';
+require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
 global $db, $langs;
 
@@ -53,12 +54,12 @@ $langs->loadLangs(array("dolimeet@dolimeet", "other"));
 // Get parameters
 $id          = GETPOST('id', 'int');
 $action      = GETPOST('action', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'meetingsignature'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'trainingsessionsignature'; // To manage different context of search
 $backtopage  = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
-$object            = new Meeting($db);
-$signatory         = new MeetingSignature($db);
+$object            = new TrainingSession($db);
+$signatory         = new TrainingSessionSignature($db);
 $usertmp           = new User($db);
 $contact           = new Contact($db);
 $form              = new Form($db);
@@ -67,12 +68,12 @@ $thirdparty        = new Societe($db);
 
 $object->fetch($id);
 
-$hookmanager->initHooks(array('meetingsignature', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('trainingsessionsignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
 //Security check
-$permissiontoread   = $user->rights->dolimeet->meeting->read;
-$permissiontoadd    = $user->rights->dolimeet->meeting->write;
-$permissiontodelete = $user->rights->dolimeet->meeting->delete;
+$permissiontoread   = $user->rights->dolimeet->trainingsession->read;
+$permissiontoadd    = $user->rights->dolimeet->trainingsession->write;
+$permissiontodelete = $user->rights->dolimeet->trainingsession->delete;
 
 if ( ! $permissiontoread) accessforbidden();
 
@@ -87,7 +88,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($backtopage) || ($cancel && empty($id))) {
 	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-		$backtopage = dol_buildpath('/dolimeet/meeting_attendants.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+		$backtopage = dol_buildpath('/dolimeet/view/trainingsession/trainingsession_attendants.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
 	}
 }
 
@@ -98,7 +99,7 @@ if ($action == 'addSocietyAttendant') {
 	$attendant_id = GETPOST('user_attendant');
 
 	if ( ! $error) {
-		$result = $signatory->setSignatory($object->id, 'meeting', 'user', array($attendant_id), 'MEETING_SOCIETY_ATTENDANT', 1);
+		$result = $signatory->setSignatory($object->id, 'trainingsession', 'user', array($attendant_id), 'TRAININGSESSION_SOCIETY_ATTENDANT', 1);
 		if ($result > 0) {
 			$usertmp = $user;
 			$usertmp->fetch($attendant_id);
@@ -123,7 +124,7 @@ if ($action == 'addExternalAttendant') {
 	$extintervenant_id = GETPOST('external_attendant');
 
 	if ( ! $error) {
-		$result = $signatory->setSignatory($object->id, 'meeting', 'socpeople', array($extintervenant_id), 'MEETING_EXTERNAL_ATTENDANT', 1);
+		$result = $signatory->setSignatory($object->id, 'trainingsession', 'socpeople', array($extintervenant_id), 'TRAININGSESSION_EXTERNAL_ATTENDANT', 1);
 		if ($result > 0) {
 			$contact->fetch($extintervenant_id);
 			setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $contact->firstname . ' ' . $contact->lastname, array());
@@ -300,7 +301,7 @@ if ($action == 'deleteAttendant') {
  */
 
 $formcompany = new FormCompany($db);
-$title    = $langs->trans("MeetingAttendants");
+$title    = $langs->trans("TrainingSessionAttendants");
 $help_url = '';
 $morejs   = array("/dolimeet/js/signature-pad.min.js", "/dolimeet/js/dolimeet.js.php");
 $morecss  = array("/dolimeet/css/dolimeet.css");
@@ -312,8 +313,8 @@ if ( ! empty($object->id)) $res = $object->fetch_optionals();
 // Object card
 // ------------------------------------------------------------
 
-$head = meetingPrepareHead($object);
-print dol_get_fiche_head($head, 'attendants', $langs->trans("Meeting"), -1, "dolimeet@dolimeet");
+$head = trainingsessionPrepareHead($object);
+print dol_get_fiche_head($head, 'attendants', $langs->trans("TrainingSession"), -1, "dolimeet@dolimeet");
 
 $width = 80; $cssclass = 'photoref';
 dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
@@ -334,9 +335,9 @@ print dol_get_fiche_end(); ?>
 <div class="wpeo-notice notice-warning">
 	<div class="notice-content">
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("MeetingMustBeValidatedToSign") ?></div>
+		<div class="notice-subtitle"><?php echo $langs->trans("TrainingSessionMustBeValidatedToSign") ?></div>
 	</div>
-	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/dolimeet/view/meeting/meeting_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/dolimeet/view/trainingsession/trainingsession_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -346,8 +347,8 @@ print dol_get_fiche_end(); ?>
 			<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
 		</div>
 		<?php
-		if ($signatory->checkSignatoriesSignatures($object->id, 'meeting')) {
-			print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/dolimeet/view/meeting/meeting_card.php?id=' . $id . '">' . $langs->trans("GoToLock") . '</a>';
+		if ($signatory->checkSignatoriesSignatures($object->id, 'trainingsession')) {
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/dolimeet/view/trainingsession/trainingsession_card.php?id=' . $id . '">' . $langs->trans("GoToLock") . '</a>';
 		}
 		?>
 	</div>
@@ -358,7 +359,7 @@ print dol_get_fiche_end(); ?>
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Society attendants -- Participants de la société
-	$society_intervenants = $signatory->fetchSignatory('MEETING_SOCIETY_ATTENDANT', $object->id, 'meeting');
+	$society_intervenants = $signatory->fetchSignatory('TRAININGSESSION_SOCIETY_ATTENDANT', $object->id, 'trainingsession');
 
 	print load_fiche_titre($langs->trans("Attendants"), '', '');
 
@@ -461,7 +462,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//External Society Intervenants -- Intervenants Société extérieure
 	$thirdparty->fetch($object->fk_soc);
-	$ext_society_intervenants = $signatory->fetchSignatory('MEETING_EXTERNAL_ATTENDANT', $object->id, 'meeting');
+	$ext_society_intervenants = $signatory->fetchSignatory('TRAININGSESSION_EXTERNAL_ATTENDANT', $object->id, 'trainingsession');
 
 	print load_fiche_titre($langs->trans("ExternalIntervenants"), '', '');
 
@@ -516,12 +517,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '<td class="center">';
 			if ($permissiontoadd) {
-				require __DIR__ . "/core/tpl/signature/dolimeet_signature_action_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/dolimeet_signature_action_view.tpl.php";
 			}
 			print '</td>';
 			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/signature/dolimeet_signature_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/dolimeet_signature_view.tpl.php";
 				print '</td>';
 			}
 			print '</tr>';
@@ -555,7 +556,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$selectedCompany = $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, '', 'minwidth300imp');
 		print '</td>';
 		print '<td class="tagtd noborderbottom minwidth500imp">';
-		print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'external_attendant', 3, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+		print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'external_attendant', 3, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 		$nbofcontacts = $form->num;
 		$newcardbutton = '';
 		if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {

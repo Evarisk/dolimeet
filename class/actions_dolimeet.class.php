@@ -76,10 +76,16 @@ class ActionsDolimeet
 		if (in_array($parameters['currentcontext'], array('category', 'somecontext2'))) { // do something only for the context 'somecontext1' or 'somecontext2'
 			$tags = array(
 				'meeting' => array(
-					'id' => 50,
+					'id' => 1050,
 					'code' => 'meeting',
-					'obj_class' => 'Question',
-					'obj_table' => 'dolimeet_meeting',
+					'obj_class' => 'Meeting',
+					'obj_table' => 'dolimeet_session',
+				),
+				'trainingsession' => array(
+					'id' => 1051,
+					'code' => 'trainingsession',
+					'obj_class' => 'TrainingSession',
+					'obj_table' => 'dolimeet_session',
 				),
 			);
 		}

@@ -23,9 +23,9 @@
  */
 
 /**
- *  \file			htdocs/core/modules/doliletter/modules_meeting.php
- *  \ingroup		doliletter
- *  \brief			File that contains parent class for meeting document models and parent class for meeting numbering models
+ *  \file			htdocs/core/modules/dolimeet/modules_session.php
+ *  \ingroup		dolimeet
+ *  \brief			File that contains parent class for session document models and parent class for session numbering models
  */
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
 /**
  *	Parent class for documents models
  */
-abstract class ModelePDFMeeting extends CommonDocGenerator
+abstract class ModelePDFSession extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -49,7 +49,7 @@ abstract class ModelePDFMeeting extends CommonDocGenerator
 		// phpcs:enable
 		global $conf;
 
-		$type = 'meeting';
+		$type = 'session';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
@@ -89,7 +89,7 @@ abstract class ModeleNumRefMeeting
 	public function info()
 	{
 		global $langs;
-		$langs->load("doliletter@doliletter");
+		$langs->load("dolimeet@dolimeet");
 		return $langs->trans("NoDescription");
 	}
 
@@ -101,7 +101,7 @@ abstract class ModeleNumRefMeeting
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("doliletter@doliletter");
+		$langs->load("dolimeet@dolimeet");
 		return $langs->trans("NoExample");
 	}
 

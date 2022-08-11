@@ -33,6 +33,8 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../../../../main.inc.php")) $res = @include "../../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
@@ -47,11 +49,11 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
-require_once './class/meeting.class.php';
-require_once './core/modules/dolimeet/mod_meeting_standard.php';
-require_once './lib/dolimeet_meeting.lib.php';
-require_once './lib/dolimeet.lib.php';
-require_once './lib/dolimeet_function.lib.php';
+require_once __DIR__ . '/../../class/meeting.class.php';
+require_once __DIR__ . '/../../core/modules/dolimeet/mod_meeting_standard.php';
+require_once __DIR__ . '/../../lib/dolimeet_meeting.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
 global $db, $conf, $langs, $user, $hookmanager;
 
@@ -64,7 +66,7 @@ $action      = GETPOST('action', 'aZ09');
 $massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
 $confirm     = GETPOST('confirm', 'alpha');
 $cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'meetingcard'; // To manage different context of search
 $backtopage  = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
@@ -83,7 +85,7 @@ if ($object->fk_contact > 0) {
 	$linked_contact->fetch($object->fk_contact);
 }
 
-$hookmanager->initHooks(array('lettercard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('meetingcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -163,14 +165,14 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/dolimeet/meeting_list.php', 1);
+	$backurlforlist = dol_buildpath('/dolimeet/view/meeting/meeting_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) {
 				$backtopage = $backurlforlist;
 			} else {
-				$backtopage = dol_buildpath('/dolimeet/meeting_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
+				$backtopage = dol_buildpath('/dolimeet/view/meeting/meeting_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 			}
 		}
 	}
@@ -285,7 +287,7 @@ if (empty($reshook)) {
 	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes")
 	{
 		$object->setStatusCommon($user, -1);
-		$urltogo = DOL_URL_ROOT . '/custom/dolimeet/meeting_list.php';
+		$urltogo = DOL_URL_ROOT . '/custom/dolimeet/view/meeting/meeting_list.php';
 		header("Location: " . $urltogo);
 		exit;
 	}
@@ -1048,7 +1050,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	$thirdparty->fetch($object->fk_soc);
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/dolimeet/meeting_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/dolimeet/view/meeting/meeting_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref = '- ' . $object->label;
@@ -1077,7 +1079,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	// Categories
 	if ($conf->categorie->enabled) {
 		print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
-		print $form->showCategories($object->id, 'meeting', 1);
+		print $form->showCategories($object->id, 'session', 1);
 		print "</td></tr>";
 	}
 
@@ -1146,7 +1148,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 
 	if (empty($reshook)) {
 		// Send
-		$class = 'ModelePDFMeeting';
+		$class = 'ModelePDFSession';
 		$modellist = call_user_func($class.'::liste_modeles', $db, 100);
 		if (!empty($modellist))
 		{
