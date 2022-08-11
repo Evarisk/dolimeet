@@ -139,7 +139,14 @@ class modDoliMeet extends DolibarrModules
 		}
 
 		// Array to add new pages in new tabs
+		$langs->load("dolimeet@dolimeet");
+		$pictopath = dol_buildpath('/custom/dolimeet/img/dolimeet32px.png', 1);
+		$picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDolimeet');
+
 		$this->tabs = array();
+		$this->tabs[] = array('data' => 'thirdparty:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&socid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&userid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contact:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&contactid=__ID__'); // To add a new tab identified by code tabname1
 
 		// Dictionaries
 		$this->dictionaries = array();
