@@ -188,12 +188,17 @@ if (empty($reshook)) {
 		$label          = GETPOST('label');
 		$society_id     = GETPOST('fk_soc');
 		$project_id     = GETPOST('fk_project');
+		$contrat_id     = GETPOST('fk_contrat');
+		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
+		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
 
 		// Initialize object
 		$now                   = dol_now();
 		$object->ref           = $refMeetingMod->getNextValue($object);
 		$object->ref_ext       = 'dolimeet_' . $object->ref;
 		$object->date_creation = $object->db->idate($now);
+		$object->date_start    = $date_start;
+		$object->date_end      = $date_end;
 		$object->tms           = $now;
 		$object->import_key    = "";
 		$object->note_private  = $note_private;
@@ -202,6 +207,7 @@ if (empty($reshook)) {
 
 		$object->fk_soc        = $society_id;
 		$object->fk_project    = $project_id;
+		$object->fk_contrat    = $contrat_id;
 
 		$object->content       = $content;
 		$object->entity = $conf->entity ?: 1;
@@ -241,14 +247,18 @@ if (empty($reshook)) {
 		$society_id     = GETPOST('fk_soc');
 		$content        = GETPOST('content', 'restricthtml');
 		$label          = GETPOST('label');
-		$contact_id     = GETPOST('fk_contact');
+		$contrat_id     = GETPOST('fk_contrat');
 		$project_id     = GETPOST('fk_project');
+		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
+		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
 
 		$object->label      = $label;
 		$object->fk_soc     = $society_id;
 		$object->content    = $content;
-		$object->fk_contact = $contact_id;
+		$object->fk_contrat = $contrat_id;
 		$object->fk_project = $project_id;
+		$object->date_start = $date_start;
+		$object->date_end = $date_end;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 		if (!$error) {
@@ -814,8 +824,10 @@ if ($action == 'create') {
 	unset($object->fields['content']);
 	unset($object->fields['note_public']);
 	unset($object->fields['note_private']);
+	unset($object->fields['date_start']);
+	unset($object->fields['date_end']);
 	unset($object->fields['fk_soc']);
-	unset($object->fields['fk_contact']);
+	unset($object->fields['fk_contrat']);
 	unset($object->fields['fk_project']);
 
 	//Ref -- Ref
@@ -833,13 +845,23 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '</td></tr>';
 
-	//Society -- Société
-	print '<tr><td class="">'.$langs->trans("Society").'</td><td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'fk_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company(GETPOST('fromtype') == 'thirdparty' ? GETPOST('fromid') : GETPOST('fk_soc'), 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	//Date start - Date de début
+	print '<tr class="oddeven"><td><label for="DateStart">' . $langs->trans("DateStart") . '</label></td><td>';
+	print $form->selectDate(dol_now('tzuser'), 'date_start', 1, 1, 0, '', 1,1);
 	print '</td></tr>';
+
+	//Date end - Date de début
+	print '<tr class="oddeven"><td><label for="DateEnd">' . $langs->trans("DateEnd") . '</label></td><td>';
+	print $form->selectDate(dol_now('tzuser'), 'date_end', 1, 1, 0, '', 1, 1);
+	print '</td></tr>';
+
+//	//Society -- Société
+//	print '<tr><td class="">'.$langs->trans("Society").'</td><td>';
+//	$events = array();
+//	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'fk_contact', 'params' => array('add-customer-contact' => 'disabled'));
+//	print $form->select_company(GETPOST('fromtype') == 'thirdparty' ? GETPOST('fromid') : GETPOST('fk_soc'), 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+//	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+//	print '</td></tr>';
 
 	//Content -- Contenu
 	print '<tr class=""><td><label for="content">'.$langs->trans("Content").'</label></td><td>';
@@ -931,13 +953,23 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '</td></tr>';
 
-	//Society -- Société
-	print '<tr><td class="fieldrequired">'.$langs->trans("Society").'</td><td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($object->fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	//Date start - Date de début
+	print '<tr class="oddeven"><td><label for="DateStart">' . $langs->trans("DateStart") . '</label></td><td>';
+	print $form->selectDate($object->date_start, 'date_start', 1, 1, 0, '', 1,1);
 	print '</td></tr>';
+
+	//Date end - Date de début
+	print '<tr class="oddeven"><td><label for="DateEnd">' . $langs->trans("DateEnd") . '</label></td><td>';
+	print $form->selectDate($object->date_end, 'date_end', 1, 1, 0, '', 1, 1);
+	print '</td></tr>';
+
+//	//Society -- Société
+//	print '<tr><td class="fieldrequired">'.$langs->trans("Society").'</td><td>';
+//	$events = array();
+//	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'contact', 'params' => array('add-customer-contact' => 'disabled'));
+//	print $form->select_company($object->fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+//	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+//	print '</td></tr>';
 
 	//Content -- Contenu
 	print '<tr class="content_field"><td><label for="content">'.$langs->trans("Content").'</label></td><td>';
@@ -1028,7 +1060,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	dol_banner_tab($object, 'ref', $linkback, 0, 'ref', 'ref', $morehtmlref, '', 0, '' );
 
 	print '<div class="fichecenter">';
-	print '<div class="">';
+	print '<div class="fichehalfleft">';
 	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
 
@@ -1041,15 +1073,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	print '</div>';
 	print '</td></tr>';
 
-	print '<tr><td class="titlefield">';
-	print $langs->trans("Thirdparty");
-	print '</td>';
-	print '<td>';
-	print '<div class="" style="">';
-	print $thirdparty->getNomUrl(1); //wrap -> middle?
-	print '</div>';
-	print '</td></tr>';
-
 	// Categories
 	if ($conf->categorie->enabled) {
 		print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
@@ -1057,15 +1080,52 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 		print "</td></tr>";
 	}
 
+	// Date Start
+	print '<tr><td class="titlefield">';
+	print $form->textwithpicto($langs->trans("DateStart"), $langs->trans("GaugeCounter"), 1, 'info');
+	print '</td>';
+	print '<td>';
+	print dol_print_date($object->date_start, 'dayhoursec');
+	print '</td></tr>';
+
+	// Date End
+	print '<tr><td class="titlefield">';
+	print $form->textwithpicto($langs->trans("DateEnd"), $langs->trans("GaugeCounter"), 1, 'info');
+	print '</td>';
+	print '<td>';
+	print dol_print_date($object->date_end, 'dayhoursec');
+	print '</td></tr>';
+
 	//unused display of information
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_contact']);
 	unset($object->fields['fk_project']);
 	unset($object->fields['content']);
+	unset($object->fields['fk_contrat']);
+	unset($object->fields['date_start']);
+	unset($object->fields['date_end']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
+
+	print '</table>';
+	print '</div>';
+
+	print '<div class="fichehalfright">';
+	print '<table class="border centpercent tableforfield">'."\n";
+
+	//Thirdparty
+	if ($object->fk_soc > 0) {
+		print '<tr><td class="titlefield">';
+		print $langs->trans("Thirdparty");
+		print '</td>';
+		print '<td>';
+		print '<div class="" style="">';
+		print $thirdparty->getNomUrl(1); //wrap -> middle?
+		print '</div>';
+		print '</td></tr>';
+	}
 
 	print '</table>';
 	print '</div>';

@@ -106,6 +106,8 @@ class Meeting extends CommonObject
 		'label'          => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'comment'=>"label of object"),
 		'entity'         => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
 		'date_creation'  => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>2,),
+		'date_start'     => array('type'=>'datetime', 'label'=>'DateStart', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>1,),
+		'date_end'       => array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>1,),
 		'tms'            => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
 		'import_key'     => array('type'=>'integer', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>0,),
 		'status'         => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'default' => 0, 'visible'=>2, 'index'=>1,),
@@ -116,6 +118,7 @@ class Meeting extends CommonObject
 		'content'        => array('type'=>'textarea', 'label'=>'Content', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>3,),
 		'document_url'   => array('type'=>'varchar(255)', 'label'=>'DocumentUrl', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>0,),
 		'fk_project'     => array('type'=>'integer', 'label'=>'Project', 'enabled'=>'1', 'position'=>175, 'notnull'=>1, 'visible'=>1,),
+		'fk_contrat'     => array('type'=>'integer', 'label'=>'Contract', 'enabled'=>'1', 'position'=>175, 'notnull'=>1, 'visible'=>1,),
 		'fk_soc'         => array('type'=>'integer', 'label'=>'Thirdparty', 'enabled'=>'1', 'position'=>175, 'notnull'=>1, 'visible'=>1,),
 		'fk_user_creat'  => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'  => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
@@ -126,6 +129,8 @@ class Meeting extends CommonObject
 	public $ref_ext;
 	public $entity;
 	public $date_creation;
+	public $date_start;
+	public $date_end;
 	public $tms;
 	public $status;
 	public $import_key;
@@ -136,6 +141,7 @@ class Meeting extends CommonObject
 	public $content;
 	public $document_url;
 	public $fk_project;
+	public $fk_contrat;
 	public $fk_soc;
 	public $fk_user_creat;
 	public $fk_user_modif;
