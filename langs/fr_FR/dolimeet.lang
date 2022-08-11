@@ -70,6 +70,9 @@ MeetingCreate = Créer une réunion
 TrainingSession = Session de formation
 TrainingSessionList = Liste des sessions de formation
 TrainingSessionCreate = Créer une session de formation
+ContractLinked = Contrat lié
+Contract = Contrat
+
 
 #
 # Audit

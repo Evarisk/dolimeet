@@ -410,6 +410,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 	exit;
 }
 
+unset($object->fields['fk_contrat']);
 
 // Output page
 // --------------------------------------------------------------------

@@ -40,6 +40,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcontract.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
@@ -48,6 +49,7 @@ require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
 
 require_once __DIR__ . '/../../class/trainingsession.class.php';
 require_once __DIR__ . '/../../core/modules/dolimeet/mod_trainingsession_standard.php';
@@ -78,6 +80,7 @@ $extrafields    = new ExtraFields($db);
 $usertmp        = new User($db);
 $ecmfile        = new EcmFiles($db);
 $thirdparty     = new Societe($db);
+$contract       = new Contrat($db);
 
 $object->fetch($id);
 if ($object->fk_contact > 0) {
@@ -793,6 +796,7 @@ $form          = new Form($db);
 $formother     = new FormOther($db);
 $formfile      = new FormFile($db);
 $formproject   = new FormProjets($db);
+$formcontract  = new FormContract($db);
 
 $title        = $langs->trans("TrainingSession");
 $title_create = $langs->trans("NewTrainingSession");
@@ -846,6 +850,12 @@ if ($action == 'create') {
 	print '<tr class="oddeven"><td><label for="Project">' . $langs->trans("ProjectLinked") . '</label></td><td>';
 	$numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1,  GETPOST('fk_project'), 'fk_project', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+	print '</td></tr>';
+
+	//Contract -- Contrat
+	print '<tr class="oddeven"><td><label for="Contract">' . $langs->trans("ContractLinked") . '</label></td><td class="minwidth500">';
+	$numcontrat = $formcontract->select_contract(GETPOST('fk_soc') ?: -1,  GETPOST('fk_contrat'), 'fk_contrat', 0, 1, 1);
+	print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddContract") . '"></span></a>';
 	print '</td></tr>';
 
 	//Date start - Date de début
@@ -956,6 +966,12 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '</td></tr>';
 
+	//Contract -- Contrat
+	print '<tr class="oddeven"><td><label for="Contract">' . $langs->trans("ContractLinked") . '</label></td><td class="minwidth500">';
+	$numcontrat = $formcontract->select_contract(GETPOST('fk_soc') ?: -1, $object->fk_contrat, 'fk_contrat', 0, 1, 1);
+	print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddContract") . '"></span></a>';
+	print '</td></tr>';
+
 	//Date start - Date de début
 	print '<tr class="oddeven"><td><label for="DateStart">' . $langs->trans("DateStart") . '</label></td><td>';
 	print $form->selectDate($object->date_start, 'date_start', 1, 1, 0, '', 1,1);
@@ -985,7 +1001,7 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 		print '<tr><td>'.$langs->trans("Categories").'</td><td>';
 		$cate_arbo = $form->select_all_categories('trainingsession', '', 'parent', 64, 0, 1);
 		$c = new Categorie($db);
-		$cats = $c->containing($object->id, 'trainingsession');
+		$cats = $c->containing($object->id, 'session');
 		$arrayselected = array();
 		if (is_array($cats)) {
 			foreach ($cats as $cat) {
@@ -1056,6 +1072,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	$morehtmlref = '- ' . $object->label;
 	$morehtmlref .= '<div class="refidno">';
 	$morehtmlref .= $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
+	$morehtmlref .= '</tr>';
+	$morehtmlref .=  '</td><br>';
+	$morehtmlref .= '</div>';
+
+	$contract->fetch($object->fk_contrat);
+	$morehtmlref .= '<div class="refidno">';
+	$morehtmlref .= $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1);
 	$morehtmlref .= '</tr>';
 	$morehtmlref .=  '</td><br>';
 	$morehtmlref .= '</div>';

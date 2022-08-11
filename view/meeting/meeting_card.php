@@ -985,7 +985,7 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 		print '<tr><td>'.$langs->trans("Categories").'</td><td>';
 		$cate_arbo = $form->select_all_categories('meeting', '', 'parent', 64, 0, 1);
 		$c = new Categorie($db);
-		$cats = $c->containing($object->id, 'meeting');
+		$cats = $c->containing($object->id, 'session');
 		$arrayselected = array();
 		if (is_array($cats)) {
 			foreach ($cats as $cat) {

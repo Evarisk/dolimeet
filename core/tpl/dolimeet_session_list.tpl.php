@@ -1,4 +1,8 @@
 <?php
+
+require_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
+$contract = new Contrat($db);
+
 if (!empty($fromtype)) {
 print dol_get_fiche_head($head, $object->type . 'List', $langs->trans($object->type), -1, $objectLinked->picto);
 dol_banner_tab($objectLinked, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
@@ -231,7 +235,7 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 
 	// Show here line of result
 	print '<tr class="oddeven">';
-		foreach ($object->fields as $key => $val) {
+	foreach ($object->fields as $key => $val) {
 		$cssforfield = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
 		if (in_array($val['type'], array('date', 'datetime', 'timestamp'))) {
 		$cssforfield .= ($cssforfield ? ' ' : '').'center';
@@ -253,8 +257,15 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 		if (!empty($arrayfields['t.'.$key]['checked'])) {
 		print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '') .'>';
 		if ($key == 'fk_soc') {
-		$thirdparty->fetch($obj->fk_soc);
-		print $thirdparty->getNomUrl(1);
+			if ($object->fk_soc > 0) {
+				$thirdparty->fetch($obj->fk_soc);
+				print $thirdparty->getNomUrl(1);
+			}
+		} elseif ($key == 'fk_contrat') {
+			if ($obj->fk_contrat > 0) {
+				$contract->fetch($obj->fk_contrat);
+				print $contract->getNomUrl(1);
+			}
 		}
 		else if ($key == 'fk_contact') {
 		$contact->fetch($obj->fk_contact);
@@ -265,8 +276,11 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 		print $sender->getNomUrl();
 		}
 		else if ($key == 'fk_project') {
-		$project->fetch($obj->fk_project);
-		print $project->getNomUrl(1);
+			if ($obj->fk_project > 0) {
+
+				$project->fetch($obj->fk_project);
+				print $project->getNomUrl(1);
+			}
 		}
 		else if ($key == 'status') {
 		print $object->getLibStatut(5);
@@ -314,8 +328,7 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 		}
 
 		print '</tr>'."\n";
-
-	$i++;
+		$i++;
 	}
 
 	// Show total line
