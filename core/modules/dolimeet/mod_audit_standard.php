@@ -17,9 +17,9 @@
 
 
 /**
- *  \file       htdocs/core/modules/dolimeet/mod_trainingsession_standard.php
+ *  \file       htdocs/core/modules/dolimeet/mod_audit_standard.php
  *  \ingroup    dolimeet
- *  \brief      File of class to manage Meeting numbering rules standard
+ *  \brief      File of class to manage Audit numbering rules standard
  */
 
 require_once __DIR__ . '/modules_session.php';
@@ -27,15 +27,15 @@ require_once __DIR__ . '/modules_session.php';
 /**
  *	Class to manage customer order numbering rules standard
  */
-class mod_trainingsession_standard extends ModeleNumRefSession
+class mod_audit_standard extends ModeleNumRefSession
 {
 	/**
-	 * Dolibarr version of the loaded trainingsession
+	 * Dolibarr version of the loaded audit
 	 * @var string
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefix = 'TS';
+	public $prefix = 'AU';
 
 	/**
 	 * @var string Error code (or message)
@@ -133,14 +133,14 @@ class mod_trainingsession_standard extends ModeleNumRefSession
 		}
 		else
 		{
-			dol_syslog("mod_trainingsession_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_audit_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_trainingsession_standard::getNextValue return ".$this->prefix.$num);
+		dol_syslog("mod_audit_standard::getNextValue return ".$this->prefix.$num);
 		return $this->prefix.$num;
 	}
 }

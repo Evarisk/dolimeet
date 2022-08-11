@@ -87,6 +87,12 @@ class ActionsDolimeet
 					'obj_class' => 'TrainingSession',
 					'obj_table' => 'dolimeet_session',
 				),
+				'audit' => array(
+					'id' => 1052,
+					'code' => 'audit',
+					'obj_class' => 'Audit',
+					'obj_table' => 'dolimeet_session',
+				),
 			);
 		}
 

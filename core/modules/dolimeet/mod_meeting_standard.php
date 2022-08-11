@@ -27,7 +27,7 @@ require_once __DIR__ . '/modules_session.php';
 /**
  *	Class to manage customer order numbering rules standard
  */
-class mod_meeting_standard extends ModeleNumRefMeeting
+class mod_meeting_standard extends ModeleNumRefSession
 {
 	/**
 	 * Dolibarr version of the loaded meeting

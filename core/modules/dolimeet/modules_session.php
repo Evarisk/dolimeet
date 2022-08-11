@@ -64,7 +64,7 @@ abstract class ModelePDFSession extends CommonDocGenerator
 /**
  *  Parent class to manage numbering of Meeting
  */
-abstract class ModeleNumRefMeeting
+abstract class ModeleNumRefSession
 {
 	/**
 	 * @var string Error code (or message)

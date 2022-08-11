@@ -126,6 +126,7 @@ class modDoliMeet extends DolibarrModules
 		$this->const = array(
 			1 => array('DOLIMEET_MEETING_ADDON','chaine', 'mod_meeting_standard','', $conf->entity),
 			2 => array('DOLIMEET_TRAININGSESSION_ADDON','chaine', 'mod_trainingsession_standard','', $conf->entity),
+			3 => array('DOLIMEET_AUDIT_ADDON','chaine', 'mod_audit_standard','', $conf->entity),
 		);
 
 		// Some keys to add into the overwriting translation tables
@@ -148,6 +149,12 @@ class modDoliMeet extends DolibarrModules
 		$this->tabs[] = array('data' => 'thirdparty:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&socid=__ID__'); // To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'user:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&userid=__ID__'); // To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'contact:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&contactid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+trainingsession:'.$picto.$langs->trans('TrainingSession').':dolimeet@dolimeet:1:/custom/dolimeet/trainingsession_list.php?type=trainingsession&socid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+trainingsession:'.$picto.$langs->trans('TrainingSession').':dolimeet@dolimeet:1:/custom/dolimeet/trainingsession_list.php?type=trainingsession&userid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contact:+trainingsession:'.$picto.$langs->trans('TrainingSession').':dolimeet@dolimeet:1:/custom/dolimeet/trainingsession_list.php?type=trainingsession&contactid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+audit:'.$picto.$langs->trans('audit').':dolimeet@dolimeet:1:/custom/dolimeet/audit_list.php?type=audit&socid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+audit:'.$picto.$langs->trans('audit').':dolimeet@dolimeet:1:/custom/dolimeet/audit_list.php?type=audit&userid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contact:+audit:'.$picto.$langs->trans('audit').':dolimeet@dolimeet:1:/custom/dolimeet/audit_list.php?type=audit&contactid=__ID__'); // To add a new tab identified by code tabname1
 
 		// Dictionaries
 		$this->dictionaries = array();
@@ -195,7 +202,21 @@ class modDoliMeet extends DolibarrModules
 		$this->rights[$r][4] = 'trainingsession';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
 		$r++;
-		/* END MODULEBUILDER PERMISSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Read audits of DoliMeet'; // Permission label
+		$this->rights[$r][4] = 'audit';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->audit->read)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Create/Update audits of DoliMeet'; // Permission label
+		$this->rights[$r][4] = 'audit';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->audit->write)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Delete audits of DoliMeet'; // Permission label
+		$this->rights[$r][4] = 'audit';
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
+		$r++;		/* END MODULEBUILDER PERMISSIONS */
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -301,7 +322,48 @@ class modDoliMeet extends DolibarrModules
 			'target'   => '',
 			'user'     => 0,
 		);
-
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=dolimeet',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left', // This is a Left menu entry
+			'titre'=>'<i class="fas fa-list"></i> '. $langs->trans('AuditList'),
+			'mainmenu'=>'dolimeet',
+			'leftmenu'=>'audit_list',
+			'url'=>'/dolimeet/view/audit/audit_list.php',
+			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>1100+$r,
+			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
+		);
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left', // This is a Left menu entry
+			'titre'=> '<i class="fas fa-paper-plane"></i> ' . $langs->trans('AuditCreate'),
+			'mainmenu'=>'dolimeet',
+			'leftmenu'=>'audit_card',
+			'url'=>'/dolimeet/view/audit/audit_card.php?action=create',
+			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>1100+$r,
+			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->doliletter->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
+		);
+		$this->menu[$r++] = array(
+			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',
+			'type'     => 'left',
+			'titre'    => '<i class="fas fa-tags"></i>  ' . $langs->trans('Categories'),
+			'mainmenu' => 'dolimeet',
+			'leftmenu' => 'dolimeet_audit',
+			'url'      => '/categories/index.php?type=audit',
+			'langs'    => 'ticket',
+			'position' => 1100 + $r,
+			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled',
+			'perms'    => '1',
+			'target'   => '',
+			'user'     => 0,
+		);
 		/* END MODULEBUILDER TOPMENU */
 		/* BEGIN MODULEBUILDER LEFTMENU MYOBJECT
 		$this->menu[$r++]=array(
