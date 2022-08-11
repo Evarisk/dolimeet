@@ -39,6 +39,7 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 
 require_once __DIR__ . '/class/meeting.class.php';
 require_once __DIR__ . '/lib/dolimeet_meeting.lib.php';
@@ -298,6 +299,7 @@ if ($action == 'deleteAttendant') {
  *  View
  */
 
+$formcompany = new FormCompany($db);
 $title    = $langs->trans("MeetingAttendants");
 $help_url = '';
 $morejs   = array("/dolimeet/js/signature-pad.min.js", "/dolimeet/js/dolimeet.js.php");
@@ -466,7 +468,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<table class="border centpercent tableforfield">';
 
 	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("Thirdparty") . '</td>';
+	print '<td>' . $langs->trans("ContactLinked") . '</td>';
 	print '<td>' . $langs->trans("Role") . '</td>';
 	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
 	print '<td class="center">' . $langs->trans("SendMailDate") . '</td>';
@@ -490,6 +493,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		foreach ($ext_society_intervenants as $element) {
 			$contact->fetch($element->element_id);
 			print '<tr class="oddeven"><td class="minwidth200">';
+			$thirdparty->fetch($contact->fk_soc);
+			print $thirdparty->getNomUrl(1);
+			print '</td><td>';
 			print $contact->getNomUrl(1);
 			print '</td><td>';
 			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
@@ -542,8 +548,20 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ($ext_society < 1) {
 			$ext_society = new StdClass();
 		}
-		print '<tr class="oddeven"><td class="maxwidth200">';
-		print $form->selectContacts($object->fk_soc, GETPOST('external_attendant'), 'external_attendant', 1, $already_selected_intervenants);
+
+		print '<tr class="oddeven">';
+		print '<td class="tagtd nowrap noborderbottom">';
+		$selectedCompany = GETPOSTISSET("newcompany") ? GETPOST("newcompany", 'int') : (empty($object->socid) ?  0 : $object->socid);
+		$selectedCompany = $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, '', 'minwidth300imp');
+		print '</td>';
+		print '<td class="tagtd noborderbottom minwidth500imp">';
+		print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'external_attendant', 3, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+		$nbofcontacts = $form->num;
+		$newcardbutton = '';
+		if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {
+			$newcardbutton .= '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid='.$selectedCompany.'&action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?id='.$object->id.'&newcompany=' . GETPOST('newcompany')).'" title="'.$langs->trans('NewContact').'"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
+		}
+		print $newcardbutton;
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';
