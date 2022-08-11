@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2022 EVARISK <dev@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,9 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_dolimeet_meeting ADD INDEX idx_dolimeet_meeting_rowid (rowid);
-ALTER TABLE llx_dolimeet_meeting ADD INDEX idx_dolimeet_meeting_ref (ref);
-ALTER TABLE llx_dolimeet_meeting ADD INDEX idx_dolimeet_meeting_fk_soc (fk_soc);
-ALTER TABLE llx_dolimeet_meeting ADD CONSTRAINT llx_dolimeet_meeting_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
-ALTER TABLE llx_dolimeet_meeting ADD INDEX idx_dolimeet_meeting_status (status);
-
+ALTER TABLE llx_categorie_session ADD PRIMARY KEY pk_categorie_session (fk_categorie, fk_session);
+ALTER TABLE llx_categorie_session ADD INDEX idx_categorie_session_fk_categorie (fk_categorie);
+ALTER TABLE llx_categorie_session ADD INDEX idx_categorie_session_fk_session (fk_session);
+ALTER TABLE llx_categorie_session ADD CONSTRAINT fk_categorie_session_categorie_rowid FOREIGN KEY (fk_categorie) REFERENCES llx_categorie (rowid);
+ALTER TABLE llx_categorie_session ADD CONSTRAINT fk_categorie_session_dolimeet_session_rowid FOREIGN KEY (fk_session) REFERENCES llx_dolimeet_session (rowid);

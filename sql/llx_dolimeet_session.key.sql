@@ -1,4 +1,4 @@
--- Copyright (C) 2022 EVARISK <dev@evarisk.com>
+-- Copyright (C) 2021 EOXIA <dev@eoxia.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,8 +13,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_categorie_meeting ADD PRIMARY KEY pk_categorie_meeting (fk_categorie, fk_meeting);
-ALTER TABLE llx_categorie_meeting ADD INDEX idx_categorie_meeting_fk_categorie (fk_categorie);
-ALTER TABLE llx_categorie_meeting ADD INDEX idx_categorie_meeting_fk_meeting (fk_meeting);
-ALTER TABLE llx_categorie_meeting ADD CONSTRAINT fk_categorie_meeting_categorie_rowid FOREIGN KEY (fk_categorie) REFERENCES llx_categorie (rowid);
-ALTER TABLE llx_categorie_meeting ADD CONSTRAINT fk_categorie_meeting_dolimeet_meeting_rowid FOREIGN KEY (fk_meeting) REFERENCES llx_dolimeet_meeting (rowid);
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_rowid (rowid);
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_ref (ref);
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_soc (fk_soc);
+ALTER TABLE llx_dolimeet_session ADD CONSTRAINT llx_dolimeet_session_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_status (status);
+

@@ -14,7 +14,7 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 
-CREATE TABLE llx_dolimeet_meeting(
+CREATE TABLE llx_dolimeet_session(
 	rowid         integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
 	ref           varchar(128) DEFAULT '(PROV)' NOT NULL,
 	ref_ext       varchar(128),
