@@ -17,8 +17,8 @@
 
 /**
  * \file        class/digirisksignature.class.php
- * \ingroup     digiriskdolibarr
- * \brief       This file is a CRUD class file for DigiriskSignature (Create/Read/Update/Delete)
+ * \ingroup     dolimeet
+ * \brief       This file is a CRUD class file for DolimeetSignature (Create/Read/Update/Delete)
  */
 
 // Put here all includes required by your class file
@@ -26,9 +26,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 
 /**
- * Class for DigiriskSignature
+ * Class for DolimeetSignature
  */
-class DigiriskSignature extends CommonObject
+class DolimeetSignature extends CommonObject
 {
 	/**
 	 * @var DoliDB Database handler.
@@ -43,7 +43,7 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * @var string ID of module.
 	 */
-	public $module = 'digiriskdolibarr';
+	public $module = 'dolimeet';
 
 	/**
 	 * @var string ID to identify managed object.
@@ -53,7 +53,7 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_object_signature';
+	public $table_element = 'dolimeet_object_signature';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -69,7 +69,7 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * @var string String with name of icon for digirisksignature. Must be the part after the 'object_' into object_digirisksignature.png
 	 */
-	public $picto = 'object_signature@digiriskdolibarr';
+	public $picto = 'object_signature@dolimeet';
 
 	/**
 	 * @var string Label status of const.
@@ -161,7 +161,7 @@ class DigiriskSignature extends CommonObject
 		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Example to show how to set values of fields definition dynamically
-		/*if ($user->rights->digiriskdolibarr->digirisksignature->read) {
+		/*if ($user->rights->dolimeet->digirisksignature->read) {
 			$this->fields['myfield']['visible'] = 1;
 			$this->fields['myfield']['noteditable'] = 0;
 		}*/
@@ -327,7 +327,7 @@ class DigiriskSignature extends CommonObject
 	 */
 	public function setRegistered($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_REGISTERED, $notrigger, 'DIGIRISKSIGNATURE_REGISTERED');
+		return $this->setStatusCommon($user, self::STATUS_REGISTERED, $notrigger, 'DOLIMEETSIGNATURE_REGISTERED');
 	}
 
 	/**
@@ -339,7 +339,7 @@ class DigiriskSignature extends CommonObject
 	 */
 	public function setPending($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'DIGIRISKSIGNATURE_PENDING_SIGNATURE');
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'DOLIMEETSIGNATURE_PENDING_SIGNATURE');
 	}
 
 	/**
@@ -351,7 +351,7 @@ class DigiriskSignature extends CommonObject
 	 */
 	public function setSigned($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_SIGNED, $notrigger, 'DIGIRISKSIGNATURE_SIGNED');
+		return $this->setStatusCommon($user, self::STATUS_SIGNED, $notrigger, 'DOLIMEETSIGNATURE_SIGNED');
 	}
 
 	/**
@@ -363,7 +363,7 @@ class DigiriskSignature extends CommonObject
 	 */
 	public function setAbsent($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_ABSENT, $notrigger, 'DIGIRISKSIGNATURE_ABSENT');
+		return $this->setStatusCommon($user, self::STATUS_ABSENT, $notrigger, 'DOLIMEETSIGNATURE_ABSENT');
 	}
 
 	/**
@@ -375,7 +375,7 @@ class DigiriskSignature extends CommonObject
 	 */
 	public function setDeleted($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_DELETED, $notrigger, 'DIGIRISKSIGNATURE_DELETED');
+		return $this->setStatusCommon($user, self::STATUS_DELETED, $notrigger, 'DOLIMEETSIGNATURE_DELETED');
 	}
 
 	/**

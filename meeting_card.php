@@ -186,6 +186,7 @@ if (empty($reshook)) {
 		$note_private   = GETPOST('note_private');
 		$note_public    = GETPOST('note_public');
 		$label          = GETPOST('label');
+		$society_id     = GETPOST('fk_soc');
 		$project_id     = GETPOST('fk_project');
 
 		// Initialize object
@@ -200,7 +201,6 @@ if (empty($reshook)) {
 		$object->label         = $label;
 
 		$object->fk_soc        = $society_id;
-		$object->fk_contact    = $contact_id;
 		$object->fk_project    = $project_id;
 
 		$object->content       = $content;
@@ -833,6 +833,14 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '</td></tr>';
 
+	//Society -- Société
+	print '<tr><td class="">'.$langs->trans("Society").'</td><td>';
+	$events = array();
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'fk_contact', 'params' => array('add-customer-contact' => 'disabled'));
+	print $form->select_company(GETPOST('fromtype') == 'thirdparty' ? GETPOST('fromid') : GETPOST('fk_soc'), 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	print '</td></tr>';
+
 	//Content -- Contenu
 	print '<tr class=""><td><label for="content">'.$langs->trans("Content").'</label></td><td>';
 	$doleditor = new DolEditor('content', GETPOST('content'), '', 250, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
@@ -917,6 +925,20 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 	print '<input name="label" id="label" value="'. $object->label .'" >';
 	print '</td></tr>';
 
+	//Project -- Projet
+	print '<tr class="oddeven"><td><label for="Project">' . $langs->trans("ProjectLinked") . '</label></td><td>';
+	$numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1,  $object->fk_project, 'fk_project', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
+	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+	print '</td></tr>';
+
+	//Society -- Société
+	print '<tr><td class="fieldrequired">'.$langs->trans("Society").'</td><td>';
+	$events = array();
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'contact', 'params' => array('add-customer-contact' => 'disabled'));
+	print $form->select_company($object->fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	print '</td></tr>';
+
 	//Content -- Contenu
 	print '<tr class="content_field"><td><label for="content">'.$langs->trans("Content").'</label></td><td>';
 	$doleditor = new DolEditor('content', $object->content, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
@@ -990,7 +1012,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	// Print form confirm
 	print $formconfirm;
 
-	$contact->fetch($object->fk_contact);
+	$thirdparty->fetch($object->fk_soc);
 	// Object card
 	// ------------------------------------------------------------
 	$linkback = '<a href="'.dol_buildpath('/dolimeet/meeting_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
@@ -1016,6 +1038,15 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	print '<td>';
 	print '<div class="longmessagecut" style="min-height: 150px">';
 	print dol_htmlentitiesbr($object->content); //wrap -> middle?
+	print '</div>';
+	print '</td></tr>';
+
+	print '<tr><td class="titlefield">';
+	print $langs->trans("Thirdparty");
+	print '</td>';
+	print '<td>';
+	print '<div class="" style="">';
+	print $thirdparty->getNomUrl(1); //wrap -> middle?
 	print '</div>';
 	print '</td></tr>';
 

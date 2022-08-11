@@ -31,6 +31,7 @@ CREATE TABLE llx_dolimeet_meeting(
 	content       text,
 	document_url  varchar(255),
     fk_project    integer,
+    fk_soc        integer,
 	fk_user_creat integer NOT NULL,
 	fk_user_modif integer
 ) ENGINE=innodb;

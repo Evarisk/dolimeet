@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       view/preventionplan/preventionplan_attendants.php
- *		\ingroup    digiriskdolibarr
- *		\brief      Page to add/edit/view preventionplan_signature
+ *   	\file       view/meeting/meeting_attendants.php
+ *		\ingroup    dolimeet
+ *		\brief      Page to add/edit/view meeting_signature
  */
 
 // Load Dolibarr environment
@@ -38,43 +38,42 @@ if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
-require_once __DIR__ . '/../../class/digiriskresources.class.php';
-require_once __DIR__ . '/../../class/preventionplan.class.php';
-require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/class/meeting.class.php';
+require_once __DIR__ . '/lib/dolimeet_meeting.lib.php';
+require_once __DIR__ . '/lib/dolimeet_function.lib.php';
 
 global $db, $langs;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+$langs->loadLangs(array("dolimeet@dolimeet", "other"));
 
 // Get parameters
 $id          = GETPOST('id', 'int');
 $action      = GETPOST('action', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'preventionplansignature'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'meetingsignature'; // To manage different context of search
 $backtopage  = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
-$object            = new PreventionPlan($db);
-$signatory         = new PreventionPlanSignature($db);
-$digiriskresources = new DigiriskResources($db);
+$object            = new Meeting($db);
+$signatory         = new MeetingSignature($db);
 $usertmp           = new User($db);
 $contact           = new Contact($db);
 $form              = new Form($db);
 $project           = new Project($db);
+$thirdparty        = new Societe($db);
 
 $object->fetch($id);
 
-$hookmanager->initHooks(array('preventionplansignature', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('meetingsignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
 //Security check
-$permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
+$permissiontoread   = $user->rights->dolimeet->meeting->read;
+$permissiontoadd    = $user->rights->dolimeet->meeting->write;
+$permissiontodelete = $user->rights->dolimeet->meeting->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
 /*
@@ -87,36 +86,46 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($backtopage) || ($cancel && empty($id))) {
 	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-		$backtopage = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_attendants.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+		$backtopage = dol_buildpath('/dolimeet/meeting_attendants.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
 	}
 }
 
-// Action to add record
-if ($action == 'addAttendant') {
+// Action to add internal attendant
+if ($action == 'addSocietyAttendant') {
 	$error = 0;
 	$object->fetch($id);
-	$extintervenant_ids = GETPOST('ext_intervenants');
-
-	//Check email of intervenants
-	if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
-		foreach ($extintervenant_ids as $extintervenant_id) {
-			$contact->fetch($extintervenant_id);
-			if ( ! dol_strlen($contact->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForExtIntervenant', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
-				$error++;
-			}
-		}
-	} else {
-		setEventMessages($langs->trans('ErrorNoAttendantSelected', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
-	}
+	$attendant_id = GETPOST('user_attendant');
 
 	if ( ! $error) {
-		$result = $signatory->setSignatory($object->id, 'preventionplan', 'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
+		$result = $signatory->setSignatory($object->id, 'meeting', 'user', array($attendant_id), 'MEETING_SOCIETY_ATTENDANT', 1);
 		if ($result > 0) {
-			foreach ($extintervenant_ids as $extintervenant_id) {
-				$contact->fetch($extintervenant_id);
-				setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $contact->firstname . ' ' . $contact->lastname, array());
-			}
+			$usertmp = $user;
+			$usertmp->fetch($attendant_id);
+			setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $usertmp->firstname . ' ' . $usertmp->lastname, array());
+			// Creation attendant OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: " . $urltogo);
+			exit;
+		} else {
+			// Creation attendant KO
+			if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+			else setEventMessages($object->error, null, 'errors');
+		}
+	}
+}
+
+// Action to add external attendant
+if ($action == 'addExternalAttendant') {
+	$error = 0;
+	$object->fetch($id);
+	$extintervenant_id = GETPOST('external_attendant');
+
+	if ( ! $error) {
+		$result = $signatory->setSignatory($object->id, 'meeting', 'socpeople', array($extintervenant_id), 'MEETING_EXTERNAL_ATTENDANT', 1);
+		if ($result > 0) {
+			$contact->fetch($extintervenant_id);
+			setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $contact->firstname . ' ' . $contact->lastname, array());
 			// Creation attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -187,13 +196,31 @@ if ($action == 'send') {
 
 	if ( ! $error) {
 		$langs->load('mails');
+
+		if (!dol_strlen($signatory->email)) {
+			if ($signatory->element_type == 'user') {
+				$usertmp = $user;
+				$usertmp->fetch($signatory->element_id);
+				if (dol_strlen($usertmp->email)) {
+					$signatory->email = $usertmp->email;
+					$signatory->update($user, true);
+				}
+			} else if ($signatory->element_type == 'socpeople') {
+				$contact->fetch($signatory->element_id);
+				if (dol_strlen($contact->email)) {
+					$signatory->email = $contact->email;
+					$signatory->update($user, true);
+				}
+			}
+		}
+
 		$sendto = $signatory->email;
 
 		if (dol_strlen($sendto) && ( ! empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
 			require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 			$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-			$url  = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&type=' . $object->element, 3);
+			$url  = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&type=' . $object->element, 3);
 
 			$message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
 			$subject = $langs->trans('SignatureEmailSubject') . ' ' . $object->ref;
@@ -271,10 +298,10 @@ if ($action == 'deleteAttendant') {
  *  View
  */
 
-$title    = $langs->trans("PreventionPlanAttendants");
+$title    = $langs->trans("MeetingAttendants");
 $help_url = '';
-$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs   = array("/dolimeet/js/signature-pad.min.js", "/dolimeet/js/dolimeet.js.php");
+$morecss  = array("/dolimeet/css/dolimeet.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
@@ -283,23 +310,21 @@ if ( ! empty($object->id)) $res = $object->fetch_optionals();
 // Object card
 // ------------------------------------------------------------
 
-$head = preventionplanPrepareHead($object);
-print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
+$head = meetingPrepareHead($object);
+print dol_get_fiche_head($head, 'attendants', $langs->trans("Meeting"), -1, "dolimeet@dolimeet");
 
 $width = 80; $cssclass = 'photoref';
 dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 $morehtmlref                             .= '<div class="refidno">';
 // External Society -- Société extérieure
-$ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
-$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 // Project
-$project->fetch($preventionplan->fk_project);
-$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+$project->fetch($object->fk_project);
+$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
 $morehtmlref .= '</div>';
 
-//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('dolimeet', $conf->dolimeet->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
+dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 print dol_get_fiche_end(); ?>
 
@@ -307,9 +332,9 @@ print dol_get_fiche_end(); ?>
 <div class="wpeo-notice notice-warning">
 	<div class="notice-content">
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidatedToSign") ?></div>
+		<div class="notice-subtitle"><?php echo $langs->trans("MeetingMustBeValidatedToSign") ?></div>
 	</div>
-	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/dolimeet/view/meeting/meeting_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -319,114 +344,21 @@ print dol_get_fiche_end(); ?>
 			<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
 		</div>
 		<?php
-		if ($signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) {
-			print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $id . '">' . $langs->trans("GoToLock") . '</a>';
+		if ($signatory->checkSignatoriesSignatures($object->id, 'meeting')) {
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/dolimeet/view/meeting/meeting_card.php?id=' . $id . '">' . $langs->trans("GoToLock") . '</a>';
 		}
 		?>
 	</div>
 </div>
 <?php
 
-// Part to create
-if ($action == 'create') {
-	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
-
-	print '<form method="POST" action="' . $_SERVER["HTTP_REFERER"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="addAttendant">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
-
-	print dol_get_fiche_head(array(), '');
-
-	print '<table class="border centpercent tableforfieldcreate">' . "\n";
-
-	//Intervenants extérieurs
-	print '<tr class="oddeven"><td>' . $langs->trans("ExtSocietyIntervenants") . '</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
-	print '</td></tr>';
-	print '</table>' . "\n";
-
-	print dol_get_fiche_end();
-
-	print '<div class="center">';
-	print '<input type="submit" class="button" id ="actionButtonCreate" name="addAttendant" value="' . dol_escape_htmltag($langs->trans("Create")) . '">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="' . $langs->trans("Cancel") . '">';
-	print '</div>';
-
-	print '</form>';
-}
-
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
-	$url  = $_SERVER['REQUEST_URI'];
-	$zone = "private";
 
-	//Master builder -- Maitre Oeuvre
-	$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $id, 'preventionplan');
-	if (is_array($element)) {
-		$element = array_shift($element);
-		$usertmp->fetch($element->element_id);
-	}
+	//Society attendants -- Participants de la société
+	$society_intervenants = $signatory->fetchSignatory('MEETING_SOCIETY_ATTENDANT', $object->id, 'meeting');
 
-	print load_fiche_titre($langs->trans("SignatureMaitreOeuvre"), '', '');
-
-	print '<div class="signatures-container">';
-
-	print '<table class="border centpercent tableforfield">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Name") . '</td>';
-	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
-	print '<td class="center">' . $langs->trans("SendMailDate") . '</td>';
-	print '<td class="center">' . $langs->trans("SignatureDate") . '</td>';
-	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
-	print '<td class="center">' . $langs->trans("Signature") . '</td>';
-	print '</tr>';
-
-	print '<tr class="oddeven"><td class="minwidth200">';
-	print $usertmp->getNomUrl(1);
-	print '</td><td>';
-	print $langs->trans("MaitreOeuvre");
-	print '</td><td class="center">';
-	if ($object->status == 2) {
-		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
-		print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
-	} else {
-		print '-';
-	}
-	print '</td><td class="center">';
-	print dol_print_date($element->last_email_sent_date, 'dayhour');
-	print '</td><td class="center">';
-	print dol_print_date($element->signature_date, 'dayhour');
-	print '</td><td class="center">';
-	print $element->getLibStatut(5);
-	print '</td>';
-
-	print '<td class="center">';
-	if ($object->status == 2 && $permissiontoadd) {
-		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
-	}
-	print '</td>';
-	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-		print '<td class="center">';
-		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-		print '</td>';
-	}
-	print '</tr>';
-	print '</table>';
-	print '<br>';
-
-	//External Society Responsible -- Responsable Société extérieure
-	$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $id, 'preventionplan');
-	if (is_array($element)) {
-		$element = array_shift($element);
-		$contact->fetch($element->element_id);
-	}
-
-	print load_fiche_titre($langs->trans("SignatureResponsibleExtSociety"), '', '');
+	print load_fiche_titre($langs->trans("Attendants"), '', '');
 
 	print '<table class="border centpercent tableforfield">';
 
@@ -440,76 +372,27 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
-
-	print '<tr class="oddeven"><td class="minwidth200">';
-	print $contact->getNomUrl(1);
-	print '</td><td>';
-	print $langs->trans("ExtSocietyResponsible");
-	print '</td><td class="center">';
-	if ($object->status == 2) {
-		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
-		print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
-	} else {
-		print '-';
-	}
-	print '</td><td class="center">';
-	print dol_print_date($element->last_email_sent_date, 'dayhour');
-	print '</td><td class="center">';
-	print dol_print_date($element->signature_date, 'dayhour');
-	print '</td><td class="center">';
-	print $element->getLibStatut(5);
-	print '</td>';
-	print '<td class="center">';
-	if ($object->status == 2 && $permissiontoadd) {
-		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
-	}	print '</td>';
-	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-		print '<td class="center">';
-		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-		print '</td>';
-	}
-	print '</tr>';
-	print '</table>';
-	print '<br>';
-
-	//External Society Interventants -- Intervenants Société extérieure
-	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $id, 'preventionplan');
-
-	print load_fiche_titre($langs->trans("SignatureIntervenants"), $newcardbutton, '');
-
-	print '<table class="border centpercent tableforfield">';
-
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Name") . '</td>';
-	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
-	print '<td class="center">' . $langs->trans("SendMailDate") . '</td>';
-	print '<td class="center">' . $langs->trans("SignatureDate") . '</td>';
-	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
-	print '<td class="center">' . $langs->trans("Signature") . '</td>';
-	print '</tr>';
-
-	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $element->id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element_id) {
-			$contacts_no_email[$element_id->id] = $element_id->id;
-		}
-	}
-
-	$already_selected_intervenants[$contact->id] = $contact->id;
-	$j                                           = 1;
-	if (is_array($ext_society_intervenants) && ! empty($ext_society_intervenants) && $ext_society_intervenants > 0) {
-		foreach ($ext_society_intervenants as $element) {
-			$contact->fetch($element->element_id);
+//
+//	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "" ));
+//	$contacts_no_email = array();
+//	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
+//		foreach ($contacts as $element_id) {
+//			$contacts_no_email[$element_id->id] = $element_id->id;
+//		}
+//	}
+	$already_added_users = array();
+	$j = 1;
+	if (is_array($society_intervenants) && ! empty($society_intervenants) && $society_intervenants > 0) {
+		foreach ($society_intervenants as $element) {
+			$usertmp = $user;
+			$usertmp->fetch($element->element_id);
 			print '<tr class="oddeven"><td class="minwidth200">';
-			print $contact->getNomUrl(1);
+			print $usertmp->getNomUrl(1);
 			print '</td><td>';
 			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
 			print '</td><td class="center">';
 			if ($object->status == 2) {
-				$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
+				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
 				print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 			} else {
 				print '-';
@@ -523,13 +406,116 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $element->getLibStatut(5);
 			print '</td>';
 			print '<td class="center">';
-			if ($object->status < 3 && $permissiontoadd) {
-				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
+			if ($permissiontoadd) {
+				require __DIR__ . "/core/tpl/signature/dolimeet_signature_action_view.tpl.php";
 			}
 			print '</td>';
 			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 				print '<td class="center">';
-				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
+				require __DIR__ . "/core/tpl/signature/dolimeet_signature_view.tpl.php";
+				print '</td>';
+			}
+			print '</tr>';
+			$already_added_users[$element->element_id] = $element->element_id;
+			$j++;
+		}
+	} else {
+		print '<tr><td>';
+		print $langs->trans('NoSocietyAttendants');
+		print '</td></tr>';
+	}
+
+	if ($permissiontoadd) {
+		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<input type="hidden" name="action" value="addSocietyAttendant">';
+		print '<input type="hidden" name="id" value="' . $id . '">';
+		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+		if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+
+		//Intervenants extérieurs
+		print '<tr class="oddeven"><td class="maxwidth200">';
+		print $form->select_dolusers('', 'user_attendant', 1, $already_added_users);
+		print '</td>';
+		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
+		print '<td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  ' . $langs->trans('Add') . '</button>';
+		print '<td class="center">';
+		print '-';
+		print '</td>';
+		print '</tr>';
+		print '</table>' . "\n";
+		print '</form>';
+	}
+
+	//External Society Intervenants -- Intervenants Société extérieure
+	$thirdparty->fetch($object->fk_soc);
+	$ext_society_intervenants = $signatory->fetchSignatory('MEETING_EXTERNAL_ATTENDANT', $object->id, 'meeting');
+
+	print load_fiche_titre($langs->trans("ExternalIntervenants"), '', '');
+
+	print '<table class="border centpercent tableforfield">';
+
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("Role") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
+	print '<td class="center">' . $langs->trans("SendMailDate") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureDate") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
+	print '<td class="center">' . $langs->trans("Signature") . '</td>';
+	print '</tr>';
+//
+//	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "" ));
+//	$contacts_no_email = array();
+//	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
+//		foreach ($contacts as $element_id) {
+//			$contacts_no_email[$element_id->id] = $element_id->id;
+//		}
+//	}
+
+	$already_selected_intervenants = array();
+	$j                                           = 1;
+	if (is_array($ext_society_intervenants) && ! empty($ext_society_intervenants) && $ext_society_intervenants > 0) {
+		foreach ($ext_society_intervenants as $element) {
+			$contact->fetch($element->element_id);
+			print '<tr class="oddeven"><td class="minwidth200">';
+			print $contact->getNomUrl(1);
+			print '</td><td>';
+			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
+			print '</td><td class="center">';
+			if ($object->status == 2) {
+				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
+				print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+			} else {
+				print '-';
+			}
+
+			print '</td><td class="center">';
+			print dol_print_date($element->last_email_sent_date, 'dayhour');
+			print '</td><td class="center">';
+			print dol_print_date($element->signature_date, 'dayhour');
+			print '</td><td class="center">';
+			print $element->getLibStatut(5);
+			print '</td>';
+			print '<td class="center">';
+			if ($permissiontoadd) {
+				require __DIR__ . "/core/tpl/signature/dolimeet_signature_action_view.tpl.php";
+			}
+			print '</td>';
+			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
+				print '<td class="center">';
+				require __DIR__ . "/core/tpl/signature/dolimeet_signature_view.tpl.php";
 				print '</td>';
 			}
 			print '</tr>';
@@ -538,26 +524,26 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 	} else {
 		print '<tr><td>';
-		print $langs->trans('NoAttendants');
+		print $langs->trans('NoExternalAttendants');
 		print '</td></tr>';
 	}
 
-	if ($object->status == 1 && $permissiontoadd) {
+	if ($permissiontoadd) {
 		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 		print '<input type="hidden" name="token" value="' . newToken() . '">';
-		print '<input type="hidden" name="action" value="addAttendant">';
+		print '<input type="hidden" name="action" value="addExternalAttendant">';
 		print '<input type="hidden" name="id" value="' . $id . '">';
 		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
 		if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
 
 		//Intervenants extérieurs
-		$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+		$ext_society = $object->fk_soc;
 		if ($ext_society < 1) {
 			$ext_society = new StdClass();
 		}
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
+		print $form->selectContacts($object->fk_soc, GETPOST('external_attendant'), 'external_attendant', 1, $already_selected_intervenants);
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';
@@ -577,6 +563,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</table>' . "\n";
 		print '</form>';
 		print '</div>';
+
 	}
 }
 

@@ -51,9 +51,9 @@ function meetingPrepareHead($object)
 	$h++;
 
 	//Linked objects selection
-	$head[$h][0] = dol_buildpath("/dolimeet/meeting_contact.php", 1).'?id='.$object->id;
-	$head[$h][1] = $langs->trans("Contact");
-	$head[$h][2] = 'contact';
+	$head[$h][0] = dol_buildpath("/dolimeet/meeting_attendants.php", 1).'?id='.$object->id;
+	$head[$h][1] = $langs->trans("Attendants");
+	$head[$h][2] = 'attendants';
 	$h++;
 
 //	$head[$h][0] = dol_buildpath("/dolimeet/meeting_signature.php", 1) . '?id=' . $object->id;

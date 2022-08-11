@@ -23,6 +23,7 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once __DIR__ . '/dolimeetsignature.class.php';
 
 /**
  * Class for Meeting
@@ -115,6 +116,7 @@ class Meeting extends CommonObject
 		'content'        => array('type'=>'textarea', 'label'=>'Content', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>3,),
 		'document_url'   => array('type'=>'varchar(255)', 'label'=>'DocumentUrl', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>0,),
 		'fk_project'     => array('type'=>'integer', 'label'=>'Project', 'enabled'=>'1', 'position'=>175, 'notnull'=>1, 'visible'=>1,),
+		'fk_soc'         => array('type'=>'integer', 'label'=>'Thirdparty', 'enabled'=>'1', 'position'=>175, 'notnull'=>1, 'visible'=>1,),
 		'fk_user_creat'  => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'  => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
 	);
@@ -134,6 +136,7 @@ class Meeting extends CommonObject
 	public $content;
 	public $document_url;
 	public $fk_project;
+	public $fk_soc;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $label;

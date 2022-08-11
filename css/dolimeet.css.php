@@ -17,9 +17,9 @@
  */
 
 /**
- * \file    css/digiriskdolibarr.css.php
- * \ingroup digiriskdolibarr
- * \brief   CSS file for module DigiriskDolibarr.
+ * \file    css/dolimeet.css.php
+ * \ingroup dolimeet
+ * \brief   CSS file for module DoliMeet.
  */
 
 //if (! defined('NOREQUIREUSER')) define('NOREQUIREUSER','1');	// Not disabled because need to load personalized language
