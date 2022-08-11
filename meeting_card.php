@@ -204,6 +204,7 @@ if (empty($reshook)) {
 		$object->note_private  = $note_private;
 		$object->note_public   = $note_public;
 		$object->label         = $label;
+		$object->type          = 'meeting';
 
 		$object->fk_soc        = $society_id;
 		$object->fk_project    = $project_id;

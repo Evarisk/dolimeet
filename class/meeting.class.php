@@ -111,6 +111,7 @@ class Meeting extends CommonObject
 		'tms'            => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
 		'import_key'     => array('type'=>'integer', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>0,),
 		'status'         => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'default' => 0, 'visible'=>2, 'index'=>1,),
+		'type'           => array('type'=>'varchar(128)', 'label'=>'Type', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'default' => '', 'visible'=>0, 'index'=>1,),
 		'note_public'    => array('type'=>'textarea', 'label'=>'PublicNote', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>0,),
 		'note_private'   => array('type'=>'textarea', 'label'=>'PrivateNote', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>0,),
 		'model_pdf'      => array('type'=>'varchar(255)', 'label'=>'PdfModel', 'enabled'=>'1', 'position'=>100, 'notnull'=>0, 'visible'=>0,),
@@ -133,6 +134,7 @@ class Meeting extends CommonObject
 	public $date_end;
 	public $tms;
 	public $status;
+	public $type;
 	public $import_key;
 	public $note_public;
 	public $note_private;
