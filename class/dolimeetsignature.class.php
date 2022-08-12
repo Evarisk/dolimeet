@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021 EVARISK <dev@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -194,7 +194,11 @@ class DolimeetSignature extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		return $this->createCommon($user, $notrigger);
+		$result = $this->createCommon($user, $notrigger);
+		if ($result > 0) {
+			$this->call_trigger('SESSION_ADDATTENDANT',$user);
+		}
+		return $result;
 	}
 
 	/**

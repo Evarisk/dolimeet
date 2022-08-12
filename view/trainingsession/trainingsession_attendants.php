@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -410,12 +410,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '<td class="center">';
 			if ($permissiontoadd) {
-				require __DIR__ . "/core/tpl/signature/dolimeet_signature_action_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/dolimeet_signature_action_view.tpl.php";
 			}
 			print '</td>';
 			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/signature/dolimeet_signature_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/dolimeet_signature_view.tpl.php";
 				print '</td>';
 			}
 			print '</tr>';

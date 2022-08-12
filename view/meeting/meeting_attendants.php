@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -517,12 +517,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '<td class="center">';
 			if ($permissiontoadd) {
-				require __DIR__ . "/core/tpl/signature/dolimeet_signature_action_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/dolimeet_signature_action_view.tpl.php";
 			}
 			print '</td>';
 			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/signature/dolimeet_signature_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/dolimeet_signature_view.tpl.php";
 				print '</td>';
 			}
 			print '</tr>';
@@ -556,7 +556,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$selectedCompany = $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, '', 'minwidth300imp');
 		print '</td>';
 		print '<td class="tagtd noborderbottom minwidth500imp">';
-		print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'external_attendant', 3, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+		print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'external_attendant', 3, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 		$nbofcontacts = $form->num;
 		$newcardbutton = '';
 		if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {
