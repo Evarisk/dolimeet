@@ -50,6 +50,7 @@ SignatureLink = Lien de signature
 SignatureDate = Date de signature
 LastEmailSentDate = Date d'envoi du mail de signature
 ContactLinked = Contact
+ProjectLinked = Projet lié
 
 #
 # Meeting
@@ -57,16 +58,19 @@ ContactLinked = Contact
 Meeting = Réunion
 MeetingList = Liste des réunions
 MeetingCreate = Créer une réunion
+MeetingAttendants = Participants - Réunion
 
 
 #
 # Training Session
 #
 TrainingSession = Session de formation
+Trainingsession = Session de formation
 TrainingSessionList = Liste des sessions de formation
 TrainingSessionCreate = Créer une session de formation
 ContractLinked = Contrat lié
 Contract = Contrat
+TrainingSessionAttendants = Participants - Session de formation
 
 
 #
@@ -75,12 +79,20 @@ Contract = Contrat
 Audit = Audit
 AuditList = Liste des audits
 AuditCreate = Créer un audit
+AuditAttendants = Participants - Audit
 
 #
 # Attendants
 #
 
+Attendats = Participants
+NoSocietyAttendants = Pas de participant interne
+ExtSocietyIntervenants = Intervenant externe
+SocietyAttendants = Participant interne
+NoExternalAttendants = Pas d'intervenant externe
 AddAttendantTrigger = Ajout d'un participant : %s
+SendMailDate = Date d'envoi d'email
+ActionsSignature = Actions
 MEETING_EXTERNAL_ATTENDANTSigned = Signature de l'intervenant extérieur :
 AUDIT_EXTERNAL_ATTENDANTSigned = Signature de l'intervenant extérieur :
 TRAININGSESSION_EXTERNAL_ATTENDANTSigned = Signature de l'intervenant extérieur :
@@ -88,3 +100,4 @@ MEETING_SOCIETY_ATTENDANTSigned = Signature du participant :
 AUDIT_SOCIETY_ATTENDANTSigned = Signature du participant :
 TRAININGSESSION_SOCIETY_ATTENDANTSigned = Signature du participant :
 DolimeetSignaturePendingSignatureTrigger = Envoi du mail de signature à
+SignatureEvent = Le participant a signé : %s

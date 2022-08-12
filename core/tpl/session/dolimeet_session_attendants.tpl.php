@@ -97,6 +97,7 @@ if ($action == 'addSignature') {
 		if ($result > 0) {
 			// Creation signature OK
 			$signatory->setSigned($user, 0);
+			setEventMessages($langs->trans('SignatureEvent') . ' ' . $contact->firstname . ' ' . $contact->lastname, array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
