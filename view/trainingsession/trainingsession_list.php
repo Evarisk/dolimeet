@@ -220,7 +220,6 @@ $permissiontoread = $user->rights->dolimeet->trainingsession->read;
 $permissiontoadd = $user->rights->dolimeet->trainingsession->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
 $permissiontodelete = $user->rights->dolimeet->trainingsession->delete || ($permissiontoadd && isset($object->status));
 $permissionnote = $user->rights->dolimeet->trainingsession->write; // Used by the include of actions_setnotes.inc.php
-$permissiondellink = $user->rights->trainingsession->letter->write; // Used by the include of actions_dellink.inc.php
 $upload_dir = $conf->dolimeet->multidir_output[$conf->entity];
 
 // Security check (enable the most restrictive one)
@@ -416,7 +415,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 
 llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss, '', '');
 
-require_once __DIR__ . '/../../core/tpl/dolimeet_session_list.tpl.php';
+require_once __DIR__ . '/../../core/tpl/session/dolimeet_session_list.tpl.php';
 
 // End of page
 llxFooter();

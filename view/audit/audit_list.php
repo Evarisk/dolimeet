@@ -220,7 +220,6 @@ $permissiontoread = $user->rights->dolimeet->audit->read;
 $permissiontoadd = $user->rights->dolimeet->audit->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
 $permissiontodelete = $user->rights->dolimeet->audit->delete || ($permissiontoadd && isset($object->status));
 $permissionnote = $user->rights->dolimeet->audit->write; // Used by the include of actions_setnotes.inc.php
-$permissiondellink = $user->rights->audit->letter->write; // Used by the include of actions_dellink.inc.php
 $upload_dir = $conf->dolimeet->multidir_output[$conf->entity];
 
 // Security check (enable the most restrictive one)
@@ -417,7 +416,7 @@ unset($object->fields['fk_contrat']);
 
 llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss, '', '');
 
-require_once __DIR__ . '/../../core/tpl/dolimeet_session_list.tpl.php';
+require_once __DIR__ . '/../../core/tpl/session/dolimeet_session_list.tpl.php';
 
 // End of page
 llxFooter();

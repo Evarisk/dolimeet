@@ -1,6 +1,6 @@
 <?php
 
-require_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 $contract = new Contrat($db);
 
 if (!empty($fromtype)) {
@@ -34,7 +34,7 @@ if ($optioncss != '') {
 $param .= '&optioncss='.urlencode($optioncss);
 }
 // Add $param from extra fields
-include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
+include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 // Add $param from hooks
 $parameters = array();
 $reshook = $hookmanager->executeHooks('printFieldListSearchParam', $parameters, $object); // Note that $action and $object may have been modified by hook
@@ -81,7 +81,7 @@ $modelmail = "document";
 
 $objecttmp = new $object->type($db);
 $trackid = 'xxxx'.$object->id;
-include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
+include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
 if ($search_all) {
 foreach ($fieldstosearchall as $key => $val) {
@@ -165,7 +165,7 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 		}
 		}
 		// Extra fields
-		include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_input.tpl.php';
+		include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_input.tpl.php';
 
 		// Fields from hook
 		$parameters = array('arrayfields'=>$arrayfields);
@@ -198,7 +198,7 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 		}
 		}
 		// Extra fields
-		include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_title.tpl.php';
+		include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_title.tpl.php';
 		// Hook fields
 		$parameters = array('arrayfields'=>$arrayfields, 'param'=>$param, 'sortfield'=>$sortfield, 'sortorder'=>$sortorder);
 		$reshook = $hookmanager->executeHooks('printFieldListTitle', $parameters, $object); // Note that $action and $object may have been modified by hook
@@ -308,7 +308,7 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 		}
 		}
 		// Extra fields
-		include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_print_fields.tpl.php';
+		include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_print_fields.tpl.php';
 		// Fields from hook
 		$parameters = array('arrayfields'=>$arrayfields, 'object'=>$object, 'obj'=>$obj, 'i'=>$i, 'totalarray'=>&$totalarray);
 		$reshook = $hookmanager->executeHooks('printFieldListValue', $parameters, $object); // Note that $action and $object may have been modified by hook
@@ -332,7 +332,7 @@ print '<div class="div-table-responsive">'; // You can use div-table-responsive-
 	}
 
 	// Show total line
-	include DOL_DOCUMENT_ROOT.'/core/tpl/list_print_total.tpl.php';
+	include DOL_DOCUMENT_ROOT . '/core/tpl/list_print_total.tpl.php';
 
 	// If no record found
 	if ($num == 0) {
@@ -363,7 +363,7 @@ if ($massaction == 'builddoc' || $action == 'remove_file' || $show_files) {
 $hidegeneratedfilelistifempty = 0;
 }
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 $formfile = new FormFile($db);
 
 // Show list of available documents
