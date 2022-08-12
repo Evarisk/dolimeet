@@ -712,7 +712,7 @@ $formother     = new FormOther($db);
 $formfile      = new FormFile($db);
 $formproject   = new FormProjets($db);
 
-$title        = $langs->trans(ucfirst($object->element));
+$title        = $langs->trans("Card" . ucfirst($object->element));
 $title_create = $langs->trans("New" . ucfirst($object->element));
 $title_edit   = $langs->trans("Modify" . ucfirst($object->element));
 $help_url     = '';
@@ -946,7 +946,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	$res = $object->fetch_optionals();
 	$prepareHead = $object->element . 'PrepareHead';
 	$head = $prepareHead($object);
-	print dol_get_fiche_head($head, 'card', $langs->trans("".ucfirst($object->element)), -1, "dolimeet@dolimeet");
+	print dol_get_fiche_head($head, 'card', $langs->trans(ucfirst($object->element)), -1, $object->picto);
 
 	$formconfirm = '';
 

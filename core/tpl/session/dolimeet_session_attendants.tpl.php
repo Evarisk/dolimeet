@@ -257,7 +257,7 @@ if ( ! empty($object->id)) $res = $object->fetch_optionals();
 
 $prepareHead = $object->element . 'PrepareHead';
 $head = $prepareHead($object);
-print dol_get_fiche_head($head, 'attendants', $langs->trans(ucfirst($object->element)), -1, "dolimeet@dolimeet");
+print dol_get_fiche_head($head, 'attendants', $langs->trans(ucfirst($object->element)), -1, $object->picto);
 
 $width = 80; $cssclass = 'photoref';
 dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';

@@ -62,6 +62,11 @@ MeetingAttendants = Participants - Réunion
 MeetingCreateTrigger = La réunion a été créée
 MeetingModifyTrigger = La réunion a été modifiée
 MeetingDeleteTrigger = La réunion a été supprimée
+CardMeeting = Fiche - Réunion
+AgendaMeeting = Agenda - Réunion
+NoteMeeting = Note - Réunion
+AttendantsMeeting = Participants - Réunion
+DocumentsMeeting = Fichiers joints - Réunion
 
 #
 # Training Session
@@ -76,6 +81,11 @@ TrainingSessionAttendants = Participants - Session de formation
 TrainingSessionCreateTrigger = La session de formation a été créée
 TrainingSessionModifyTrigger = La session de formation a été modifiée
 TrainingSessionDeleteTrigger = La session de formation a été supprimée
+CardTrainingsession = Fiche - Session de formation
+AgendaTrainingsession = Agenda - Session de formation
+NoteTrainingsession = Note - Session de formation
+AttendantsTrainingsession = Participants - Session de formation
+DocumentsTrainingsession = Fichiers joints - Session de formation
 
 #
 # Audit
@@ -87,6 +97,11 @@ AuditAttendants = Participants - Audit
 AuditCreateTrigger = L'audit a été créé
 AuditModifyTrigger = L'audit a été modifié
 AuditDeleteTrigger = L'audit a été supprimé
+CardAudit = Fiche - Audit
+AgendaAudit = Agenda - Audit
+NoteAudit = Note - Audit
+AttendantsAudit = Participants - Audit
+DocumentsAudit = Fichiers joints - Audit
 
 #
 # Attendants

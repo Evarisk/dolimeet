@@ -38,7 +38,7 @@ include DOL_DOCUMENT_ROOT.'/core/actions_linkedfiles.inc.php';
 
 $form = new Form($db);
 
-$title = $langs->trans(ucfirst($object->element)).' - '.$langs->trans("Files");
+$title = $langs->trans("Documents" . ucfirst($object->element));
 $help_url = '';
 //$help_url='EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
 llxHeader('', $title, $help_url);

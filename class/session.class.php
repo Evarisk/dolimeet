@@ -56,11 +56,6 @@ class Session extends CommonObject
 	 */
 	public $isextrafieldmanaged = 1;
 
-	/**
-	 * @var string String with name of icon for document. Must be the part after the 'object_' into object_document.png
-	 */
-	public $picto = 'dolimeet32px@dolimeet';
-
 	const STATUS_DELETED = -1;
 	const STATUS_PENDING_SIGNATURE = 0;
 	const STATUS_SIGNED = 1;

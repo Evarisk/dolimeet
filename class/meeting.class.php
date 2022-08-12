@@ -55,7 +55,7 @@ class Meeting extends Session
 	/**
 	 * @var string String with name of icon for document. Must be the part after the 'object_' into object_document.png
 	 */
-	public $picto = 'dolimeet32px@dolimeet';
+	public $picto = 'meeting@dolimeet';
 
 	/**
 	 * Constructor
@@ -108,6 +108,11 @@ class MeetingSignature extends DolimeetSignature
 	 * @var array Context element object
 	 */
 	public $context = array();
+
+	/**
+	 * @var string String with name of icon for document. Must be the part after the 'object_' into object_document.png
+	 */
+	public $picto = 'meeting@dolimeet';
 
 	/**
 	 * Constructor

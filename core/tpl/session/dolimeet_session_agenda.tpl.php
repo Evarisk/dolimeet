@@ -57,7 +57,7 @@ $search_agenda_label = '';
 $form = new Form($db);
 
 if ($object->id > 0) {
-$title = $langs->trans("Agenda");
+$title = $langs->trans("Agenda" . ucfirst($object->element));
 //if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
 $help_url = 'EN:Module_Agenda_En';
 llxHeader('', $title, $help_url);

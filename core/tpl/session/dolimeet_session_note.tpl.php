@@ -40,7 +40,9 @@ $form = new Form($db);
 
 //$help_url='EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
 $help_url = '';
-llxHeader('', $langs->trans(ucfirst($object->element)), $help_url);
+$title        = $langs->trans("Note" . ucfirst($object->element));
+
+llxHeader('', $title, $help_url);
 
 if ($id > 0 || !empty($ref)) {
 	$object->fetch_thirdparty();
@@ -48,7 +50,7 @@ if ($id > 0 || !empty($ref)) {
 	$prepareHead = $object->element . 'PrepareHead';
 	$head = $prepareHead($object);
 
-	print dol_get_fiche_head($head, 'note', $langs->trans('Notes'), -1, "dolimeet@dolimeet");
+	print dol_get_fiche_head($head, 'note', $langs->trans('Notes'), -1, $object->picto);
 
 	// Object card
 	// ------------------------------------------------------------
