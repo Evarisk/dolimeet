@@ -1129,6 +1129,22 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Delete') . '</a>' . "\n";
 		}
 	}
+
+	print '</div><div class="fichehalfleft">';
+
+	$MAXEVENT = 10;
+
+	$morehtmlright  = '<a href="' . dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_agenda.php', 1) . '?id=' . $object->id . '">';
+	$morehtmlright .= $langs->trans("SeeAll");
+	$morehtmlright .= '</a>';
+
+	// List of actions on element
+	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+	$formactions    = new FormActions($db);
+	$somethingshown = $formactions->showactions($object, $object->element.'@dolimeet', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+
+	print '</div></div></div>';
+
 	print '</div>'."\n";
 }
 
