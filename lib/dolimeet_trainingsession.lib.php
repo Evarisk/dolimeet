@@ -36,7 +36,7 @@ function remove_index($model) {
 	}
 }
 
-function trainingSessionPrepareHead($object)
+function trainingsessionPrepareHead($object)
 {
 	global $db, $langs, $conf;
 
@@ -45,13 +45,13 @@ function trainingSessionPrepareHead($object)
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingSession_card.php", 1).'?id='.$object->id;
+	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingsession_card.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Card");
 	$head[$h][2] = 'card';
 	$h++;
 
 	//Linked objects selection
-	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingSession_attendants.php", 1).'?id='.$object->id;
+	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingsession_attendants.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Attendants");
 	$head[$h][2] = 'attendants';
 	$h++;
@@ -69,7 +69,7 @@ function trainingSessionPrepareHead($object)
 		if (!empty($object->note_public)) {
 			$nbNote++;
 		}
-		$head[$h][0] = dol_buildpath('/dolimeet/view/trainingsession/trainingSession_note.php', 1).'?id='.$object->id;
+		$head[$h][0] = dol_buildpath('/dolimeet/view/trainingsession/trainingsession_note.php', 1).'?id='.$object->id;
 		$head[$h][1] = $langs->trans('Notes');
 		if ($nbNote > 0) {
 			$head[$h][1] .= (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '<span class="badge marginleftonlyshort">'.$nbNote.'</span>' : '');
@@ -83,7 +83,7 @@ function trainingSessionPrepareHead($object)
 	$upload_dir = $conf->dolimeet->dir_output."/trainingSession/".dol_sanitizeFileName($object->ref);
 	$nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
 	$nbLinks = Link::count($db, $object->element, $object->id);
-	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingSession_document.php", 1).'?id='.$object->id;
+	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingsession_document.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans('Documents');
 	if (($nbFiles + $nbLinks) > 0) {
 		$head[$h][1] .= '<span class="badge marginleftonlyshort">'.($nbFiles + $nbLinks).'</span>';
@@ -91,7 +91,7 @@ function trainingSessionPrepareHead($object)
 	$head[$h][2] = 'document';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingSession_agenda.php", 1).'?id='.$object->id;
+	$head[$h][0] = dol_buildpath("/dolimeet/view/trainingsession/trainingsession_agenda.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Events");
 	$head[$h][2] = 'agenda';
 	$h++;
@@ -117,9 +117,9 @@ function trainingSessionPrepareHead($object)
 	//$this->tabs = array(
 	//	'entity:-tabname:Title:@dolimeet:/dolimeet/view/trainingsession/mypage.php?id=__ID__'
 	//); // to remove a tab
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'trainingSession@dolimeet');
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'trainingsession@dolimeet');
 
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'trainingSession@dolimeet', 'remove');
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'trainingsession@dolimeet', 'remove');
 
 	return $head;
 }
