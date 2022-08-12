@@ -333,7 +333,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 				$actioncomm->elementtype       = $object->object_type . '@dolimeet';
 				$actioncomm->code              = 'AC_DOLIMEETSIGNATURE_ABSENT';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureAbsentTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
+				$actioncomm->label             = $langs->transnoentities('DolimeetSignatureAbsentTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
 				if ($object->element_type == 'socpeople') {
@@ -355,7 +355,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 				$actioncomm->elementtype       = $object->object_type . '@dolimeet';
 				$actioncomm->code              = 'AC_DOLIMEETSIGNATURE_DELETED';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureDeletedTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
+				$actioncomm->label             = $langs->transnoentities('DolimeetSignatureDeletedTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
 				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);

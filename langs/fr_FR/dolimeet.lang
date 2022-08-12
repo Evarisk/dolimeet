@@ -59,7 +59,9 @@ Meeting = Réunion
 MeetingList = Liste des réunions
 MeetingCreate = Créer une réunion
 MeetingAttendants = Participants - Réunion
-
+MeetingCreateTrigger = La réunion a été créée
+MeetingModifyTrigger = La réunion a été modifiée
+MeetingDeleteTrigger = La réunion a été supprimée
 
 #
 # Training Session
@@ -71,7 +73,9 @@ TrainingSessionCreate = Créer une session de formation
 ContractLinked = Contrat lié
 Contract = Contrat
 TrainingSessionAttendants = Participants - Session de formation
-
+TrainingSessionCreateTrigger = La session de formation a été créée
+TrainingSessionModifyTrigger = La session de formation a été modifiée
+TrainingSessionDeleteTrigger = La session de formation a été supprimée
 
 #
 # Audit
@@ -80,6 +84,9 @@ Audit = Audit
 AuditList = Liste des audits
 AuditCreate = Créer un audit
 AuditAttendants = Participants - Audit
+AuditCreateTrigger = L'audit a été créé
+AuditModifyTrigger = L'audit a été modifié
+AuditDeleteTrigger = L'audit a été supprimé
 
 #
 # Attendants
@@ -100,4 +107,11 @@ MEETING_SOCIETY_ATTENDANTSigned = Signature du participant :
 AUDIT_SOCIETY_ATTENDANTSigned = Signature du participant :
 TRAININGSESSION_SOCIETY_ATTENDANTSigned = Signature du participant :
 DolimeetSignaturePendingSignatureTrigger = Envoi du mail de signature à
+DolimeetSignatureAbsentTrigger = Participant absent
+DolimeetSignatureDeletedTrigger = Suppression du participant
 SignatureEvent = Le participant a signé : %s
+
+#
+# Triggers
+#
+
