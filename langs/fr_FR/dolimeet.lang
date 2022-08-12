@@ -26,13 +26,7 @@ ModuleDoliMeetDesc = DoliMeet pour Dolibarr
 # Admin page
 #
 DoliMeetSetup = DoliMeet setup
-Settings = Settings
-DoliMeetSetupPage = DoliMeet setup page
-DOLIMEET_MYPARAM1 = My param 1
-DOLIMEET_MYPARAM1Tooltip = My param 1 tooltip
-DOLIMEET_MYPARAM2=My param 2
-DOLIMEET_MYPARAM2Tooltip=My param 2 tooltip
-
+Settings = Réglages
 
 #
 # About page
@@ -40,6 +34,7 @@ DOLIMEET_MYPARAM2Tooltip=My param 2 tooltip
 About = About
 DoliMeetAbout = About DoliMeet
 DoliMeetAboutPage = DoliMeet about page
+ModuleConfiguration = Configuration du module
 
 #
 # Session
