@@ -1,10 +1,12 @@
 <?php
+require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
 $usertmp           = new User($db);
 $contact           = new Contact($db);
 $form              = new Form($db);
 $project           = new Project($db);
 $thirdparty        = new Societe($db);
+$contract          = new Contrat($db);
 
 $object->fetch($id);
 
@@ -263,10 +265,24 @@ $width = 80; $cssclass = 'photoref';
 dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 $morehtmlref                             .= '<div class="refidno">';
 // External Society -- Société extérieure
+
 // Project
 $project->fetch($object->fk_project);
-$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
+$morehtmlref = '- ' . $object->label;
+$morehtmlref .= '<div class="refidno">';
+$morehtmlref .= $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
+$morehtmlref .= '</tr>';
+$morehtmlref .=  '</td><br>';
 $morehtmlref .= '</div>';
+
+if ($object->element == 'trainingsession') {
+	$contract->fetch($object->fk_contrat);
+	$morehtmlref .= '<div class="refidno">';
+	$morehtmlref .= $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1);
+	$morehtmlref .= '</tr>';
+	$morehtmlref .= '</td><br>';
+	$morehtmlref .= '</div>';
+}
 
 //$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('dolimeet', $conf->dolimeet->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 

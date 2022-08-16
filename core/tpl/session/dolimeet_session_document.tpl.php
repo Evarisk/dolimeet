@@ -1,5 +1,9 @@
 <?php
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
+$project = new Project($db);
+$contract = new Contrat($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->dolimeet->dir_output.'/temp/massgeneration/'.$user->id;
 $hookmanager->initHooks(array($object->element.'document', 'globalcard')); // Note that conf->hooks_modules contains array
@@ -63,9 +67,23 @@ if ($object->id) {
 	// ------------------------------------------------------------
 	$linkback = '<a href="'.dol_buildpath('/'. $object->element .'/'. $object->element .'_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
-	$morehtmlref = '<div class="refidno">';
-
+	// Project
+	$project->fetch($object->fk_project);
+	$morehtmlref = '- ' . $object->label;
+	$morehtmlref .= '<div class="refidno">';
+	$morehtmlref .= $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
+	$morehtmlref .= '</tr>';
+	$morehtmlref .=  '</td><br>';
 	$morehtmlref .= '</div>';
+
+	if ($object->element == 'trainingsession') {
+		$contract->fetch($object->fk_contrat);
+		$morehtmlref .= '<div class="refidno">';
+		$morehtmlref .= $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1);
+		$morehtmlref .= '</tr>';
+		$morehtmlref .= '</td><br>';
+		$morehtmlref .= '</div>';
+	}	$morehtmlref .= '</div>';
 
 	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 
@@ -82,7 +100,6 @@ if ($object->id) {
 
 	print '</table>';
 
-	print '</div>';
 
 	print dol_get_fiche_end();
 
@@ -98,6 +115,8 @@ if ($object->id) {
 	$relativepathwithnofile = $object->element . '/'.dol_sanitizeFileName($object->ref).'/';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_post_headers.tpl.php';
+	print '</div>';
+
 } else {
 	accessforbidden('', 0, 1);
 }

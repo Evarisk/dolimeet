@@ -986,6 +986,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	// Object card
 	// ------------------------------------------------------------
 	$linkback = '<a href="'.dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref = '- ' . $object->label;
