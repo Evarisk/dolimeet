@@ -65,7 +65,7 @@ class mod_audit_standard extends ModeleNumRefSession
 	 */
 	public function getExample()
 	{
-		return $this->prefix."1";
+		return $this->prefix."2208-0001";
 	}
 
 	/**
@@ -119,7 +119,7 @@ class mod_audit_standard extends ModeleNumRefSession
 		$posindice = strlen($this->prefix) + 1;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
 		$sql .= " FROM ".MAIN_DB_PREFIX."dolimeet_session";
-		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."%'";
+		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."____-%'";
 		if ($object->ismultientitymanaged == 1) {
 			$sql .= " AND entity = ".$conf->entity;
 		}
@@ -137,10 +137,17 @@ class mod_audit_standard extends ModeleNumRefSession
 			return -1;
 		}
 
-		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		else $num = sprintf("%s", $max + 1);
+		$date = empty($object->date_creation) ?dol_now() : $object->date_creation;
 
-		dol_syslog("mod_audit_standard::getNextValue return ".$this->prefix.$num);
-		return $this->prefix.$num;
+		$yymm = strftime("%y%m", $date);
+
+		if ($max >= (pow(10, 4) - 1)) {
+			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+		} else {
+			$num = sprintf("%04s", $max + 1);
+		}
+
+		dol_syslog("mod_audit_standard::getNextValue return ".$this->prefix.$yymm."-".$num);
+		return $this->prefix.$yymm."-".$num;
 	}
 }
