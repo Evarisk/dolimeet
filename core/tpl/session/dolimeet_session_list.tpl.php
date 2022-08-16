@@ -71,7 +71,7 @@ $fromurl = '';
 if (!empty($fromtype)) {
 $fromurl = '&fromtype='.$fromtype.'&fromid='.$fromid;
 }
-$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/'. $object->type .'/'. $object->type .'_card.php', 1).'?action=create'.$fromurl, '', $permissiontoadd);
+$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/'. strtolower($object->type) .'/'. strtolower($object->type) .'_card.php', 1).'?action=create'.$fromurl, '', $permissiontoadd);
 $object->picto ='dolimeet32px@dolimeet';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_'.$object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 $object->picto ='dolimeet16px@dolimeet';
