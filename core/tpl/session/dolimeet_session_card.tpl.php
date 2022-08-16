@@ -106,7 +106,6 @@ if (empty($reshook)) {
 		}
 	}
 
-
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	//include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
@@ -118,7 +117,7 @@ if (empty($reshook)) {
 		$note_public    = GETPOST('note_public');
 		$label          = GETPOST('label');
 		$society_id     = GETPOST('fk_soc');
-		$project_id     = GETPOST('fk_project');
+		$project_id     = GETPOST('projectid');
 		$contrat_id     = GETPOST('fk_contrat');
 		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
 		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
@@ -762,7 +761,7 @@ if ($action == 'create') {
 
 	//Project -- Projet
 	print '<tr class="oddeven"><td><label for="Project">' . $langs->trans("ProjectLinked") . '</label></td><td>';
-	$numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1,  GETPOST('fk_project'), 'fk_project', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
+	$numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1,  GETPOST('projectid'), 'projectid', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '</td></tr>';
 
@@ -996,7 +995,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	$morehtmlref .=  '</td><br>';
 	$morehtmlref .= '</div>';
 
-	if ($object->element == 'trainingsession') {
+	if ($object->element == 'trainingsession' && $object->fk_contrat > 0) {
 		$contract->fetch($object->fk_contrat);
 		$morehtmlref .= '<div class="refidno">';
 		$morehtmlref .= $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1);
