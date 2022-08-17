@@ -20,6 +20,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/order.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/contact.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/contract.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/usergroups.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcontract.class.php';
 
 // load session libraries
 require_once __DIR__ . '/../../../lib/dolimeet_function.lib.php';
@@ -70,6 +71,7 @@ $contact = new Contact($db);
 $sender = new User($db);
 $project = new Project($db);
 $formproject = new FormProjets($db);
+$formcontrat = new FormContract($db);
 if (empty($object->type)) {
 	$object->type = 'session';
 }
@@ -445,34 +447,34 @@ require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 $contract = new Contrat($db);
 
 if (!empty($fromtype)) {
-print dol_get_fiche_head($head, $object->type . 'List', $langs->trans($object->type), -1, $objectLinked->picto);
-dol_banner_tab($objectLinked, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	print dol_get_fiche_head($head, $object->type . 'List', $langs->trans($object->type), -1, $objectLinked->picto);
+	dol_banner_tab($objectLinked, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 }
 
 if ($fromid) {
-print '<div class="underbanner clearboth"></div>';
+	print '<div class="underbanner clearboth"></div>';
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : array();
 
 $param = '';
 if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
-$param .= '&contextpage='.urlencode($contextpage);
+	$param .= '&contextpage='.urlencode($contextpage);
 }
 if ($limit > 0 && $limit != $conf->liste_limit) {
-$param .= '&limit='.urlencode($limit);
+	$param .= '&limit='.urlencode($limit);
 }
 foreach ($search as $key => $val) {
-if (is_array($search[$key]) && count($search[$key])) {
-foreach ($search[$key] as $skey) {
-$param .= '&search_'.$key.'[]='.urlencode($skey);
-}
-} else {
-$param .= '&search_'.$key.'='.urlencode($search[$key]);
-}
+	if (is_array($search[$key]) && count($search[$key])) {
+		foreach ($search[$key] as $skey) {
+			$param .= '&search_'.$key.'[]='.urlencode($skey);
+		}
+	} else {
+		$param .= '&search_'.$key.'='.urlencode($search[$key]);
+	}
 }
 if ($optioncss != '') {
-$param .= '&optioncss='.urlencode($optioncss);
+	$param .= '&optioncss='.urlencode($optioncss);
 }
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
@@ -489,16 +491,16 @@ $arrayofmassactions = array(
 //'presend'=>img_picto('', 'email', 'class="pictofixedwidth"').$langs->trans("SendByMail"),
 );
 if ($permissiontodelete) {
-$arrayofmassactions['predelete'] = img_picto('', 'delete', 'class="pictofixedwidth"').$langs->trans("Delete");
+	$arrayofmassactions['predelete'] = img_picto('', 'delete', 'class="pictofixedwidth"').$langs->trans("Delete");
 }
 if (GETPOST('nomassaction', 'int') || in_array($massaction, array('presend', 'predelete'))) {
-$arrayofmassactions = array();
+	$arrayofmassactions = array();
 }
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'?fromtype='.$fromtype.'&fromid=' . $fromid.'">'."\n";
 if ($optioncss != '') {
-print '<input type="hidden" name="optioncss" value="'.$optioncss.'">';
+	print '<input type="hidden" name="optioncss" value="'.$optioncss.'">';
 }
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -510,9 +512,9 @@ print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 
 $fromurl = '';
 if (!empty($fromtype)) {
-$fromurl = '&fromtype='.$fromtype.'&fromid='.$fromid;
+	$fromurl = '&fromtype='.$fromtype.'&fromid='.$fromid;
 }
-if (!$object->type == 'session') {
+if ($object->type !== 'session') {
 	$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/'. strtolower($object->type) .'/'. strtolower($object->type) .'_card.php', 1).'?action=create'.$fromurl, '', $permissiontoadd);
 }
 $object->picto ='dolimeet32px@dolimeet';
@@ -527,10 +529,10 @@ $trackid = 'xxxx'.$object->id;
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
 if ($search_all) {
-foreach ($fieldstosearchall as $key => $val) {
-$fieldstosearchall[$key] = $langs->trans($val);
-}
-print '<div class="divsearchfieldfilter">'.$langs->trans("FilterOnInto", $search_all).join(', ', $fieldstosearchall).'</div>';
+	foreach ($fieldstosearchall as $key => $val) {
+		$fieldstosearchall[$key] = $langs->trans($val);
+	}
+	print '<div class="divsearchfieldfilter">'.$langs->trans("FilterOnInto", $search_all).join(', ', $fieldstosearchall).'</div>';
 }
 
 $moreforfilter = '';
@@ -596,6 +598,10 @@ foreach ($object->fields as $key => $val) {
 			$project->fetch(0, $search['fk_project']);
 			print $formproject->select_projects(0, ( ! empty(GETPOST('fk_project')) ? GETPOST('fk_project') :  (GETPOST('fromtype') == 'project' ? GETPOST('fromid') : '')), 'fk_project', 0, 0, 1, 0, 1, 0, 0, '', 1, 0, 'maxwidth200');
 			print '<input class="input-hidden-fk_project" type="hidden" name="search_fk_project" value=""/>';
+		}  elseif ($key == 'fk_contrat') {
+			$contract->fetch(0, $search['fk_contrat']);
+			$formcontrat->select_contract(-1, ( ! empty(GETPOST('fk_contrat')) ? GETPOST('fk_contrat') :  (GETPOST('fromtype') == 'contrat' ? GETPOST('fromid') : '')), 'fk_contrat', 0, 1, 1, 0, 1, 0, 0, '', 1, 0, 'maxwidth200');
+			print '<input class="input-hidden-fk_contrat" type="hidden" name="search_fk_contrat" value=""/>';
 		} elseif ($key == 'fk_contact') {
 			$contact->fetch(0, $search['fk_contact']);
 			print $form->selectcontacts(0, !empty(GETPOST('fk_contact')) ? GETPOST('fk_contact') : (GETPOST('fromtype') == 'contact' ? GETPOST('fromid') : ''), 'fk_contact', 1);
