@@ -146,15 +146,11 @@ class modDoliMeet extends DolibarrModules
 		$picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDolimeet');
 
 		$this->tabs = array();
-		$this->tabs[] = array('data' => 'thirdparty:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&socid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'user:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&userid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contact:+meeting:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/meeting_list.php?type=meeting&contactid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'thirdparty:+trainingsession:'.$picto.$langs->trans('TrainingSession').':dolimeet@dolimeet:1:/custom/dolimeet/trainingsession_list.php?type=trainingsession&socid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'user:+trainingsession:'.$picto.$langs->trans('TrainingSession').':dolimeet@dolimeet:1:/custom/dolimeet/trainingsession_list.php?type=trainingsession&userid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contact:+trainingsession:'.$picto.$langs->trans('TrainingSession').':dolimeet@dolimeet:1:/custom/dolimeet/trainingsession_list.php?type=trainingsession&contactid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'thirdparty:+audit:'.$picto.$langs->trans('audit').':dolimeet@dolimeet:1:/custom/dolimeet/audit_list.php?type=audit&socid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'user:+audit:'.$picto.$langs->trans('audit').':dolimeet@dolimeet:1:/custom/dolimeet/audit_list.php?type=audit&userid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contact:+audit:'.$picto.$langs->trans('audit').':dolimeet@dolimeet:1:/custom/dolimeet/audit_list.php?type=audit&contactid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contact:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'project:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contract:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__'); // To add a new tab identified by code tabname1
 
 		// Dictionaries
 		$this->dictionaries = array();
@@ -172,6 +168,21 @@ class modDoliMeet extends DolibarrModules
 		$r = 0;
 		// Add here entries to declare new permissions
 		/* BEGIN MODULEBUILDER PERMISSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Read sessions of DoliMeet'; // Permission label
+		$this->rights[$r][4] = 'session';
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->read)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Create/Update sessions of DoliMeet'; // Permission label
+		$this->rights[$r][4] = 'session';
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->write)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'Delete sessions of DoliMeet'; // Permission label
+		$this->rights[$r][4] = 'session';
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->delete)
+		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Read meetings of DoliMeet'; // Permission label
 		$this->rights[$r][4] = 'meeting';

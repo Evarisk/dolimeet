@@ -17,7 +17,7 @@
  */
 
 /**
- *   	\file       trainingsession_list.php
+ *   	\file       session_list.php
  *		\ingroup    dolimeet
  *		\brief      List page for document
  */
@@ -38,7 +38,7 @@ if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../
 if (!$res && file_exists("../../../../../main.inc.php")) $res = @include "../../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-$session_type = 'TrainingSession';
+$session_type = 'Session';
 
 require_once __DIR__ . '/../../core/tpl/session/dolimeet_session_list.tpl.php';
 
