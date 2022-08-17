@@ -101,12 +101,12 @@ if ($object->element == 'trainingsession') {
 dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 
 print '<div class="fichecenter">';
-	print '<div class="underbanner clearboth"></div>';
+print '<div class="underbanner clearboth"></div>';
 
-	$object->info($object->id);
-	dol_print_object_info($object, 1);
+$object->info($object->id);
+dol_print_object_info($object, 1);
 
-	print '</div>';
+print '</div>';
 
 print dol_get_fiche_end();
 

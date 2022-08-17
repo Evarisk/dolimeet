@@ -45,7 +45,7 @@ class mod_trainingsession_standard extends ModeleNumRefSession
 	/**
 	 * @var string name
 	 */
-	public $name = 'Test';
+	public $name = 'TrainingSession';
 
 	/**
 	 *  Return description of numbering module
@@ -116,7 +116,7 @@ class mod_trainingsession_standard extends ModeleNumRefSession
 		global $db, $conf;
 
 		// first we get the max value
-		$posindice = strlen($this->prefix) + 1;
+		$posindice = strlen($this->prefix) + 6;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
 		$sql .= " FROM ".MAIN_DB_PREFIX."dolimeet_session";
 		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."____-%'";

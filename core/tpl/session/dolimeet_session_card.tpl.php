@@ -687,9 +687,6 @@ if (empty($reshook)) {
 
 	// Action clone object
 	if ($action == 'confirm_clone' && $confirm == 'yes') {
-		if ($object->status > 0) {
-			$object->status = 0;
-		}
 		$object->ref = $refMod->getNextValue($object);
 		$result = $object->create($user);
 
@@ -702,7 +699,7 @@ if (empty($reshook)) {
 
 /*
  * View
- *
+ *FZ
  * Put here all code to build page
  */
 
