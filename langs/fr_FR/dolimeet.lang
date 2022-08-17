@@ -35,6 +35,8 @@ About = About
 DoliMeetAbout = About DoliMeet
 DoliMeetAboutPage = DoliMeet about page
 ModuleConfiguration = Configuration du module
+DoliMeetSettings = Réglages de DoliMeet
+
 
 #
 # Session
@@ -51,6 +53,12 @@ SignatureDate = Date de signature
 LastEmailSentDate = Date d'envoi du mail de signature
 ContactLinked = Contact
 ProjectLinked = Projet lié
+NewSession = Nouvelle session
+SessionList = Liste des sessions
+SessionTypes = Types de session
+SessionNumberingModule = Numérotation des sessions
+SessionConfig = Configuration des sessions
+
 
 #
 # Meeting
@@ -67,12 +75,17 @@ AgendaMeeting = Agenda - Réunion
 NoteMeeting = Note - Réunion
 AttendantsMeeting = Participants - Réunion
 DocumentsMeeting = Fichiers joints - Réunion
+NewMeeting = Nouvelle réunion
+EnableMeetingDescription = Activer l'objet Réunion
+CloneMeeting = Cloner la réunion
+ConfirmCloneMeeting = Voulez-vous cloner cette réunion ?
 
 #
 # Training Session
 #
 TrainingSession = Session de formation
 Trainingsession = Session de formation
+TrainingsessionList = Liste des sessions de formation
 TrainingSessionList = Liste des sessions de formation
 TrainingSessionCreate = Créer une session de formation
 ContractLinked = Contrat lié
@@ -86,6 +99,10 @@ AgendaTrainingsession = Agenda - Session de formation
 NoteTrainingsession = Note - Session de formation
 AttendantsTrainingsession = Participants - Session de formation
 DocumentsTrainingsession = Fichiers joints - Session de formation
+NewTrainingsession = Nouvelle session de formation
+EnableTrainingSessionDescription = Activer l'objet Session de Formation
+CloneTrainingsession = Cloner la session de formation
+ConfirmCloneTrainingsession = Voulez-vous cloner cette session de formation ?
 
 #
 # Audit
@@ -102,6 +119,10 @@ AgendaAudit = Agenda - Audit
 NoteAudit = Note - Audit
 AttendantsAudit = Participants - Audit
 DocumentsAudit = Fichiers joints - Audit
+NewAudit = Nouvel audit
+EnableAuditDescription = Activer l'objet Audit
+CloneAudit = Cloner l'audit ?
+ConfirmCloneAudit = Voulez-vous cloner cet audit ?
 
 #
 # Attendants
