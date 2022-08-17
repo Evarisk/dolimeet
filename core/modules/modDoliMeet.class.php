@@ -125,8 +125,13 @@ class modDoliMeet extends DolibarrModules
 		// );
 		$this->const = array(
 			1 => array('DOLIMEET_MEETING_ADDON','chaine', 'mod_meeting_standard','', $conf->entity),
-			2 => array('DOLIMEET_TRAININGSESSION_ADDON','chaine', 'mod_trainingsession_standard','', $conf->entity),
-			3 => array('DOLIMEET_AUDIT_ADDON','chaine', 'mod_audit_standard','', $conf->entity),
+			2 => array('DOLIMEET_MEETING_MENU_ENABLED','integer', 1,'', $conf->entity),
+
+			3 => array('DOLIMEET_TRAININGSESSION_ADDON','chaine', 'mod_trainingsession_standard','', $conf->entity),
+			4 => array('DOLIMEET_TRAININGSESSION_MENU_ENABLED','integer', 1,'', $conf->entity),
+
+			5 => array('DOLIMEET_AUDIT_ADDON','chaine', 'mod_audit_standard','', $conf->entity),
+			6 => array('DOLIMEET_AUDIT_MENU_ENABLED','integer', 1,'', $conf->entity),
 		);
 
 		// Some keys to add into the overwriting translation tables
@@ -258,7 +263,7 @@ class modDoliMeet extends DolibarrModules
 			'url'=>'/dolimeet/view/meeting/meeting_list.php',
 			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
@@ -272,7 +277,7 @@ class modDoliMeet extends DolibarrModules
 			'url'=>'/dolimeet/view/meeting/meeting_card.php?action=create',
 			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
@@ -286,7 +291,7 @@ class modDoliMeet extends DolibarrModules
 			'url'      => '/categories/index.php?type=meeting',
 			'langs'    => 'ticket',
 			'position' => 1100 + $r,
-			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled',
+			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
 			'perms'    => '1',
 			'target'   => '',
 			'user'     => 0,
@@ -300,7 +305,7 @@ class modDoliMeet extends DolibarrModules
 			'url'=>'/dolimeet/view/trainingsession/trainingsession_list.php',
 			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
@@ -314,7 +319,7 @@ class modDoliMeet extends DolibarrModules
 			'url'=>'/dolimeet/view/trainingsession/trainingsession_card.php?action=create',
 			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
@@ -328,7 +333,7 @@ class modDoliMeet extends DolibarrModules
 			'url'      => '/categories/index.php?type=trainingsession',
 			'langs'    => 'ticket',
 			'position' => 1100 + $r,
-			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled',
+			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled  && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
 			'perms'    => '1',
 			'target'   => '',
 			'user'     => 0,
@@ -342,7 +347,7 @@ class modDoliMeet extends DolibarrModules
 			'url'=>'/dolimeet/view/audit/audit_list.php',
 			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
@@ -356,7 +361,7 @@ class modDoliMeet extends DolibarrModules
 			'url'=>'/dolimeet/view/audit/audit_card.php?action=create',
 			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
@@ -370,7 +375,7 @@ class modDoliMeet extends DolibarrModules
 			'url'      => '/categories/index.php?type=audit',
 			'langs'    => 'ticket',
 			'position' => 1100 + $r,
-			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled',
+			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
 			'perms'    => '1',
 			'target'   => '',
 			'user'     => 0,
