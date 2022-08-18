@@ -62,103 +62,103 @@ $search_agenda_label = '';
 $form = new Form($db);
 
 if ($object->id > 0) {
-$title = $langs->trans("Agenda" . ucfirst($object->element));
-//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
-$help_url = 'EN:Module_Agenda_En';
-llxHeader('', $title, $help_url);
+	$title = $langs->trans("Agenda" . ucfirst($object->element));
+	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
+	$help_url = 'EN:Module_Agenda_En';
+	llxHeader('', $title, $help_url);
 
-if (!empty($conf->notification->enabled)) {
-$langs->load("mails");
-}
-$prepareHead = $object->element . 'PrepareHead';
-$head = $prepareHead($object);
+	if (!empty($conf->notification->enabled)) {
+	$langs->load("mails");
+	}
+	$prepareHead = $object->element . 'PrepareHead';
+	$head = $prepareHead($object);
 
-print dol_get_fiche_head($head, 'agenda', $langs->trans('Agenda'), -1, $object->picto);
+	print dol_get_fiche_head($head, 'agenda', $langs->trans('Agenda'), -1, $object->picto);
 
-// Object card
-// ------------------------------------------------------------
-$linkback = '<a href="'.dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	// Object card
+	// ------------------------------------------------------------
+	$linkback = '<a href="'.dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
-// Project
-$project->fetch($object->fk_project);
-$morehtmlref = '- ' . $object->label;
-$morehtmlref .= '<div class="refidno">';
-$morehtmlref .= $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
-$morehtmlref .= '</tr>';
-$morehtmlref .=  '</td><br>';
-$morehtmlref .= '</div>';
-
-if ($object->element == 'trainingsession') {
-	$contract->fetch($object->fk_contrat);
+	// Project
+	$project->fetch($object->fk_project);
+	$morehtmlref = '- ' . $object->label;
 	$morehtmlref .= '<div class="refidno">';
-	$morehtmlref .= $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1);
+	$morehtmlref .= $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
 	$morehtmlref .= '</tr>';
-	$morehtmlref .= '</td><br>';
+	$morehtmlref .=  '</td><br>';
 	$morehtmlref .= '</div>';
-}
+
+	if ($object->element == 'trainingsession') {
+		$contract->fetch($object->fk_contrat);
+		$morehtmlref .= '<div class="refidno">';
+		$morehtmlref .= $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1);
+		$morehtmlref .= '</tr>';
+		$morehtmlref .= '</td><br>';
+		$morehtmlref .= '</div>';
+	}
 
 
-dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 
-print '<div class="fichecenter">';
-print '<div class="underbanner clearboth"></div>';
+	print '<div class="fichecenter">';
+	print '<div class="underbanner clearboth"></div>';
 
-$object->info($object->id);
-dol_print_object_info($object, 1);
+	$object->info($object->id);
+	dol_print_object_info($object, 1);
 
-print '</div>';
+	print '</div>';
 
-print dol_get_fiche_end();
+	print dol_get_fiche_end();
 
-// Actions buttons
+	// Actions buttons
 
-$objthirdparty = $object;
-$objcon = new stdClass();
+	$objthirdparty = $object;
+	$objcon = new stdClass();
 
-$out = '&origin='.urlencode($object->element.'@'.$object->module).'&originid='.urlencode($object->id);
-$urlbacktopage = $_SERVER['PHP_SELF'].'?id='.$object->id;
-$out .= '&backtopage='.urlencode($urlbacktopage);
-$permok = $user->rights->agenda->myactions->create;
-if ((!empty($objthirdparty->id) || !empty($objcon->id)) && $permok) {
-//$out.='<a href="'.DOL_URL_ROOT.'/comm/action/card.php?action=create';
-		if (get_class($objthirdparty) == 'Societe') {
-			$out .= '&socid='.urlencode($objthirdparty->id);
-		}
-		$out .= (!empty($objcon->id) ? '&contactid='.urlencode($objcon->id) : '').'&percentage=-1';
-		//$out.=$langs->trans("AddAnAction").' ';
-//$out.=img_picto($langs->trans("AddAnAction"),'filenew');
-//$out.="</a>";
-}
+	$out = '&origin='.urlencode($object->element.'@'.$object->module).'&originid='.urlencode($object->id);
+	$urlbacktopage = $_SERVER['PHP_SELF'].'?id='.$object->id;
+	$out .= '&backtopage='.urlencode($urlbacktopage);
+	$permok = $user->rights->agenda->myactions->create;
+	if ((!empty($objthirdparty->id) || !empty($objcon->id)) && $permok) {
+	//$out.='<a href="'.DOL_URL_ROOT.'/comm/action/card.php?action=create';
+			if (get_class($objthirdparty) == 'Societe') {
+				$out .= '&socid='.urlencode($objthirdparty->id);
+			}
+			$out .= (!empty($objcon->id) ? '&contactid='.urlencode($objcon->id) : '').'&percentage=-1';
+			//$out.=$langs->trans("AddAnAction").' ';
+	//$out.=img_picto($langs->trans("AddAnAction"),'filenew');
+	//$out.="</a>";
+	}
 
 
-print '<div class="tabsAction">';
+	print '<div class="tabsAction">';
 
 	if (!empty($conf->agenda->enabled)) {
-	if (!empty($user->rights->agenda->myactions->create) || !empty($user->rights->agenda->allactions->create)) {
-	print '<a class="butAction" href="'.DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out.'">'.$langs->trans("AddAction").'</a>';
-	} else {
-	print '<a class="butActionRefused classfortooltip" href="#">'.$langs->trans("AddAction").'</a>';
-	}
+		if (!empty($user->rights->agenda->myactions->create) || !empty($user->rights->agenda->allactions->create)) {
+			print '<a class="butAction" href="'.DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out.'">'.$langs->trans("AddAction").'</a>';
+		} else {
+			print '<a class="butActionRefused classfortooltip" href="#">'.$langs->trans("AddAction").'</a>';
+		}
 	}
 
 	print '</div>';
 
-if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
-$param = '&id='.$object->id.'&socid='.$socid;
-if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
-$param .= '&contextpage='.urlencode($contextpage);
-}
-if ($limit > 0 && $limit != $conf->liste_limit) {
-$param .= '&limit='.urlencode($limit);
-}
+	if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
+		$param = '&id='.$object->id.'&socid='.$socid;
+		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
+			$param .= '&contextpage='.urlencode($contextpage);
+		}
+		if ($limit > 0 && $limit != $conf->liste_limit) {
+			$param .= '&limit='.urlencode($limit);
+		}
 
-// List of all actions
-$filters = array();
-$filters['search_agenda_label'] = $search_agenda_label;
+		// List of all actions
+		$filters = array();
+		$filters['search_agenda_label'] = $search_agenda_label;
 
-// TODO Replace this with same code than into list.php
-show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, $object->module);
-}
+		// TODO Replace this with same code than into list.php
+		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, $object->module);
+	}
 }
 
 // End of page
