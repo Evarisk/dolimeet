@@ -351,7 +351,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<tr class="oddeven"><td class="minwidth200">';
 			print $usertmp->getNomUrl(1);
 			print '</td><td>';
-			print $langs->trans("SocietyAttendants") . ' ' . $j;
+			print $langs->trans("SocietyAttendant") . ' ' . $j;
 			print '</td><td class="center">';
 			if ($object->status == 2) {
 				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
@@ -400,7 +400,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<tr class="oddeven"><td class="maxwidth200">';
 		print $form->select_dolusers('', 'user_attendant', 1, $already_added_users);
 		print '</td>';
-		print '<td>' . $langs->trans("SocietyAttendants") . '</td>';
+		print '<td>' . $langs->trans("SocietyAttendant") . '</td>';
 		print '<td class="center">';
 		print '-';
 		print '</td><td class="center">';

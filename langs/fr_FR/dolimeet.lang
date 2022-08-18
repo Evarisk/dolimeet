@@ -58,6 +58,21 @@ SessionList = Liste des sessions
 SessionTypes = Types de session
 SessionNumberingModule = Numérotation des sessions
 SessionConfig = Configuration des sessions
+Deleted = Supprimé
+ValidatePendingSignature = Validé (en attente de signature)
+Signed = Signé
+Locked = Verrouillé
+SentByLetter = Envoyé par courrier
+SentByMail = Envoyé par email
+ReceivedAndSignedByMail = Reçu par mail et signé
+ReceivedAndSignedByLetter = Reçu par courrier et signé
+Registered = Inscrit
+SignatureRequest = Demande de signature envoyée
+PendingSignature = En attente de signature
+Denied = Refusé
+Unsigned = Non signé
+Absent = Absent
+JustifiedAbsent = Absence justifiée
 
 
 #

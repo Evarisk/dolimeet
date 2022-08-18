@@ -687,8 +687,9 @@ if (empty($reshook)) {
 
 	// Action clone object
 	if ($action == 'confirm_clone' && $confirm == 'yes') {
+		$options = array();
 		$object->ref = $refMod->getNextValue($object);
-		$result = $object->create($user);
+		$result = $object->createFromClone($user, $object->id, $options);
 
 		if ($result > 0) {
 			header("Location: " . $_SERVER["PHP_SELF"] . '?id=' . $result);
