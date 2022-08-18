@@ -132,7 +132,8 @@ Attendants = Participants
 NoSocietyAttendants = Pas de participant interne
 ExtSocietyIntervenants = Intervenant externe
 ExtSocietyIntervenant = Intervenant externe
-SocietyAttendants = Participant interne
+SocietyAttendants = Participants internes
+SocietyAttendant = Participant interne
 NoExternalAttendants = Pas d'intervenant externe
 AddAttendantTrigger = Ajout d'un participant : %s
 SendMailDate = Date d'envoi d'email
@@ -147,6 +148,8 @@ DolimeetSignaturePendingSignatureTrigger = Envoi du mail de signature à
 DolimeetSignatureAbsentTrigger = Participant absent
 DolimeetSignatureDeletedTrigger = Suppression du participant
 SignatureEvent = Le participant a signé : %s
+ExternalAttendants = Participants externes
+AttendantThirdparties = Tiers concernés
 
 #
 # Triggers
