@@ -291,27 +291,27 @@ dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $moreht
 print dol_get_fiche_end(); ?>
 
 <?php if ( $object->status == 1 ) : ?>
-	<div class="wpeo-notice notice-warning">
-		<div class="notice-content">
-			<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-			<div class="notice-subtitle"><?php echo $langs->trans(ucfirst($object->element)."MustBeValidatedToSign") ?></div>
-		</div>
-		<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/dolimeet/view/<?php echo $object->element ?>/<?php echo $object->element ?>_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
-	</div>
-<?php endif; ?>
-	<div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
-		<div class="all-notice-content">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
-			</div>
-			<?php
-			if ($signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-				print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/dolimeet/view/'. $object->element .'/'. $object->element .'_card.php?id=' . $id . '">' . $langs->trans("GoToLock") . '</a>';
-			}
-			?>
-		</div>
-	</div>
+<!--	<div class="wpeo-notice notice-warning">-->
+<!--		<div class="notice-content">-->
+<!--			<div class="notice-title">--><?php //echo $langs->trans('DisclaimerSignatureTitle') ?><!--</div>-->
+<!--			<div class="notice-subtitle">--><?php //echo $langs->trans(ucfirst($object->element)."MustBeValidatedToSign") ?><!--</div>-->
+<!--		</div>-->
+<!--		<a class="butAction" style="width = 100%;margin-right:0" href="--><?php //echo DOL_URL_ROOT ?><!--/custom/dolimeet/view/--><?php //echo $object->element ?><!--/--><?php //echo $object->element ?><!--_card.php?id=--><?php //echo $id ?><!--">--><?php //echo $langs->trans("GoToValidate") ?><!--</a>;-->
+<!--	</div>-->
+<?php //endif; ?>
+<!--	<div class="noticeSignatureSuccess wpeo-notice notice-success hidden">-->
+<!--		<div class="all-notice-content">-->
+<!--			<div class="notice-content">-->
+<!--				<div class="notice-title">--><?php //echo $langs->trans('AddSignatureSuccess') ?><!--</div>-->
+<!--				<div class="notice-subtitle">--><?php //echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?><!--</div>-->
+<!--			</div>-->
+<!--			--><?php
+//			if ($signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+//				print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/dolimeet/view/'. $object->element .'/'. $object->element .'_card.php?id=' . $id . '">' . $langs->trans("GoToLock") . '</a>';
+//			}
+//			?>
+<!--		</div>-->
+<!--	</div>-->
 <?php
 
 // Part to show record

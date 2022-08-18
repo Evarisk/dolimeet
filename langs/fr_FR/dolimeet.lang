@@ -128,9 +128,10 @@ ConfirmCloneAudit = Voulez-vous cloner cet audit ?
 # Attendants
 #
 
-Attendats = Participants
+Attendants = Participants
 NoSocietyAttendants = Pas de participant interne
 ExtSocietyIntervenants = Intervenant externe
+ExtSocietyIntervenant = Intervenant externe
 SocietyAttendants = Participant interne
 NoExternalAttendants = Pas d'intervenant externe
 AddAttendantTrigger = Ajout d'un participant : %s
