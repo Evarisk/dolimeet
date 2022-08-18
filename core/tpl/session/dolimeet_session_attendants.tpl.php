@@ -298,7 +298,7 @@ print dol_get_fiche_end(); ?>
 <!--		</div>-->
 <!--		<a class="butAction" style="width = 100%;margin-right:0" href="--><?php //echo DOL_URL_ROOT ?><!--/custom/dolimeet/view/--><?php //echo $object->element ?><!--/--><?php //echo $object->element ?><!--_card.php?id=--><?php //echo $id ?><!--">--><?php //echo $langs->trans("GoToValidate") ?><!--</a>;-->
 <!--	</div>-->
-<?php //endif; ?>
+<?php endif; ?>
 <!--	<div class="noticeSignatureSuccess wpeo-notice notice-success hidden">-->
 <!--		<div class="all-notice-content">-->
 <!--			<div class="notice-content">-->
@@ -351,7 +351,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<tr class="oddeven"><td class="minwidth200">';
 			print $usertmp->getNomUrl(1);
 			print '</td><td>';
-			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
+			print $langs->trans("SocietyAttendants") . ' ' . $j;
 			print '</td><td class="center">';
 			if ($object->status == 2) {
 				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
@@ -400,7 +400,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<tr class="oddeven"><td class="maxwidth200">';
 		print $form->select_dolusers('', 'user_attendant', 1, $already_added_users);
 		print '</td>';
-		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
+		print '<td>' . $langs->trans("SocietyAttendants") . '</td>';
 		print '<td class="center">';
 		print '-';
 		print '</td><td class="center">';
