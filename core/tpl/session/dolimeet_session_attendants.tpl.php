@@ -512,10 +512,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<tr class="oddeven">';
 		print '<td class="tagtd nowrap noborderbottom">';
 		$selectedCompany = GETPOSTISSET("newcompany") ? GETPOST("newcompany", 'int') : (empty($object->socid) ?  0 : $object->socid);
-		$selectedCompany = $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, '', 'minwidth300imp');
+		$formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, '', 'minwidth300imp');
+
 		print '</td>';
 		print '<td class="tagtd noborderbottom minwidth500imp">';
-		print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'external_attendant', 3, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+		print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'external_attendant', 1, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 		$nbofcontacts = $form->num;
 		$newcardbutton = '';
 		if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {
