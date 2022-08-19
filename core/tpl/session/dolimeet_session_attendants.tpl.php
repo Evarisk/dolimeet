@@ -334,6 +334,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
+
 //
 //	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "" ));
 //	$contacts_no_email = array();

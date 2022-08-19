@@ -151,11 +151,11 @@ class modDoliMeet extends DolibarrModules
 		$picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDolimeet');
 
 		$this->tabs = array();
-		$this->tabs[] = array('data' => 'thirdparty:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'user:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contact:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'project:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contract:+sessionList:'.$picto.$langs->trans('Meeting').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contact:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'project:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contract:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__'); // To add a new tab identified by code tabname1
 
 		// Dictionaries
 		$this->dictionaries = array();
@@ -271,7 +271,7 @@ class modDoliMeet extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=meeting_list',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left', // This is a Left menu entry
-			'titre'=> '<i class="fas fa-paper-plane"></i> ' . $langs->trans('MeetingCreate'),
+			'titre'=> '<i class="fas fa-comments"></i> ' . $langs->trans('MeetingCreate'),
 			'mainmenu'=>'dolimeet',
 			'leftmenu'=>'meeting_card',
 			'url'=>'/dolimeet/view/meeting/meeting_card.php?action=create',
@@ -313,7 +313,7 @@ class modDoliMeet extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=trainingsession_list',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left', // This is a Left menu entry
-			'titre'=> '<i class="fas fa-paper-plane"></i> ' . $langs->trans('TrainingSessionCreate'),
+			'titre'=> '<i class="fas fa-people-arrows"></i> ' . $langs->trans('TrainingSessionCreate'),
 			'mainmenu'=>'dolimeet',
 			'leftmenu'=>'trainingsession_card',
 			'url'=>'/dolimeet/view/trainingsession/trainingsession_card.php?action=create',
@@ -355,7 +355,7 @@ class modDoliMeet extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left', // This is a Left menu entry
-			'titre'=> '<i class="fas fa-paper-plane"></i> ' . $langs->trans('AuditCreate'),
+			'titre'=> '<i class="fas fa-tasks"></i> ' . $langs->trans('AuditCreate'),
 			'mainmenu'=>'dolimeet',
 			'leftmenu'=>'audit_card',
 			'url'=>'/dolimeet/view/audit/audit_card.php?action=create',
