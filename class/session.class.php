@@ -101,8 +101,9 @@ class Session extends CommonObject
 		'label'          => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'comment'=>"label of object"),
 		'entity'         => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
 		'date_creation'  => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>2,),
-		'date_start'     => array('type'=>'datetime', 'label'=>'DateStart', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>1,),
-		'date_end'       => array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>1,),
+		'date_start'     => array('type'=>'datetime', 'label'=>'DateStart', 'enabled'=>'1', 'position'=>41, 'notnull'=>0, 'visible'=>1,),
+		'date_end'       => array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>'1', 'position'=>42, 'notnull'=>0, 'visible'=>1,),
+		'duration'       => array('type'=>'integer', 'label'=>'Duration', 'enabled'=>'1', 'position'=>45, 'notnull'=>0, 'visible'=>1,),
 		'tms'            => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
 		'import_key'     => array('type'=>'integer', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>0,),
 		'status'         => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'default' => 1, 'visible'=>2, 'index'=>1,),
@@ -127,6 +128,7 @@ class Session extends CommonObject
 	public $date_creation;
 	public $date_start;
 	public $date_end;
+	public $duration;
 	public $tms;
 	public $status;
 	public $type;

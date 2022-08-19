@@ -119,8 +119,19 @@ if (empty($reshook)) {
 		$society_id     = GETPOST('fk_soc');
 		$project_id     = GETPOST('projectid');
 		$contrat_id     = GETPOST('fk_contrat');
+		$duration       = GETPOST('duration');
 		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
 		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
+
+		$minutes = 0;
+		if (preg_match('/,/', $duration)){
+			$hours = preg_split('/,/', $duration)[0];
+			$minutes = ($duration - $hours) * 60;
+		} else if (preg_match('/./', $duration)){
+			$hours = preg_split('/\./', $duration)[0];
+			$minutes = ($duration - $hours) * 60;
+		}
+		$duration_minutes = $hours * 60 + $minutes;
 
 		// Initialize object
 		$now                   = dol_now();
@@ -135,6 +146,7 @@ if (empty($reshook)) {
 		$object->note_public   = $note_public;
 		$object->label         = $label;
 		$object->type          = $object->element;
+		$object->duration      = $duration_minutes;
 
 		$object->fk_soc        = $society_id;
 		$object->fk_project    = $project_id;
@@ -747,6 +759,7 @@ if ($action == 'create') {
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_contrat']);
 	unset($object->fields['fk_project']);
+	unset($object->fields['duration']);
 
 	//Ref -- Ref
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
@@ -769,6 +782,11 @@ if ($action == 'create') {
 		$numcontrat = $formcontract->select_contract(GETPOST('fk_soc') ?: -1,  GETPOST('fk_contrat'), 'fk_contrat', 0, 1, 1);
 		print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddContract") . '"></span></a>';
 		print '</td></tr>';
+
+		//Date end - Date de début
+		print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans("DurationH") . '</label></td><td>';
+		print '<input type=number step=".01" name="duration" id="duration" value="'. GETPOST('duration') .'">';
+		print '</td></tr>';
 	}
 
 	//Date start - Date de début
@@ -780,6 +798,7 @@ if ($action == 'create') {
 	print '<tr class="oddeven"><td><label for="DateEnd">' . $langs->trans("DateEnd") . '</label></td><td>';
 	print $form->selectDate(dol_now('tzuser'), 'date_end', 1, 1, 0, '', 1, 1);
 	print '</td></tr>';
+
 
 //	//Society -- Société
 //	print '<tr><td class="">'.$langs->trans("Society").'</td><td>';
@@ -864,6 +883,7 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_contact']);
 	unset($object->fields['fk_project']);
+	unset($object->fields['duration']);
 
 	// Common attributes
 //	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
@@ -884,6 +904,13 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 		print '<tr class="oddeven"><td><label for="Contract">' . $langs->trans("ContractLinked") . '</label></td><td class="minwidth500">';
 		$numcontrat = $formcontract->select_contract(GETPOST('fk_soc') ?: -1, $object->fk_contrat, 'fk_contrat', 0, 1, 1);
 		print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddContract") . '"></span></a>';
+		print '</td></tr>';
+
+		//Duration - Durée
+		print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans("DurationH") . '</label></td><td>';
+		$duration_hours = floor($object->duration / 60);
+		$duration_minutes = ($object->duration % 60) * 100/60;
+		print '<input type=number step=".01" name="duration" id="duration" value="'. $duration_hours . '.' . $duration_minutes .'">';
 		print '</td></tr>';
 	}
 
@@ -1041,6 +1068,18 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	print dol_print_date($object->date_end, 'dayhoursec');
 	print '</td></tr>';
 
+	if ($object->type == 'trainingsession') {
+		$duration_hours = floor($object->duration / 60);
+		$duration_minutes = ($object->duration % 60) * 100/60;
+
+		print '<tr><td class="titlefield">';
+		print $langs->trans("Duration");
+		print '</td>';
+		print '<td>';
+		print $duration_hours . '.' . $duration_minutes . ' ' . $langs->trans('Hours');
+		print '</td></tr>';
+	}
+
 	//unused display of information
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_contact']);
@@ -1049,6 +1088,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	unset($object->fields['fk_contrat']);
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
+	unset($object->fields['duration']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
