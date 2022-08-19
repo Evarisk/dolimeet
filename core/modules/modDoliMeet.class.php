@@ -159,8 +159,45 @@ class modDoliMeet extends DolibarrModules
 		$this->tabs[] = array('data' => 'contract:+openinghours:'.$picto.$langs->trans('OpeningHours').':dolimeet@dolimeet:1:/custom/dolimeet/view/openinghours_card.php?element_type=contrat&id=__ID__'); // To add a new tab identified by code tabname1
 
 		// Dictionaries
-		$this->dictionaries = array();
-
+		$this->dictionaries = array(
+			'langs' => 'dolimeet@dolimeet',
+			// List of tables we want to see into dictonnary editor
+			'tabname' => array(
+				MAIN_DB_PREFIX . "c_trainingsession_type"
+			),
+			// Label of tables
+			'tablib' => array(
+				"TrainingSession"
+			),
+			// Request to select fields
+			'tabsql' => array(
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_type as f'
+			),
+			// Sort order
+			'tabsqlsort' => array(
+				"label ASC"
+			),
+			// List of fields (result of select to show dictionary)
+			'tabfield' => array(
+				"ref,label,description"
+			),
+			// List of fields (list of fields to edit a record)
+			'tabfieldvalue' => array(
+				"ref,label,description"
+			),
+			// List of fields (list of fields for insert)
+			'tabfieldinsert' => array(
+				"ref,label,description"
+			),
+			// Name of columns with primary key (try to always name it 'rowid')
+			'tabrowid' => array(
+				"rowid"
+			),
+			// Condition to show each dictionary
+			'tabcond' => array(
+				$conf->dolimeet->enabled,
+			)
+		);
 		// Boxes/Widgets
 		$this->boxes = array(
 		);
@@ -528,11 +565,14 @@ class modDoliMeet extends DolibarrModules
 		$extra_fields->update('label', $langs->transnoentities("Label"), 'varchar', '', 'contrat', 0, 0, 1040, '', '', '', 1);
 		$extra_fields->addExtraField('label', $langs->transnoentities("Label"), 'varchar', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
 
-		$extra_fields->update('trainingsession_start', $langs->transnoentities("TrainingSessionStart"), 'datetime', '', 'contrat', 0, 0, 1040, '', '', '', 1);
+		$extra_fields->update('trainingsession_start', $langs->transnoentities("TrainingSessionStart"), 'datetime', '', 'contrat', 0, 0, 1800, '', '', '', 1);
 		$extra_fields->addExtraField('trainingsession_start', $langs->transnoentities("TrainingSessionStart"), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
 
-		$extra_fields->update('trainingsession_end', $langs->transnoentities("TrainingSessionEnd"), 'datetime', '', 'contrat', 0, 0, 1040, '', '', '', 1);
+		$extra_fields->update('trainingsession_end', $langs->transnoentities("TrainingSessionEnd"), 'datetime', '', 'contrat', 0, 0, 1810, '', '', '', 1);
 		$extra_fields->addExtraField('trainingsession_end', $langs->transnoentities("TrainingSessionEnd"), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+
+		$extra_fields->update('trainingsession_type', $langs->transnoentities("TrainingSessionType"), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_type', $langs->transnoentities("TrainingSessionType"), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
 
 		// Permissions
 		$this->remove($options);
