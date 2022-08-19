@@ -156,6 +156,7 @@ class modDoliMeet extends DolibarrModules
 		$this->tabs[] = array('data' => 'contact:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'); // To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'project:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'); // To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'contract:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'contract:+openinghours:'.$picto.$langs->trans('OpeningHours').':dolimeet@dolimeet:1:/custom/dolimeet/view/openinghours_card.php?element_type=contrat&id=__ID__'); // To add a new tab identified by code tabname1
 
 		// Dictionaries
 		$this->dictionaries = array();

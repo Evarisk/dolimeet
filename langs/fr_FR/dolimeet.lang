@@ -74,6 +74,8 @@ Unsigned = Non signé
 Absent = Absent
 JustifiedAbsent = Absence justifiée
 DurationH = Durée (en h)
+ContratOpeningHours = Horaires de la formation
+
 
 #
 # Meeting
