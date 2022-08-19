@@ -120,6 +120,9 @@ NewTrainingsession = Nouvelle session de formation
 EnableTrainingSessionDescription = Activer l'objet Session de Formation
 CloneTrainingsession = Cloner la session de formation
 ConfirmCloneTrainingsession = Voulez-vous cloner cette session de formation ?
+TrainingSessionStart = Date de début de la formation
+TrainingSessionEnd = Date de fin de la formation
+
 
 #
 # Audit

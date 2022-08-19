@@ -522,13 +522,17 @@ class modDoliMeet extends DolibarrModules
 		}
 
 		// Create extrafields during init
-		//include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-		//$extrafields = new ExtraFields($this->db);
-		//$result1=$extrafields->addExtraField('dolimeet_myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'dolimeet@dolimeet', '$conf->dolimeet->enabled');
-		//$result2=$extrafields->addExtraField('dolimeet_myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'dolimeet@dolimeet', '$conf->dolimeet->enabled');
-		//$result3=$extrafields->addExtraField('dolimeet_myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'dolimeet@dolimeet', '$conf->dolimeet->enabled');
-		//$result4=$extrafields->addExtraField('dolimeet_myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'dolimeet@dolimeet', '$conf->dolimeet->enabled');
-		//$result5=$extrafields->addExtraField('dolimeet_myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'dolimeet@dolimeet', '$conf->dolimeet->enabled');
+		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+		$extra_fields = new ExtraFields($this->db);
+
+		$extra_fields->update('label', $langs->transnoentities("Label"), 'varchar', '', 'contrat', 0, 0, 1040, '', '', '', 1);
+		$extra_fields->addExtraField('label', $langs->transnoentities("Label"), 'varchar', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+
+		$extra_fields->update('trainingsession_start', $langs->transnoentities("TrainingSessionStart"), 'datetime', '', 'contrat', 0, 0, 1040, '', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_start', $langs->transnoentities("TrainingSessionStart"), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+
+		$extra_fields->update('trainingsession_end', $langs->transnoentities("TrainingSessionEnd"), 'datetime', '', 'contrat', 0, 0, 1040, '', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_end', $langs->transnoentities("TrainingSessionEnd"), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
 
 		// Permissions
 		$this->remove($options);
