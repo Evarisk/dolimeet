@@ -180,3 +180,20 @@ AttendantThirdparties = Tiers concernés
 # Triggers
 #
 
+
+#
+# Droits
+#
+
+ReadDoliMeetSession = Lire les sessions de DoliMeet
+WriteDoliMeetSession = Créer/mettre à jour les sessions de DoliMeet
+DeleteDoliMeetSession = Supprimer les sessions de DoliMeet
+ReadDoliMeetMeeting = Lire les réunions de DoliMeet
+WriteDoliMeetMeeting = Créer/mettre à jour les réunions de DoliMeet
+DeleteDoliMeetMeeting = Supprimer les réunions de DoliMeet
+ReadDoliMeetTrainingSession = Lire les sessions de formation de DoliMeet
+WriteDoliMeetTrainingSession = Créer/mettre à jour les sessions de formation de DoliMeet
+DeleteDoliMeetTrainingSession = Supprimer les sessions de formation de DoliMeet
+ReadDoliMeetAudit = Lire les audits de DoliMeet
+WriteDoliMeetAudit = Créer/mettre à jour les audits de DoliMeet
+DeleteDoliMeetAudit = Supprimer les audits de DoliMeet
