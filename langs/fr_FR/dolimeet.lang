@@ -36,6 +36,7 @@ DoliMeetAbout = About DoliMeet
 DoliMeetAboutPage = DoliMeet about page
 ModuleConfiguration = Configuration du module
 DoliMeetSettings = Réglages de DoliMeet
+DoliMeetObjects = Objets de DoliMeet
 
 
 #
@@ -75,7 +76,8 @@ Absent = Absent
 JustifiedAbsent = Absence justifiée
 DurationH = Durée (en h)
 ContratOpeningHours = Horaires de la formation
-
+ObjectType = Type
+Object = Objet
 
 #
 # Meeting

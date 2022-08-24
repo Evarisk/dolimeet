@@ -106,6 +106,30 @@ class ActionsDolimeet
 	}
 
 	/**
+	 *  Overloading the doActions function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @param $action
+	 * @return int              < 0 on error, 0 on success, 1 to replace standard code
+	 */
+	public function completeListOfReferent($parameters, $object, $action)
+	{
+		global $db, $conf, $langs;
+
+
+
+		if (true) {
+			$this->results   = array('myreturn' => 999);
+			$this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+	/**
 	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
 	 *
 	 * @param   array           $parameters     Hook metadatas (context, etc...)
@@ -113,7 +137,46 @@ class ActionsDolimeet
 	 */
 	public function printCommonFooter($parameters)
 	{
+		global $langs, $db;
 		$error = 0; // Error counter
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if ($parameters['currentcontext'] == 'projectOverview') {
+			require_once DOL_DOCUMENT_ROOT . '/custom/dolimeet/class/session.class.php';
+
+			$session = new Session($db);
+			$linkedSessions = $session->fetchAll('','','','',array("fk_project" => GETPOST('id')));
+
+			$outputline = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><img src="'. DOL_URL_ROOT .'/custom/dolimeet/img/dolimeet32px.png"> '. $langs->transnoentities('DoliMeetObjects') .'</div></td></tr></table>';
+			$outputline .= '<table><div class="div-table-responsive-no-min"><table class="liste formdoc noborder centpercent"><tbody>';
+			$outputline .= '<tr class="liste_titre">';
+			$outputline .= '<td class="float">'. $langs->transnoentities('ObjectType') .'</td>&nbsp;';
+			$outputline .= '<td class="float">'. $langs->transnoentities('Object') .'</td>&nbsp;';
+			$outputline .= '<td class="float">'. $langs->transnoentities('Date') .'</td>&nbsp;';
+			$outputline .= '</tr>';
+
+			if (!empty($linkedSessions)) {
+				foreach($linkedSessions as $linkedSession) {
+					$outputline .= '<tr>';
+					$outputline .= '<td>';
+					$outputline .= $langs->trans(ucfirst($linkedSession->type));
+					$outputline .= '</td>';
+					$outputline .= '<td>';
+					$outputline .= $linkedSession->getNomUrl();
+					$outputline .= '</td>';
+					$outputline .= '<td>';
+					$outputline .= dol_print_date($linkedSession->date_start, 'dayhour') . ' - ' . dol_print_date($linkedSession->date_end, 'dayhour');
+					$outputline .= '</td>';
+					$outputline .= '</tr>';
+				}
+			}
+			$outputline .= '</tbody></table></div>';
+			?>
+			<script>
+				jQuery('.fiche').append(<?php echo json_encode($outputline); ?>)
+			</script>
+			<?php
+		}
 
 		if (preg_match('/categoryindex/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			print '<script src="../custom/dolimeet/js/dolimeet.js.php"></script>';
