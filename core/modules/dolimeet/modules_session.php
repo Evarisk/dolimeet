@@ -29,6 +29,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/dolimeet/lib/dolimeet_function.lib.php';
 
 /**
  *	Parent class for documents models
@@ -44,16 +45,15 @@ abstract class ModelePDFSession extends CommonDocGenerator
 	 *  @param  integer	$maxfilenamelength  Max length of value to show
 	 *  @return	array						List of templates
 	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
+	public static function liste_modeles($db, $maxfilenamelength = 0, $type)
 	{
 		// phpcs:enable
 		global $conf;
 
-		$type = 'session';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-		$list = getListOfModels($db, $type, $maxfilenamelength);
+		$list = getListOfModelsDolimeet($db, $type, $maxfilenamelength);
 
 		return $list;
 	}

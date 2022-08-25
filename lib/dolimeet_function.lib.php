@@ -17,7 +17,7 @@
 
 /**
  * \file    lib/betterform.lib.php
- * \ingroup doliletter
+ * \ingroup dolimeet
  * \brief   unified form function
  */
 
@@ -153,7 +153,7 @@ function selectForm($objecttype, $htmlname = 'form[]', $htmlid ='', $notid = arr
  * @param      string              $tooltiptext       (optional) Tooltip text when gen button disabled
  * @return		string              					Output string with HTML array of documents (might be empty string)
  */
-function dolilettershowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $noform = 0, $param = '', $title = '', $buttonlabel = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = true, $tooltiptext = '')
+function dolimeetshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $noform = 0, $param = '', $title = '', $buttonlabel = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = true, $tooltiptext = '')
 {
 
 	global $db, $langs, $conf, $hookmanager, $form;
@@ -173,7 +173,7 @@ function dolilettershowdocuments($modulepart, $modulesubdir, $filedir, $urlsourc
 	$file_list = null;
 	if ( ! empty($filedir)) {
 		$filter = '(\.odt|\.zip|\.pdf)';
-		if ($modulepart == 'doliletter:AcknowledgementReceipt' || $modulepart == 'doliletter') {
+		if ($modulepart == 'dolimeet:AcknowledgementReceipt' || $modulepart == 'dolimeet') {
 			$filter = '(\.jpg|\.jpeg|\.png|\.odt|\.zip|\.pdf)';
 		}
 		$file_list = dol_dir_list($filedir, 'files', 0, $filter, '', 'date', SORT_DESC, 1);
@@ -198,6 +198,10 @@ function dolilettershowdocuments($modulepart, $modulesubdir, $filedir, $urlsourc
 		$modulepart    = $tmp[0];
 		$submodulepart = $tmp[1];
 	}
+	if ($submodulepart == 'trainingsession') {
+		$subtype = $submodulepart;
+		$submodulepart = 'session';
+	}
 
 	// Show table
 	if ($genallowed) {
@@ -214,12 +218,13 @@ function dolilettershowdocuments($modulepart, $modulesubdir, $filedir, $urlsourc
 				include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 				$modellist = getListOfModels($db, $type, 0);
 			} else {
-				$modellist = call_user_func($class . '::liste_modeles', $db, 100);
+				$modellist = call_user_func($class . '::liste_modeles', $db, 100, $subtype);
 			}
 		} else {
 			dol_print_error($db, "Bad value for modulepart '" . $modulepart . "' in showdocuments");
 			return -1;
 		}
+
 
 		// Set headershown to avoid to have table opened a second time later
 		$headershown = 1;
@@ -445,6 +450,103 @@ function dolilettershowdocuments($modulepart, $modulesubdir, $filedir, $urlsourc
 
 	return $out;
 }
+
+
+/**
+ * 	Return list of activated modules usable for document generation
+ *
+ * 	@param	DoliDB		$db				    Database handler
+ * 	@param	string		$type			    Type of models (company, invoice, ...)
+ *  @param  int		    $maxfilenamelength  Max length of value to show
+ * 	@return	array|int			    		0 if no module is activated, or array(key=>label). For modules that need directory scan, key is completed with ":filename".
+ */
+function getListOfModelsDolimeet($db, $type, $maxfilenamelength = 0)
+{
+	global $conf, $langs;
+	$liste = array();
+	$found = 0;
+	$dirtoscan = '';
+
+	$sql = "SELECT nom as id, nom as doc_template_name, libelle as label, description as description";
+	$sql .= " FROM ".MAIN_DB_PREFIX."document_model";
+	$sql .= " WHERE type = '".$db->escape($type)."'";
+	$sql .= " AND entity IN (0,".$conf->entity.")";
+	$sql .= " ORDER BY description DESC";
+
+	dol_syslog('/core/lib/function2.lib.php::getListOfModels', LOG_DEBUG);
+	$resql = $db->query($sql);
+	if ($resql) {
+		$num = $db->num_rows($resql);
+		$i = 0;
+		while ($i < $num) {
+			$found = 1;
+
+			$obj = $db->fetch_object($resql);
+
+			// If this generation module needs to scan a directory, then description field is filled
+			// with the constant that contains list of directories to scan (COMPANY_ADDON_PDF_ODT_PATH, ...).
+			if (!empty($obj->description)) {	// A list of directories to scan is defined
+				include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+
+				$const = $obj->description;
+				//irtoscan.=($dirtoscan?',':'').preg_replace('/[\r\n]+/',',',trim($conf->global->$const));
+				$dirtoscan = preg_replace('/[\r\n]+/', ',', trim($conf->global->$const));
+
+				$listoffiles = array();
+
+				// Now we add models found in directories scanned
+				$listofdir = explode(',', $dirtoscan);
+				foreach ($listofdir as $key => $tmpdir) {
+					$tmpdir = trim($tmpdir);
+					$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
+					$tmpdir = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $tmpdir);
+					if (!$tmpdir) {
+						unset($listofdir[$key]);
+						continue;
+					}
+					if (is_dir($tmpdir)) {
+						// all type of template is allowed
+						$tmpfiles = dol_dir_list($tmpdir, 'files', 0, '', '', 'name', SORT_ASC, 0);
+						if (count($tmpfiles)) {
+							$listoffiles = array_merge($listoffiles, $tmpfiles);
+						}
+					}
+				}
+
+				if (count($listoffiles)) {
+					foreach ($listoffiles as $record) {
+						$max = ($maxfilenamelength ? $maxfilenamelength : 28);
+						$liste[$obj->id.':'.$record['fullname']] = dol_trunc($record['name'], $max, 'middle');
+					}
+				} else {
+					$liste[0] = $obj->label.': '.$langs->trans("None");
+				}
+			} else {
+				if ($type == 'member' && $obj->doc_template_name == 'standard') {   // Special case, if member template, we add variant per format
+					global $_Avery_Labels;
+					include_once DOL_DOCUMENT_ROOT.'/core/lib/format_cards.lib.php';
+					foreach ($_Avery_Labels as $key => $val) {
+						$liste[$obj->id.':'.$key] = ($obj->label ? $obj->label : $obj->doc_template_name).' '.$val['name'];
+					}
+				} else {
+					// Common usage
+					$liste[$obj->id] = $obj->label ? $obj->label : $obj->doc_template_name;
+				}
+			}
+			$i++;
+		}
+	} else {
+		dol_print_error($db);
+		return -1;
+	}
+
+	if ($found) {
+		return $liste;
+	} else {
+		return 0;
+	}
+}
+
 
 /**
  * Show header for public page signature

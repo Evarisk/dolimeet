@@ -274,6 +274,7 @@ class DolimeetSignature extends CommonObject
 			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i   = 0;
@@ -544,7 +545,7 @@ class DolimeetSignature extends CommonObject
 	 */
 	public function fetchSignatories($fk_object, $object_type, $morefilter = '1 = 1')
 	{
-		$filter      = array('customsql' => 'fk_object=' . $fk_object . ' AND ' . $morefilter . ' AND object_type="' . $object_type . '"');
+		$filter      = array('customsql' => 'fk_object=' . $fk_object . ' AND ' . $morefilter . ' AND object_type="' . $object_type . '"' . ' AND status > 0');
 		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 	}
 

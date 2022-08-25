@@ -242,89 +242,39 @@ if (empty($reshook)) {
 	//include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';
 
 	// Action to build doc
-//	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
-
 	if ($action == 'builddoc' && $permissiontoadd) {
-		if (is_numeric(GETPOST('model', 'alpha'))) {
-			$error = $langs->trans("ErrorFieldRequired", $langs->transnoentities("Model"));
+		$outputlangs = $langs;
+		$newlang     = '';
+
+		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
+		if ( ! empty($newlang)) {
+			$outputlangs = new Translate("", $conf);
+			$outputlangs->setDefaultLang($newlang);
+		}
+
+		// To be sure vars is defined
+		if (empty($hidedetails)) $hidedetails = 0;
+		if (empty($hidedesc)) $hidedesc       = 0;
+		if (empty($hideref)) $hideref         = 0;
+		if (empty($moreparams)) $moreparams   = null;
+
+		$model = GETPOST('model', 'alpha');
+
+		$moreparams['object'] = $object;
+		$moreparams['user']   = $user;
+
+		$result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		if ($result <= 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+			$action = '';
 		} else {
-			// Reload to get all modified line records and be ready for hooks
-			$ret = $object->fetch($id);
-			$ret = $object->fetch_thirdparty();
-			/*if (empty($object->id) || ! $object->id > 0)
-			{
-				dol_print_error('Object must have been loaded by a fetch');
+			if (empty($donotredirect)) {
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
+				$urltoredirect = $_SERVER['REQUEST_URI'];
+				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+				header('Location: ' . $urltoredirect . '#builddoc');
 				exit;
-			}*/
-
-			// Save last template used to generate document
-			if (GETPOST('model', 'alpha')) {
-				$object->setDocModel($user, GETPOST('model', 'alpha'));
-			}
-
-			$outputlangs = $langs;
-			$newlang = '';
-
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) {
-				$newlang = GETPOST('lang_id', 'aZ09');
-			}
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->thirdparty->default_lang)) {
-				$newlang = $object->thirdparty->default_lang; // for proposal, order, invoice, ...
-			}
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->default_lang)) {
-				$newlang = $object->default_lang; // for thirdparty
-			}
-			if (!empty($newlang)) {
-				$outputlangs = new Translate("", $conf);
-				$outputlangs->setDefaultLang($newlang);
-			}
-
-			// To be sure vars is defined
-			if (empty($hidedetails)) {
-				$hidedetails = 0;
-			}
-			if (empty($hidedesc)) {
-				$hidedesc = 0;
-			}
-			if (empty($hideref)) {
-				$hideref = 0;
-			}
-			if (empty($moreparams)) {
-				$moreparams = null;
-			}
-
-			$result = $object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-			if ($result <= 0) {
-				setEventMessages($object->error, $object->errors, 'errors');
-				$action = '';
-			} else {
-				if ($conf->global->DOLIMEET_SHOW_DOCUMENTS_ON_PUBLIC_INTERFACE) {
-					$filedir = $conf->dolimeet->dir_output.'/'.$object->element.'/'.$object->ref;
-					$filelist = dol_dir_list($filedir, 'files');
-					if (!empty($filelist)) {
-						foreach ($filelist as $file) {
-							if (!preg_match('/specimen/', $file['name'])) {
-								$fileurl = $file['fullname'];
-								$filename = $file['name'];
-							}
-						}
-					}
-
-					$ecmfile->fetch(0, '', 'dolimeet/'. $object->element .'/'.$object->ref.'/'.$filename, '', '', 'dolimeet_'. $object->element, $id);
-					require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
-					$ecmfile->share = getRandomPassword(true);
-					$ecmfile->update($user);
-				}
-				if (empty($donotredirect)) {	// This is set when include is done by bulk action "Bill Orders"
-					setEventMessages($langs->trans("FileGenerated"), null);
-
-					$urltoredirect = $_SERVER['REQUEST_URI'];
-					$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-					$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-					header('Location: '.$urltoredirect.'#builddoc');
-					exit;
-				}
 			}
 		}
 	}
@@ -1131,7 +1081,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	if (empty($reshook)) {
 		// Send
 		$class = 'ModelePDFSession';
-		$modellist = call_user_func($class.'::liste_modeles', $db, 100);
+		$modellist = call_user_func($class.'::liste_modeles', $db, 100, $object->type);
 		if (!empty($modellist))
 		{
 			asort($modellist);
@@ -1168,7 +1118,31 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 		}
 	}
 
-	print '</div><div class="fichehalfleft">';
+	print '</div>';
+	$includedocgeneration = 1;
+
+	print '<div class="fichehalfleft">';
+	// Documents
+	if ($includedocgeneration) {
+		$objref = dol_sanitizeFileName($object->ref);
+		$relativepath = $objref.'/'.$objref.'.pdf';
+		$filedir = $conf->dolimeet->dir_output.'/'.$object->element.'/'.$objref;
+
+		$generated_files = dol_dir_list($filedir.'/', 'files');
+		$document_generated = 0;
+		foreach ($generated_files as $generated_file) {
+			if (!preg_match('/specimen/', $generated_file['name'])) {
+				$document_generated += 1;
+			}
+		}
+		$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
+		$genallowed = $user->rights->dolimeet->session->read; // If you can read, you can build the PDF to read content
+		$delallowed = $user->rights->dolimeet->session->write; // If you can create/edit, you can remove a file on card
+		print dolimeetshowdocuments('dolimeet:'.$object->type, $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, 0, '', 1, 0, 0, $langs->trans("LinkedDocuments"), 0, '', '', '', $langs->defaultlang, 1);
+	}
+
+	print '</div>';
+	print '<div class="fichehalfright">';
 
 	$MAXEVENT = 10;
 

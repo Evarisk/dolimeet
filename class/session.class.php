@@ -566,7 +566,8 @@ class Session extends CommonObject
 			}
 		}
 
-		$modelpath = "core/modules/dolimeet/doc/";
+
+		$modelpath = "custom/dolimeet/core/modules/dolimeet/documents/";
 
 		if ($includedocgeneration && !empty($modele)) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);

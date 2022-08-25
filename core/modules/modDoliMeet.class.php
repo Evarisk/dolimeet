@@ -134,6 +134,10 @@ class modDoliMeet extends DolibarrModules
 
 			5 => array('DOLIMEET_AUDIT_ADDON','chaine', 'mod_audit_standard','', $conf->entity),
 			6 => array('DOLIMEET_AUDIT_MENU_ENABLED','integer', 1,'', $conf->entity),
+
+			7 => array('DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/attendancesheet/', '', 0, 'current'),
+			8 => array('DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/completioncertificate/', '', 0, 'current'),
+
 		);
 
 		// Some keys to add into the overwriting translation tables
@@ -559,6 +563,12 @@ class modDoliMeet extends DolibarrModules
 		if ($result < 0) {
 			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
 		}
+
+		delDocumentModel('attendancesheet_odt', 'trainingsession');
+		delDocumentModel('completioncertificate_odt', 'trainingsession');
+
+		addDocumentModel('attendancesheet_odt', 'trainingsession', 'ODT templates', 'DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH');
+		addDocumentModel('completioncertificate_odt', 'trainingsession', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH');
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';

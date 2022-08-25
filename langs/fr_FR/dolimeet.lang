@@ -37,7 +37,7 @@ DoliMeetAboutPage = DoliMeet about page
 ModuleConfiguration = Configuration du module
 DoliMeetSettings = Réglages de DoliMeet
 DoliMeetObjects = Objets de DoliMeet
-
+LinkedDocuments = Documents liés
 
 #
 # Session
@@ -109,7 +109,7 @@ TrainingSessionList = Liste des sessions de formation
 TrainingSessionCreate = Créer une session de formation
 ContractLinked = Contrat lié
 Contract = Contrat
-TrainingSessionAttendants = Participants - Session de formation
+TrainingsessionAttendants = Participants - Session de formation
 TrainingSessionCreateTrigger = La session de formation a été créée
 TrainingSessionModifyTrigger = La session de formation a été modifiée
 TrainingSessionDeleteTrigger = La session de formation a été supprimée
