@@ -65,9 +65,9 @@ class doc_attendancesheet_odt extends ModelePDFSession
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('ControlDocumentDoliSMQTemplate');
+		$this->name = $langs->trans('AttendanceSheetDoliMeetTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -101,13 +101,13 @@ class doc_attendancesheet_odt extends ModelePDFSession
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH)));
 		$listoffiles = array();
 		foreach ($listofdir as $key=>$tmpdir)
 		{
@@ -126,9 +126,9 @@ class doc_attendancesheet_odt extends ModelePDFSession
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH))
+		if (!empty($conf->global->DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH))
 		{
-			$texte .= $langs->trans("DoliSMQNumberOfModelFilesFound").': <b>';
+			$texte .= $langs->trans("DoliMeetNumberOfModelFilesFound").': <b>';
 			$texte .= count($listoffiles);
 			$texte .= '</b>';
 		}
@@ -211,14 +211,7 @@ class doc_attendancesheet_odt extends ModelePDFSession
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
-//			$object->last_main_doc = $filename;
-//
-//			$sql = "UPDATE ".MAIN_DB_PREFIX."dolimeet_control";
-//			$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
-//			$sql .= " WHERE rowid = ".$object->id;
-
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
-//			$this->db->query($sql);
 			$file = $dir.'/'.$filename;
 
 			dol_mkdir($conf->dolimeet->dir_temp);

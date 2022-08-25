@@ -65,9 +65,9 @@ class doc_completioncertificate_odt extends ModelePDFSession
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('ControlDocumentDoliSMQTemplate');
+		$this->name = $langs->trans('CompletionCertificateDoliMeetTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -101,13 +101,13 @@ class doc_completioncertificate_odt extends ModelePDFSession
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH)));
 		$listoffiles = array();
 		foreach ($listofdir as $key=>$tmpdir)
 		{
@@ -126,7 +126,7 @@ class doc_completioncertificate_odt extends ModelePDFSession
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DOLISMQ_CONTROLDOCUMENT_ADDON_ODT_PATH))
+		if (!empty($conf->global->DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("DoliSMQNumberOfModelFilesFound").': <b>';
 			$texte .= count($listoffiles);
@@ -167,6 +167,7 @@ class doc_completioncertificate_odt extends ModelePDFSession
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc, $db;
 
+		$attendant = $object['attendant'];
 		$object = $object['object'];
 
 		if (empty($srctemplatepath))
@@ -207,7 +208,7 @@ class doc_completioncertificate_odt extends ModelePDFSession
 
 			$date = dol_print_date(dol_now(),'dayxcard');
 
-			$filename = $date . '_completioncertificate_' . $object->ref . '.odt';
+			$filename = $date . '_completioncertificate_' . $object->ref . '_' . $attendant->firstname . $attendant->lastname .'.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
@@ -276,16 +277,48 @@ class doc_completioncertificate_odt extends ModelePDFSession
 			$project = new Project($db);
 
 			$contract->fetch($object->fk_contrat);
+			$contract->fetch_optionals();
+
 			$project->fetch($object->fk_project);
 
+			$trainingsession_type_dict = fetchDictionnary('c_trainingsession_type');
+
 			$tmparray['mycompany_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$tmparray['Adress']     = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
-			$tmparray['CONTRACT']     = $contract->ref;
-			$tmparray['PROJECT']     = $project->ref;
-			$tmparray['DATESESSION']     = dol_print_date($object->date_start, 'dayhour');
-			$tmparray['DSSESSION']     = dol_print_date($object->date_start, 'dayhour');
-			$tmparray['DESESSION']     = dol_print_date($object->date_end, 'dayhour');
-			$tmparray['DURATION']     = $object->duration;
+
+			$tmparray['date_start']     = dol_print_date($object->date_start, 'dayhour');
+			$tmparray['date_end']     = dol_print_date($object->date_end, 'dayhour');
+			$duration_hours = floor($object->duration / 60);
+			$duration_minutes = $object->duration % 60;
+			$duration_minutes = $duration_minutes < 10 ? 0 . $duration_minutes : $duration_minutes;
+			$tmparray['duration']     = $duration_hours . 'h' . $duration_minutes;
+
+			if (is_array($trainingsession_type_dict) && !empty($trainingsession_type_dict)) {
+				$tmparray['action_nature'] = $langs->trans($trainingsession_type_dict[$contract->array_options['options_trainingsession_type']]->label);
+			} else {
+				$tmparray['action_nature'] = '';
+			}
+
+			$tmparray['attendant_fullname']     = $attendant->firstname . ' ' . $attendant->lastname;
+
+			if ($attendant->element_type == 'user') {
+
+				$tmparray['attendant_company_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
+
+			} else if ($attendant->element_type == 'socpeople') {
+				$contact = new Contact($db);
+				$thirdparty = new Societe($db);
+				$contact->fetch($attendant->element_id);
+				$thirdparty->fetch($contact->fk_soc);
+				$tmparray['attendant_company_name']     = $thirdparty->nom;
+			}
+
+			$tmparray['trainingsession_name']     = $contract->array_options['options_label'];
+			$tmparray['trainingsession_company_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
+
+			$tmparray['sessiontrainer_fullname']     = $object->duration;
+			$tmparray['sessiontrainer_signature']     = $object->duration;
+			$tmparray['document_date']     = dol_print_date(dol_now('tzuser'), 'dayhour');
+			$tmparray['location']     = $object->duration;
 
 			foreach ($tmparray as $key=>$value)
 			{
@@ -309,71 +342,7 @@ class doc_completioncertificate_odt extends ModelePDFSession
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
-			// Replace tags of lines
-			try
-			{
-				$foundtagforlines = 1;
-				if ($foundtagforlines) {
-					if ( ! empty( $object ) ) {
-						$listlines = $odfHandler->setSegment('attendants');
-						$signatory = new DolimeetSignature($db);
-						$signatoriesList = $signatory->fetchSignatories($object->id, $object->type);
 
-						if ( ! empty($signatoriesList) && is_array($signatoriesList)) {
-							$k = 0;
-							foreach ($signatoriesList as $objectSignatory) {
-								$tmparray['attendant_number'] = $k;
-								$tmparray['attendant_lastname'] = $objectSignatory->lastname;
-								$tmparray['attendant_firstname'] = $objectSignatory->firstname;
-								if (dol_strlen($objectSignatory->signature) > 0) {
-									$encoded_image = explode(",", $objectSignatory->signature)[1];
-									$decoded_image = base64_decode($encoded_image);
-									file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
-									$tmparray['attendant_signature'] = $tempdir . "signature" . $k . ".png";
-								} else {
-									$tmparray['attendant_signature'] = '';
-								}
-								foreach ($tmparray as $key=>$value)
-								{
-									try {
-										if ($key == 'attendant_signature') { // Image
-											if (is_file($value)) {
-												$list     = getimagesize($value);
-												$newWidth = 200;
-												if ($list[0]) {
-													$ratio     = $newWidth / $list[0];
-													$newHeight = $ratio * $list[1];
-													dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-												}
-												$odfHandler->setImage($key, $value);
-											}
-										} else if (!is_array($value)) {
-											$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-										}
-									}
-									catch (OdfException $e)
-									{
-										dol_syslog($e->getMessage(), LOG_INFO);
-									}
-								}
-								dol_delete_file($tempdir . "signature" . $k . ".png");
-
-								$listlines->merge();
-								$k++;
-							}
-							$odfHandler->mergeSegment($listlines);
-
-						}
-					}
-				}
-
-			}
-			catch (OdfException $e)
-			{
-				$this->error = $e->getMessage();
-				dol_syslog($this->error, LOG_WARNING);
-				return -1;
-			}
 			// Replace labels translated
 			$tmparray = $outputlangs->get_translations_for_substitutions();
 

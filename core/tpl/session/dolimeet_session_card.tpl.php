@@ -8,6 +8,7 @@ $extrafields    = new ExtraFields($db);
 $usertmp        = new User($db);
 $ecmfile        = new EcmFiles($db);
 $thirdparty     = new Societe($db);
+$signatory      = new DolimeetSignature($db);
 
 $object->fetch($id);
 if ($object->fk_contact > 0) {
@@ -262,6 +263,28 @@ if (empty($reshook)) {
 
 		$moreparams['object'] = $object;
 		$moreparams['user']   = $user;
+
+		if (preg_match('/completioncertificate/',GETPOST('model'))) {
+			$signatoriesList = $signatory->fetchSignatories($object->id, $object->type);
+			if (!empty($signatoriesList)) {
+				foreach($signatoriesList as $objectSignatory) {
+					$moreparams['attendant']   = $objectSignatory;
+					$result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+					if ($result <= 0) {
+						setEventMessages($object->error, $object->errors, 'errors');
+						$action = '';
+					}
+				}
+				if (empty($donotredirect)) {
+					setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
+					$urltoredirect = $_SERVER['REQUEST_URI'];
+					$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+					$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+					header('Location: ' . $urltoredirect . '#builddoc');
+					exit;
+				}
+			}
+		}
 
 		$result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		if ($result <= 0) {
