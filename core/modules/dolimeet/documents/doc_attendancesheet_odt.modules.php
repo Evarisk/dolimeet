@@ -267,6 +267,11 @@ class doc_attendancesheet_odt extends ModelePDFSession
 			$usertmp    = new User($db);
 			$contract = new Contrat($db);
 			$project = new Project($db);
+			$signatorytmp = new DolimeetSignature($db);
+			$signatorytmp = $signatorytmp->fetchSignatory('TRAININGSESSION_SESSION_TRAINER', $object->id, $object->type);
+			if (is_array($signatorytmp) && !empty($signatorytmp)) {
+				$signatorytmp = array_shift($signatorytmp);
+			}
 
 			$contract->fetch($object->fk_contrat);
 			$project->fetch($object->fk_project);
@@ -280,11 +285,28 @@ class doc_attendancesheet_odt extends ModelePDFSession
 			$tmparray['DESESSION']     = dol_print_date($object->date_end, 'dayhour');
 			$tmparray['DURATION']     = $object->duration;
 
+			$tmparray['intervenant_name'] = $signatorytmp->firstname . ' ' . $signatorytmp->lastname;
+			if (dol_strlen($signatorytmp->signature) > 0) {
+				$encoded_image = explode(",", $signatorytmp->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir . "signature.png", $decoded_image);
+				$tmparray['intervenant_signature'] = $tempdir . "signature.png";
+			} else {
+				$tmparray['intervenant_signature'] = '';
+			}
+
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' || preg_match('/logo$/', $key)) // Image
+					if (($key == 'intervenant_signature' || preg_match('/logo$/', $key)) && is_file($value)) // Image
 					{
+						$list     = getimagesize($value);
+						$newWidth = 200;
+						if ($list[0]) {
+							$ratio     = $newWidth / $list[0];
+							$newHeight = $ratio * $list[1];
+							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+						}
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
@@ -302,6 +324,7 @@ class doc_attendancesheet_odt extends ModelePDFSession
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
+
 			// Replace tags of lines
 			try
 			{
@@ -314,44 +337,47 @@ class doc_attendancesheet_odt extends ModelePDFSession
 						if ( ! empty($signatoriesList) && is_array($signatoriesList)) {
 							$k = 1;
 							foreach ($signatoriesList as $objectSignatory) {
-								$tmparray['attendant_number'] = $k;
-								$tmparray['attendant_lastname'] = $objectSignatory->lastname;
-								$tmparray['attendant_firstname'] = $objectSignatory->firstname;
-								if (dol_strlen($objectSignatory->signature) > 0) {
-									$encoded_image = explode(",", $objectSignatory->signature)[1];
-									$decoded_image = base64_decode($encoded_image);
-									file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
-									$tmparray['attendant_signature'] = $tempdir . "signature" . $k . ".png";
-								} else {
-									$tmparray['attendant_signature'] = '';
-								}
-								foreach ($tmparray as $key=>$value)
-								{
-									try {
-										if ($key == 'attendant_signature' && is_file($value)) { // Image
-											$list     = getimagesize($value);
+								if ($objectSignatory->role != "TRAININGSESSION_SESSION_TRAINER") {
+									$tmparray['attendant_number'] = $k;
+									$tmparray['attendant_lastname'] = $objectSignatory->lastname;
+									$tmparray['attendant_firstname'] = $objectSignatory->firstname;
+									if (dol_strlen($objectSignatory->signature) > 0) {
+										$encoded_image = explode(",", $objectSignatory->signature)[1];
+										$decoded_image = base64_decode($encoded_image);
+										file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
+										$tmparray['attendant_signature'] = $tempdir . "signature" . $k . ".png";
+									} else {
+										$tmparray['attendant_signature'] = '';
+									}
+									foreach ($tmparray as $key=>$value)
+									{
+										try {
+											if ($key == 'attendant_signature' && is_file($value)) { // Image
+												$list     = getimagesize($value);
 
-											$newWidth = 200;
-											if ($list[0]) {
-												$ratio     = $newWidth / $list[0];
-												$newHeight = $ratio * $list[1];
-												dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+												$newWidth = 200;
+												if ($list[0]) {
+													$ratio     = $newWidth / $list[0];
+													$newHeight = $ratio * $list[1];
+													dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+												}
+												$listlines->setImage($key, $value);
+											} else if (empty($value)) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else if (!is_array($value)) {
+												$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 											}
-											$listlines->setImage($key, $value);
-										} else if (empty($value)) {
-											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-										} else if (!is_array($value)) {
-											$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
+										catch (OdfException $e)
+										{
+											dol_syslog($e->getMessage(), LOG_INFO);
 										}
 									}
-									catch (OdfException $e)
-									{
-										dol_syslog($e->getMessage(), LOG_INFO);
-									}
+									$listlines->merge();
+									dol_delete_file($tempdir . "signature" . $k . ".png");
+									$k++;
 								}
-								$listlines->merge();
-								dol_delete_file($tempdir . "signature" . $k . ".png");
-								$k++;
+
 							}
 							$odfHandler->mergeSegment($listlines);
 
@@ -417,6 +443,7 @@ class doc_attendancesheet_odt extends ModelePDFSession
 			$odfHandler = null; // Destroy object
 
 			$this->result = array('fullpath'=>$file);
+			dol_delete_file($tempdir . "signature.png");
 
 			return 1; // Success
 		}

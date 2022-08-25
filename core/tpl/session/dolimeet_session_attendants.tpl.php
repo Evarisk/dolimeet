@@ -42,7 +42,8 @@ if ($action == 'addSocietyAttendant') {
 	$attendant_id = GETPOST('user_attendant');
 
 	if ( ! $error) {
-		$result = $signatory->setSignatory($object->id, $object->element, 'user', array($attendant_id), strtoupper($object->element).'_SOCIETY_ATTENDANT', 1);
+		$role = strtoupper(GETPOST('attendantRole'));
+		$result = $signatory->setSignatory($object->id, $object->element, 'user', array($attendant_id), strtoupper($object->element).'_' . $role, $role == 'SESSION_TRAINER' ? 0 : 1);
 		if ($result > 0) {
 			$usertmp = $user;
 			$usertmp->fetch($attendant_id);
@@ -319,6 +320,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Society attendants -- Participants de la société
 	$society_intervenants = $signatory->fetchSignatory(strtoupper($object->element).'_SOCIETY_ATTENDANT', $object->id, $object->element);
+	$society_trainer = $signatory->fetchSignatory(strtoupper($object->element).'_SESSION_TRAINER', $object->id, $object->element);
+
+	$society_intervenants = array_merge($society_intervenants, $society_trainer);
 
 	print load_fiche_titre($langs->trans("Attendants"), '', '');
 
@@ -352,7 +356,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<tr class="oddeven"><td class="minwidth200">';
 			print $usertmp->getNomUrl(1);
 			print '</td><td>';
-			print $langs->trans("SocietyAttendant") . ' ' . $j;
+			print $langs->trans($element->role);
 			print '</td><td class="center">';
 			if ($object->status == 2) {
 				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
@@ -401,8 +405,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<tr class="oddeven"><td class="maxwidth200">';
 		print $form->select_dolusers('', 'user_attendant', 1, $already_added_users);
 		print '</td>';
-		print '<td>' . $langs->trans("SocietyAttendant") . '</td>';
-		print '<td class="center">';
+		print '<td>';
+		print '<select id="attendantRole" name="attendantRole">';
+		print '<option value="society_attendant">' . $langs->trans("SocietyAttendant") . '</option>';
+		print '<option value="session_trainer">' . $langs->trans("SessionTrainer") . '</option>';
+		print '</select>';
+		print ajax_combobox('attendantRole');
+		print '</td><td class="center">';
 		print '-';
 		print '</td><td class="center">';
 		print '-';
@@ -459,7 +468,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td>';
 			print $contact->getNomUrl(1);
 			print '</td><td>';
-			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
+			print $langs->trans("ExtSocietyIntervenant");
 			print '</td><td class="center">';
 			if ($object->status == 2) {
 				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);

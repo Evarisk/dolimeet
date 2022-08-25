@@ -268,11 +268,13 @@ if (empty($reshook)) {
 			$signatoriesList = $signatory->fetchSignatories($object->id, $object->type);
 			if (!empty($signatoriesList)) {
 				foreach($signatoriesList as $objectSignatory) {
-					$moreparams['attendant']   = $objectSignatory;
-					$result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-					if ($result <= 0) {
-						setEventMessages($object->error, $object->errors, 'errors');
-						$action = '';
+					if ($objectSignatory->role != 'TRAININGSESSION_SESSION_TRAINER') {
+						$moreparams['attendant']   = $objectSignatory;
+						$result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+						if ($result <= 0) {
+							setEventMessages($object->error, $object->errors, 'errors');
+							$action = '';
+						}
 					}
 				}
 				if (empty($donotredirect)) {

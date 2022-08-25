@@ -198,7 +198,7 @@ function dolimeetshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		$modulepart    = $tmp[0];
 		$submodulepart = $tmp[1];
 	}
-	if ($submodulepart == 'trainingsession') {
+	if ($submodulepart == 'trainingsession' || $submodulepart == 'meeting' || $submodulepart == 'audit') {
 		$subtype = $submodulepart;
 		$submodulepart = 'session';
 	}

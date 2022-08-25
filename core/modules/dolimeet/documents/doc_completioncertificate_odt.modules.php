@@ -275,6 +275,11 @@ class doc_completioncertificate_odt extends ModelePDFSession
 			$usertmp    = new User($db);
 			$contract = new Contrat($db);
 			$project = new Project($db);
+			$signatorytmp = new DolimeetSignature($db);
+			$signatorytmp = $signatorytmp->fetchSignatory('TRAININGSESSION_SESSION_TRAINER', $object->id, $object->type);
+			if (is_array($signatorytmp) && !empty($signatorytmp)) {
+				$signatorytmp = array_shift($signatorytmp);
+			}
 
 			$contract->fetch($object->fk_contrat);
 			$contract->fetch_optionals();
@@ -309,22 +314,38 @@ class doc_completioncertificate_odt extends ModelePDFSession
 				$thirdparty = new Societe($db);
 				$contact->fetch($attendant->element_id);
 				$thirdparty->fetch($contact->fk_soc);
-				$tmparray['attendant_company_name']     = $thirdparty->nom;
+				$tmparray['attendant_company_name']     = $thirdparty->name;
 			}
 
 			$tmparray['trainingsession_name']     = $contract->array_options['options_label'];
 			$tmparray['trainingsession_company_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
 
-			$tmparray['sessiontrainer_fullname']     = $object->duration;
-			$tmparray['sessiontrainer_signature']     = $object->duration;
+			$tmparray['sessiontrainer_fullname']     = $signatorytmp->firstname . ' ' . $signatorytmp->lastname;
+
+			if (dol_strlen($signatorytmp->signature) > 0) {
+				$encoded_image = explode(",", $signatorytmp->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir . "signature.png", $decoded_image);
+				$tmparray['sessiontrainer_signature'] = $tempdir . "signature.png";
+			} else {
+				$tmparray['sessiontrainer_signature'] = '';
+			}
+
 			$tmparray['document_date']     = dol_print_date(dol_now('tzuser'), 'dayhour');
 			$tmparray['location']     = $object->duration;
 
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' || preg_match('/logo$/', $key)) // Image
+					if (($key == 'sessiontrainer_signature' || preg_match('/logo$/', $key)) && is_file($value)) // Image
 					{
+						$list     = getimagesize($value);
+						$newWidth = 200;
+						if ($list[0]) {
+							$ratio     = $newWidth / $list[0];
+							$newHeight = $ratio * $list[1];
+							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+						}
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
@@ -349,10 +370,6 @@ class doc_completioncertificate_odt extends ModelePDFSession
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'attendant_lastname') {
-						echo '<pre>'; print_r( $value ); echo '</pre>'; exit;
-
-					}
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
 				}
 				catch (OdfException $e)
