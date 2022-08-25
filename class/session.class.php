@@ -326,7 +326,15 @@ class Session extends CommonObject
 
 		$result = '';
 
-		$label = img_picto('', $this->picto).' <u>'.$langs->trans("Session").'</u>';
+		switch ($this->type) {
+			case 'trainingsession':
+				$picto = '<i class"fas fa-people-arrows"></i>';
+			case 'meeting':
+				$picto = '<i class"fas fa-comments"></i>';
+			case 'audit':
+				$picto = '<i class"fas fa-list-check"></i>';
+		}
+		$label = $picto .' <u>'.$langs->trans("Session").'</u>';
 		if (isset($this->status)) {
 			$label .= ' '.$this->getLibStatut(5);
 		}
