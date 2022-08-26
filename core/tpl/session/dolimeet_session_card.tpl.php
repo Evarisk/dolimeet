@@ -120,19 +120,13 @@ if (empty($reshook)) {
 		$society_id     = GETPOST('fk_soc');
 		$project_id     = GETPOST('projectid');
 		$contrat_id     = GETPOST('fk_contrat');
-		$duration       = GETPOST('duration');
+		$durationh       = GETPOST('durationh') ?:0;
+		$durationm       = GETPOST('durationm') ?: 0;
+
+		$duration_minutes = $durationh * 60 + $durationm;
+
 		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
 		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
-
-		$minutes = 0;
-		if (preg_match('/,/', $duration)){
-			$hours = preg_split('/,/', $duration)[0];
-			$minutes = ($duration - $hours) * 60;
-		} else if (preg_match('/./', $duration)){
-			$hours = preg_split('/\./', $duration)[0];
-			$minutes = ($duration - $hours) * 60;
-		}
-		$duration_minutes = $hours * 60 + $minutes;
 
 		// Initialize object
 		$now                   = dol_now();
@@ -195,6 +189,10 @@ if (empty($reshook)) {
 		$project_id     = GETPOST('fk_project');
 		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
 		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
+		$durationh       = GETPOST('durationh') ?:0;
+		$durationm       = GETPOST('durationm') ?: 0;
+
+		$duration_minutes = $durationh * 60 + $durationm;
 
 		$object->label      = $label;
 		$object->fk_soc     = $society_id;
@@ -203,6 +201,7 @@ if (empty($reshook)) {
 		$object->fk_project = $project_id;
 		$object->date_start = $date_start;
 		$object->date_end = $date_end;
+		$object->duration = $duration_minutes;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 		if (!$error) {
@@ -758,9 +757,12 @@ if ($action == 'create') {
 		print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddContract") . '"></span></a>';
 		print '</td></tr>';
 
-		//Date end - Date de début
-		print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans("DurationH") . '</label></td><td>';
-		print '<input type=number step=".01" name="duration" id="duration" value="'. GETPOST('duration') .'">';
+		//Duration - Durée
+		print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans("Duration") . '</label></td><td>';
+		print '<input type=number name="durationh" id="durationh" value="'. GETPOST('durationh') .'">';
+		print $langs->trans('Hour(s)');
+		print '<input type=number name="durationm" id="durationm" value="'. GETPOST('durationm') .'">';
+		print $langs->trans('Minute(s)');
 		print '</td></tr>';
 	}
 
@@ -884,8 +886,9 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 		//Duration - Durée
 		print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans("DurationH") . '</label></td><td>';
 		$duration_hours = floor($object->duration / 60);
-		$duration_minutes = ($object->duration % 60) * 100/60;
-		print '<input type=number step=".01" name="duration" id="duration" value="'. $duration_hours . '.' . $duration_minutes .'">';
+		$duration_minutes = ($object->duration % 60);
+		print '<input type=number name="durationh" id="durationh" value="'. $duration_hours .'">';
+		print '<input type=number name="durationm" id="durationm" value="'. $duration_minutes .'">';
 		print '</td></tr>';
 	}
 
@@ -1045,13 +1048,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 
 	if ($object->type == 'trainingsession') {
 		$duration_hours = floor($object->duration / 60);
-		$duration_minutes = ($object->duration % 60) * 100/60;
+		$duration_minutes = ($object->duration % 60);
 
 		print '<tr><td class="titlefield">';
 		print $langs->trans("Duration");
 		print '</td>';
 		print '<td>';
-		print $duration_hours . '.' . $duration_minutes . ' ' . $langs->trans('Hours');
+		print $duration_hours . ' ' . $langs->trans('Hour(s)') . ' ' . $duration_minutes . ' ' . $langs->trans('Minute(s)');
 		print '</td></tr>';
 	}
 

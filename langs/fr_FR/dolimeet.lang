@@ -38,6 +38,8 @@ ModuleConfiguration = Configuration du module
 DoliMeetSettings = Réglages de DoliMeet
 DoliMeetObjects = Objets de DoliMeet
 LinkedDocuments = Documents liés
+Hour(s) = Heure(s)
+Minute(s) = Minute(s)
 
 #
 # Session
