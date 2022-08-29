@@ -84,6 +84,7 @@ SessionTrainer = Formateur
 TRAININGSESSION_SESSION_TRAINER = Formateur
 TRAININGSESSION_SOCIETY_ATTENDANT = Participant
 
+
 #
 # Meeting
 #
@@ -134,7 +135,7 @@ ActionFormationApprentissage = Action de formation par apprentissage
 ActionVAE = Action de VAE
 BilanCompetences = Bilan de compétences
 TrainingSessionType = Type de formation
-
+TrainingSessionLocation = Lieu de la formation
 
 #
 # Audit

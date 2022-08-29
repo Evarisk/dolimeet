@@ -332,7 +332,7 @@ class doc_completioncertificate_odt extends ModelePDFSession
 			}
 
 			$tmparray['document_date']     = dol_print_date(dol_now('tzuser'), 'dayhour');
-			$tmparray['location']     = $object->duration;
+			$tmparray['location']     = $contract->array_options['options_trainingsession_location'];
 
 			foreach ($tmparray as $key=>$value)
 			{

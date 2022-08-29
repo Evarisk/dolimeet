@@ -586,6 +586,9 @@ class modDoliMeet extends DolibarrModules
 		$extra_fields->update('trainingsession_type', $langs->transnoentities("TrainingSessionType"), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
 		$extra_fields->addExtraField('trainingsession_type', $langs->transnoentities("TrainingSessionType"), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
 
+		$extra_fields->update('trainingsession_location', $langs->transnoentities("TrainingSessionLocation"), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_location', $langs->transnoentities("TrainingSessionLocation"), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1);
+
 		// Permissions
 		$this->remove($options);
 
