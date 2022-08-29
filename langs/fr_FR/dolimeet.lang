@@ -104,6 +104,7 @@ NewMeeting = Nouvelle réunion
 EnableMeetingDescription = Activer l'objet Réunion
 CloneMeeting = Cloner la réunion
 ConfirmCloneMeeting = Voulez-vous cloner cette réunion ?
+MeetingsCategoriesArea = Catégories de réunion
 
 #
 # Training Session
@@ -136,6 +137,7 @@ ActionVAE = Action de VAE
 BilanCompetences = Bilan de compétences
 TrainingSessionType = Type de formation
 TrainingSessionLocation = Lieu de la formation
+TrainingsessionsCategoriesArea = Catégories de session de formation
 
 #
 # Audit
@@ -156,6 +158,7 @@ NewAudit = Nouvel audit
 EnableAuditDescription = Activer l'objet Audit
 CloneAudit = Cloner l'audit ?
 ConfirmCloneAudit = Voulez-vous cloner cet audit ?
+AuditsCategoriesArea = Catégories d'audit
 
 #
 # Attendants
