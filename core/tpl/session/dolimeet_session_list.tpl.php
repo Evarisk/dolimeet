@@ -75,6 +75,9 @@ $formcontrat = new FormContract($db);
 if (empty($object->type)) {
 	$object->type = 'session';
 }
+if (!$fromtype || !$fromid) {
+	unset($object->fields['type']);
+}
 $diroutputmassaction = $conf->session->dir_output.'/temp/massgeneration/'.$user->id;
 $hookmanager->initHooks(array('documentlist')); // Note that conf->hooks_modules contains array
 
@@ -280,6 +283,7 @@ $help_url = '';
 $title = $langs->trans(ucfirst($object->type) . 'List');
 $morejs = array();
 $morecss = array();
+
 
 // Build and execute select
 // --------------------------------------------------------------------
@@ -748,6 +752,10 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					$contract->fetch($obj->fk_contrat);
 					print $contract->getNomUrl(1);
 				}
+			} elseif ($key == 'type') {
+				print '<div class="nowrap">';
+				print $langs->transnoentities(ucfirst($object->type));
+				print '</div>';
 			}
 			else if ($key == 'fk_contact') {
 				$contact->fetch($obj->fk_contact);
