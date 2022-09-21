@@ -283,7 +283,11 @@ class doc_attendancesheet_odt extends ModelePDFSession
 			$tmparray['DATESESSION']     = dol_print_date($object->date_start, 'dayhour');
 			$tmparray['DSSESSION']     = dol_print_date($object->date_start, 'dayhour');
 			$tmparray['DESESSION']     = dol_print_date($object->date_end, 'dayhour');
-			$tmparray['DURATION']     = $object->duration;
+
+			$duration_hours = floor($object->duration / 60);
+			$duration_minutes = ($object->duration % 60);
+
+			$tmparray['DURATION'] = $duration_hours . ' ' . $langs->trans('Hour(s)') . ' ' . $duration_minutes . ' ' . $langs->trans('Minute(s)');
 
 			$tmparray['intervenant_name'] = $signatorytmp->firstname . ' ' . $signatorytmp->lastname;
 			if (dol_strlen($signatorytmp->signature) > 0) {
