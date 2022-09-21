@@ -349,12 +349,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td>';
 			print $langs->trans($element->role);
 			print '</td><td class="center">';
-			if ($object->status == 2) {
+//			if ($object->status == 2) {
 				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
 				print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
-			} else {
-				print '-';
-			}
+//			} else {
+//				print '-';
+//			}
 
 			print '</td><td class="center">';
 			print dol_print_date($element->last_email_sent_date, 'dayhour');
@@ -453,12 +453,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td>';
 			print $langs->trans("ExtSocietyIntervenant");
 			print '</td><td class="center">';
-			if ($object->status == 2) {
+//			if ($object->status == 2) {
 				$signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
 				print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
-			} else {
-				print '-';
-			}
+//			} else {
+//				print '-';
+//			}
 
 			print '</td><td class="center">';
 			print dol_print_date($element->last_email_sent_date, 'dayhour');

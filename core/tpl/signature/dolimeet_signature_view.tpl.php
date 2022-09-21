@@ -1,4 +1,5 @@
-<?php if (empty($element->signature)) : ?>
+<?php
+if (empty($element->signature)) : ?>
 	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
 		<span><i class="fas fa-signature"></i> <?php echo $langs->trans('Sign'); ?></span>
 	</div>
