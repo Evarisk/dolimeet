@@ -621,23 +621,8 @@ window.eoxiaJS.signature.createSignature = function() {
 
 	var url = '';
 	var type = '';
-	if (elementZone == "private") {
-		url = document.URL + '&action=addSignature' + signatoryIDPost + '&token=' + token;
-		type = "POST"
-	} else {
-		url = document.URL + '&action=addSignature' + signatoryIDPost + '&token=' + token;
-		type = "POST";
-	}
-
-	if (elementConfCAPTCHA == 1) {
-		elementCode = $('#securitycode').val();
-		let elementSessionCode = $('#sessionCode').val();
-		if (elementSessionCode != elementCode) {
-			elementRedirect = $('#redirectSignatureError').val();
-		}
-	} else {
-		elementRedirect = $(this).find('#redirect' + elementSignatory).attr('value');
-	}
+	url = document.URL + '&action=addSignature' + signatoryIDPost + '&token=' + token;
+	type = "POST"
 
 	$.ajax({
 		url: url,
@@ -654,7 +639,7 @@ window.eoxiaJS.signature.createSignature = function() {
 				actionContainerSuccess.removeClass('hidden');
 				$('.signatures-container').html($(resp).find('.signatures-container'));
 			} else {
-				window.location.replace(elementRedirect);
+				window.location.reload();
 			}
 		},
 		error: function ( ) {
