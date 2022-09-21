@@ -166,8 +166,9 @@ AuditsCategoriesArea = Catégories d'audit
 
 Attendants = Participants
 NoSocietyAttendants = Pas de participant interne
-ExtSocietyIntervenants = Intervenant externe
-ExtSocietyIntervenant = Intervenant externe
+ExtSocietyIntervenants = Participants
+ExtSocietyIntervenant = Participant
+ExternalAttendants = Participants externes
 SocietyAttendants = Participants internes
 SocietyAttendant = Participant interne
 NoExternalAttendants = Pas d'intervenant externe

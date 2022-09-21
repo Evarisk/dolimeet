@@ -265,7 +265,6 @@ print dol_get_fiche_head($head, 'attendants', $langs->trans(ucfirst($object->ele
 $width = 80; $cssclass = 'photoref';
 dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 $morehtmlref                             .= '<div class="refidno">';
-// External Society -- Société extérieure
 
 // Project
 $project->fetch($object->fk_project);
@@ -339,14 +338,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
 
-//
-//	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "" ));
-//	$contacts_no_email = array();
-//	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-//		foreach ($contacts as $element_id) {
-//			$contacts_no_email[$element_id->id] = $element_id->id;
-//		}
-//	}
 	$already_added_users = array();
 	$j = 1;
 	if (is_array($society_intervenants) && ! empty($society_intervenants) && $society_intervenants > 0) {
@@ -433,7 +424,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$thirdparty->fetch($object->fk_soc);
 	$ext_society_intervenants = $signatory->fetchSignatory(strtoupper($object->element).'_EXTERNAL_ATTENDANT', $object->id, $object->element);
 
-	print load_fiche_titre($langs->trans("ExternalIntervenants"), '', '');
+	print load_fiche_titre($langs->trans("ExternalAttendants"), '', '');
 
 	print '<table class="border centpercent tableforfield">';
 
@@ -448,14 +439,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
-//
-//	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "" ));
-//	$contacts_no_email = array();
-//	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-//		foreach ($contacts as $element_id) {
-//			$contacts_no_email[$element_id->id] = $element_id->id;
-//		}
-//	}
 
 	$already_selected_intervenants = array();
 	$j                                           = 1;
@@ -534,7 +517,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print $newcardbutton;
 		print '</td>';
-		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
+		print '<td>' . $langs->trans("ExtSocietyIntervenant") . '</td>';
 		print '<td class="center">';
 		print '-';
 		print '</td><td class="center">';
