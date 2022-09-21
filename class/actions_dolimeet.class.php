@@ -137,7 +137,7 @@ class ActionsDolimeet
 	 */
 	public function printCommonFooter($parameters)
 	{
-		global $langs, $db;
+		global $langs, $db, $conf;
 		$error = 0; // Error counter
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
@@ -178,6 +178,22 @@ class ActionsDolimeet
 			<?php
 		}
 
+		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			$form      = new Form($db);
+			$pictopath = dol_buildpath('/dolimeet/img/dolimeet32px.png', 1);
+			$pictoDolimeet = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+			$training_organization_number_input = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
+			?>
+			<script>
+				let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $pictoDolimeet . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
+				trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($training_organization_number_input) ; ?> + '</td></tr>');
+
+				let element = $('table:nth-child(1) .oddeven:last-child');
+				element.after(trainingOrganizationNumberInput);
+			</script>
+			<?php
+		}
+
 		if (preg_match('/categoryindex/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			print '<script src="../custom/dolimeet/js/dolimeet.js.php"></script>';
 		}
@@ -190,4 +206,26 @@ class ActionsDolimeet
 			return -1;
 		}
 	}
+
+
+	/**
+	 *  Overloading the doActions function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @param $action
+	 * @return int              < 0 on error, 0 on success, 1 to replace standard code
+	 */
+	public function doActions($parameters, $object, $action)
+	{
+		global $db, $conf;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			if ($action == 'update') {
+				dolibarr_set_const($db, "MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER", GETPOST("MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER"), 'chaine', 0, '', $conf->entity);
+			}
+		}
+	}
+
 }

@@ -86,7 +86,8 @@ class modDoliMeet extends DolibarrModules
 				'category',
 				'categoryindex',
 				'projectOverview',
-				'printOverviewDetail'
+				'printOverviewDetail',
+				'admincompany'
 			),
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 0,
@@ -138,6 +139,7 @@ class modDoliMeet extends DolibarrModules
 			7 => array('DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/attendancesheet/', '', 0, 'current'),
 			8 => array('DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/completioncertificate/', '', 0, 'current'),
 
+			9 => array('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', 'chaine', '', '', 0, 'current')
 		);
 
 		// Some keys to add into the overwriting translation tables
