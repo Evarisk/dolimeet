@@ -277,12 +277,18 @@ class doc_attendancesheet_odt extends ModelePDFSession
 			$project->fetch($object->fk_project);
 
 			$tmparray['mycompany_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$tmparray['Adress']     = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
-			$tmparray['CONTRACT']     = $contract->ref;
+			$tmparray['Adress']             = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
+			$tmparray['declaration_number'] = '';
+			$tmparray['society_phone']      = $conf->global->MAIN_INFO_SOCIETE_TEL;
+			$tmparray['society_siret']      = $conf->global->MAIN_INFO_SIRET;
+			$tmparray['society_mail']       = $conf->global->MAIN_INFO_SOCIETE_MAIL;
+			$tmparray['society_website']    = $conf->global->MAIN_INFO_SOCIETE_WEB;
+
+			$tmparray['CONTRACT']    = $contract->ref;
 			$tmparray['PROJECT']     = $project->ref;
-			$tmparray['DATESESSION']     = dol_print_date($object->date_start, 'dayhour');
-			$tmparray['DSSESSION']     = dol_print_date($object->date_start, 'dayhour');
-			$tmparray['DESESSION']     = dol_print_date($object->date_end, 'dayhour');
+			$tmparray['DATESESSION'] = dol_print_date($object->date_start, 'dayhour');
+			$tmparray['DSSESSION']   = dol_print_date($object->date_start, 'dayhour');
+			$tmparray['DESESSION']   = dol_print_date($object->date_end, 'dayhour');
 
 			$duration_hours = floor($object->duration / 60);
 			$duration_minutes = ($object->duration % 60);
