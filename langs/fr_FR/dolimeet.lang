@@ -85,6 +85,8 @@ Object = Objet
 SessionTrainer = Formateur
 TRAININGSESSION_SESSION_TRAINER = Formateur
 TRAININGSESSION_SOCIETY_ATTENDANT = Participant
+SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
+SignatureEmailSubject = Signature de la feuille de présence
 
 
 #
