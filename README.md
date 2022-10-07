@@ -7,13 +7,6 @@ Dolimeet permet de suivre :
 - Sessions de formation avec attestions de présence et certification de réalisation
 - Audits avec le compte rendu
 
-
-<!--
-![Screenshot dolimeet](img/screenshot_dolimeet.png?raw=true "DoliMeet"){imgmd}
--->
-
-Other external modules are available on [Dolistore.com](https://www.dolistore.com).
-
 ## Traduction / translate
 
 Translations can be completed manually by editing files into directories *langs*.
