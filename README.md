@@ -1,8 +1,12 @@
-# DOLIMEET FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
+# DOLIMEET pour [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
-## Features
+## Description du module
 
-Description of the module...
+Dolimeet permet de suivre :
+- Réunions et compte rendu
+- Sessions de formation avec attestions de présence et certification de réalisation
+- Audits avec le compte rendu
+
 
 <!--
 ![Screenshot dolimeet](img/screenshot_dolimeet.png?raw=true "DoliMeet"){imgmd}
@@ -10,7 +14,7 @@ Description of the module...
 
 Other external modules are available on [Dolistore.com](https://www.dolistore.com).
 
-## Translations
+## Traduction / translate
 
 Translations can be completed manually by editing files into directories *langs*.
 
