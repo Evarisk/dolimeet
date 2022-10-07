@@ -1,4 +1,4 @@
-# DOLIMEET - Suivi des réunions, session de formation, audits pour [DOLIBARR ERP CRM](https://www.dolibarr.org)
+# DOLIMEET - Suivi des réunions, sessions de formation, audits pour [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
 ## Description du module
 
