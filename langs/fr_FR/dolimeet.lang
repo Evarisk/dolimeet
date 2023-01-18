@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Theo David <theodavid.perso@gmail.com>
+# Copyright (C) 2021-2023 EVARISK <dev@evarisk.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,42 +14,55 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #
-# Generic
+# Générique
 #
 
 # Module label 'ModuleDoliMeetName'
 ModuleDoliMeetName = DoliMeet
 # Module description 'ModuleDoliMeetDesc'
-ModuleDoliMeetDesc = DoliMeet pour Dolibarr
+ModuleDoliMeetDesc = Suivi des réunions, sessions de formation, audit
+DoliMeetDescription = Suivi des réunions, sessions de formation, audit
+DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 #
-# Admin page
+# Page d'administration
 #
-DoliMeetSetup = DoliMeet setup
+
 Settings = Réglages
+DoliMeetSetup = Configuration du module DoliMeet
 
 #
-# About page
+# Page À propos
 #
-About = About
-DoliMeetAbout = About DoliMeet
-DoliMeetAboutPage = DoliMeet about page
-ModuleConfiguration = Configuration du module
-DoliMeetSettings = Réglages de DoliMeet
-DoliMeetObjects = Objets de DoliMeet
-LinkedDocuments = Documents liés
-Hour(s) = Heure(s)
-Minute(s) = Minute(s)
-TrainingOrganizationNumber = Numéro de déclaration de l\'organisme de formation
-TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
+
+About = À propos
+DoliMeetAbout = À propos de DoliMeet
 
 #
-# Session
+# Page index
 #
-MyWidget = My widget
-MyWidgetDescription = My widget description
-Tags = Catégories
-Thirdparty = Tiers
+
+# Data - Donnée
+DoliMeetArea = Bienvenue sur DoliMeet
+DoliMeetUpdate = Mise à jour de DoliMeet :
+DoliMeetHasBeenUpdatedTo = DoliMeet a été mis à jour en version %s
+DoliMeetPatchNote = Note de mise à jour DoliMeet %s
+ShowPatchNote = Consulter la note de mise à jour
+DontShowPatchNote = Ne plus afficher la note de mise à jour
+
+#
+# DoliMeet
+#
+
+# Right - Droit
+LireDoliMeet = Consulter DoliMeet
+ReadDoliMeet = Consulter DoliMeet (read)
+ReadAdminPage = Accéder à la configuration du module
+
+#
+# Session - Session
+#
+
 ExternalIntervenants = Intervenants extérieurs
 Name = Nom
 Role = Rôle
@@ -88,10 +101,18 @@ TRAININGSESSION_SOCIETY_ATTENDANT = Participant
 SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
 SignatureEmailSubject = Signature de la feuille de présence
 
+#
+# Meeting - Réunion
+#
 
-#
-# Meeting
-#
+# Right - Droit
+ReadMeeting = Consulter les réunions
+WriteMeeting = Créer/Modifier les réunions
+DeleteMeeting = Supprimer les réunions
+
+# Trigger - Déclencheur
+
+# Data - Donnée
 Meeting = Réunion
 MeetingList = Liste des réunions
 MeetingCreate = Créer une réunion
@@ -100,10 +121,7 @@ MeetingCreateTrigger = La réunion a été créée
 MeetingModifyTrigger = La réunion a été modifiée
 MeetingDeleteTrigger = La réunion a été supprimée
 CardMeeting = Fiche - Réunion
-AgendaMeeting = Agenda - Réunion
-NoteMeeting = Note - Réunion
 AttendantsMeeting = Participants - Réunion
-DocumentsMeeting = Fichiers joints - Réunion
 NewMeeting = Nouvelle réunion
 EnableMeetingDescription = Activer l'objet Réunion
 CloneMeeting = Cloner la réunion
@@ -111,8 +129,15 @@ ConfirmCloneMeeting = Voulez-vous cloner cette réunion ?
 MeetingsCategoriesArea = Catégories de réunion
 
 #
-# Training Session
+# Training Session - Session de formation
 #
+
+# Right - Droit
+ReadTrainingSession = Consulter les sessions de formation
+WriteTrainingSession = Créer/Modifier les sessions de formation
+DeleteTrainingSession = Supprimer les sessions de formation
+
+# Data - Donnée
 TrainingSession = Session de formation
 Trainingsession = Session de formation
 TrainingsessionList = Liste des sessions de formation
@@ -125,10 +150,7 @@ TrainingSessionCreateTrigger = La session de formation a été créée
 TrainingSessionModifyTrigger = La session de formation a été modifiée
 TrainingSessionDeleteTrigger = La session de formation a été supprimée
 CardTrainingsession = Fiche - Session de formation
-AgendaTrainingsession = Agenda - Session de formation
-NoteTrainingsession = Note - Session de formation
 AttendantsTrainingsession = Participants - Session de formation
-DocumentsTrainingsession = Fichiers joints - Session de formation
 NewTrainingsession = Nouvelle session de formation
 EnableTrainingSessionDescription = Activer l'objet Session de Formation
 CloneTrainingsession = Cloner la session de formation
@@ -144,8 +166,15 @@ TrainingSessionLocation = Lieu de la formation
 TrainingsessionsCategoriesArea = Catégories de session de formation
 
 #
-# Audit
+# Audit - Audit
 #
+
+# Right - Droit
+ReadAudit = Consulter les audits
+WriteAudit = Créer/Modifier les audits
+DeleteAudit = Supprimer les audits
+
+# Data - Donnée
 Audit = Audit
 AuditList = Liste des audits
 AuditCreate = Créer un audit
@@ -154,10 +183,7 @@ AuditCreateTrigger = L'audit a été créé
 AuditModifyTrigger = L'audit a été modifié
 AuditDeleteTrigger = L'audit a été supprimé
 CardAudit = Fiche - Audit
-AgendaAudit = Agenda - Audit
-NoteAudit = Note - Audit
 AttendantsAudit = Participants - Audit
-DocumentsAudit = Fichiers joints - Audit
 NewAudit = Nouvel audit
 EnableAuditDescription = Activer l'objet Audit
 CloneAudit = Cloner l'audit ?
@@ -192,24 +218,16 @@ SignatureEvent = Le participant a signé : %s
 ExternalAttendants = Participants externes
 AttendantThirdparties = Tiers concernés
 
-#
-# Triggers
-#
 
-
-#
-# Droits
-#
 
 ReadDoliMeetSession = Lire les sessions de DoliMeet
 WriteDoliMeetSession = Créer/mettre à jour les sessions de DoliMeet
 DeleteDoliMeetSession = Supprimer les sessions de DoliMeet
-ReadDoliMeetMeeting = Lire les réunions de DoliMeet
-WriteDoliMeetMeeting = Créer/mettre à jour les réunions de DoliMeet
-DeleteDoliMeetMeeting = Supprimer les réunions de DoliMeet
-ReadDoliMeetTrainingSession = Lire les sessions de formation de DoliMeet
-WriteDoliMeetTrainingSession = Créer/mettre à jour les sessions de formation de DoliMeet
-DeleteDoliMeetTrainingSession = Supprimer les sessions de formation de DoliMeet
-ReadDoliMeetAudit = Lire les audits de DoliMeet
-WriteDoliMeetAudit = Créer/mettre à jour les audits de DoliMeet
-DeleteDoliMeetAudit = Supprimer les audits de DoliMeet
+
+
+DoliMeetObjects = Objets de DoliMeet
+LinkedDocuments = Documents liés
+Hour(s) = Heure(s)
+Minute(s) = Minute(s)
+TrainingOrganizationNumber = Numéro de déclaration de l\'organisme de formation
+TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation

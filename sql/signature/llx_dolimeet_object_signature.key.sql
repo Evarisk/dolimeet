@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EVARISK <dev@evarisk.com>
+-- Copyright (C) 2021-2023 EVARISK <dev@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -14,4 +14,6 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 ALTER TABLE llx_dolimeet_object_signature ADD INDEX idx_dolimeet_object_signature_rowid (rowid);
-ALTER TABLE llx_dolimeet_object_signature  ADD CONSTRAINT llx_dolimeet_object_signature_fk_object FOREIGN KEY (fk_object) REFERENCES llx_dolimeet_object(rowid);
+ALTER TABLE llx_dolimeet_object_signature ADD INDEX idx_dolimeet_object_signature_status (status);
+ALTER TABLE llx_dolimeet_object_signature ADD INDEX idx_dolimeet_object_signature_element_id (element_id);
+ALTER TABLE llx_dolimeet_object_signature ADD INDEX idx_dolimeet_object_signature_fk_object (fk_object);
