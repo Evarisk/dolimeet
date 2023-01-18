@@ -1,8 +1,5 @@
 <?php
-/* Copyright (C) 2004-2018  Laurent Destailleur     <eldy@users.sourceforge.net>
- * Copyright (C) 2018-2019  Nicolas ZABOURI         <info@inovea-conseil.com>
- * Copyright (C) 2019-2020  Frédéric France         <frederic.france@netlogic.fr>
- * Copyright (C) 2022 Theo David <theodavid.perso@gmail.com>
+/* Copyright (C) 2021-2023 EVARISK <dev@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,11 +19,12 @@
  * 	\defgroup   dolimeet     Module DoliMeet
  *  \brief      DoliMeet module descriptor.
  *
- *  \file       htdocs/dolimeet/core/modules/modDoliMeet.class.php
+ *  \file       core/modules/modDoliMeet.class.php
  *  \ingroup    dolimeet
  *  \brief      Description and activation file for module DoliMeet
  */
-include_once DOL_DOCUMENT_ROOT.'/core/modules/DolibarrModules.class.php';
+
+require_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module DoliMeet
@@ -42,19 +40,55 @@ class modDoliMeet extends DolibarrModules
 	{
 		global $langs, $conf;
 		$this->db = $db;
-		$this->numero = 500000; // TODO Go on page https://wiki.dolibarr.org/index.php/List_of_modules_id to reserve an id number for your module
+
+        $langs->load('dolimeet@dolimeet');
+
+        // ID for module (must be unique).
+        // Use here a free id (See in Home -> System information -> Dolibarr for list of used module id).
+        $this->numero = 436304;
+
+        // Key text used to identify module (for permissions, menus, etc...)
 		$this->rights_class = 'dolimeet';
-		$this->family = "other";
-		$this->module_position = '90';
+
+        // Family can be 'base' (core modules),'crm','financial','hr','projects','products','ecm','technic' (transverse modules),'interface' (link with external tools),'other','...'
+        // It is used to group modules by family in module setup page
+		$this->family = '';
+
+        // Module position in the family on 2 digits ('01', '10', '20', ...)
+		$this->module_position = '';
+
+        // Gives the possibility for the module, to provide his own family info and position of this family (Overwrite $this->family and $this->module_position. Avoid this)
+        $this->familyinfo = ['Evarisk' => ['position' => '01', 'label' => 'Evarisk']];
+        // Module label (no space allowed), used if translation string 'ModulePriseoName' not found (Priseo is name of module).
 		$this->name = preg_replace('/^mod/i', '', get_class($this));
-		$this->description = "DoliMeetDescription";
-		$this->descriptionlong = "DoliMeetDescription";
+
+        // Module description, used if translation string 'ModulePriseoDesc' not found (Priseo is name of module).
+        $this->description = $langs->trans('DoliMeetDescription');
+        // Used only if file README.md and README-LL.md not found.
+        $this->descriptionlong = $langs->trans('DoliMeetDescriptionLong');
+
+        // Author
 		$this->editor_name = 'Evarisk';
 		$this->editor_url = 'https://www.evarisk.com';
+
+        // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
 		$this->version = '1.0.0';
+
+        // Url to the file with your last numberversion of this module
+        //@todo a faire
+        //$this->url_last_version = 'http://www.example.com/versionmodule.txt';
+
+        // Key used in llx_const table to save module status enabled/disabled (where DOLIMEET is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
-		$this->picto = 'dolimeet@dolimeet';
-		$this->module_parts = array(
+
+        // Name of image file used for this module.
+        // If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
+        // If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
+        // To use a supported fa-xxx css style of font awesome, use this->picto='xxx'
+		$this->picto = 'dolimeet_color@dolimeet';
+
+        // Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
+		$this->module_parts = [
 			// Set this to 1 if module has its own trigger directory (core/triggers)
 			'triggers' => 1,
 			// Set this to 1 if module has its own login method file (core/login)
@@ -64,60 +98,56 @@ class modDoliMeet extends DolibarrModules
 			// Set this to 1 if module has its own menus handler directory (core/menus)
 			'menus' => 0,
 			// Set this to 1 if module overwrite template dir (core/tpl)
-			'tpl' => 0,
+			'tpl' => 1,
 			// Set this to 1 if module has its own barcode directory (core/modules/barcode)
 			'barcode' => 0,
-			// Set this to 1 if module has its own models directory (core/modules/xxx)
+			// Set this to 1 if module has its own models' directory (core/modules/xxx)
 			'models' => 0,
 			// Set this to 1 if module has its own printing directory (core/modules/printing)
 			'printing' => 0,
 			// Set this to 1 if module has its own theme directory (theme)
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
-			'css' => array(
-				//    '/dolimeet/css/dolimeet.css.php',
-			),
+			//'css' => ['/priseo/css/priseo_all.css'],
 			// Set this to relative path of js file if module must load a js on all pages
-			'js' => array(
-				//   '/dolimeet/js/dolimeet.js.php',
-			),
+			'js' => [],
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
-			'hooks' => array(
+			'hooks' => [
 				'category',
 				'categoryindex',
 				'projectOverview',
 				'printOverviewDetail',
 				'admincompany'
-			),
+            ],
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 0,
-		);
+        ];
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/dolimeet/temp","/dolimeet/subdir");
-		$this->dirs = array("/dolimeet/temp");
+		$this->dirs = ['/dolimeet/temp'];
 
 		// Config pages. Put here list of php page, stored into dolimeet/admin directory, to use to setup module.
-		$this->config_page_url = array("setup.php@dolimeet");
+		$this->config_page_url = ['setup.php@dolimeet'];
 
 		// Dependencies
 		// A condition to hide module
 		$this->hidden = false;
 		// List of module class names as string that must be enabled if this module is enabled. Example: array('always1'=>'modModuleToEnable1','always2'=>'modModuleToEnable2', 'FR1'=>'modModuleToEnableFR'...)
-		$this->depends = array('modCategorie', 'modContrat', 'modProjet', 'modFckeditor', 'modAgenda');
-		$this->requiredby = array(); // List of module class names as string to disable if this one is disabled. Example: array('modModuleToDisable1', ...)
-		$this->conflictwith = array(); // List of module class names as string this module is in conflict with. Example: array('modModuleToDisable1', ...)
+		$this->depends = ['modCategorie', 'modContrat', 'modProjet', 'modFckeditor', 'modAgenda', 'modSaturne'];
+		$this->requiredby = []; // List of module class names as string to disable if this one is disabled. Example: array('modModuleToDisable1', ...)
+		$this->conflictwith = []; // List of module class names as string this module is in conflict with. Example: array('modModuleToDisable1', ...)
 
 		// The language file dedicated to your module
-		$this->langfiles = array("dolimeet@dolimeet");
+		$this->langfiles = ['dolimeet@dolimeet'];
 
 		// Prerequisites
-		$this->phpmin = array(5, 6); // Minimum version of PHP required by module
-		$this->need_dolibarr_version = array(11, -3); // Minimum version of Dolibarr required by module
+		$this->phpmin = [7, 0]; // Minimum version of PHP required by module
+		$this->need_dolibarr_version = [15, 0]; // Minimum version of Dolibarr required by module
 
 		// Messages at activation
-		$this->warnings_activation = array(); // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','MX'='textmx'...)
-		$this->warnings_activation_ext = array(); // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','MX'='textmx'...)
+		$this->warnings_activation = []; // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','MX'='textmx'...)
+		$this->warnings_activation_ext = []; // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','MX'='textmx'...)
 		//$this->automatic_activation = array('FR'=>'DoliMeetWasAutomaticallyActivatedBecauseOfYourCountryChoice');
 		//$this->always_enabled = true;								// If true, can't be disabled
 
@@ -126,21 +156,32 @@ class modDoliMeet extends DolibarrModules
 		// Example: $this->const=array(1 => array('DOLIMEET_MYNEWCONST1', 'chaine', 'myvalue', 'This is a constant to add', 1),
 		//                             2 => array('DOLIMEET_MYNEWCONST2', 'chaine', 'myvalue', 'This is another constant to add', 0, 'current', 1)
 		// );
-		$this->const = array(
-			1 => array('DOLIMEET_MEETING_ADDON','chaine', 'mod_meeting_standard','', $conf->entity),
-			2 => array('DOLIMEET_MEETING_MENU_ENABLED','integer', 1,'', $conf->entity),
+        $i = 0;
+		$this->const = [
+            // CONST MEETING
+            $i++ => ['DOLIMEET_MEETING_ADDON', 'chaine', 'mod_meeting_standard', '', 0, 'current'],
+            $i++ => ['DOLIMEET_MEETING_MENU_ENABLED', 'integer', 1, '', 0, 'current'],
 
-			3 => array('DOLIMEET_TRAININGSESSION_ADDON','chaine', 'mod_trainingsession_standard','', $conf->entity),
-			4 => array('DOLIMEET_TRAININGSESSION_MENU_ENABLED','integer', 1,'', $conf->entity),
+            // CONST TRAININGSESSION
+            $i++ => ['DOLIMEET_TRAININGSESSION_ADDON', 'chaine', 'mod_trainingsession_standard', '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_MENU_ENABLED', 'integer', 1, '', 0, 'current'],
 
-			5 => array('DOLIMEET_AUDIT_ADDON','chaine', 'mod_audit_standard','', $conf->entity),
-			6 => array('DOLIMEET_AUDIT_MENU_ENABLED','integer', 1,'', $conf->entity),
+            // CONST AUDIT
+            $i++ => ['DOLIMEET_AUDIT_ADDON', 'chaine', 'mod_audit_standard', '', 0, 'current'],
+            $i++ => ['DOLIMEET_AUDIT_MENU_ENABLED', 'integer', 1,'', 0, 'current'],
 
-			7 => array('DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/attendancesheet/', '', 0, 'current'),
-			8 => array('DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/completioncertificate/', '', 0, 'current'),
+            // CONST DOLIMEET DOCUMENTS
+            // @todo probleme document
+            $i++ => ['DOLIMEET_ATTENDANCESHEET_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/attendancesheet/', '', 0, 'current'],
+            $i++ => ['DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/completioncertificate/', '', 0, 'current'],
 
-			9 => array('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', 'chaine', '', '', 0, 'current')
-		);
+            // CONST CONFIGURATION
+            $i++ => ['MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', 'chaine', '', '', 0, 'current'],
+
+            // CONST MODULE
+			$i++ => ['DOLIMEET_VERSION','chaine', $this->version, '', 0, 'current'],
+			$i   => ['DOLIMEET_DB_VERSION', 'chaine', $this->version, '', 0, 'current']
+        ];
 
 		// Some keys to add into the overwriting translation tables
 		/*$this->overwrite_translation = array(
@@ -154,341 +195,349 @@ class modDoliMeet extends DolibarrModules
 		}
 
 		// Array to add new pages in new tabs
-		$langs->load("dolimeet@dolimeet");
-		$pictopath = dol_buildpath('/custom/dolimeet/img/dolimeet32px.png', 1);
-		$picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDolimeet');
-
-		$this->tabs = array();
-		$this->tabs[] = array('data' => 'thirdparty:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'user:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contact:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'project:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contract:+sessionList:'.$picto.$langs->trans('DoliMeet').':dolimeet@dolimeet:1:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'contract:+openinghours:'.$picto.$langs->trans('OpeningHours').':dolimeet@dolimeet:1:/custom/dolimeet/view/openinghours_card.php?element_type=contrat&id=__ID__'); // To add a new tab identified by code tabname1
+        $this->tabs   = [];
+        $pictopath    = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+        $picto        = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
+        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . 'DoliMeet:dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'user:+sessionList:' . $picto . 'DoliMeetdolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . 'DoliMeetdolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'project:+sessionList:' . $picto . 'DoliMeetdolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . 'DoliMeetdolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contract:+openinghours:'. $picto . $langs->trans('OpeningHours') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/dolimeet/view/openinghours_card.php?element_type=contrat&id=__ID__']; // To add a new tab identified by code tabname1
+        // Example:
+        // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@dolimeet:$user->rights->othermodule->read:/dolimeet/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
+        // $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');
 
 		// Dictionaries
-		$this->dictionaries = array(
+		$this->dictionaries = [
 			'langs' => 'dolimeet@dolimeet',
 			// List of tables we want to see into dictonnary editor
-			'tabname' => array(
-				MAIN_DB_PREFIX . "c_trainingsession_type"
-			),
+			'tabname' => [
+				MAIN_DB_PREFIX . 'c_trainingsession_type'
+            ],
 			// Label of tables
-			'tablib' => array(
-				"TrainingSession"
-			),
+			'tablib' => [
+                'TrainingSession'
+            ],
 			// Request to select fields
-			'tabsql' => array(
+			'tabsql' => [
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_type as f'
-			),
+            ],
 			// Sort order
-			'tabsqlsort' => array(
-				"label ASC"
-			),
+			'tabsqlsort' => [
+                'label ASC'
+            ],
 			// List of fields (result of select to show dictionary)
-			'tabfield' => array(
-				"ref,label,description"
-			),
+			'tabfield' => [
+                'ref,label,description'
+            ],
 			// List of fields (list of fields to edit a record)
-			'tabfieldvalue' => array(
-				"ref,label,description"
-			),
+			'tabfieldvalue' => [
+                'ref,label,description'
+            ],
 			// List of fields (list of fields for insert)
-			'tabfieldinsert' => array(
-				"ref,label,description"
-			),
+			'tabfieldinsert' => [
+                'ref,label,description'
+            ],
 			// Name of columns with primary key (try to always name it 'rowid')
-			'tabrowid' => array(
-				"rowid"
-			),
+			'tabrowid' => [
+                'rowid'
+            ],
 			// Condition to show each dictionary
-			'tabcond' => array(
+			'tabcond' => [
 				$conf->dolimeet->enabled,
-			)
-		);
+            ]
+        ];
+
 		// Boxes/Widgets
-		$this->boxes = array(
-		);
+		$this->boxes = [];
 
 		// Cronjobs (List of cron jobs entries to add when module is enabled)
-		$this->cronjobs = array(
-		);
+		$this->cronjobs = [];
 
 		// Permissions provided by this module
-		$this->rights = array();
+		$this->rights = [];
 		$r = 0;
-		// Add here entries to declare new permissions
-		/* BEGIN MODULEBUILDER PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('ReadDoliMeetSession'); // Permission label
+
+        /* DOLIMEET PERMISSIONS */
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+        $this->rights[$r][1] = $langs->trans('LireDoliMeet');
+        $this->rights[$r][4] = 'lire';
+        $this->rights[$r][5] = 1;
+        $r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+        $this->rights[$r][1] = $langs->trans('ReadDoliMeet');
+        $this->rights[$r][4] = 'read';
+        $this->rights[$r][5] = 1;
+        $r++;
+
+        /* SESSION PERMISSSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('ReadSession'); // Permission label
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->read)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('WriteDoliMeetSession'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateSession'); // Permission label
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->write)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('DeleteDoliMeetSession'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('DeleteDoliMeetSession'); // Permission label
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->delete)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('ReadDoliMeetMeeting'); // Permission label
+
+        /* MEETING PERMISSSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadMeeting'); // Permission label
 		$this->rights[$r][4] = 'meeting';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('WriteDoliMeetMeeting'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateMeeting'); // Permission label
 		$this->rights[$r][4] = 'meeting';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->write)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('DeleteDoliMeetMeeting'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteMeeting'); // Permission label
 		$this->rights[$r][4] = 'meeting';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('ReadDoliMeetTrainingSession'); // Permission label
+
+        /* TRAINING SESSION PERMISSSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('ReadTrainingSession'); // Permission label
 		$this->rights[$r][4] = 'trainingsession';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->trainingsession->read)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('WriteDoliMeetTrainingSession'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateTrainingSession'); // Permission label
 		$this->rights[$r][4] = 'trainingsession';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->trainingsession->write)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('DeleteDoliMeetTrainingSession'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('DeleteTrainingSession'); // Permission label
 		$this->rights[$r][4] = 'trainingsession';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('ReadDoliMeetAudit'); // Permission label
+
+        /* AUDIT PERMISSSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('ReadAudit'); // Permission label
 		$this->rights[$r][4] = 'audit';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->audit->read)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('WriteDoliMeetAudit'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateAudit'); // Permission label
 		$this->rights[$r][4] = 'audit';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->audit->write)
 		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('DeleteDoliMeetAudit'); // Permission label
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('DeleteAudit'); // Permission label
 		$this->rights[$r][4] = 'audit';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
-		$r++;		/* END MODULEBUILDER PERMISSIONS */
+        $r++;
+
+        /* ADMINPAGE PANEL ACCESS PERMISSIONS */
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+        $this->rights[$r][1] = $langs->transnoentities('ReadAdminPage');
+        $this->rights[$r][4] = 'adminpage';
+        $this->rights[$r][5] = 'read';
 
 		// Main menu entries to add
-		$this->menu = array();
+		$this->menu = [];
 		$r = 0;
+
 		// Add here entries to declare new menus
-		/* BEGIN MODULEBUILDER TOPMENU */
-		$this->menu[$r++] = array(
-			'fk_menu'=>'', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'top', // This is a Top menu entry
-			'titre'=>'ModuleDoliMeetName',
-			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'',
-			'url'=>'/dolimeet/dolimeetindex.php',
-			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1000 + $r,
-			'enabled'=>'$conf->dolimeet->enabled', // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->myobject->read' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left', // This is a Left menu entry
-			'titre'=>'<i class="fas fa-list"></i> '. $langs->trans('MeetingList'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'meeting_list',
-			'url'=>'/dolimeet/view/meeting/meeting_list.php',
-			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=meeting_list',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left', // This is a Left menu entry
-			'titre'=> '<i class="fas fa-comments"></i> ' . $langs->trans('MeetingCreate'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'meeting_card',
-			'url'=>'/dolimeet/view/meeting/meeting_card.php?action=create',
-			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++] = array(
-			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=meeting_list',
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'type'     => 'top', // This is a Top menu entry
+            'titre'    => 'DoliMeet',
+            'prefix'   => '<i class="fas fa-home pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => '',
+            'url'      => '/dolimeet/dolimeetindex.php', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled', // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled.
+            'perms'    => '$user->rights->dolimeet->lire', // Use 'perms'=>'$user->rights->dolimeet->myobject->read' if you want your menu with a permission rules
+            'target'   => '',
+            'user'     => 0, // 0=Menu for internal users, 1=external users, 2=both
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
+            'type'     => 'left',
+            'titre'    => $langs->trans('MeetingList'),
+            'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_meeting',
+            'url'      => '/dolimeet/view/meeting/meeting_list.php',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
+            'perms'    => '$user->rights->dolimeet->meeting->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_meeting',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-comments pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('MeetingCreate'),
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_meeting_card',
+            'url'      => '/dolimeet/view/meeting/meeting_card.php?action=create',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
+            'perms'    => '$user->rights->dolimeet->meeting->write',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_meeting',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_meeting_tags',
+            'url'      => '/categories/index.php?type=meeting',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
+            'perms'    => '$user->rights->dolimeet->meeting->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
+            'type'     => 'left',
+            'titre'    => $langs->trans('TrainingSessionList'),
+            'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_trainingsession',
+            'url'      => '/dolimeet/view/trainingsession/trainingsession_list.php',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
+            'perms'    => '$user->rights->dolimeet->trainingsession->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_trainingsession',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-people-arrows pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('TrainingSessionCreate'),
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_trainingsession_card',
+            'url'      => '/dolimeet/view/trainingsession/trainingsession_card.php?action=create',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
+            'perms'    => '$user->rights->dolimeet->trainingsession->write',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_trainingsession',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_trainingsession_tags',
+            'url'      => '/categories/index.php?type=trainingsession',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
+            'perms'    => '$user->rights->dolimeet->trainingsession->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=dolimeet',
 			'type'     => 'left',
-			'titre'    => '<i class="fas fa-tags"></i>  ' . $langs->trans('Categories'),
-			'mainmenu' => 'dolimeet',
-			'leftmenu' => 'dolimeet_meeting',
-			'url'      => '/categories/index.php?type=meeting',
-			'langs'    => 'ticket',
-			'position' => 1100 + $r,
-			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
-			'perms'    => '1',
-			'target'   => '',
-			'user'     => 0,
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left', // This is a Left menu entry
-			'titre'=>'<i class="fas fa-list"></i> '. $langs->trans('TrainingSessionList'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'trainingsession_list',
-			'url'=>'/dolimeet/view/trainingsession/trainingsession_list.php',
-			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=trainingsession_list',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left', // This is a Left menu entry
-			'titre'=> '<i class="fas fa-people-arrows"></i> ' . $langs->trans('TrainingSessionCreate'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'trainingsession_card',
-			'url'=>'/dolimeet/view/trainingsession/trainingsession_card.php?action=create',
-			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++] = array(
-			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=trainingsession_list',
-			'type'     => 'left',
-			'titre'    => '<i class="fas fa-tags"></i>  ' . $langs->trans('Categories'),
-			'mainmenu' => 'dolimeet',
-			'leftmenu' => 'dolimeet_trainingsession',
-			'url'      => '/categories/index.php?type=trainingsession',
-			'langs'    => 'ticket',
-			'position' => 1100 + $r,
-			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled  && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
-			'perms'    => '1',
-			'target'   => '',
-			'user'     => 0,
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left', // This is a Left menu entry
-			'titre'=>'<i class="fas fa-list"></i> '. $langs->trans('AuditList'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'audit_list',
-			'url'=>'/dolimeet/view/audit/audit_list.php',
-			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left', // This is a Left menu entry
-			'titre'=> '<i class="fas fa-tasks"></i> ' . $langs->trans('AuditCreate'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'audit_card',
-			'url'=>'/dolimeet/view/audit/audit_card.php?action=create',
-			'langs'=>'dolimeet@dolimeet', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1100+$r,
-			'enabled'=>'$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0, // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++] = array(
-			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',
-			'type'     => 'left',
-			'titre'    => '<i class="fas fa-tags"></i>  ' . $langs->trans('Categories'),
+			'titre'    => $langs->trans('AuditList'),
+            'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
 			'mainmenu' => 'dolimeet',
 			'leftmenu' => 'dolimeet_audit',
-			'url'      => '/categories/index.php?type=audit',
-			'langs'    => 'ticket',
-			'position' => 1100 + $r,
-			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
-			'perms'    => '1',
+			'url'      => '/dolimeet/view/audit/audit_list.php',
+			'langs'    => 'dolimeet@dolimeet',
+			'position' => 1000 + $r,
+			'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
+			'perms'    => '$user->rights->dolimeet->audit->read',
 			'target'   => '',
 			'user'     => 0,
-		);
-		$this->menu[$r++] = array(
-			'fk_menu'  => 'fk_mainmenu=dolimeet',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'     => 'left',			                // This is a Left menu entry
-			'titre'    => $langs->trans('ModuleConfiguration'),
-			'prefix'   => '<i class="fas fa-cog"></i>  ',
+        ];
+
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_audit',
+			'type'     => 'left',
+			'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('AuditCreate'),
 			'mainmenu' => 'dolimeet',
-			'leftmenu' => 'dolimeetconfig',
-			'url'      => '/dolimeet/admin/setup.php',
-			'langs'    => 'dolimeet@dolimeet',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 48520 + $r,
-			'enabled'  => '$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'    => '1',			                // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
+			'leftmenu' => 'dolimeet_audit_card',
+			'url'      => '/dolimeet/view/audit/audit_card.php?action=create',
+			'langs'    => 'dolimeet@dolimeet',
+			'position' => 1000 + $r,
+			'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
+			'perms'    => '$user->rights->dolimeet->audit->write',
 			'target'   => '',
-			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
-		);
-		/* END MODULEBUILDER TOPMENU */
-		/* BEGIN MODULEBUILDER LEFTMENU MYOBJECT
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left',                          // This is a Left menu entry
-			'titre'=>'MyObject',
-			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'myobject',
-			'url'=>'/dolimeet/dolimeetindex.php',
-			'langs'=>'dolimeet@dolimeet',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1000+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled.
-			'perms'=>'$user->rights->dolimeet->myobject->read',			                // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=myobject',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>'List_MyObject',
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'dolimeet_myobject_list',
-			'url'=>'/dolimeet/myobject_list.php',
-			'langs'=>'dolimeet@dolimeet',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1000+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'$user->rights->dolimeet->myobject->read',			                // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=dolimeet,fk_leftmenu=myobject',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>'New_MyObject',
-			'mainmenu'=>'dolimeet',
-			'leftmenu'=>'dolimeet_myobject_new',
-			'url'=>'/dolimeet/myobject_card.php?action=create',
-			'langs'=>'dolimeet@dolimeet',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1000+$r,
-			'enabled'=>'$conf->dolimeet->enabled',  // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'$user->rights->dolimeet->myobject->write',			                // Use 'perms'=>'$user->rights->dolimeet->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-		);
-		END MODULEBUILDER LEFTMENU MYOBJECT */
+			'user'     => 0,
+        ];
+
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_audit',
+			'type'     => 'left',
+			'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+			'mainmenu' => 'dolimeet',
+			'leftmenu' => 'dolimeet_audit_tags',
+			'url'      => '/categories/index.php?type=audit',
+			'langs'    => 'dolimeet@dolimeet',
+			'position' => 1000 + $r,
+			'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
+			'perms'    => '$user->rights->dolimeet->audit->read',
+			'target'   => '',
+			'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
+            'type'     => 'left',
+            'titre'    => $langs->trans('DoliMeetConfig'),
+            'prefix'   => '<i class="fas fa-cog pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeetconfig',
+            'url'      => '/dolimeet/admin/setup.php',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled',
+            'perms'    => '$user->rights->dolimeet->adminpage->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
+            'type'     => 'left',
+            'titre'    => $langs->transnoentities('MinimizeMenu'),
+            'prefix'   => '<i class="fas fa-chevron-circle-left pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'minimizemenu',
+            'url'      => '',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->dolimeet->enabled',
+            'perms'    => '$user->rights->dolimeet->lire',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
 		// Exports profiles provided by this module
-		$r = 1;
+		// $r = 1;
 		/* BEGIN MODULEBUILDER EXPORT MYOBJECT */
 		/*
 		$langs->load("dolimeet@dolimeet");
@@ -519,7 +568,7 @@ class modDoliMeet extends DolibarrModules
 		/* END MODULEBUILDER EXPORT MYOBJECT */
 
 		// Imports profiles provided by this module
-		$r = 1;
+		// $r = 1;
 		/* BEGIN MODULEBUILDER IMPORT MYOBJECT */
 		/*
 		 $langs->load("dolimeet@dolimeet");
@@ -539,29 +588,33 @@ class modDoliMeet extends DolibarrModules
 		/* END MODULEBUILDER IMPORT MYOBJECT */
 	}
 
-	/**
-	 *  Function called when module is enabled.
-	 *  The init function add constants, boxes, permissions and menus (defined in constructor) into Dolibarr database.
-	 *  It also creates data directories
-	 *
-	 *  @param      string  $options    Options when enabling module ('', 'noboxes')
-	 *  @return     int             	1 if OK, 0 if KO
-	 */
-	public function init($options = '')
-	{
+    /**
+     *  Function called when module is enabled.
+     *  The init function add constants, boxes, permissions and menus (defined in constructor) into Dolibarr database.
+     *  It also creates data directories
+     *
+     * @param  string    $options Options when enabling module ('', 'noboxes')
+     * @return int                1 if OK, 0 if KO
+     * @throws Exception
+     */
+	public function init($options = ''): int
+    {
 		global $conf, $langs;
 
-		//$result = $this->_load_tables('/install/mysql/tables/', 'dolimeet');
-		$sql = array();
-		// Load sql sub folders
+        $sql = [];
+        $result = $this->_load_tables('/dolimeet/sql/');
+
+        // Load sql sub folders
 		$sqlFolder = scandir(__DIR__ . '/../../sql');
 		foreach ($sqlFolder as $subFolder) {
-			if ( ! preg_match('/\./', $subFolder)) {
+			if (!preg_match('/\./', $subFolder)) {
 				$this->_load_tables('/dolimeet/sql/' . $subFolder . '/');
 			}
 		}
 
-		$this->_load_tables('/dolimeet/sql/');
+        dolibarr_set_const($this->db, 'DOLIMEET_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+        dolibarr_set_const($this->db, 'DOLIMEET_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+
 		if ($result < 0) {
 			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
 		}
@@ -576,59 +629,23 @@ class modDoliMeet extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields($this->db);
 
-		$extra_fields->update('label', $langs->transnoentities("Label"), 'varchar', '', 'contrat', 0, 0, 1040, '', '', '', 1);
-		$extra_fields->addExtraField('label', $langs->transnoentities("Label"), 'varchar', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+		$extra_fields->update('label', $langs->transnoentities('Label'), 'varchar', '', 'contrat', 0, 0, 1040, '', '', '', 1);
+		$extra_fields->addExtraField('label', $langs->transnoentities('Label'), 'varchar', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
 
-		$extra_fields->update('trainingsession_start', $langs->transnoentities("TrainingSessionStart"), 'datetime', '', 'contrat', 0, 0, 1800, '', '', '', 1);
-		$extra_fields->addExtraField('trainingsession_start', $langs->transnoentities("TrainingSessionStart"), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+		$extra_fields->update('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', '', 'contrat', 0, 0, 1800, '', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
 
-		$extra_fields->update('trainingsession_end', $langs->transnoentities("TrainingSessionEnd"), 'datetime', '', 'contrat', 0, 0, 1810, '', '', '', 1);
-		$extra_fields->addExtraField('trainingsession_end', $langs->transnoentities("TrainingSessionEnd"), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+		$extra_fields->update('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', '', 'contrat', 0, 0, 1810, '', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
 
-		$extra_fields->update('trainingsession_type', $langs->transnoentities("TrainingSessionType"), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
-		$extra_fields->addExtraField('trainingsession_type', $langs->transnoentities("TrainingSessionType"), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
+		$extra_fields->update('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
 
-		$extra_fields->update('trainingsession_location', $langs->transnoentities("TrainingSessionLocation"), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1);
-		$extra_fields->addExtraField('trainingsession_location', $langs->transnoentities("TrainingSessionLocation"), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1);
+		$extra_fields->update('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1);
+		$extra_fields->addExtraField('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1);
 
 		// Permissions
 		$this->remove($options);
-
-		$sql = array();
-
-		// Document templates
-		$moduledir = dol_sanitizeFileName('dolimeet');
-		$myTmpObjects = array();
-		$myTmpObjects['MyObject'] = array('includerefgeneration'=>0, 'includedocgeneration'=>0);
-
-		foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
-			if ($myTmpObjectKey == 'MyObject') {
-				continue;
-			}
-			if ($myTmpObjectArray['includerefgeneration']) {
-				$src = DOL_DOCUMENT_ROOT.'/install/doctemplates/'.$moduledir.'/template_myobjects.odt';
-				$dirodt = DOL_DATA_ROOT.'/doctemplates/'.$moduledir;
-				$dest = $dirodt.'/template_myobjects.odt';
-
-				if (file_exists($src) && !file_exists($dest)) {
-					require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-					dol_mkdir($dirodt);
-					$result = dol_copy($src, $dest, 0, 0);
-					if ($result < 0) {
-						$langs->load("errors");
-						$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
-						return 0;
-					}
-				}
-
-				$sql = array_merge($sql, array(
-					"DELETE FROM ".MAIN_DB_PREFIX."document_model WHERE nom = 'standard_".strtolower($myTmpObjectKey)."' AND type = '".$this->db->escape(strtolower($myTmpObjectKey))."' AND entity = ".((int) $conf->entity),
-					"INSERT INTO ".MAIN_DB_PREFIX."document_model (nom, type, entity) VALUES('standard_".strtolower($myTmpObjectKey)."', '".$this->db->escape(strtolower($myTmpObjectKey))."', ".((int) $conf->entity).")",
-					"DELETE FROM ".MAIN_DB_PREFIX."document_model WHERE nom = 'generic_".strtolower($myTmpObjectKey)."_odt' AND type = '".$this->db->escape(strtolower($myTmpObjectKey))."' AND entity = ".((int) $conf->entity),
-					"INSERT INTO ".MAIN_DB_PREFIX."document_model (nom, type, entity) VALUES('generic_".strtolower($myTmpObjectKey)."_odt', '".$this->db->escape(strtolower($myTmpObjectKey))."', ".((int) $conf->entity).")"
-				));
-			}
-		}
 
 		return $this->_init($sql, $options);
 	}
@@ -641,9 +658,9 @@ class modDoliMeet extends DolibarrModules
 	 *  @param      string	$options    Options when enabling module ('', 'noboxes')
 	 *  @return     int                 1 if OK, 0 if KO
 	 */
-	public function remove($options = '')
-	{
-		$sql = array();
+	public function remove($options = ''): int
+    {
+		$sql = [];
 		return $this->_remove($sql, $options);
 	}
 }
