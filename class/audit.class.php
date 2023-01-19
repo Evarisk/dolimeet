@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EVARISK <dev@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,9 @@
 /**
  * \file        class/audit.class.php
  * \ingroup     dolimeet
- * \brief       This file is a CRUD class file for Document (Create/Read/Update/Delete)
+ * \brief       This file is a CRUD class file for Audit (Create/Read/Update/Delete)
  */
 
-// Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 require_once __DIR__ . '/dolimeetsignature.class.php';
 require_once __DIR__ . '/session.class.php';
@@ -42,7 +41,7 @@ class Audit extends Session
 	public $element = 'audit';
 
 	/**
-	 * @var string String with name of icon for document. Must be the part after the 'object_' into object_document.png
+	 * @var string String with name of icon for audit. Must be the part after the 'object_' into object_audit.png
 	 */
 	public $picto = 'audit@dolimeet';
 
@@ -107,10 +106,10 @@ class AuditSignature extends DolimeetSignature
 	/**
 	 * @var array Context element object
 	 */
-	public $context = array();
+	public $context = [];
 
 	/**
-	 * @var string String with name of icon for document. Must be the part after the 'object_' into object_document.png
+	 * @var string String with name of icon for audit. Must be the part after the 'object_' into object_audit.png
 	 */
 	public $picto = 'audit@dolimeet';
 
@@ -150,10 +149,10 @@ class AuditSignature extends DolimeetSignature
 	/**
 	 * Clone an object into another one
 	 *
-	 * @param User $user User that creates
-	 * @param int $fromid Id of object to clone
-	 * @param $auditid
-	 * @return    mixed                New object created, <0 if KO
+	 * @param User        $user     User that creates
+	 * @param int         $fromid   ID of object to clone
+	 * @param int         $auditid  ID of audit object
+	 * @return            int       New object created, <0 if KO
 	 * @throws Exception
 	 */
 	public function createFromClone(User $user, $fromid, $auditid)
