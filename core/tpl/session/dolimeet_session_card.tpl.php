@@ -946,8 +946,7 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'confirm_setInProgress' && $action != 'create'))) {
 	$res = $object->fetch_optionals();
-	$prepareHead = $object->element . 'PrepareHead';
-	$head = $prepareHead($object);
+    $head = sessionPrepareHead($object);
 	print dol_get_fiche_head($head, 'card', $langs->trans(ucfirst($object->element)), -1, $object->picto);
 
 	$formconfirm = '';

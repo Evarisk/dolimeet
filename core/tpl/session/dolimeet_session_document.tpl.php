@@ -51,8 +51,7 @@ if ($object->id) {
 	/*
 	 * Show tabs
 	 */
-	$prepareHead = $object->element . 'PrepareHead';
-	$head = $prepareHead($object);
+    $head = sessionPrepareHead($object);
 
 	print dol_get_fiche_head($head, 'document', $langs->trans('Document'), -1, $object->picto);
 

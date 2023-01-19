@@ -51,8 +51,7 @@ llxHeader('', $title, $help_url);
 if ($id > 0 || !empty($ref)) {
 	$object->fetch_thirdparty();
 
-	$prepareHead = $object->element . 'PrepareHead';
-	$head = $prepareHead($object);
+    $head = sessionPrepareHead($object);;
 
 	print dol_get_fiche_head($head, 'note', $langs->trans('Notes'), -1, $object->picto);
 

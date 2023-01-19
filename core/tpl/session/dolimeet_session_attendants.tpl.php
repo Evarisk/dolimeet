@@ -258,8 +258,7 @@ if ( ! empty($object->id)) $res = $object->fetch_optionals();
 // Object card
 // ------------------------------------------------------------
 
-$prepareHead = $object->element . 'PrepareHead';
-$head = $prepareHead($object);
+$head = sessionPrepareHead($object);
 print dol_get_fiche_head($head, 'attendants', $langs->trans(ucfirst($object->element)), -1, $object->picto);
 
 $width = 80; $cssclass = 'photoref';

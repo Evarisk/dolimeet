@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EVARISK <dev@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ require_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
 
 require_once __DIR__ . '/../../class/trainingsession.class.php';
 require_once __DIR__ . '/../../core/modules/dolimeet/mod_trainingsession_standard.php';
-require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet_session.lib.php';
 require_once __DIR__ . '/../../lib/dolimeet.lib.php';
 require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 

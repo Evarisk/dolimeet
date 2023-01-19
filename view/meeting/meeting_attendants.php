@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EVARISK <dev@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 
 require_once __DIR__ . '/../../class/meeting.class.php';
-require_once __DIR__ . '/../../lib/dolimeet_meeting.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet_session.lib.php';
 require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
 global $db, $langs;
