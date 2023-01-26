@@ -106,30 +106,6 @@ class ActionsDolimeet
 	}
 
 	/**
-	 *  Overloading the doActions function : replacing the parent's function with the one below
-	 *
-	 * @param Hook $parameters metadatas (context, etc...)
-	 * @param $object current object
-	 * @param $action
-	 * @return int              < 0 on error, 0 on success, 1 to replace standard code
-	 */
-	public function completeListOfReferent($parameters, $object, $action)
-	{
-		global $db, $conf, $langs;
-
-
-
-		if (true) {
-			$this->results   = array('myreturn' => 999);
-			$this->resprints = 'A text to show';
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
-	}
-
-	/**
 	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
 	 *
 	 * @param   array           $parameters     Hook metadatas (context, etc...)
