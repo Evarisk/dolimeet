@@ -64,6 +64,8 @@ class Session extends CommonObject
 	const STATUS_SENT_BY_MAIL = 4;
 	const STATUS_RECEIVED_BY_MAIL_AND_SIGNED = 5;
 	const STATUS_RECEIVED_BY_LETTER_AND_SIGNED = 6;
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
 
 	/**
 	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')

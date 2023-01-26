@@ -44,7 +44,7 @@ function sessionPrepareHead($object): array
 	$head[$h][2] = 'card';
 	$h++;
 
-	$head[$h][0] = dol_buildpath('/dolimeet/view/' . $object->element . '/' . $object->element . '_attendants.php', 1) . '?id=' . $object->id;
+	$head[$h][0] = dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_parent_type=session&object_type=' . $object->element;
 	$head[$h][1] = '<i class="fas fa-file-signature pictofixedwidth"></i>' . $langs->trans('Attendants');
 	$head[$h][2] = 'attendants';
 	$h++;

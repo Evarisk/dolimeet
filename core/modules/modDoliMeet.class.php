@@ -108,7 +108,7 @@ class modDoliMeet extends DolibarrModules
 			// Set this to 1 if module has its own theme directory (theme)
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
-			//'css' => ['/priseo/css/priseo_all.css'],
+			'css' => [],
 			// Set this to relative path of js file if module must load a js on all pages
 			'js' => [],
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
@@ -203,7 +203,7 @@ class modDoliMeet extends DolibarrModules
 		$this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . 'DoliMeetdolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'project:+sessionList:' . $picto . 'DoliMeetdolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . 'DoliMeetdolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'contract:+openinghours:'. $picto . $langs->trans('OpeningHours') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/dolimeet/view/openinghours_card.php?element_type=contrat&id=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contract:+openinghours:'. $picto . $langs->trans('OpeningHours') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/saturne/view/openinghours_card.php?module_name=DoliMeet&element_type=contrat&id=__ID__']; // To add a new tab identified by code tabname1
         // Example:
         // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@dolimeet:$user->rights->othermodule->read:/dolimeet/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
         // $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');
