@@ -21,30 +21,29 @@
  *	\brief      Home page of dolimeet top menu
  */
 
-// Load Dolibarr environment
-if (file_exists('../../main.inc.php')) {
-    require_once __DIR__ . '/../../main.inc.php';
-} elseif (file_exists('../../../main.inc.php')) {
-    require_once '../../../main.inc.php';
+// Load DoliMeet environment
+if (file_exists('dolimeet.main.inc.php')) {
+    require_once __DIR__ . '/dolimeet.main.inc.php';
 } else {
-    die('Include of main fails');
+    die('Include of dolimeet main fails');
 }
 
-// Libraries
-require_once __DIR__ . '/core/modules/modDoliMeet.class.php';
-
 // Global variables definitions
-global $conf, $db, $langs, $user;
+global $conf, $db, $langs, $moduleName, $moduleNameLowerCase, $user;
+
+// Libraries
+require_once __DIR__ . '/core/modules/mod' . $moduleName . '.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(['dolimeet@dolimeet']);
+$langs->loadLangs([$moduleNameLowerCase . '@' . $moduleNameLowerCase]);
 
 // Initialize technical objects
-$modDoliMeet = new modDoliMeet($db);
+$classname = 'mod' . $moduleName;
+$modModule = new $classname($db);
 
 // Security check
-$permissiontoread = $user->rights->dolimeet->read;
-if (empty($conf->dolimeet->enabled) || !$permissiontoread) {
+$permissiontoread = $user->rights->$moduleNameLowerCase->read;
+if (empty($conf->$moduleNameLowerCase->enabled) || !$permissiontoread) {
     accessforbidden();
 }
 
@@ -52,14 +51,14 @@ if (empty($conf->dolimeet->enabled) || !$permissiontoread) {
  * View
  */
 
-$help_url = 'FR:Module_DoliMeet';
-$title    = $langs->trans('DoliMeetArea');
-$morejs   = ['/dolimeet/js/dolimeet.js'];
-$morecss  = ['/dolimeet/css/dolimeet.css'];
+$title    = $langs->trans($moduleName . 'Area');
+$helpUrl = 'FR:Module_' . $moduleName;
+$morejs   = ['/' . $moduleNameLowerCase . '/js/' . $moduleNameLowerCase . '.js'];
+$morecss  = ['/' . $moduleNameLowerCase . '/css/' . $moduleNameLowerCase . '.css'];
 
-llxHeader('', $title . ' ' . $modDoliMeet->version, $help_url, '', 0, 0, $morejs, $morecss);
+llxHeader('', $title . ' ' . $modModule->version, $helpUrl, '', 0, 0, $morejs, $morecss);
 
-print load_fiche_titre($title . ' ' . $modDoliMeet->version, '', 'dolimeet_color.png@dolimeet');
+print load_fiche_titre($title . ' ' . $modModule->version, '', $moduleNameLowerCase . '_color.png@' . $moduleNameLowerCase);
 
 // End of page
 llxFooter();
