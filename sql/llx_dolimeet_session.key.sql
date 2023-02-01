@@ -21,4 +21,3 @@ ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_contract (fk_
 ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_soc (fk_soc);
 ALTER TABLE llx_dolimeet_session ADD UNIQUE INDEX uk_dolimeet_session_ref (ref, entity);
 ALTER TABLE llx_dolimeet_session ADD CONSTRAINT llx_dolimeet_session_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
-
