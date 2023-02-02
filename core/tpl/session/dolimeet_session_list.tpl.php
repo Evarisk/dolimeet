@@ -274,7 +274,7 @@ if (empty($reshook)) {
  */
 
 $form = new Form($db);
-$signatory = new DolimeetSignature($db);
+$signatory = new Signature($db);
 
 $now = dol_now();
 

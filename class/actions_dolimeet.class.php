@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EVARISK <dev@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,35 +29,34 @@ class ActionsDolimeet
 	/**
 	 * @var DoliDB Database handler.
 	 */
-	public $db;
+	public DoliDB $db;
 
 	/**
 	 * @var string Error code (or message)
 	 */
-	public $error = '';
+	public string $error = '';
 
 	/**
 	 * @var array Errors
 	 */
-	public $errors = array();
-
+	public array $errors = [];
 
 	/**
 	 * @var array Hook results. Propagated to $hookmanager->resArray for later reuse
 	 */
-	public $results = array();
+	public array $results = [];
 
 	/**
 	 * @var string String displayed by executeHook() immediately after return
 	 */
-	public $resprints;
+	public string $resprints;
 
 	/**
 	 * Constructor
 	 *
-	 *  @param		DoliDB		$db      Database handler
+	 *  @param DoliDB $db Database handler
 	 */
-	public function __construct($db)
+	public function __construct(DoliDB $db)
 	{
 		$this->db = $db;
 	}
@@ -65,63 +64,55 @@ class ActionsDolimeet
 	/**
 	 * Overloading the constructCategory function : replacing the parent's function with the one below
 	 *
-	 * @param   array           $parameters     Hook metadatas (context, etc...)
-	 * @param   CommonObject    $object         The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
-	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
+	 * @param  array $parameters Hook metadatas (context, etc...)
+	 * @return int               0 < on error, 0 on success, 1 to replace standard code
 	 */
-	public function constructCategory($parameters, &$object)
-	{
-		$error = 0; // Error counter
-
-		if (in_array($parameters['currentcontext'], array('category', 'somecontext2'))) { // do something only for the context 'somecontext1' or 'somecontext2'
-			$tags = array(
-				'meeting' => array(
-					'id' => 1050,
+	public function constructCategory(array $parameters): int
+    {
+        // Do something only for the current context
+		if ($parameters['currentcontext'] == 'category') {
+			$tags = [
+				'meeting' => [
+					'id' => 436304001,
 					'code' => 'meeting',
 					'obj_class' => 'Meeting',
 					'obj_table' => 'dolimeet_session',
-				),
-				'trainingsession' => array(
-					'id' => 1051,
+                ],
+				'trainingsession' => [
+					'id' => 436304002,
 					'code' => 'trainingsession',
 					'obj_class' => 'TrainingSession',
 					'obj_table' => 'dolimeet_session',
-				),
-				'audit' => array(
-					'id' => 1052,
+                ],
+				'audit' => [
+					'id' => 436304003,
 					'code' => 'audit',
 					'obj_class' => 'Audit',
 					'obj_table' => 'dolimeet_session',
-				),
-			);
-		}
+                ],
+            ];
+            $this->results = $tags;
+        }
 
-		if (!$error) {
-			$this->results = $tags;
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+        return 0; // or return 1 to replace standard code
 	}
 
 	/**
 	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
 	 *
-	 * @param   array           $parameters     Hook metadatas (context, etc...)
-	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
+     * @param  array $parameters Hook metadatas (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
 	 */
-	public function printCommonFooter($parameters)
-	{
+	public function printCommonFooter($parameters): int
+    {
 		global $langs, $db, $conf;
-		$error = 0; // Error counter
 
-		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+        // Do something only for the current context
 		if ($parameters['currentcontext'] == 'projectOverview') {
 			require_once DOL_DOCUMENT_ROOT . '/custom/dolimeet/class/session.class.php';
 
 			$session = new Session($db);
-			$linkedSessions = $session->fetchAll('','','','',array("fk_project" => GETPOST('id')));
+			$linkedSessions = $session->fetchAll('','','','',array('fk_project' => GETPOST('id')));
 
 			$outputline = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><img src="'. DOL_URL_ROOT .'/custom/dolimeet/img/dolimeet32px.png"> '. $langs->transnoentities('DoliMeetObjects') .'</div></td></tr></table>';
 			$outputline .= '<table><div class="div-table-responsive-no-min"><table class="liste formdoc noborder centpercent"><tbody>';
@@ -154,10 +145,11 @@ class ActionsDolimeet
 			<?php
 		}
 
-		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+        // Do something only for the current context
+		if ($parameters['currentcontext'] == 'admincompany') {
 			$form      = new Form($db);
-			$pictopath = dol_buildpath('/dolimeet/img/dolimeet32px.png', 1);
-			$pictoDolimeet = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+			$pictopath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+			$pictoDolimeet = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 			$training_organization_number_input = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
 			?>
 			<script>
@@ -170,38 +162,29 @@ class ActionsDolimeet
 			<?php
 		}
 
-		if (preg_match('/categoryindex/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			print '<script src="../custom/dolimeet/js/dolimeet.js.php"></script>';
-		}
-
-		if (!$error) {
-			$this->results   = array('myreturn' => 999);
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+        return 0; // or return 1 to replace standard code
 	}
 
 
 	/**
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
-	 * @param Hook $parameters metadatas (context, etc...)
-	 * @param $object current object
-	 * @param $action
-	 * @return int              < 0 on error, 0 on success, 1 to replace standard code
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
 	 */
-	public function doActions($parameters, $object, $action)
-	{
-		global $db, $conf;
+	public function doActions(array $parameters, $object, string $action): int
+    {
+		global $conf, $db;
 
-		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+        // Do something only for the current context
+		if ($parameters['currentcontext'] == 'admincompany') {
 			if ($action == 'update') {
-				dolibarr_set_const($db, "MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER", GETPOST("MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER"), 'chaine', 0, '', $conf->entity);
+				dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
 			}
 		}
-	}
 
+        return 0; // or return 1 to replace standard code
+	}
 }

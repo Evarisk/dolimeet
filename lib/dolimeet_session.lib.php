@@ -39,7 +39,7 @@ function sessionPrepareHead($object): array
     $h = 0;
     $head = [];
 
-	$head[$h][0] = dol_buildpath('/dolimeet/view/' . $object->element . '/' . $object->element . '_card.php', 1) . '?id=' . $object->id;
+	$head[$h][0] = dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?id=' . $object->id . '&object_type=' . $object->element;
 	$head[$h][1] = '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('Card');
 	$head[$h][2] = 'card';
 	$h++;

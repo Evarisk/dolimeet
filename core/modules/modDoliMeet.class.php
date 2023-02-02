@@ -125,7 +125,7 @@ class modDoliMeet extends DolibarrModules
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/dolimeet/temp","/dolimeet/subdir");
-		$this->dirs = ['/dolimeet/temp'];
+		$this->dirs = ['/dolimeet/temp', '/dolimeet/meeting'];
 
 		// Config pages. Put here list of php page, stored into dolimeet/admin directory, to use to setup module.
 		$this->config_page_url = ['setup.php@dolimeet'];
@@ -372,8 +372,8 @@ class modDoliMeet extends DolibarrModules
             'titre'    => $langs->trans('MeetingList'),
             'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'dolimeet_meeting',
-            'url'      => '/dolimeet/view/meeting/meeting_list.php',
+            'leftmenu' => 'meeting_list',
+            'url'      => '/dolimeet/view/session/session_list.php?object_type=meeting',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
             'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
@@ -383,12 +383,12 @@ class modDoliMeet extends DolibarrModules
         ];
 
         $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_meeting',
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=meeting_list',
             'type'     => 'left',
             'titre'    => '<i class="fas fa-comments pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('MeetingCreate'),
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'dolimeet_meeting_card',
-            'url'      => '/dolimeet/view/meeting/meeting_card.php?action=create',
+            'leftmenu' => 'meeting_card',
+            'url'      => '/dolimeet/view/session/session_card.php?action=create&object_type=meeting',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
             'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
@@ -398,15 +398,15 @@ class modDoliMeet extends DolibarrModules
         ];
 
         $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_meeting',
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=meeting_list',
             'type'     => 'left',
             'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'dolimeet_meeting_tags',
+            'leftmenu' => 'meeting_tags',
             'url'      => '/categories/index.php?type=meeting',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
+            'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
             'perms'    => '$user->rights->dolimeet->meeting->read',
             'target'   => '',
             'user'     => 0,
@@ -418,8 +418,8 @@ class modDoliMeet extends DolibarrModules
             'titre'    => $langs->trans('TrainingSessionList'),
             'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'dolimeet_trainingsession',
-            'url'      => '/dolimeet/view/trainingsession/trainingsession_list.php',
+            'leftmenu' => 'trainingsession_list',
+            'url'      => '/dolimeet/view/session/session_list.php?object_type=trainingsession',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
             'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
@@ -429,12 +429,12 @@ class modDoliMeet extends DolibarrModules
         ];
 
         $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_trainingsession',
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=trainingsession_list',
             'type'     => 'left',
             'titre'    => '<i class="fas fa-people-arrows pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('TrainingSessionCreate'),
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'dolimeet_trainingsession_card',
-            'url'      => '/dolimeet/view/trainingsession/trainingsession_card.php?action=create',
+            'leftmenu' => 'trainingsession_card',
+            'url'      => '/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
             'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
@@ -444,11 +444,11 @@ class modDoliMeet extends DolibarrModules
         ];
 
         $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_trainingsession',
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=trainingsession_list',
             'type'     => 'left',
             'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'dolimeet_trainingsession_tags',
+            'leftmenu' => 'trainingsession_tags',
             'url'      => '/categories/index.php?type=trainingsession',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
@@ -464,8 +464,8 @@ class modDoliMeet extends DolibarrModules
 			'titre'    => $langs->trans('AuditList'),
             'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
 			'mainmenu' => 'dolimeet',
-			'leftmenu' => 'dolimeet_audit',
-			'url'      => '/dolimeet/view/audit/audit_list.php',
+			'leftmenu' => 'audit_list',
+			'url'      => '/dolimeet/view/session/session_list.php?object_type=audit',
 			'langs'    => 'dolimeet@dolimeet',
 			'position' => 1000 + $r,
 			'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
@@ -475,12 +475,12 @@ class modDoliMeet extends DolibarrModules
         ];
 
 		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_audit',
+			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',
 			'type'     => 'left',
 			'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('AuditCreate'),
 			'mainmenu' => 'dolimeet',
-			'leftmenu' => 'dolimeet_audit_card',
-			'url'      => '/dolimeet/view/audit/audit_card.php?action=create',
+			'leftmenu' => 'audit_card',
+			'url'      => '/dolimeet/view/session/session_card.php?action=create&object_type=audit',
 			'langs'    => 'dolimeet@dolimeet',
 			'position' => 1000 + $r,
 			'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
@@ -490,11 +490,11 @@ class modDoliMeet extends DolibarrModules
         ];
 
 		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=dolimeet_audit',
+			'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',
 			'type'     => 'left',
 			'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
 			'mainmenu' => 'dolimeet',
-			'leftmenu' => 'dolimeet_audit_tags',
+			'leftmenu' => 'audit_tags',
 			'url'      => '/categories/index.php?type=audit',
 			'langs'    => 'dolimeet@dolimeet',
 			'position' => 1000 + $r,
@@ -507,10 +507,10 @@ class modDoliMeet extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=dolimeet',
             'type'     => 'left',
-            'titre'    => $langs->trans('DoliMeetConfig'),
+            'titre'    => $langs->trans('Config'),
             'prefix'   => '<i class="fas fa-cog pictofixedwidth"></i>',
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'dolimeetconfig',
+            'leftmenu' => 'config',
             'url'      => '/dolimeet/admin/setup.php',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
