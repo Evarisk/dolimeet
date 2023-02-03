@@ -65,7 +65,7 @@ $objectType  = GETPOST('object_type', 'alpha');
 
 
 // Initialize technical objects
-$object      = new Session($db);
+$object      = new Session($db, $objectType);
 $signatory   = new Signature($db);
 $extrafields = new ExtraFields($db);
 $usertmp     = new User($db);
@@ -143,73 +143,6 @@ if (empty($reshook)) {
 
     // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
     include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
-
-//    // Action to add record
-//    if ($action == 'add' && $permissiontoadd) {
-//        // Get parameters
-//        $content = GETPOST('content', 'restricthtml');
-//        $label = GETPOST('label');
-//        $society_id = GETPOST('fk_soc');
-//        $project_id = GETPOST('projectid');
-//        $contrat_id = GETPOST('fk_contrat');
-//        $durationh = GETPOST('durationh') ?: 0;
-//        $durationm = GETPOST('durationm') ?: 0;
-//
-//        $duration_minutes = $durationh * 60 + $durationm;
-//
-//        $date_start = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
-//        $date_end = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
-//
-//        // Initialize object
-//        $now = dol_now();
-//        $object->ref = $refMod->getNextValue($object);
-//        $object->ref_ext = 'dolimeet_' . $object->ref;
-//        $object->date_creation = $object->db->idate($now);
-//        $object->date_start = $date_start;
-//        $object->date_end = $date_end;
-//        $object->tms = $now;
-//        $object->import_key = '';
-//        $object->note_private = $note_private;
-//        $object->note_public = $note_public;
-//        $object->label = $label;
-//        $object->type = $objectType;
-//        $object->duration = $duration_minutes;
-//
-//        $object->fk_soc = $society_id;
-//        $object->fk_project = $project_id;
-//        $object->fk_contrat = $contrat_id;
-//
-//        $object->content = $content;
-//        $object->entity = $conf->entity ?: 1;
-//
-//        $object->fk_user_creat = $user->id ? $user->id : 1;
-//
-//        // Check parameters
-//        if (empty($label)) {
-//            setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Label')), null, 'errors');
-//            $error++;
-//        }
-//
-//        if (!$error) {
-//            $result = $object->create($user, false);
-//            if ($result > 0) {
-//                // Creation OK
-//                // Category association
-//                $categories = GETPOST('categories', 'array');
-//                $object->setCategories($categories);
-//                $urltogo = $backtopage ? str_replace('__ID__', $result, $backtopage) : $backurlforlist;
-//                $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $object->id, $urltogo); // New method to autoselect project after a New on another form object creation
-//                header('Location: ' . $urltogo);
-//                exit;
-//            } else {
-//                // Creation KO
-//                if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-//                else  setEventMessages($object->error, null, 'errors');
-//            }
-//        } else {
-//            $action = 'create';
-//        }
-//    }
 
 //    // Action to update record
 //    if ($action == 'update' && $permissiontoadd) {
@@ -763,42 +696,6 @@ if ($action == 'create') {
 
     // Common attributes
     include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
-
-//    //Project -- Projet
-//    print '<tr class="oddeven"><td><label for="Project">' . $langs->trans('ProjectLinked') . '</label></td><td>';
-//    $numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1, GETPOST('projectid'), 'projectid', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
-//    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans('AddProject') . '"></span></a>';
-//    print '</td></tr>';
-
-//    //Contract -- Contrat
-//    if ($objectType == 'trainingsession') {
-//        print '<tr class="oddeven"><td><label for="Contract">' . $langs->trans('ContractLinked') . '</label></td><td class="minwidth500">';
-//        $numcontrat = $formcontract->select_contract(GETPOST('fk_soc') ?: -1, GETPOST('fk_contrat'), 'fk_contrat', 0, 1, 1);
-//        print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans('AddContract') . '"></span></a>';
-//        print '</td></tr>';
-//
-//        //Duration - Durée
-//        print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans('Duration') . '</label></td><td>';
-//        print '<input type=number name="durationh" id="durationh" value="' . GETPOST('durationh') . '">';
-//        print $langs->trans('Hour(s)');
-//        print '<input type=number name="durationm" id="durationm" value="' . GETPOST('durationm') . '">';
-//        print $langs->trans('Minute(s)');
-//        print '</td></tr>';
-//    }
-
-//	//Society -- Société
-//	print '<tr><td class="">'.$langs->trans("Society").'</td><td>';
-//	$events = array();
-//	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'fk_contact', 'params' => array('add-customer-contact' => 'disabled'));
-//	print $form->select_company(GETPOST('fromtype') == 'thirdparty' ? GETPOST('fromid') : GETPOST('fk_soc'), 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-//	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-//	print '</td></tr>';
-
-//    //Content -- Contenu
-//    print '<tr class=""><td><label for="content">' . $langs->trans('Content') . '</label></td><td>';
-//    $doleditor = new DolEditor('content', GETPOST('content'), '', 250, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
-//    $doleditor->Create();
-//    print '</td></tr>';
 
     // Categories
     if (isModEnabled('categorie')) {

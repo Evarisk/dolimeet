@@ -57,6 +57,11 @@ class Session extends CommonObject
 	public int $isextrafieldmanaged = 1;
 
     /**
+     * @var string Name of icon for session. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'session@dolimeet' if picto is file 'img/object_session.png'.
+     */
+    public string $picto = '';
+
+    /**
      * @var array Label status of const.
      */
     public array $labelStatus;
@@ -89,7 +94,7 @@ class Session extends CommonObject
      *  'picto' is code of a picto to show before value in forms
      *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM' or '!empty($conf->multicurrency->enabled)' ...)
      *  'position' is the sort order of field.
-     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty '' or 0.
      *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
      *  'noteditable' says if field is not editable (1 or 0)
      *  'default' is a default value for creation (can still be overwroted by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
@@ -125,19 +130,18 @@ class Session extends CommonObject
 		'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 80,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1],
 		'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 90,  'notnull' => 1, 'visible' => 1],
 		'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 100, 'notnull' => 1, 'visible' => 1],
-		'description'    => ['type' => 'html',         'label' => 'Description',      'enabled' => 1, 'position' => 110, 'notnull' => 1, 'visible' => 3, 'validate' => 1],
+		'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 110, 'notnull' => 1, 'visible' => 3, 'validate' => 1],
 		'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 0],
-		'duration'       => ['type' => 'integer',      'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1],
+		'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1],
 		'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
 		'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
-		'document_url'   => ['type' => 'varchar(255)', 'label' => 'DocumentUrl',      'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 0],
 		'last_main_doc'  => ['type' => 'varchar(255)', 'label' => 'LastMainDoc',      'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0],
 		'model_pdf'      => ['type' => 'varchar(255)', 'label' => 'PdfModel',         'enabled' => 1, 'position' => 180, 'notnull' => 0, 'visible' => 0],
 		'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1,                         'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_user_modif'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1,                         'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_soc'         => ['type' => 'integer:Societe:societe/class/societe.class.php:1', 'label' => 'ThirdParty', 'picto' => 'company', 'enabled' => '$conf->societe->enabled', 'position' => 210, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'societe.rowid'],
 		'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php:1',  'label' => 'Project',    'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 220, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
-		'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php:1', 'label' => 'Contract',   'picto' => 'contrat', 'enabled' => '$conf->contrat->enabled', 'position' => 230, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid'],
+		'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php:1', 'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 230, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid'],
     ];
 
     /**
@@ -166,9 +170,9 @@ class Session extends CommonObject
 	public $date_creation;
 
     /**
-     * @var int Timestamp
+     * @var int|string Timestamp
      */
-    public int $tms;
+    public $tms;
 
     /**
      * @var string Import key
@@ -196,9 +200,9 @@ class Session extends CommonObject
     public $date_end;
 
     /**
-     * @var string Description
+     * @var string Content
      */
-    public string $description;
+    public string $content;
 
     /**
      * @var string Object type
@@ -206,9 +210,9 @@ class Session extends CommonObject
     public string $type;
 
     /**
-     * @var int Duration
+     * @var int|null Duration
      */
-    public int $duration;
+    public ?int $duration;
 
     /**
      * @var string Public note
@@ -226,11 +230,6 @@ class Session extends CommonObject
     public $last_main_doc;
 
     /**
-     * @var string Document url
-     */
-    public string $document_url;
-
-    /**
      * @var string Pdf model name
      */
     public $model_pdf;
@@ -241,14 +240,14 @@ class Session extends CommonObject
     public int $fk_user_creat;
 
     /**
-     * @var int User ID
+     * @var int|null User ID
      */
-    public int $fk_user_modif;
+    public ?int $fk_user_modif;
 
     /**
-     * @var int Thirdparty ID
+     * @var int|string  ThirdParty ID
      */
-    public int $fk_soc;
+    public $fk_soc;
 
     /**
      * @var int Project ID
@@ -256,20 +255,21 @@ class Session extends CommonObject
     public $fk_project;
 
     /**
-     * @var int Contract ID
+     * @var int|string Contract ID
      */
-    public int $fk_contrat;
+    public $fk_contrat;
 
     /**
 	 * Constructor
 	 *
 	 * @param DoliDb $db Database handler
 	 */
-	public function __construct(DoliDB $db)
+	public function __construct(DoliDB $db, $objectType)
     {
 		global $conf, $langs;
 
 		$this->db = $db;
+        $this->type = $objectType;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) {
 			$this->fields['rowid']['visible'] = 0;
@@ -295,6 +295,21 @@ class Session extends CommonObject
 				}
 			}
 		}
+
+        switch ($objectType) {
+            case 'trainingsession':
+                $this->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
+                break;
+            case 'meeting':
+                $this->picto = 'fontawesome_fa-comments_fas_#d35968';
+                break;
+            case 'audit':
+                $this->picto = 'fontawesome_fa-tasks_fas_#d35968';
+                break;
+            default :
+                $this->picto = '';
+                break;
+        }
 	}
 
     /**
@@ -444,22 +459,7 @@ class Session extends CommonObject
 
         $result = '';
 
-		switch ($this->type) {
-			case 'trainingsession':
-				$picto = 'fontawesome_fa-people-arrows_fas_#d35968';
-				break;
-			case 'meeting':
-				$picto = 'fontawesome_fa-comments_fas_#d35968';
-				break;
-			case 'audit':
-				$picto = 'fontawesome_fa-tasks_fas_#d35968';
-				break;
-            default :
-                $picto = '';
-                break;
-		}
-
-		$label = img_picto('', $picto) . ' <u>' . $langs->trans('Session') . '</u>';
+		$label = img_picto('', $this->picto) . ' <u>' . $langs->trans('Session') . '</u>';
 		if (isset($this->status)) {
 			$label .= ' ' . $this->getLibStatut(5);
 		}
@@ -467,7 +467,7 @@ class Session extends CommonObject
 		$label .= '<b>' . $langs->trans('Ref') . ' : </b> ' . $this->ref;
         
         $objectType = GETPOST('object_type', 'alpha');
-		$url        = dol_buildpath('/' . $this->module . '/view/' . $this->type . '/' . $this->type . '_card.php', 1) . '?id=' . $this->id . '&object_type=' . $objectType;
+		$url        = dol_buildpath('/' . $this->module . '/view/session/session_card.php', 1) . '?id=' . $this->id . '&object_type=' . $objectType;
 
 		if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
@@ -508,12 +508,12 @@ class Session extends CommonObject
 
 //        if (empty($this->showphoto_on_popup)) {
 //            if ($withpicto > 0) {
-//                $result .= img_object(($notooltip ? '' : $label), ($picto ?: 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+//                $result .= img_object(($notooltip ? '' : $label), ($this->picto ?: 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
 //            }
 //        } elseif ($withpicto > 0) {
 //            require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 //
-//            list($class, $module) = explode('@', $picto);
+//            list($class, $module) = explode('@', $this->picto);
 //            $upload_dir = $conf->$module->multidir_output[$conf->entity] . "/$class/" . dol_sanitizeFileName($this->ref);
 //            $filearray = dol_dir_list($upload_dir, 'files');
 //            $filename = $filearray[0]['name'];
@@ -529,12 +529,12 @@ class Session extends CommonObject
 //
 //                $result .= '</div>';
 //            } else {
-//                $result .= img_object(($notooltip ? '' : $label), ($picto ?: 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+//                $result .= img_object(($notooltip ? '' : $label), ($this->picto ?: 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
 //            }
 //        }
 
 		if ($withpicto > 0) {
-            $result .= img_picto('', $picto) . ' ';
+            $result .= img_picto('', $this->picto) . ' ';
         }
 
 		if ($withpicto != 2) {

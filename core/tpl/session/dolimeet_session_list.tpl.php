@@ -29,11 +29,11 @@ require_once __DIR__ . '/../../../class/trainingsession.class.php';
 require_once __DIR__ . '/../../../class/meeting.class.php';
 require_once __DIR__ . '/../../../class/audit.class.php';
 
-// for other modules
-//dol_include_once('/othermodule/class/otherobject.class.php');
-global $user, $db, $user, $langs;
+// Global variables definitions
+global $conf, $db, $hookmanager, $langs, $user;
+
 // Load translation files required by the page
-$langs->loadLangs(array("dolimeet@dolimeet", "other", "bills", "projects", "orders", "companies", "contracts"));
+$langs->loadLangs(["dolimeet@dolimeet", "other", "bills", "projects", "orders", "companies", "contracts"]);
 
 $action     = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...
 $massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
@@ -46,6 +46,7 @@ $backtopage = GETPOST('backtopage', 'alpha'); // Go back to a dedicated page
 $optioncss = GETPOST('optioncss', 'aZ'); // Option for the css output (always '' except when 'print')
 $fromtype = GETPOST('fromtype', 'alpha'); // element type
 $fromid = GETPOST('fromid', 'int'); //element id
+$objectType  = GETPOST('object_type', 'alpha');
 
 $id = GETPOST('id', 'int');
 $type = GETPOST('type');
@@ -64,26 +65,23 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 // Initialize technical objects
-$object = new $session_type($db);
+$object      = new Session($db, $objectType);
 $extrafields = new ExtraFields($db);
+$usertmp     = new User($db);
 $thirdparty = new Societe($db);
 $contact = new Contact($db);
-$sender = new User($db);
 $project = new Project($db);
 $formproject = new FormProjets($db);
 $formcontrat = new FormContract($db);
-if (empty($object->type)) {
-	$object->type = 'session';
-}
+
 if (!$fromtype || !$fromid) {
 	unset($object->fields['type']);
 }
-$diroutputmassaction = $conf->session->dir_output.'/temp/massgeneration/'.$user->id;
+
 $hookmanager->initHooks(array('documentlist')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
-//$extrafields->fetch_name_optionals_label($object->table_element_line);
 
 $search_array_options = $extrafields->getOptionalsFromPost($object->table_element, '', 'search_');
 
@@ -528,7 +526,7 @@ print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sort
 $topicmail = "Send". $object->type ."Ref";
 $modelmail = "document";
 
-$objecttmp = new $object->type($db);
+$objecttmp = new Session($db, $objectType);
 $trackid = 'xxxx'.$object->id;
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
