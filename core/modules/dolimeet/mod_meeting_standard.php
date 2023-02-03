@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@
  *  \brief      File of class to manage Meeting numbering rules standard
  */
 
-require_once __DIR__ . '/modules_meeting.php';
+require_once __DIR__ . '/modules_session.php';
 
 /**
  *	Class to manage customer order numbering rules standard
  */
-class mod_meeting_standard extends ModeleNumRefMeeting
+class mod_meeting_standard extends ModeleNumRefSession
 {
 	/**
 	 * Dolibarr version of the loaded meeting
@@ -45,7 +45,7 @@ class mod_meeting_standard extends ModeleNumRefMeeting
 	/**
 	 * @var string name
 	 */
-	public $name = 'Test';
+	public $name = 'Meeting';
 
 	/**
 	 *  Return description of numbering module
@@ -65,7 +65,7 @@ class mod_meeting_standard extends ModeleNumRefMeeting
 	 */
 	public function getExample()
 	{
-		return $this->prefix."1";
+		return $this->prefix."2208-0001";
 	}
 
 	/**
@@ -82,7 +82,7 @@ class mod_meeting_standard extends ModeleNumRefMeeting
 
 		$posindice = strlen($this->prefix) + 6;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
-		$sql .= " FROM ".MAIN_DB_PREFIX."dolimeet_meeting";
+		$sql .= " FROM ".MAIN_DB_PREFIX."dolimeet_session";
 		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."_______-%'";
 		if ($object->ismultientitymanaged == 1) {
 			$sql .= " AND entity = ".$conf->entity;
@@ -116,10 +116,10 @@ class mod_meeting_standard extends ModeleNumRefMeeting
 		global $db, $conf;
 
 		// first we get the max value
-		$posindice = strlen($this->prefix) + 1;
+		$posindice = strlen($this->prefix) + 6;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
-		$sql .= " FROM ".MAIN_DB_PREFIX."dolimeet_meeting";
-		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."%'";
+		$sql .= " FROM ".MAIN_DB_PREFIX."dolimeet_session";
+		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."____-%'";
 		if ($object->ismultientitymanaged == 1) {
 			$sql .= " AND entity = ".$conf->entity;
 		}
@@ -137,10 +137,17 @@ class mod_meeting_standard extends ModeleNumRefMeeting
 			return -1;
 		}
 
-		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		else $num = sprintf("%s", $max + 1);
+		$date = empty($object->date_creation) ?dol_now() : $object->date_creation;
 
-		dol_syslog("mod_meeting_standard::getNextValue return ".$this->prefix.$num);
-		return $this->prefix.$num;
+		$yymm = strftime("%y%m", $date);
+
+		if ($max >= (pow(10, 4) - 1)) {
+			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+		} else {
+			$num = sprintf("%04s", $max + 1);
+		}
+
+		dol_syslog("mod_meeting_standard::getNextValue return ".$this->prefix.$yymm."-".$num);
+		return $this->prefix.$yymm."-".$num;
 	}
 }

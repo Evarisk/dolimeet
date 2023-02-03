@@ -23,17 +23,18 @@
  */
 
 /**
- *  \file			htdocs/core/modules/doliletter/modules_meeting.php
- *  \ingroup		doliletter
- *  \brief			File that contains parent class for meeting document models and parent class for meeting numbering models
+ *  \file			htdocs/core/modules/dolimeet/modules_session.php
+ *  \ingroup		dolimeet
+ *  \brief			File that contains parent class for session document models and parent class for session numbering models
  */
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/dolimeet/lib/dolimeet_function.lib.php';
 
 /**
  *	Parent class for documents models
  */
-abstract class ModelePDFMeeting extends CommonDocGenerator
+abstract class ModelePDFSession extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -44,16 +45,15 @@ abstract class ModelePDFMeeting extends CommonDocGenerator
 	 *  @param  integer	$maxfilenamelength  Max length of value to show
 	 *  @return	array						List of templates
 	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
+	public static function liste_modeles($db, $maxfilenamelength = 0, $type)
 	{
 		// phpcs:enable
 		global $conf;
 
-		$type = 'meeting';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-		$list = getListOfModels($db, $type, $maxfilenamelength);
+		$list = getListOfModelsDolimeet($db, $type, $maxfilenamelength);
 
 		return $list;
 	}
@@ -64,7 +64,7 @@ abstract class ModelePDFMeeting extends CommonDocGenerator
 /**
  *  Parent class to manage numbering of Meeting
  */
-abstract class ModeleNumRefMeeting
+abstract class ModeleNumRefSession
 {
 	/**
 	 * @var string Error code (or message)
@@ -89,7 +89,7 @@ abstract class ModeleNumRefMeeting
 	public function info()
 	{
 		global $langs;
-		$langs->load("doliletter@doliletter");
+		$langs->load("dolimeet@dolimeet");
 		return $langs->trans("NoDescription");
 	}
 
@@ -101,7 +101,7 @@ abstract class ModeleNumRefMeeting
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("doliletter@doliletter");
+		$langs->load("dolimeet@dolimeet");
 		return $langs->trans("NoExample");
 	}
 

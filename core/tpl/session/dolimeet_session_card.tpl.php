@@ -1,81 +1,14 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
-/**
- *   	\file       meeting_card.php
- *		\ingroup    meeting
- *		\brief      Page to create/edit/view meeting
- */
-
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
-// Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if (!$res) die("Include of main fails");
-
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
-require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
-require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
-require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-
-require_once './class/meeting.class.php';
-require_once './core/modules/dolimeet/mod_meeting_standard.php';
-require_once './lib/dolimeet_meeting.lib.php';
-require_once './lib/dolimeet.lib.php';
-require_once './lib/dolimeet_function.lib.php';
-
-global $db, $conf, $langs, $user, $hookmanager;
-
-// Load translation files required by the page
-$langs->loadLangs(array("dolimeet@dolimeet", "other"));
-
-// Get parameters
-$id          = GETPOST('id', 'int');
-$action      = GETPOST('action', 'aZ09');
-$massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
-$confirm     = GETPOST('confirm', 'alpha');
-$cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
-$backtopage  = GETPOST('backtopage', 'alpha');
-
-// Initialize technical objects
-$object         = new Meeting($db);
 $contact        = new Contact($db);
 $project        = new Project($db);
-$refMeetingMod = new $conf->global->DOLIMEET_MEETING_ADDON();
+$mod            = 'DOLIMEET_'. strtoupper($object->element) .'_ADDON';
+$refMod         = new $conf->global->$mod();
 $extrafields    = new ExtraFields($db);
 $usertmp        = new User($db);
 $ecmfile        = new EcmFiles($db);
 $thirdparty     = new Societe($db);
+$signatory      = new DolimeetSignature($db);
 
 $object->fetch($id);
 if ($object->fk_contact > 0) {
@@ -83,7 +16,7 @@ if ($object->fk_contact > 0) {
 	$linked_contact->fetch($object->fk_contact);
 }
 
-$hookmanager->initHooks(array('lettercard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array($object->element . 'card', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -102,15 +35,15 @@ foreach ($object->fields as $key => $val) {
 if (empty($action) && empty($id) && empty($ref)) {
 	$action = 'view';
 }
-$upload_dir = $conf->dolimeet->multidir_output[$conf->entity ?: $conf->entity]."/meeting/".get_exdir(0, 0, 0, 1, $object);
+$upload_dir = $conf->dolimeet->multidir_output[$conf->entity ?: $conf->entity]. "/" . $object->element . "/" .get_exdir(0, 0, 0, 1, $object);
 // Load object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
-$permissiontoread = $user->rights->dolimeet->meeting->read;
-$permissiontoadd = $user->rights->dolimeet->meeting->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-$permissiontodelete = $user->rights->dolimeet->meeting->delete || ($permissiontoadd && isset($object->status));
-$permissionnote = $user->rights->dolimeet->meeting->write; // Used by the include of actions_setnotes.inc.php
-$permissiondellink = $user->rights->meeting->letter->write; // Used by the include of actions_dellink.inc.php
+$object_type = $object->element;
+$permissiontoread = $user->rights->dolimeet->$object_type->read;
+$permissiontoadd = $user->rights->dolimeet->$object_type->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
+$permissiontodelete = $user->rights->dolimeet->$object_type->delete || ($permissiontoadd && isset($object->status));
+$permissionnote = $user->rights->dolimeet->$object_type->write; // Used by the include of actions_setnotes.inc.php
 $upload_dir = $conf->dolimeet->multidir_output[$conf->entity];
 $thirdparty->fetch($object->fk_soc);
 
@@ -119,7 +52,6 @@ if ($user->socid > 0) accessforbidden();
 if ($user->socid > 0) $socid = $user->socid;
 if (empty($conf->dolimeet->enabled)) accessforbidden();
 if (!$permissiontoread) accessforbidden();
-
 
 /*
  * Actions
@@ -163,18 +95,17 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/dolimeet/meeting_list.php', 1);
+	$backurlforlist = dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) {
 				$backtopage = $backurlforlist;
 			} else {
-				$backtopage = dol_buildpath('/dolimeet/meeting_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
+				$backtopage = dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 			}
 		}
 	}
-
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	//include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
@@ -186,22 +117,35 @@ if (empty($reshook)) {
 		$note_private   = GETPOST('note_private');
 		$note_public    = GETPOST('note_public');
 		$label          = GETPOST('label');
-		$project_id     = GETPOST('fk_project');
+		$society_id     = GETPOST('fk_soc');
+		$project_id     = GETPOST('projectid');
+		$contrat_id     = GETPOST('fk_contrat');
+		$durationh       = GETPOST('durationh') ?:0;
+		$durationm       = GETPOST('durationm') ?: 0;
+
+		$duration_minutes = $durationh * 60 + $durationm;
+
+		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
+		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
 
 		// Initialize object
 		$now                   = dol_now();
-		$object->ref           = $refMeetingMod->getNextValue($object);
+		$object->ref           = $refMod->getNextValue($object);
 		$object->ref_ext       = 'dolimeet_' . $object->ref;
 		$object->date_creation = $object->db->idate($now);
+		$object->date_start    = $date_start;
+		$object->date_end      = $date_end;
 		$object->tms           = $now;
 		$object->import_key    = "";
 		$object->note_private  = $note_private;
 		$object->note_public   = $note_public;
 		$object->label         = $label;
+		$object->type          = $object->element;
+		$object->duration      = $duration_minutes;
 
 		$object->fk_soc        = $society_id;
-		$object->fk_contact    = $contact_id;
 		$object->fk_project    = $project_id;
+		$object->fk_contrat    = $contrat_id;
 
 		$object->content       = $content;
 		$object->entity = $conf->entity ?: 1;
@@ -217,14 +161,17 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-				// Creation meeting OK
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
+				// Creation OK
+				// Category association
+				$categories = GETPOST('categories', 'array');
+				$object->setCategories($categories);
+				$urltogo = $backtopage ? str_replace('__ID__', $result, $backtopage) : $backurlforlist;
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $object->id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: ".$urltogo);
 				exit;
 			}
 			else {
-				// Creation meeting KO
+				// Creation KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -238,24 +185,33 @@ if (empty($reshook)) {
 		$society_id     = GETPOST('fk_soc');
 		$content        = GETPOST('content', 'restricthtml');
 		$label          = GETPOST('label');
-		$contact_id     = GETPOST('fk_contact');
+		$contrat_id     = GETPOST('fk_contrat');
 		$project_id     = GETPOST('fk_project');
+		$date_start     = dol_mktime(GETPOST('date_starthour', 'int'), GETPOST('date_startmin', 'int'), 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
+		$date_end       = dol_mktime(GETPOST('date_endhour', 'int'), GETPOST('date_endmin', 'int'), 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
+		$durationh       = GETPOST('durationh') ?:0;
+		$durationm       = GETPOST('durationm') ?: 0;
+
+		$duration_minutes = $durationh * 60 + $durationm;
 
 		$object->label      = $label;
 		$object->fk_soc     = $society_id;
 		$object->content    = $content;
-		$object->fk_contact = $contact_id;
+		$object->fk_contrat = $contrat_id;
 		$object->fk_project = $project_id;
+		$object->date_start = $date_start;
+		$object->date_end = $date_end;
+		$object->duration = $duration_minutes;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 		if (!$error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
-				$signatory->deleteSignatoriesSignatures($object->id, 0);
-				$object->setStatusCommon($user, 0);
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
+				$categories = GETPOST('categories', 'array');
+				$object->setCategories($categories);
+				$urltogo = $backtopage ? str_replace('__ID__', $result, $backtopage) : $backurlforlist;
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $object->id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: ".$urltogo);
 				exit;
 			}
 			else
@@ -271,7 +227,7 @@ if (empty($reshook)) {
 	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes")
 	{
 		$object->setStatusCommon($user, -1);
-		$urltogo = DOL_URL_ROOT . '/custom/dolimeet/meeting_list.php';
+		$urltogo = DOL_URL_ROOT . '/custom/dolimeet/view/'. $object->element .'/'. $object->element .'_list.php';
 		header("Location: " . $urltogo);
 		exit;
 	}
@@ -286,108 +242,71 @@ if (empty($reshook)) {
 	//include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';
 
 	// Action to build doc
-//	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
-
 	if ($action == 'builddoc' && $permissiontoadd) {
-		if (is_numeric(GETPOST('model', 'alpha'))) {
-			$error = $langs->trans("ErrorFieldRequired", $langs->transnoentities("Model"));
-		} else {
-			// Reload to get all modified line records and be ready for hooks
-			$ret = $object->fetch($id);
-			$ret = $object->fetch_thirdparty();
-			/*if (empty($object->id) || ! $object->id > 0)
-			{
-				dol_print_error('Object must have been loaded by a fetch');
-				exit;
-			}*/
+		$outputlangs = $langs;
+		$newlang     = '';
 
-			// Save last template used to generate document
-			if (GETPOST('model', 'alpha')) {
-				$object->setDocModel($user, GETPOST('model', 'alpha'));
-			}
+		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
+		if ( ! empty($newlang)) {
+			$outputlangs = new Translate("", $conf);
+			$outputlangs->setDefaultLang($newlang);
+		}
 
-			// Special case to force bank account
-			//if (property_exists($object, 'fk_bank'))
-			//{
-			if (GETPOST('fk_bank', 'int')) {
-				// this field may come from an external module
-				$object->fk_bank = GETPOST('fk_bank', 'int');
-			} elseif (!empty($object->fk_account)) {
-				$object->fk_bank = $object->fk_account;
-			}
-			//}
+		// To be sure vars is defined
+		if (empty($hidedetails)) $hidedetails = 0;
+		if (empty($hidedesc)) $hidedesc       = 0;
+		if (empty($hideref)) $hideref         = 0;
+		if (empty($moreparams)) $moreparams   = null;
 
-			$outputlangs = $langs;
-			$newlang = '';
+		$model = GETPOST('model', 'alpha');
 
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) {
-				$newlang = GETPOST('lang_id', 'aZ09');
-			}
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->thirdparty->default_lang)) {
-				$newlang = $object->thirdparty->default_lang; // for proposal, order, invoice, ...
-			}
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->default_lang)) {
-				$newlang = $object->default_lang; // for thirdparty
-			}
-			if (!empty($newlang)) {
-				$outputlangs = new Translate("", $conf);
-				$outputlangs->setDefaultLang($newlang);
-			}
+		$moreparams['object'] = $object;
+		$moreparams['user']   = $user;
 
-			// To be sure vars is defined
-			if (empty($hidedetails)) {
-				$hidedetails = 0;
-			}
-			if (empty($hidedesc)) {
-				$hidedesc = 0;
-			}
-			if (empty($hideref)) {
-				$hideref = 0;
-			}
-			if (empty($moreparams)) {
-				$moreparams = null;
-			}
-
-			$result = $object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-			if ($result <= 0) {
-				setEventMessages($object->error, $object->errors, 'errors');
-				$action = '';
-			} else {
-				if ($conf->global->DOLIMEET_SHOW_DOCUMENTS_ON_PUBLIC_INTERFACE) {
-					$filedir = $conf->dolimeet->dir_output.'/'.$object->element.'/'.$object->ref;
-					$filelist = dol_dir_list($filedir, 'files');
-					if (!empty($filelist)) {
-						foreach ($filelist as $file) {
-							if (!preg_match('/specimen/', $file['name'])) {
-								$fileurl = $file['fullname'];
-								$filename = $file['name'];
-							}
+		if (preg_match('/completioncertificate/',GETPOST('model'))) {
+			$signatoriesList = $signatory->fetchSignatories($object->id, $object->type);
+			if (!empty($signatoriesList)) {
+				foreach($signatoriesList as $objectSignatory) {
+					if ($objectSignatory->role != 'TRAININGSESSION_SESSION_TRAINER') {
+						$moreparams['attendant']   = $objectSignatory;
+						$result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+						if ($result <= 0) {
+							setEventMessages($object->error, $object->errors, 'errors');
+							$action = '';
 						}
 					}
-
-					$ecmfile->fetch(0, '', 'dolimeet/meeting/'.$object->ref.'/'.$filename, '', '', 'dolimeet_meeting', $id);
-					require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
-					$ecmfile->share = getRandomPassword(true);
-					$ecmfile->update($user);
 				}
-				if (empty($donotredirect)) {	// This is set when include is done by bulk action "Bill Orders"
-					setEventMessages($langs->trans("FileGenerated"), null);
-
+				if (empty($donotredirect)) {
+					setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
 					$urltoredirect = $_SERVER['REQUEST_URI'];
 					$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 					$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-					header('Location: '.$urltoredirect.'#builddoc');
+					header('Location: ' . $urltoredirect . '#builddoc');
 					exit;
 				}
+			}
+		}
+
+		$result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		if ($result <= 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+			$action = '';
+		} else {
+			if (empty($donotredirect)) {
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
+				$urltoredirect = $_SERVER['REQUEST_URI'];
+				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+				header('Location: ' . $urltoredirect . '#builddoc');
+				exit;
 			}
 		}
 	}
 
 	// Actions to send emails
-	$triggersendname = 'DOLIMEET_MEETING_SENTBYMAIL';
-	$autocopy = 'MAIN_MAIL_AUTOCOPY_MEETING_TO';
-	$trackid = 'meeting'.$object->id;
+	$triggersendname = 'DOLIMEET_'. strtoupper($object->element) .'_SENTBYMAIL';
+	$autocopy = 'MAIN_MAIL_AUTOCOPY_'. strtoupper($object->element) .'_TO';
+	$trackid = $object->element.$object->id;
 
 	/*
 	 * Send mail
@@ -754,11 +673,9 @@ if (empty($reshook)) {
 
 	// Action clone object
 	if ($action == 'confirm_clone' && $confirm == 'yes') {
-		if ($object->status > 0) {
-			$object->status = 0;
-		}
-		$object->ref = $refMeetingMod->getNextValue($object);
-		$result = $object->create($user);
+		$options = array();
+		$object->ref = $refMod->getNextValue($object);
+		$result = $object->createFromClone($user, $object->id, $options);
 
 		if ($result > 0) {
 			header("Location: " . $_SERVER["PHP_SELF"] . '?id=' . $result);
@@ -769,7 +686,7 @@ if (empty($reshook)) {
 
 /*
  * View
- *
+ *FZ
  * Put here all code to build page
  */
 
@@ -778,9 +695,9 @@ $formother     = new FormOther($db);
 $formfile      = new FormFile($db);
 $formproject   = new FormProjets($db);
 
-$title        = $langs->trans("Meeting");
-$title_create = $langs->trans("NewMeeting");
-$title_edit   = $langs->trans("ModifyMeeting");
+$title        = $langs->trans("Card" . ucfirst($object->element));
+$title_create = $langs->trans("New" . ucfirst($object->element));
+$title_edit   = $langs->trans("Modify" . ucfirst($object->element));
 $help_url     = '';
 $morejs   = array("/dolimeet/js/signature-pad.min.js", "/dolimeet/js/dolimeet.js.php");
 $morecss  = array("/dolimeet/css/dolimeet.css");
@@ -811,14 +728,17 @@ if ($action == 'create') {
 	unset($object->fields['content']);
 	unset($object->fields['note_public']);
 	unset($object->fields['note_private']);
+	unset($object->fields['date_start']);
+	unset($object->fields['date_end']);
 	unset($object->fields['fk_soc']);
-	unset($object->fields['fk_contact']);
+	unset($object->fields['fk_contrat']);
 	unset($object->fields['fk_project']);
+	unset($object->fields['duration']);
 
 	//Ref -- Ref
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$refMeetingMod->getNextValue($object).'">';
-	print $refMeetingMod->getNextValue($object);
+	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$refMod->getNextValue($object).'">';
+	print $refMod->getNextValue($object);
 	print '</td></tr>';
 
 	// Common attributes
@@ -826,15 +746,59 @@ if ($action == 'create') {
 
 	//Project -- Projet
 	print '<tr class="oddeven"><td><label for="Project">' . $langs->trans("ProjectLinked") . '</label></td><td>';
-	$numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1,  GETPOST('fk_project'), 'fk_project', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
+	$numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1,  GETPOST('projectid'), 'projectid', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '</td></tr>';
+
+	//Contract -- Contrat
+	if ($object->element == 'trainingsession') {
+		print '<tr class="oddeven"><td><label for="Contract">' . $langs->trans("ContractLinked") . '</label></td><td class="minwidth500">';
+		$numcontrat = $formcontract->select_contract(GETPOST('fk_soc') ?: -1,  GETPOST('fk_contrat'), 'fk_contrat', 0, 1, 1);
+		print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddContract") . '"></span></a>';
+		print '</td></tr>';
+
+		//Duration - Durée
+		print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans("Duration") . '</label></td><td>';
+		print '<input type=number name="durationh" id="durationh" value="'. GETPOST('durationh') .'">';
+		print $langs->trans('Hour(s)');
+		print '<input type=number name="durationm" id="durationm" value="'. GETPOST('durationm') .'">';
+		print $langs->trans('Minute(s)');
+		print '</td></tr>';
+	}
+
+	//Date start - Date de début
+	print '<tr class="oddeven"><td><label for="DateStart">' . $langs->trans("DateStart") . '</label></td><td>';
+	print $form->selectDate(dol_now('tzuser'), 'date_start', 1, 1, 0, '', 1,1);
+	print '</td></tr>';
+
+	//Date end - Date de début
+	print '<tr class="oddeven"><td><label for="DateEnd">' . $langs->trans("DateEnd") . '</label></td><td>';
+	print $form->selectDate(dol_now('tzuser'), 'date_end', 1, 1, 0, '', 1, 1);
+	print '</td></tr>';
+
+
+//	//Society -- Société
+//	print '<tr><td class="">'.$langs->trans("Society").'</td><td>';
+//	$events = array();
+//	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'fk_contact', 'params' => array('add-customer-contact' => 'disabled'));
+//	print $form->select_company(GETPOST('fromtype') == 'thirdparty' ? GETPOST('fromid') : GETPOST('fk_soc'), 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+//	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+//	print '</td></tr>';
 
 	//Content -- Contenu
 	print '<tr class=""><td><label for="content">'.$langs->trans("Content").'</label></td><td>';
 	$doleditor = new DolEditor('content', GETPOST('content'), '', 250, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
+
+	// Categories
+	if (!empty($conf->categorie->enabled)) {
+		print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+		$cate_arbo = $form->select_all_categories($object->element, '', 'parent', 64, 0, 1);
+		print img_picto('', 'category').$form->multiselectarray('categories', $cate_arbo, GETPOST('categories', 'array'), '', 0, 'quatrevingtpercent widthcentpercentminusx', 0, 0);
+		print "</td></tr>";
+	}
+
 
 //	//PublicNote -- Note publique
 //	print '<tr class="content_field"><td><label for="note_public">'.$langs->trans("PublicNote").'</label></td><td>';
@@ -867,7 +831,7 @@ if ($action == 'create') {
 // Part to edit record
 if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 
-	print load_fiche_titre($langs->trans("EditMeeting"), '', 'object_'.$object->picto);
+	print load_fiche_titre($langs->trans("Edit".ucfirst($object->element)), '', 'object_'.$object->picto);
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -896,6 +860,7 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_contact']);
 	unset($object->fields['fk_project']);
+	unset($object->fields['duration']);
 
 	// Common attributes
 //	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
@@ -905,30 +870,67 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 	print '<input name="label" id="label" value="'. $object->label .'" >';
 	print '</td></tr>';
 
-	//Society -- Société
-	print '<tr><td class="fieldrequired">'.$langs->trans("Society").'</td><td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($object->fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-	print '</td></tr>';
-
-	//Contact -- Contact
-	print '<tr><td class="fieldrequired">'.$langs->trans("Contact").'</td><td>';
-	print $form->selectcontacts(GETPOST('fk_soc', 'int'), $object->fk_contact, 'fk_contact', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'fk_contact');
-	print '</td></tr>';
-
-	//Contact -- Contact
-	print '<tr class="oddeven"><td><label for="ACCProject">' . $langs->trans("ProjectLinked") . '</label></td><td>';
-	$numprojet = $formproject->select_projects(0,  $object->fk_project, 'fk_project', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
+	//Project -- Projet
+	print '<tr class="oddeven"><td><label for="Project">' . $langs->trans("ProjectLinked") . '</label></td><td>';
+	$numprojet = $formproject->select_projects(GETPOST('fk_soc') ?: -1,  $object->fk_project, 'fk_project', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, 'minwidth300');
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '</td></tr>';
+
+	//Contract -- Contrat
+	if ($object->element == 'trainingsession') {
+		print '<tr class="oddeven"><td><label for="Contract">' . $langs->trans("ContractLinked") . '</label></td><td class="minwidth500">';
+		$numcontrat = $formcontract->select_contract(GETPOST('fk_soc') ?: -1, $object->fk_contrat, 'fk_contrat', 0, 1, 1);
+		print ' <a href="' . DOL_URL_ROOT . '/contrat/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddContract") . '"></span></a>';
+		print '</td></tr>';
+
+		//Duration - Durée
+		print '<tr class="oddeven"><td><label for="Duration">' . $langs->trans("DurationH") . '</label></td><td>';
+		$duration_hours = floor($object->duration / 60);
+		$duration_minutes = ($object->duration % 60);
+		print '<input type=number name="durationh" id="durationh" value="'. $duration_hours .'">';
+		print '<input type=number name="durationm" id="durationm" value="'. $duration_minutes .'">';
+		print '</td></tr>';
+	}
+
+	//Date start - Date de début
+	print '<tr class="oddeven"><td><label for="DateStart">' . $langs->trans("DateStart") . '</label></td><td>';
+	print $form->selectDate($object->date_start, 'date_start', 1, 1, 0, '', 1,1);
+	print '</td></tr>';
+
+	//Date end - Date de début
+	print '<tr class="oddeven"><td><label for="DateEnd">' . $langs->trans("DateEnd") . '</label></td><td>';
+	print $form->selectDate($object->date_end, 'date_end', 1, 1, 0, '', 1, 1);
+	print '</td></tr>';
+
+//	//Society -- Société
+//	print '<tr><td class="fieldrequired">'.$langs->trans("Society").'</td><td>';
+//	$events = array();
+//	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'contact', 'params' => array('add-customer-contact' => 'disabled'));
+//	print $form->select_company($object->fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+//	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+//	print '</td></tr>';
 
 	//Content -- Contenu
 	print '<tr class="content_field"><td><label for="content">'.$langs->trans("Content").'</label></td><td>';
 	$doleditor = new DolEditor('content', $object->content, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
+
+	// Tags-Categories
+	if ($conf->categorie->enabled) {
+		print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+		$cate_arbo = $form->select_all_categories($object->element, '', 'parent', 64, 0, 1);
+		$c = new Categorie($db);
+		$cats = $c->containing($object->id, 'session');
+		$arrayselected = array();
+		if (is_array($cats)) {
+			foreach ($cats as $cat) {
+				$arrayselected[] = $cat->id;
+			}
+		}
+		print img_picto('', 'category').$form->multiselectarray('categories', $cate_arbo, $arrayselected, '', 0, 'quatrevingtpercent widthcentpercentminusx', 0, 0);
+		print "</td></tr>";
+	}
 
 	print '</table>';
 
@@ -944,8 +946,9 @@ if (($id || $ref) && $action == 'edit' ||$action == 'confirm_setInProgress') {
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'confirm_setInProgress' && $action != 'create'))) {
 	$res = $object->fetch_optionals();
-	$head = meetingPrepareHead($object);
-	print dol_get_fiche_head($head, 'card', $langs->trans("Meeting"), -1, "dolimeet@dolimeet");
+	$prepareHead = $object->element . 'PrepareHead';
+	$head = $prepareHead($object);
+	print dol_get_fiche_head($head, 'card', $langs->trans(ucfirst($object->element)), -1, $object->picto);
 
 	$formconfirm = '';
 
@@ -963,10 +966,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 		|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
 		// Define confirmation messages
 		$formquestionclone = array(
-			'text' => $langs->trans("CloneMeeting", $object->ref),
+			'text' => $langs->trans("Clone".ucfirst($object->element), $object->ref),
 		);
 
-		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneMeeting', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
+		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClone' . ucfirst($object->element), $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
 	}
 
 	// Call Hook formConfirm
@@ -981,23 +984,33 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	// Print form confirm
 	print $formconfirm;
 
-	$contact->fetch($object->fk_contact);
+	$thirdparty->fetch($object->fk_soc);
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/dolimeet/meeting_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+
 	// Project
 	$project->fetch($object->fk_project);
-	$morehtmlref = '<div class="refidno">';
-
+	$morehtmlref = '- ' . $object->label;
+	$morehtmlref .= '<div class="refidno">';
 	$morehtmlref .= $langs->trans('Project') . ' : ' . $project->getNomUrl(1);
 	$morehtmlref .= '</tr>';
 	$morehtmlref .=  '</td><br>';
 	$morehtmlref .= '</div>';
 
+	if ($object->element == 'trainingsession' && $object->fk_contrat > 0) {
+		$contract->fetch($object->fk_contrat);
+		$morehtmlref .= '<div class="refidno">';
+		$morehtmlref .= $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1);
+		$morehtmlref .= '</tr>';
+		$morehtmlref .= '</td><br>';
+		$morehtmlref .= '</div>';
+	}
+
 	dol_banner_tab($object, 'ref', $linkback, 0, 'ref', 'ref', $morehtmlref, '', 0, '' );
 
 	print '<div class="fichecenter">';
-	print '<div class="">';
+	print '<div class="fichehalfleft">';
 	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
 
@@ -1010,15 +1023,72 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 	print '</div>';
 	print '</td></tr>';
 
+	// Categories
+	if ($conf->categorie->enabled) {
+		print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
+		print $form->showCategories($object->id, 'session', 1);
+		print "</td></tr>";
+	}
+
+	// Date Start
+	print '<tr><td class="titlefield">';
+	print $form->textwithpicto($langs->trans("DateStart"), $langs->trans("GaugeCounter"), 1, 'info');
+	print '</td>';
+	print '<td>';
+	print dol_print_date($object->date_start, 'dayhoursec');
+	print '</td></tr>';
+
+	// Date End
+	print '<tr><td class="titlefield">';
+	print $form->textwithpicto($langs->trans("DateEnd"), $langs->trans("GaugeCounter"), 1, 'info');
+	print '</td>';
+	print '<td>';
+	print dol_print_date($object->date_end, 'dayhoursec');
+	print '</td></tr>';
+
+	if ($object->type == 'trainingsession') {
+		$duration_hours = floor($object->duration / 60);
+		$duration_minutes = ($object->duration % 60);
+
+		print '<tr><td class="titlefield">';
+		print $langs->trans("Duration");
+		print '</td>';
+		print '<td>';
+		print $duration_hours . ' ' . $langs->trans('Hour(s)') . ' ' . $duration_minutes . ' ' . $langs->trans('Minute(s)');
+		print '</td></tr>';
+	}
+
 	//unused display of information
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_contact']);
 	unset($object->fields['fk_project']);
 	unset($object->fields['content']);
+	unset($object->fields['fk_contrat']);
+	unset($object->fields['date_start']);
+	unset($object->fields['date_end']);
+	unset($object->fields['duration']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
+
+	print '</table>';
+	print '</div>';
+
+	print '<div class="fichehalfright">';
+	print '<table class="border centpercent tableforfield">'."\n";
+
+	//Thirdparty
+	if ($object->fk_soc > 0) {
+		print '<tr><td class="titlefield">';
+		print $langs->trans("Thirdparty");
+		print '</td>';
+		print '<td>';
+		print '<div class="" style="">';
+		print $thirdparty->getNomUrl(1); //wrap -> middle?
+		print '</div>';
+		print '</td></tr>';
+	}
 
 	print '</table>';
 	print '</div>';
@@ -1038,8 +1108,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 
 	if (empty($reshook)) {
 		// Send
-		$class = 'ModelePDFMeeting';
-		$modellist = call_user_func($class.'::liste_modeles', $db, 100);
+		$class = 'ModelePDFSession';
+		$modellist = call_user_func($class.'::liste_modeles', $db, 100, $object->type);
 		if (!empty($modellist))
 		{
 			asort($modellist);
@@ -1059,9 +1129,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 			$button_edit = '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken().'"' .'>' . $langs->trans("Modify"). '</a>' . "\n";
 			$button_edit_with_confirm = '<span class="butAction" id="actionButtonInProgress">' . $langs->trans("Modify"). '</span>' . "\n";
 			$button_edit_disabled = '<a class="butActionRefused classfortooltip"  title="'. $langs->trans('CantEditAlreadySigned').'"'.'>' . $langs->trans("Modify") . '</a>' . "\n";
-			print ($object->status == 0 ?  $button_edit : ($object->status == 1 ? $button_edit_with_confirm : $button_edit_disabled));
-//			print '<a class="'. ($object->status == 0 ? 'butAction" id="actionButtonSign" href="' . DOL_URL_ROOT . '/custom/dolimeet/meeting_signature.php'.'?id='.$object->id.'&mode=init&token='.newToken().'"' : 'butActionRefused classfortooltip" title="'. $langs->trans('AlreadySigned').'"')  .' >' . $langs->trans("Sign") . '</a>' . "\n";
-//			print '<span class="' . ($object->status == 1 ? 'butAction"  id="actionButtonLock"' : 'butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans("MeetingMustBeSigned")) . '"') . '>' . $langs->trans("Lock") . '</span>';
+			print $button_edit;
+//			print '<a class="'. ($object->status == 0 ? 'butAction" id="actionButtonSign" href="' . DOL_URL_ROOT . '/custom/dolimeet/'. $object->element .'_signature.php'.'?id='.$object->id.'&mode=init&token='.newToken().'"' : 'butActionRefused classfortooltip" title="'. $langs->trans('AlreadySigned').'"')  .' >' . $langs->trans("Sign") . '</a>' . "\n";
+//			print '<span class="' . ($object->status == 1 ? 'butAction"  id="actionButtonLock"' : 'butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans(ucfirst($object->element)."MustBeSigned")) . '"') . '>' . $langs->trans("Lock") . '</span>';
 //			print '<a class="'. ($object->status == 2 || $object->status == 4 ? 'butAction" id="actionButtonSendMail" href="' . $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init&model='.$modelselected.'&token='.newToken().'"'  : 'butActionRefused classfortooltip" title="'. $langs->trans('MustBeSignedBeforeSending').'"') . ' >' . $langs->trans("SendMail") . '</a>' . "\n";
 			print '<span class="butAction" id="actionButtonClone" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone' . '">' . $langs->trans("ToClone") . '</span>';
 		} else {
@@ -1075,6 +1145,46 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'conf
 			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Delete') . '</a>' . "\n";
 		}
 	}
+
+	print '</div>';
+	$includedocgeneration = 1;
+
+	print '<div class="fichehalfleft">';
+	// Documents
+	if ($includedocgeneration) {
+		$objref = dol_sanitizeFileName($object->ref);
+		$relativepath = $objref.'/'.$objref.'.pdf';
+		$filedir = $conf->dolimeet->dir_output.'/'.$object->element.'/'.$objref;
+
+		$generated_files = dol_dir_list($filedir.'/', 'files');
+		$document_generated = 0;
+		foreach ($generated_files as $generated_file) {
+			if (!preg_match('/specimen/', $generated_file['name'])) {
+				$document_generated += 1;
+			}
+		}
+		$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
+		$genallowed = $user->rights->dolimeet->session->read; // If you can read, you can build the PDF to read content
+		$delallowed = $user->rights->dolimeet->session->write; // If you can create/edit, you can remove a file on card
+		print dolimeetshowdocuments('dolimeet:'.$object->type, $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, 0, '', 1, 0, 0, $langs->trans("LinkedDocuments"), 0, '', '', '', $langs->defaultlang, 1);
+	}
+
+	print '</div>';
+	print '<div class="fichehalfright">';
+
+	$MAXEVENT = 10;
+
+	$morehtmlright  = '<a href="' . dol_buildpath('/dolimeet/view/'. $object->element .'/'. $object->element .'_agenda.php', 1) . '?id=' . $object->id . '">';
+	$morehtmlright .= $langs->trans("SeeAll");
+	$morehtmlright .= '</a>';
+
+	// List of actions on element
+	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+	$formactions    = new FormActions($db);
+	$somethingshown = $formactions->showactions($object, $object->element.'@dolimeet', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+
+	print '</div></div></div>';
+
 	print '</div>'."\n";
 }
 

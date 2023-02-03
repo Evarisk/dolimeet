@@ -13,24 +13,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
-CREATE TABLE llx_dolimeet_meeting(
-	rowid         integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	ref           varchar(128) DEFAULT '(PROV)' NOT NULL,
-	ref_ext       varchar(128),
-    label         varchar(255),
-    entity        integer DEFAULT 1 NOT NULL,
-	date_creation datetime NOT NULL,
-	tms           timestamp,
-	import_key    varchar(128),
-    status        smallint,
-	note_public   text,
-	note_private  text,
-	model_pdf     varchar(255),
-	last_main_doc varchar(255),
-	content       text,
-	document_url  varchar(255),
-    fk_project    integer,
-	fk_user_creat integer NOT NULL,
-	fk_user_modif integer
+CREATE TABLE llx_c_trainingsession_type(
+	rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	entity      integer default 1,
+	ref         varchar(128),
+	label       varchar(255),
+	description text,
+	active      tinyint(4) DEFAULT 0
 ) ENGINE=innodb;
