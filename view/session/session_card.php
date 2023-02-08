@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       view/session_card.php
+ *   	\file       view/session/session_card.php
  *		\ingroup    dolimeet
  *		\brief      Page to create/edit/view session
  */
@@ -59,10 +59,9 @@ $ref         = GETPOST('ref', 'alpha');
 $action      = GETPOST('action', 'aZ09');
 $confirm     = GETPOST('confirm', 'alpha');
 $cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'auditcard'; // To manage different context of search
-$backtopage  = GETPOST('backtopage', 'alpha');
 $objectType  = GETPOST('object_type', 'alpha');
-
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : $objectType . 'card'; // To manage different context of search
+$backtopage  = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
 $object      = new Session($db, $objectType);
