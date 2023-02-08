@@ -73,7 +73,7 @@ class Session extends CommonObject
 
 	public const STATUS_DELETED = -1;
     public const STATUS_DRAFT = 0;
-    public const STATUS_PENDING_SIGNATURE = 1;
+    public const STATUS_VALIDATED = 1;
     public const STATUS_LOCKED = 2;
     public const STATUS_ARCHIVED = 3;
 
@@ -459,15 +459,14 @@ class Session extends CommonObject
 
         $result = '';
 
-		$label = img_picto('', $this->picto) . ' <u>' . $langs->trans('Session') . '</u>';
+		$label = img_picto('', $this->picto) . ' <u>' . $langs->trans(ucfirst($this->type)) . '</u>';
 		if (isset($this->status)) {
 			$label .= ' ' . $this->getLibStatut(5);
 		}
 		$label .= '<br>';
 		$label .= '<b>' . $langs->trans('Ref') . ' : </b> ' . $this->ref;
         
-        $objectType = GETPOST('object_type', 'alpha');
-		$url        = dol_buildpath('/' . $this->module . '/view/session/session_card.php', 1) . '?id=' . $this->id . '&object_type=' . $objectType;
+		$url = dol_buildpath('/' . $this->module . '/view/session/session_card.php', 1) . '?id=' . $this->id . '&object_type=' . $this->type;
 
 		if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
@@ -579,27 +578,27 @@ class Session extends CommonObject
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			$langs->load('dolimeet@dolimeet');
-            $this->labelStatus[self::STATUS_DELETED]           = $langs->transnoentitiesnoconv('Deleted');
-            $this->labelStatus[self::STATUS_DRAFT]             = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->transnoentitiesnoconv('ValidatePendingSignature');
-			$this->labelStatus[self::STATUS_LOCKED]            = $langs->transnoentitiesnoconv('Locked');
-            $this->labelStatus[self::STATUS_ARCHIVED]          = $langs->transnoentitiesnoconv('Archived');
+            $this->labelStatus[self::STATUS_DELETED]  = $langs->transnoentitiesnoconv('Deleted');
+            $this->labelStatus[self::STATUS_DRAFT]    = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('ValidatePendingSignature');
+			$this->labelStatus[self::STATUS_LOCKED]   = $langs->transnoentitiesnoconv('Locked');
+            $this->labelStatus[self::STATUS_ARCHIVED] = $langs->transnoentitiesnoconv('Archived');
 
-            $this->labelStatusShort[self::STATUS_DELETED]           = $langs->transnoentitiesnoconv('Deleted');
-            $this->labelStatusShort[self::STATUS_DRAFT]             = $langs->transnoentitiesnoconv('StatusDraft');
-            $this->labelStatusShort[self::STATUS_PENDING_SIGNATURE] = $langs->transnoentitiesnoconv('ValidatePendingSignature');
-            $this->labelStatusShort[self::STATUS_LOCKED]            = $langs->transnoentitiesnoconv('Locked');
-            $this->labelStatusShort[self::STATUS_ARCHIVED]          = $langs->transnoentitiesnoconv('Archived');
+            $this->labelStatusShort[self::STATUS_DELETED]  = $langs->transnoentitiesnoconv('Deleted');
+            $this->labelStatusShort[self::STATUS_DRAFT]    = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('ValidatePendingSignature');
+            $this->labelStatusShort[self::STATUS_LOCKED]   = $langs->transnoentitiesnoconv('Locked');
+            $this->labelStatusShort[self::STATUS_ARCHIVED] = $langs->transnoentitiesnoconv('Archived');
 		}
 
 		$statusType = 'status' . $status;
 		if ($status == self::STATUS_DELETED) {
             $statusType = 'status0';
         }
-		if ($status == self::STATUS_PENDING_SIGNATURE) {
+		if ($status == self::STATUS_VALIDATED) {
             $statusType = 'status3';
         }
-		if ($status == self::STATUS_LOCKED) {
+		if ($status == self::STATUS_LOCKED || $status == self::STATUS_ARCHIVED) {
             $statusType = 'status8';
         }
 
