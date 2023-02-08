@@ -528,7 +528,7 @@ if (GETPOST('nomassaction', 'int') || in_array($massaction, ['presend', 'predele
 }
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
-print '<form method="POST" id="searchFormList" action="' . $_SERVER['PHP_SELF'] . '?fromtype=' . $fromtype . '&fromid=' . $fromid . '">';
+print '<form method="POST" id="searchFormList" action="' . $_SERVER['REQUEST_URI'] . '">';
 if ($optioncss != '') {
     print '<input type="hidden" name="optioncss" value="' . $optioncss . '">';
 }
@@ -550,7 +550,7 @@ print '<input type="hidden" name="mode" value="' . $mode . '">'; ?>
     });
 </script>
 
-<?php if (!empty($objectType) || $objectType == 'session') {
+<?php if ($objectType == 'session' || !empty($fromtype) && $fromid > 0) {
     $newcardbutton = '<select name="object_type" id="object_type_select">';
     $objectTypes = ['meeting', 'trainingsession', 'audit'];
     if ($objectType == 'session') {
@@ -593,7 +593,7 @@ $moreforfilter = '';
 // Filter on categories
 if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire) {
     $formcategory = new FormCategory($db);
-    $moreforfilter .= $formcategory->getFilterBox('timesheet', $search_category_array);
+    $moreforfilter .= $formcategory->getFilterBox($objectType, $search_category_array);
 }
 
 $parameters = [];

@@ -139,9 +139,9 @@ class Session extends CommonObject
 		'model_pdf'      => ['type' => 'varchar(255)', 'label' => 'PdfModel',         'enabled' => 1, 'position' => 180, 'notnull' => 0, 'visible' => 0],
 		'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1,                         'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_user_modif'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1,                         'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_soc'         => ['type' => 'integer:Societe:societe/class/societe.class.php:1', 'label' => 'ThirdParty', 'picto' => 'company', 'enabled' => '$conf->societe->enabled', 'position' => 210, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'societe.rowid'],
-		'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php:1',  'label' => 'Project',    'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 220, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
-		'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php:1', 'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 230, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid'],
+		'fk_soc'         => ['type' => 'integer:Societe:societe/class/societe.class.php:1', 'label' => 'ThirdParty', 'picto' => 'company', 'enabled' => '$conf->societe->enabled', 'position' => 210, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'societe.rowid'],
+		'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php:1',  'label' => 'Project',    'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 220, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
+		'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php:1', 'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 230, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid'],
     ];
 
     /**
@@ -210,9 +210,9 @@ class Session extends CommonObject
     public string $type;
 
     /**
-     * @var int|null Duration
+     * @var int|null|string Duration
      */
-    public ?int $duration;
+    public $duration;
 
     /**
      * @var string Public note
@@ -440,6 +440,159 @@ class Session extends CommonObject
 	}
 
     /**
+     * Validate object
+     *
+     * @param  User      $user      User making status change
+     * @param  int       $notrigger 1=Does not execute triggers, 0= execute triggers
+     * @return int                  0 < if OK, 0=Nothing done, >0 if KO
+     * @throws Exception
+     */
+    public function validate(User $user, int $notrigger = 0): int
+    {
+        global $conf;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+        $error = 0;
+
+        // Protection
+        if ($this->status == self::STATUS_VALIDATED) {
+            dol_syslog(get_class($this) . '::validate action abandonned: already validated', LOG_WARNING);
+            return 0;
+        }
+
+        $this->db->begin();
+
+        // Define new ref
+        if ((preg_match('/^\(?PROV/i', $this->ref) || empty($this->ref))) { // empty should not happen, but when it occurs, the test save life
+            $num = $this->getNextNumRef();
+        } else {
+            $num = $this->ref;
+        }
+        $this->newref = $num;
+
+        if (!empty($num)) {
+            // Validate
+            $sql = 'UPDATE ' . MAIN_DB_PREFIX . $this->table_element;
+            $sql .= " SET ref = '" . $this->db->escape($num)."',";
+            $sql .= ' status = ' . self::STATUS_VALIDATED;
+            $sql .= ' WHERE rowid = ' . ($this->id);
+
+            dol_syslog(get_class($this) . '::validate()', LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if (!$resql) {
+                dol_print_error($this->db);
+                $this->error = $this->db->lasterror();
+                $error++;
+            }
+
+            if (!$error && !$notrigger) {
+                // Call trigger
+                $result = $this->call_trigger('SESSION_VALIDATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        }
+
+        if (!$error) {
+            $this->oldref = $this->ref;
+
+            // Rename directory if dir was a temporary ref
+            if (preg_match('/^\(?PROV/i', $this->ref)) {
+                // Now we rename also files into index
+                $sql = 'UPDATE ' . MAIN_DB_PREFIX . "ecm_files set filename = CONCAT('".$this->db->escape($this->newref) . "', SUBSTR(filename, " . (strlen($this->ref) + 1).")), filepath = 'session/" . $this->db->escape($this->newref) . "'";
+                $sql .= " WHERE filename LIKE '" . $this->db->escape($this->ref) . "%' AND filepath = 'session/" . $this->db->escape($this->ref) . "' and entity = " . $conf->entity;
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    $error++; $this->error = $this->db->lasterror();
+                }
+
+                // We rename directory ($this->ref = old ref, $num = new ref) in order not to lose the attachments
+                $oldref = dol_sanitizeFileName($this->ref);
+                $newref = dol_sanitizeFileName($num);
+                $dirsource = $conf->dolimeet->dir_output . '/session/' . $oldref;
+                $dirdest = $conf->dolimeet->dir_output . '/session/' . $newref;
+                if (!$error && file_exists($dirsource)) {
+                    dol_syslog(get_class($this) . '::validate() rename dir ' . $dirsource . ' into ' . $dirdest);
+
+                    if (@rename($dirsource, $dirdest)) {
+                        dol_syslog('Rename ok');
+                        // Rename docs starting with $oldref with $newref
+                        $listoffiles = dol_dir_list($conf->dolimeet->dir_output . '/session/' . $newref, 'files', 1, '^'.preg_quote($oldref, '/'));
+                        foreach ($listoffiles as $fileentry) {
+                            $dirsource = $fileentry['name'];
+                            $dirdest   = preg_replace('/^' . preg_quote($oldref, '/') . '/', $newref, $dirsource);
+                            $dirsource = $fileentry['path'] . '/' .$dirsource;
+                            $dirdest   = $fileentry['path'] . '/' . $dirdest;
+                            @rename($dirsource, $dirdest);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Set new ref and current status
+        if (!$error) {
+            $this->ref = $num;
+            $this->status = self::STATUS_VALIDATED;
+        }
+
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     *    Set draft status
+     *
+     * @param  User      $user      Object user that modify
+     * @param  int       $notrigger 1=Does not execute triggers, 0=Execute triggers
+     * @return int                  0 < if KO, >0 if OK
+     * @throws Exception
+     */
+    public function setDraft(User $user, int $notrigger = 0): int
+    {
+        // Protection
+        if ($this->status <= self::STATUS_DRAFT) {
+            return 0;
+        }
+
+//        $signatory = new SessionSignature($this->db);
+//        $signatory->deleteSignatoriesSignatures($this->id, 'session');
+        return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'SESSION_UNVALIDATE');
+    }
+
+    /**
+     *	Set locked status
+     *
+     *	@param  User $user	    Object user that modify
+     *  @param  int  $notrigger 1=Does not execute triggers, 0=Execute triggers
+     *	@return	int				0 < if KO, 0=Nothing done, >0 if OK
+     */
+    public function setLocked(User $user, int $notrigger = 0): int
+    {
+        return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, 'SESSION_LOCKED');
+    }
+
+    /**
+     *	Set archived status
+     *
+     *	@param  User $user	    Object user that modify
+     *  @param  int  $notrigger 1=Does not execute triggers, 0=Execute triggers
+     *	@return	int			    0 < if KO, >0 if OK
+     */
+    public function setArchived(User $user, int $notrigger = 0): int
+    {
+        return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, 'SESSION_ARCHIVED');
+    }
+
+    /**
      *  Return a link to the object card (with optionaly the picto)
      *
      *  @param  int     $withpicto              Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
@@ -644,6 +797,61 @@ class Session extends CommonObject
     {
 		$this->initAsSpecimenCommon();
 	}
+
+    /**
+     * Returns the reference to the following non-used object depending on the active numbering module.
+     *
+     *  @return string Object free reference
+     */
+    public function getNextNumRef(): string
+    {
+        global $langs, $conf;
+        $langs->load('dolimeet@dolimeet');
+
+        if (empty($conf->global->DOLIMEET_SESSION_ADDON)) {
+            $conf->global->DOLIMEET_SESSION_ADDON = 'mod_session_standard';
+        }
+
+        if (!empty($conf->global->DOLIMEET_SESSION_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->DOLIMEET_SESSION_ADDON . '.php';
+            $classname = $conf->global->DOLIMEET_SESSION_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . 'core/modules/dolimeet/session/');
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir.$file;
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', 'Failed to include file ' .$file);
+                return '';
+            }
+
+            if (class_exists($classname)) {
+                $obj = new $classname();
+                $numref = $obj->getNextValue($this);
+
+                if ($numref != '' && $numref != '-1') {
+                    return $numref;
+                } else {
+                    $this->error = $obj->error;
+                    //dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
+                    return '';
+                }
+            } else {
+                print $langs->trans('Error') . ' ' . $langs->trans('ClassNotFound') . ' ' . $classname;
+                return '';
+            }
+        } else {
+            print $langs->trans('ErrorNumberingModuleNotSetup', $this->element);
+            return '';
+        }
+    }
 
     /**
      * Sets object to supplied categories.

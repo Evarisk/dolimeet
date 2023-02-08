@@ -28,24 +28,20 @@ if (file_exists('../../dolimeet.main.inc.php')) {
     die('Include of dolimeet main fails');
 }
 
+// Get module parameters
+$objectType = GETPOST('object_type', 'alpha');
+
 // Libraries
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
-require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
-require_once __DIR__ . '/../../class/audit.class.php';
-require_once __DIR__ . '/../../core/modules/dolimeet/mod_audit_standard.php';
 require_once __DIR__ . '/../../lib/dolimeet_session.lib.php';
-require_once __DIR__ . '/../../lib/dolimeet.lib.php';
 require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+
+require_once __DIR__ . '/../../class/session.class.php';
+require_once __DIR__ . '/../../core/modules/dolimeet/mod_' . $objectType . '_standard.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
@@ -59,7 +55,6 @@ $ref         = GETPOST('ref', 'alpha');
 $action      = GETPOST('action', 'aZ09');
 $confirm     = GETPOST('confirm', 'alpha');
 $cancel      = GETPOST('cancel', 'aZ09');
-$objectType  = GETPOST('object_type', 'alpha');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : $objectType . 'card'; // To manage different context of search
 $backtopage  = GETPOST('backtopage', 'alpha');
 
@@ -67,19 +62,13 @@ $backtopage  = GETPOST('backtopage', 'alpha');
 $object      = new Session($db, $objectType);
 $signatory   = new Signature($db);
 $extrafields = new ExtraFields($db);
-$usertmp     = new User($db);
-$project     = new Project($db);
 $thirdparty  = new Societe($db);
 $contact     = new Contact($db);
-$ecmfile     = new EcmFiles($db);
-//$mod         = 'DOLIMEET_'. strtoupper($objectType) .'_ADDON';
-//$refMod      = new $conf->global->$mod();
+$mod         = 'DOLIMEET_'. strtoupper($objectType) .'_ADDON';
+$refMod      = new $conf->global->$mod();
 
 // Initialize view objects
-$form        = new Form($db);
-$formother   = new FormOther($db);
-$formfile    = new FormFile($db);
-$formproject = new FormProjets($db);
+$form = new Form($db);
 
 $hookmanager->initHooks([$objectType . 'card', 'globalcard']); // Note that conf->hooks_modules contains array
 
@@ -105,7 +94,7 @@ if (empty($action) && empty($id) && empty($ref)) {
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
 // @todo a finir
-$upload_dir = $conf->dolimeet->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->dolimeet->$objectType->read;
@@ -949,7 +938,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         // List of actions on element
         include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
         $formactions = new FormActions($db);
-        $somethingshown = $formactions->showactions($object, $object->element . '@' . $object->module, (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlcenter);
+        $somethingshown = $formactions->showactions($object, $objectType . '@' . $object->module, (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlcenter);
 
         print '</div></div>';
     }
