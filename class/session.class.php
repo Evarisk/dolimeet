@@ -307,7 +307,7 @@ class Session extends CommonObject
                 $this->picto = 'fontawesome_fa-tasks_fas_#d35968';
                 break;
             default :
-                $this->picto = '';
+                $this->picto = 'dolimeet_color@dolimeet';
                 break;
         }
 	}

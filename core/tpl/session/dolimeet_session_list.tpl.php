@@ -46,7 +46,7 @@ $backtopage = GETPOST('backtopage', 'alpha'); // Go back to a dedicated page
 $optioncss = GETPOST('optioncss', 'aZ'); // Option for the css output (always '' except when 'print')
 $fromtype = GETPOST('fromtype', 'alpha'); // element type
 $fromid = GETPOST('fromid', 'int'); //element id
-$objectType  = GETPOST('object_type', 'alpha');
+$objectType = GETPOSTISSET('object_type') ? GETPOST('object_type', 'alpha') : 'session';
 
 $id = GETPOST('id', 'int');
 $type = GETPOST('type');
