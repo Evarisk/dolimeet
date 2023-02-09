@@ -24,25 +24,25 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
 
-require_once __DIR__ . '/../../../lib/dolimeet_function.lib.php';
+require_once __DIR__ . '/../../../lib/dolimeet_functions.lib.php';
 
 /**
  *	Parent class for documents models
  */
-abstract class ModelePDFSession extends CommonDocGenerator
+abstract class ModeleODTSession extends CommonDocGenerator
 {
     /**
-     *  Return list of active generation modules
+     * Return list of activated modules usable for document generation
      *
-     * @param DoliDB $db Database handler
-     * @param int $maxfilenamelength Max length of value to show
-     * @param $type
-     * @return array                        List of templates
+     * @param  DoliDB     $db                Database handler
+     * @param  int        $maxfilenamelength Max length of value to show
+     * @return array|int                     0 if no module is activated, or array(key=>label). For modules that need directory scan, key is completed with ":filename".
+     * @throws Exception
      */
-	public static function liste_modeles(DoliDB $db, int $maxfilenamelength = 0, $type)
+	public static function liste_modeles(DoliDB $db, int $maxfilenamelength = 0)
 	{
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-        return getListOfModelsDolimeet($db, $type, $maxfilenamelength);
+        require_once __DIR__ . '/../../../../saturne/lib/documents.lib.php';
+        return saturne_get_list_of_models($db, 'trainingsession', $maxfilenamelength);
 	}
 }
 

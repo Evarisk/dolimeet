@@ -214,7 +214,7 @@ class ActionsDolimeet
                     if (!empty($object->fk_contrat)) {
                         $contract = new Contrat($db);
                         $contract->fetch($object->fk_contrat);
-                        $morehtmlref = $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1, '', 1) . '<br>';
+                        $morehtmlref = $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1) . '<br>';
                     } else {
                         $morehtmlref = $langs->trans('Contract') . ' : ' . '<br>';
                     }

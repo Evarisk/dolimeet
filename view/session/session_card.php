@@ -38,7 +38,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 
 require_once __DIR__ . '/../../lib/dolimeet_session.lib.php';
-require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
 
 require_once __DIR__ . '/../../class/session.class.php';
 require_once __DIR__ . '/../../core/modules/dolimeet/mod_' . $objectType . '_standard.php';
@@ -59,18 +59,19 @@ $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : $ob
 $backtopage  = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
-$object      = new Session($db, $objectType);
-$signatory   = new Signature($db);
-$extrafields = new ExtraFields($db);
-$thirdparty  = new Societe($db);
-$contact     = new Contact($db);
-$mod         = 'DOLIMEET_'. strtoupper($objectType) .'_ADDON';
-$refMod      = new $conf->global->$mod();
+$object           = new Session($db, $objectType);
+$sessiondocument  = new SessionDocument($db, $objectType);
+$signatory        = new Signature($db);
+$extrafields      = new ExtraFields($db);
+$thirdparty       = new Societe($db);
+$contact          = new Contact($db);
+$mod              = 'DOLIMEET_'. strtoupper($objectType) .'_ADDON';
+$refMod           = new $conf->global->$mod();
 
 // Initialize view objects
 $form = new Form($db);
 
-$hookmanager->initHooks([$objectType . 'card', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks([$objectType . 'card', 'saturnecard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -144,38 +145,49 @@ if (empty($reshook)) {
         $outputlangs = $langs;
         $newlang = '';
 
-        if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
+        if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) {
+            $newlang = GETPOST('lang_id', 'aZ09');
+        }
         if (!empty($newlang)) {
             $outputlangs = new Translate('', $conf);
             $outputlangs->setDefaultLang($newlang);
         }
 
         // To be sure vars is defined
-        if (empty($hidedetails)) $hidedetails = 0;
-        if (empty($hidedesc)) $hidedesc = 0;
-        if (empty($hideref)) $hideref = 0;
-        if (empty($moreparams)) $moreparams = null;
+        if (empty($hidedetails)){
+            $hidedetails = 0;
+        }
+        if (empty($hidedesc)) {
+            $hidedesc = 0;
+        }
+        if (empty($hideref)) {
+            $hideref = 0;
+        }
+        if (empty($moreparams)) {
+            $moreparams = null;
+        }
 
         $model = GETPOST('model', 'alpha');
 
         $moreparams['object'] = $object;
-        $moreparams['user'] = $user;
+        $moreparams['user']   = $user;
 
+        // @todo pertinence ??
         if (preg_match('/completioncertificate/', GETPOST('model'))) {
             $signatoriesList = $signatory->fetchSignatories($object->id, $object->type);
             if (!empty($signatoriesList)) {
                 foreach ($signatoriesList as $objectSignatory) {
                     if ($objectSignatory->role != 'TRAININGSESSION_SESSION_TRAINER') {
                         $moreparams['attendant'] = $objectSignatory;
-                        $result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+                        $result = $sessiondocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
                         if ($result <= 0) {
-                            setEventMessages($object->error, $object->errors, 'errors');
+                            setEventMessages($sessiondocument->error, $object->errors, 'errors');
                             $action = '';
                         }
                     }
                 }
                 if (empty($donotredirect)) {
-                    setEventMessages($langs->trans('FileGenerated') . ' - ' . $object->last_main_doc, null);
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
                     $urltoredirect = $_SERVER['REQUEST_URI'];
                     $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
                     $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
@@ -185,19 +197,17 @@ if (empty($reshook)) {
             }
         }
 
-        $result = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+        $result = $sessiondocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
         if ($result <= 0) {
-            setEventMessages($object->error, $object->errors, 'errors');
+            setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
             $action = '';
-        } else {
-            if (empty($donotredirect)) {
-                setEventMessages($langs->trans('FileGenerated') . ' - ' . $object->last_main_doc, null);
-                $urltoredirect = $_SERVER['REQUEST_URI'];
-                $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-                $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-                header('Location: ' . $urltoredirect . '#builddoc');
-                exit;
-            }
+        } elseif (empty($donotredirect)) {
+            setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
+            $urltoredirect = $_SERVER['REQUEST_URI'];
+            $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+            $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+            header('Location: ' . $urltoredirect . '#builddoc');
+            exit;
         }
     }
 
@@ -630,11 +640,8 @@ if (empty($reshook)) {
 
 $title    = $langs->trans(ucfirst($objectType));
 $help_url = '';
-// @todo changer
-//$morejs  = ['/dolimeet/js/dolimeet.js.php'];
-//$morecss = ['/dolimeet/css/dolimeet.css'];
 
-llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
+saturne_header(0, '', $title, $help_url);
 
 // Part to create
 if ($action == 'create') {
@@ -917,19 +924,14 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
         // Documents
         $objref = dol_sanitizeFileName($object->ref);
-        $relativepath = $objref . '/' . $objref . '.pdf';
-        $filedir = $conf->dolimeet->dir_output . '/' . $objectType . '/' . $objref;
-
-        $generated_files = dol_dir_list($filedir . '/', 'files');
-        $document_generated = 0;
-        foreach ($generated_files as $generated_file) {
-            if (!preg_match('/specimen/', $generated_file['name'])) {
-                $document_generated += 1;
-            }
-        }
+        $dir_files = $objectType . 'document/' . $objref;
+        $filedir = $upload_dir . '/' . $dir_files;
         $urlsource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $objectType;
 
-        print dolimeetshowdocuments('dolimeet:' . $object->type, $objectType . '/' . $objref, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, $langs->trans('LinkedDocuments'), 0, '', '', '', $langs->defaultlang, 1);
+        //$defaultmodel = 'controldocument_odt';
+        //$title = $langs->trans('WorkUnitDocument');
+
+        print saturne_show_documents('dolimeet:' . ucfirst($objectType) . 'Document', $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang,0, $object, 0, 'remove_file', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerated'));
 
         // Show links to link elements
         // @todo a test

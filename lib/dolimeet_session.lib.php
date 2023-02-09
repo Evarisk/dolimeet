@@ -24,10 +24,11 @@
 /**
  * Prepare admin pages header
  *
- * @param $object
- * @return array
+ * @param  Session    $object Session
+ * @return array              Array of tabs
+ * @throws Exception
  */
-function sessionPrepareHead($object): array
+function sessionPrepareHead(Session $object): array
 {
     // Global variables definitions
     global $conf, $db, $langs, $user;
