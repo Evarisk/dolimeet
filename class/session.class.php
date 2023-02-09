@@ -24,6 +24,7 @@
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 
 require_once __DIR__ . '/../../saturne/class/signature.class.php';
+require_once __DIR__ . '/dolimeetdocuments.class.php';
 
 /**
  * Class for Session
@@ -135,13 +136,11 @@ class Session extends CommonObject
 		'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1],
 		'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
 		'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
-		'last_main_doc'  => ['type' => 'varchar(255)', 'label' => 'LastMainDoc',      'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0],
-		'model_pdf'      => ['type' => 'varchar(255)', 'label' => 'PdfModel',         'enabled' => 1, 'position' => 180, 'notnull' => 0, 'visible' => 0],
-		'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1,                         'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1,                         'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_soc'         => ['type' => 'integer:Societe:societe/class/societe.class.php:1', 'label' => 'ThirdParty', 'picto' => 'company', 'enabled' => '$conf->societe->enabled', 'position' => 210, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'societe.rowid'],
-		'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php:1',  'label' => 'Project',    'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 220, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
-		'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php:1', 'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 230, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid'],
+		'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',     'enabled' => 1,                         'position' => 160, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserModif',  'picto' => 'user',     'enabled' => 1,                         'position' => 170, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_soc'         => ['type' => 'integer:Societe:societe/class/societe.class.php:1', 'label' => 'ThirdParty', 'picto' => 'company',  'enabled' => '$conf->societe->enabled', 'position' => 180, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'societe.rowid'],
+		'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php:1',  'label' => 'Project',    'picto' => 'project',  'enabled' => '$conf->project->enabled', 'position' => 190, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
+		'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php:1', 'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 200, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid'],
     ];
 
     /**
@@ -872,45 +871,6 @@ class Session extends CommonObject
 	}
 
 //	/**
-//	 *  Create a document onto disk according to template module.
-//	 *
-//	 *  @param	    string		$modele			Force template to use ('' to not force)
-//	 *  @param		Translate	$outputlangs	objet lang a utiliser pour traduction
-//	 *  @param      int			$hidedetails    Hide details of lines
-//	 *  @param      int			$hidedesc       Hide description
-//	 *  @param      int			$hideref        Hide ref
-//	 *  @param      null|array  $moreparams     Array to provide more information
-//	 *  @return     int         				0 if KO, 1 if OK
-//	 */
-//	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null) {
-//		global $conf, $langs;
-//
-//		$result = 0;
-//		$includedocgeneration = 1;
-//
-//		$langs->load('dolimeet@dolimeet');
-//
-//		if (!dol_strlen($modele)) {
-//			$modele = 'standard_document';
-//
-//			if (!empty($this->model_pdf)) {
-//				$modele = $this->model_pdf;
-//			} elseif (!empty($conf->global->DOLILETTER_ADDON_PDF)) {
-//				$modele = $conf->global->DOLILETTER_ADDON_PDF;
-//			}
-//		}
-//
-//
-//		$modelpath = 'custom/dolimeet/core/modules/dolimeet/documents/';
-//
-//		if ($includedocgeneration && !empty($modele)) {
-//			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-//		}
-//
-//		return $result;
-//	}
-
-//	/**
 //	 * Clone an object into another one
 //	 *
 //	 * @param User $user User that creates
@@ -1052,4 +1012,48 @@ class Session extends CommonObject
 //			return -1;
 //		}
 //	}
+}
+
+/**
+ * Class for SessionDocument
+ */
+class SessionDocument extends DoliMeetDocuments
+{
+    /**
+     * @var string Element type of object.
+     */
+    public $element = 'sessiondocument';
+
+    /**
+     * @var string Name of icon for trainingsession. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'trainingsession@dolimeet' if picto is file 'img/object_trainingsession.png'.
+     */
+    public string $picto = '';
+
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db, $objectType)
+    {
+        $this->element = $objectType;
+        $this->type    = $objectType;
+
+        parent::__construct($db);
+
+        switch ($objectType) {
+            case 'trainingsession':
+                $this->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
+                break;
+            case 'meeting':
+                $this->picto = 'fontawesome_fa-comments_fas_#d35968';
+                break;
+            case 'audit':
+                $this->picto = 'fontawesome_fa-tasks_fas_#d35968';
+                break;
+            default :
+                $this->picto = 'dolimeet_color@dolimeet';
+                break;
+        }
+    }
 }

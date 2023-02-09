@@ -21,7 +21,6 @@
  * \brief       This file is a CRUD class file for TrainingSession (Create/Read/Update/Delete)
  */
 
-require_once __DIR__ . '/../../saturne/class/signature.class.php';
 require_once __DIR__ . '/session.class.php';
 
 /**
