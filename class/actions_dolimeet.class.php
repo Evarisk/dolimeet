@@ -187,4 +187,35 @@ class ActionsDolimeet
 
         return 0; // or return 1 to replace standard code
 	}
+
+    /**
+     *  Overloading the saturneBannerTab function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function saturneBannerTab(array $parameters, CommonObject $object): int
+    {
+        global $db, $langs;
+        
+        // Do something only for the current context
+        if ($parameters['currentcontext'] == 'saturnecard') {
+            if (isModEnabled('contrat')) {
+                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+                if (GETPOST('object_type') == 'trainingsession') {
+                    if (!empty($object->fk_contrat)) {
+                        $contract = new Contrat($db);
+                        $contract->fetch($object->fk_contrat);
+                        $morehtmlref = $langs->trans('Contract') . ' : ' . $contract->getNomUrl(1, '', 1) . '<br>';
+                    } else {
+                        $morehtmlref = $langs->trans('Contract') . ' : ' . '<br>';
+                    }
+                    $this->resprints = $morehtmlref;
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
 }
