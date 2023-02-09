@@ -51,7 +51,7 @@ if (!empty($conf->categorie->enabled)) {
 }
 
 // load session libraries
-require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
 require_once __DIR__ . '/../../class/session.class.php';
 
 // @fin todo

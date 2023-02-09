@@ -51,7 +51,7 @@ require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once __DIR__ . '/../../class/trainingsession.class.php';
 require_once __DIR__ . '/../../class/meeting.class.php';
 require_once __DIR__ . '/../../class/audit.class.php';
-require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("dolimeet@dolimeet", "other", "errors"));
