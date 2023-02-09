@@ -30,7 +30,7 @@
 function sessionPrepareHead($object): array
 {
     // Global variables definitions
-    global $conf, $db, $langs;
+    global $conf, $db, $langs, $user;
 
     // Load translation files required by the page
     $langs->load('dolimeet@dolimeet');
@@ -72,7 +72,7 @@ function sessionPrepareHead($object): array
 	$nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
 	$nbLinks = Link::count($db, $object->type, $object->id);
 	$head[$h][0] = dol_buildpath('/saturne/view/saturne_document.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_parent_type=session&object_type=' . $object->type;
-	$head[$h][1] = $langs->trans('Documents');
+	$head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('Documents');
 	if (($nbFiles + $nbLinks) > 0) {
 		$head[$h][1] .= '<span class="badge marginleftonlyshort">' . ($nbFiles + $nbLinks) . '</span>';
 	}
@@ -81,6 +81,34 @@ function sessionPrepareHead($object): array
 
 	$head[$h][0] = dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_parent_type=session&object_type=' . $object->type;
 	$head[$h][1] = '<i class="fas fa-calendar-alt pictofixedwidth"></i>' . $langs->trans('Events');
+    if (isModEnabled('agenda') && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
+        $nbEvent = 0;
+        // Enable caching of session count actioncomm
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/memory.lib.php';
+        $cachekey = 'count_events_session_' . $object->id;
+        $dataretrieved = dol_getcache($cachekey);
+        if (!is_null($dataretrieved)) {
+            $nbEvent = $dataretrieved;
+        } else {
+            $sql = 'SELECT COUNT(id) as nb';
+            $sql .= ' FROM ' . MAIN_DB_PREFIX . 'actioncomm';
+            $sql .= ' WHERE fk_element = ' . ((int) $object->id);
+            $sql .=  " AND elementtype = '" . $object->type . '@dolimeet' . "'";
+            $resql = $db->query($sql);
+            if ($resql) {
+                $obj = $db->fetch_object($resql);
+                $nbEvent = $obj->nb;
+            } else {
+                dol_syslog('Failed to count actioncomm ' . $db->lasterror(), LOG_ERR);
+            }
+            dol_setcache($cachekey, $nbEvent, 120); // If setting cache fails, this is not a problem, so we do not test result.
+        }
+        $head[$h][1] .= '/';
+        $head[$h][1] .= $langs->trans('Agenda');
+        if ($nbEvent > 0) {
+            $head[$h][1] .= '<span class="badge marginleftonlyshort">' . $nbEvent . '</span>';
+        }
+    }
 	$head[$h][2] = 'agenda';
 	$h++;
 
