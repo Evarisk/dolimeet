@@ -97,13 +97,14 @@ class ActionsDolimeet
         return 0; // or return 1 to replace standard code
 	}
 
-	/**
-	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
-	 *
+    /**
+     * Overloading the printCommonFooter function : replacing the parent's function with the one below
+     *
      * @param  array $parameters Hook metadatas (context, etc...)
      * @return int               0 < on error, 0 on success, 1 to replace standard code
-	 */
-	public function printCommonFooter($parameters): int
+     * @throws Exception
+     */
+	public function printCommonFooter(array $parameters): int
     {
 		global $langs, $db, $conf;
 
@@ -111,32 +112,38 @@ class ActionsDolimeet
 		if ($parameters['currentcontext'] == 'projectOverview') {
 			require_once DOL_DOCUMENT_ROOT . '/custom/dolimeet/class/session.class.php';
 
-			$session = new Session($db);
-			$linkedSessions = $session->fetchAll('','','','',array('fk_project' => GETPOST('id')));
+            $pictopath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+            $picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 
-			$outputline = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block"><img src="'. DOL_URL_ROOT .'/custom/dolimeet/img/dolimeet32px.png"> '. $langs->transnoentities('DoliMeetObjects') .'</div></td></tr></table>';
+			$session = new Session($db, 'session');
+			$linkedSessions = $session->fetchAll('','',0,0, ['fk_project' => GETPOST('id')]);
+
+			$outputline = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block">' . $picto . $langs->transnoentities('SessionListOnProject') . '</div></td></tr></table>';
 			$outputline .= '<table><div class="div-table-responsive-no-min"><table class="liste formdoc noborder centpercent"><tbody>';
 			$outputline .= '<tr class="liste_titre">';
-			$outputline .= '<td class="float">'. $langs->transnoentities('ObjectType') .'</td>&nbsp;';
-			$outputline .= '<td class="float">'. $langs->transnoentities('Object') .'</td>&nbsp;';
-			$outputline .= '<td class="float">'. $langs->transnoentities('Date') .'</td>&nbsp;';
+			$outputline .= '<td class="float">' . $langs->transnoentities('ObjectType') . '</td>';
+			$outputline .= '<td class="float">' . $langs->transnoentities('Ref') . '</td>';
+			$outputline .= '<td class="float">' . $langs->transnoentities('Date') . '</td>';
+            $outputline .= '<td class="float">' . $langs->transnoentities('Status') . '</td>';
 			$outputline .= '</tr>';
 
 			if (!empty($linkedSessions)) {
 				foreach($linkedSessions as $linkedSession) {
-					$outputline .= '<tr>';
-					$outputline .= '<td>';
+					$outputline .= '<tr><td>';
 					$outputline .= $langs->trans(ucfirst($linkedSession->type));
-					$outputline .= '</td>';
-					$outputline .= '<td>';
+					$outputline .= '</td><td>';
 					$outputline .= $linkedSession->getNomUrl();
-					$outputline .= '</td>';
-					$outputline .= '<td>';
+					$outputline .= '</td><td>';
 					$outputline .= dol_print_date($linkedSession->date_start, 'dayhour') . ' - ' . dol_print_date($linkedSession->date_end, 'dayhour');
-					$outputline .= '</td>';
-					$outputline .= '</tr>';
+                    $outputline .= '</td><td>';
+                    $outputline .= $linkedSession->getLibStatut(5);
+					$outputline .= '</td></tr>';
 				}
-			}
+			} else {
+                $outputline .= '<tr><td colspan="4">';
+                $outputline .= '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
+                $outputline .= '</td></tr>';
+            }
 			$outputline .= '</tbody></table></div>';
 			?>
 			<script>
@@ -149,12 +156,12 @@ class ActionsDolimeet
 		if ($parameters['currentcontext'] == 'admincompany') {
 			$form      = new Form($db);
 			$pictopath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-			$pictoDolimeet = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-			$training_organization_number_input = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
+            $picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
+			$trainingOrganizationNumberInput = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
 			?>
 			<script>
-				let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $pictoDolimeet . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
-				trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($training_organization_number_input) ; ?> + '</td></tr>');
+				let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $picto . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
+				trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($trainingOrganizationNumberInput) ; ?> + '</td></tr>');
 
 				let element = $('table:nth-child(1) .oddeven:last-child');
 				element.after(trainingOrganizationNumberInput);

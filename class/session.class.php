@@ -397,7 +397,7 @@ class Session extends CommonObject
 			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $this->db->fetch_object($resql);
 
-				$record = new self($this->db);
+				$record = new self($this->db, $this->type);
 				$record->setVarsFromFetchObj($obj);
 
 				$records[$record->id] = $record;
