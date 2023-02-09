@@ -659,6 +659,14 @@ if ($action == 'create') {
 
     print '<table class="border centpercent tableforfieldcreate">';
 
+    $now = dol_getdate(dol_now());
+
+    $_POST['date_startyear']  = $now['year'];
+    $_POST['date_startmonth'] = $now['mon'];
+    $_POST['date_startday']   = $now['mday'];
+    $_POST['date_starthour']  = $now['hours'];
+    $_POST['date_startmin']   = $now['minutes'];
+
     // Common attributes
     include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
 
