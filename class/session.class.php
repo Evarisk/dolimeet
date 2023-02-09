@@ -124,7 +124,7 @@ class Session extends CommonObject
 		'ref_ext'        => ['type' => 'varchar(128)', 'label' => 'RefExt',           'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0],
 		'entity'         => ['type' => 'integer',      'label' => 'Entity',           'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0, 'index' => 1],
 		'date_creation'  => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 0],
-		'tms'            => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0],
+		'tms'            => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 1, 'visible' => 0],
 		'import_key'     => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
 		'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => ['0' => 'StatusDraft', '1' => 'ValidatePendingSignature', '2' => 'Locked', '3' => 'Archived']],
 		'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 80,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1],
@@ -327,11 +327,11 @@ class Session extends CommonObject
     /**
      * Load object in memory from the database
      *
-     * @param  int         $id  ID object
+     * @param  int|string       $id  ID object
      * @param  string|null $ref Ref
      * @return int              0 < if KO, 0 if not found, >0 if OK
      */
-	public function fetch(int $id, string $ref = null): int
+	public function fetch($id, string $ref = null): int
     {
         return $this->fetchCommon($id, $ref);
 	}
@@ -766,8 +766,8 @@ class Session extends CommonObject
      */
 	public function info(int $id): void
     {
-		$sql = 'SELECT rowid, date_creation as datec, tms as datem,';
-		$sql .= ' fk_user_creat, fk_user_modif';
+		$sql = 'SELECT t.rowid, t.date_creation as datec, t.tms as datem,';
+		$sql .= ' t.fk_user_creat, t.fk_user_modif';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
 		$sql .= ' WHERE t.rowid = ' . $id;
 
@@ -775,10 +775,13 @@ class Session extends CommonObject
 		if ($result) {
 			if ($this->db->num_rows($result)) {
 				$obj = $this->db->fetch_object($result);
+
 				$this->id = $obj->rowid;
 
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
+                $this->user_creation_id = $obj->fk_user_creat;
+                $this->user_modification_id = $obj->fk_user_modif;
+                $this->date_creation     = $this->db->jdate($obj->datec);
+                $this->date_modification = empty($obj->datem) ? '' : $this->db->jdate($obj->datem);
 			}
 
 			$this->db->free($result);
