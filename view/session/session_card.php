@@ -524,7 +524,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             //$defaultmodel = 'controldocument_odt';
             //$title = $langs->trans('WorkUnitDocument');
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerated'));
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', (($object->status > $object::STATUS_DRAFT && $object->fk_contrat > 0) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerated'));
         }
 
         print '</div><div class="fichehalfright">';
