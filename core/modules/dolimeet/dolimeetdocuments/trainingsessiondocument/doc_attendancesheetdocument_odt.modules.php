@@ -325,31 +325,36 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 
             $tmparray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
-			foreach ($tmparray as $key => $value) {
-				try {
-					if (($key == 'intervenant_signature' || preg_match('/logo$/', $key)) && is_file($value)) {
-                        // Image
-						$list     = getimagesize($value);
-						$newWidth = 200;
-						if ($list[0]) {
-							$ratio     = $newWidth / $list[0];
-							$newHeight = $ratio * $list[1];
-							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-						}
-						if (file_exists($value)) {
+            foreach ($tmparray as $key => $value) {
+                try {
+                    if ($key == 'intervenant_signature') { // Image
+                        if (file_exists($value)) {
+                            $list = getimagesize($value);
+                            $newWidth = 350;
+                            if ($list[0]) {
+                                $ratio = $newWidth / $list[0];
+                                $newHeight = $ratio * $list[1];
+                                dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+                            }
+                            $odfHandler->setImage($key, $value);
+                        } else {
+                            $odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+                        }
+                    } elseif (preg_match('/logo$/', $key)) {
+                        if (file_exists($value)) {
                             $odfHandler->setImage($key, $value);
                         } else {
                             $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
                         }
-					} elseif (empty($value)) { // Text
+                    } elseif (empty($value)) { // Text
                         $odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
                     } else {
                         $odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
                     }
                 } catch (OdfException $e) {
-					dol_syslog($e->getMessage());
-				}
-			}
+                    dol_syslog($e->getMessage());
+                }
+            }
 
 			// Replace tags of lines
 //			try {
