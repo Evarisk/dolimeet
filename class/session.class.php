@@ -23,7 +23,7 @@
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 
-require_once __DIR__ . '/../../saturne/class/signature.class.php';
+//require_once __DIR__ . '/../../saturne/class/signature.class.php';
 require_once __DIR__ . '/dolimeetdocuments.class.php';
 
 /**

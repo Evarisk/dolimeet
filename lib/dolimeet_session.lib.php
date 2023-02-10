@@ -22,13 +22,13 @@
  */
 
 /**
- * Prepare admin pages header
+ * Prepare session pages header
  *
- * @param  Session    $object Session
- * @return array              Array of tabs
+ * @param  CommonObject $object Object
+ * @return array                Array of tabs
  * @throws Exception
  */
-function sessionPrepareHead(Session $object): array
+function sessionPrepareHead(CommonObject $object): array
 {
     // Global variables definitions
     global $conf, $db, $langs, $user;
@@ -45,7 +45,7 @@ function sessionPrepareHead(Session $object): array
 	$head[$h][2] = 'card';
 	$h++;
 
-	$head[$h][0] = dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_parent_type=session&object_type=' . $object->type;
+	$head[$h][0] = dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->type;
 	$head[$h][1] = '<i class="fas fa-file-signature pictofixedwidth"></i>' . $langs->trans('Attendants');
 	$head[$h][2] = 'attendants';
 	$h++;
@@ -58,7 +58,7 @@ function sessionPrepareHead(Session $object): array
 		if (!empty($object->note_public)) {
 			$nbNote++;
 		}
-		$head[$h][0] = dol_buildpath('/saturne/view/saturne_note.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_parent_type=session&object_type=' . $object->type;
+		$head[$h][0] = dol_buildpath('/saturne/view/saturne_note.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->type;
 		$head[$h][1] = '<i class="fas fa-comment pictofixedwidth"></i>' . $langs->trans('Notes');
 		if ($nbNote > 0) {
 			$head[$h][1] .= (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '<span class="badge marginleftonlyshort">' . $nbNote . '</span>' : '');
@@ -72,7 +72,7 @@ function sessionPrepareHead(Session $object): array
 	$upload_dir = $conf->dolimeet->dir_output. '/audit/' .dol_sanitizeFileName($object->ref);
 	$nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
 	$nbLinks = Link::count($db, $object->type, $object->id);
-	$head[$h][0] = dol_buildpath('/saturne/view/saturne_document.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_parent_type=session&object_type=' . $object->type;
+	$head[$h][0] = dol_buildpath('/saturne/view/saturne_document.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->type;
 	$head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('Documents');
 	if (($nbFiles + $nbLinks) > 0) {
 		$head[$h][1] .= '<span class="badge marginleftonlyshort">' . ($nbFiles + $nbLinks) . '</span>';
@@ -80,7 +80,7 @@ function sessionPrepareHead(Session $object): array
 	$head[$h][2] = 'document';
 	$h++;
 
-	$head[$h][0] = dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_parent_type=session&object_type=' . $object->type;
+	$head[$h][0] = dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->type;
 	$head[$h][1] = '<i class="fas fa-calendar-alt pictofixedwidth"></i>' . $langs->trans('Events');
     if (isModEnabled('agenda') && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
         $nbEvent = 0;
