@@ -419,28 +419,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     print '<div class="fichehalfleft">';
     print '<table class="border centpercent tableforfield">';
 
-    // @todo inspiration tickt message
-//    print '<tr><td class="titlefield">';
-//    print $langs->trans('Content');
-//    print '</td>';
-//    print '<td>';
-//    print '<div class="longmessagecut" style="min-height: 150px">';
-//    print dol_htmlentitiesbr($object->content); //wrap -> middle?
-//    print '</div>';
-//    print '</td></tr>';
-
-//    if ($object->type == 'trainingsession') {
-//        $duration_hours = floor($object->duration / 60);
-//        $duration_minutes = ($object->duration % 60);
-//
-//        print '<tr><td class="titlefield">';
-//        print $langs->trans('Duration');
-//        print '</td>';
-//        print '<td>';
-//        print $duration_hours . ' ' . $langs->trans('Hour(s)') . ' ' . $duration_minutes . ' ' . $langs->trans('Minute(s)');
-//        print '</td></tr>';
-//    }
-
+    $keyforbreak = 'content';
     unset($object->fields['fk_project']); // Hide field already shown in banner
     unset($object->fields['fk_soc']);     // Hide field already shown in banner
     unset($object->fields['fk_contrat']); // Hide field already shown in banner
