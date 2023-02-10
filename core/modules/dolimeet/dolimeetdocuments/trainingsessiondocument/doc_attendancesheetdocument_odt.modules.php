@@ -272,45 +272,46 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			$tmparray = array_merge($substitutionarray, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
-			$filearray = dol_dir_list($conf->dolimeet->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref . '/thumbs/', 'files', 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
-			if (count($filearray)) {
-				$image = array_shift($filearray);
-				$tmparray['photoDefault'] = $image['fullname'];
-			} else {
-				$nophoto = '/public/theme/common/nophoto.png';
-				$tmparray['photoDefault'] = DOL_DOCUMENT_ROOT.$nophoto;
-			}
-
-			$usertmp  = new User($db);
-			//$contract = new Contrat($db);
-			//$project   = new Project($db);
 			//$signatory = new Signature($db);
 			/*$signatory = $signatory->fetchSignatory('TRAININGSESSION_SESSION_TRAINER', $object->id, $object->type);
 			if (is_array($signatory) && !empty($signatory)) {
 				$signatory = array_shift($signatory);
 			}*/
 
-			//$contract->fetch($object->fk_contrat);
-			//$project->fetch($object->fk_project);
-
 			$tmparray['mycompany_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$tmparray['Adress']             = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
+			$tmparray['address']            = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
 			$tmparray['declaration_number'] = $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER;
 			$tmparray['society_phone']      = $conf->global->MAIN_INFO_SOCIETE_TEL;
 			$tmparray['society_siret']      = $conf->global->MAIN_INFO_SIRET;
 			$tmparray['society_mail']       = $conf->global->MAIN_INFO_SOCIETE_MAIL;
 			$tmparray['society_website']    = $conf->global->MAIN_INFO_SOCIETE_WEB;
 
-			//$tmparray['CONTRACT']    = $contract->ref;
-			//$tmparray['PROJECT']     = $project->ref;
-			$tmparray['DATESESSION'] = dol_print_date($object->date_start, 'dayhour');
-			$tmparray['DSSESSION']   = dol_print_date($object->date_start, 'dayhour');
-			$tmparray['DESESSION']   = dol_print_date($object->date_end, 'dayhour');
+            if (!empty($object->fk_contrat)) {
+                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+                $contract = new Contrat($this->db);
+                $contract->fetch($object->fk_contrat);
+                $contract->fetch_optionals();
+                $tmparray['contract_ref_label'] = $contract->ref;
+                if (!empty($contract->array_options['options_label'])) {
+                    $tmparray['contract_ref_label'] .= ' - ' . $contract->array_options['options_label'];
+                }
+            } else {
+                $tmparray['contract_ref_label'] = '';
+            }
 
-			$duration_hours = floor($object->duration / 60);
-			$duration_minutes = ($object->duration % 60);
+            if (!empty($object->fk_project)) {
+                require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                $project = new Project($this->db);
+                $project->fetch($object->fk_project);
+                $tmparray['project_ref_label'] = $project->ref . ' - ' . $project->title;
+            } else {
+                $tmparray['project_ref_label'] = '';
+            }
 
-			$tmparray['DURATION'] = $duration_hours . ' ' . $langs->trans('Hour(s)') . ' ' . $duration_minutes . ' ' . $langs->trans('Minute(s)');
+			$tmparray['datestart_session'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
+			$tmparray['dateend_session']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
+
+			$tmparray['duration'] = convertSecondToTime($object->duration);
 
 //			$tmparray['intervenant_name'] = $signatory->firstname . ' ' . $signatory->lastname;
 //			if (dol_strlen($signatory->signature) > 0) {
@@ -321,6 +322,8 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 //			} else {
 //				$tmparray['intervenant_signature'] = '';
 //			}
+
+            $tmparray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
 			foreach ($tmparray as $key => $value) {
 				try {
@@ -343,8 +346,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
                     } else {
                         $odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
                     }
-                }
-				catch (OdfException $e) {
+                } catch (OdfException $e) {
 					dol_syslog($e->getMessage());
 				}
 			}
@@ -413,6 +415,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 //				dol_syslog($this->error, LOG_WARNING);
 //				return -1;
 //			}
+
 			// Replace labels translated
 			$tmparray = $outputlangs->get_translations_for_substitutions();
 
