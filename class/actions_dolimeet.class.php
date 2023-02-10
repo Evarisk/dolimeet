@@ -70,7 +70,7 @@ class ActionsDolimeet
 	public function constructCategory(array $parameters): int
     {
         // Do something only for the current context
-		if ($parameters['currentcontext'] == 'category') {
+		if (in_array($parameters['currentcontext'], ['category', 'sessioncard'])) {
 			$tags = [
 				'meeting' => [
 					'id' => 436304001,
@@ -81,7 +81,7 @@ class ActionsDolimeet
 				'trainingsession' => [
 					'id' => 436304002,
 					'code' => 'trainingsession',
-					'obj_class' => 'TrainingSession',
+					'obj_class' => 'Trainingsession',
 					'obj_table' => 'dolimeet_session',
                 ],
 				'audit' => [

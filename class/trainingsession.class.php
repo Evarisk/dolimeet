@@ -18,15 +18,15 @@
 /**
  * \file        class/trainingsession.class.php
  * \ingroup     dolimeet
- * \brief       This file is a CRUD class file for TrainingSession (Create/Read/Update/Delete)
+ * \brief       This file is a CRUD class file for Trainingsession (Create/Read/Update/Delete)
  */
 
 require_once __DIR__ . '/session.class.php';
 
 /**
- * Class for TrainingSession
+ * Class for Trainingsession
  */
-class TrainingSession extends Session
+class Trainingsession extends Session
 {
     /**
      * @var string Element type of object.

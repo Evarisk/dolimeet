@@ -72,7 +72,7 @@ switch ($type) {
 		$signatory      = new MeetingSignature($db);
 		break;
 	case 'trainingsession':
-		$object         = new TrainingSession($db);
+		$object         = new Trainingsession($db);
 		$signatory      = new TrainingSessionSignature($db);
 		break;
 	case 'audit':

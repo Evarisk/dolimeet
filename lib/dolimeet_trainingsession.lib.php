@@ -26,11 +26,11 @@ require_once __DIR__ . '/dolimeet_session.lib.php';
 /**
  * Prepare training session pages header
  *
- * @param  TrainingSession $object TrainingSession
+ * @param  Trainingsession $object TrainingSession
  * @return array                   Array of tabs
  * @throws Exception
  */
-function trainingsessionPrepareHead(TrainingSession $object): array
+function trainingsessionPrepareHead(Trainingsession $object): array
 {
     return sessionPrepareHead($object);
 }
