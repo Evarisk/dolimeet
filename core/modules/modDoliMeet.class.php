@@ -514,38 +514,6 @@ class modDoliMeet extends DolibarrModules
 			'user'     => 0,
         ];
 
-        $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet',
-            'type'     => 'left',
-            'titre'    => $langs->trans('Config'),
-            'prefix'   => '<i class="fas fa-cog pictofixedwidth"></i>',
-            'mainmenu' => 'dolimeet',
-            'leftmenu' => 'config',
-            'url'      => '/dolimeet/admin/setup.php',
-            'langs'    => 'dolimeet@dolimeet',
-            'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled',
-            'perms'    => '$user->rights->dolimeet->adminpage->read',
-            'target'   => '',
-            'user'     => 0,
-        ];
-
-        $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet',
-            'type'     => 'left',
-            'titre'    => $langs->transnoentities('MinimizeMenu'),
-            'prefix'   => '<i class="fas fa-chevron-circle-left pictofixedwidth"></i>',
-            'mainmenu' => 'dolimeet',
-            'leftmenu' => 'minimizemenu',
-            'url'      => '',
-            'langs'    => 'dolimeet@dolimeet',
-            'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled',
-            'perms'    => '$user->rights->dolimeet->lire',
-            'target'   => '',
-            'user'     => 0,
-        ];
-
 		// Exports profiles provided by this module
 		// $r = 1;
 		/* BEGIN MODULEBUILDER EXPORT MYOBJECT */
