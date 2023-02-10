@@ -96,7 +96,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $now = dol_now();
         $actioncomm = new ActionComm($this->db);
 
-        $actioncomm->elementtype = $object->type . '@dolimeet';
+        $actioncomm->elementtype = $object->element . '@dolimeet';
         $actioncomm->type_code   = 'AC_OTH_AUTO';
         $actioncomm->datep       = $now;
         $actioncomm->fk_element  = $object->id;
@@ -104,75 +104,63 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $actioncomm->percentage  = -1;
 
         switch ($action) {
-			// Meeting
-			case 'SESSION_CREATE' :
-				$actioncomm->code  = 'AC_' . strtoupper($object->type) . '_CREATE';
-				$actioncomm->label = $langs->trans(ucfirst($object->type) . 'CreateTrigger');
-
+			case 'MEETING_CREATE' :
+            case 'TRAININGSESSION_CREATE' :
+            case 'AUDIT_CREATE' :
+				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
+				$actioncomm->label = $langs->trans(ucfirst($object->element) . 'CreateTrigger');
 				$actioncomm->create($user);
 				break;
-			case 'SESSION_MODIFY' :
-				$actioncomm->code  = 'AC_' . strtoupper($object->type) . '_MODIFY';
-				$actioncomm->label = $langs->trans(ucfirst($object->type) . 'ModifyTrigger');
-
+            case 'MEETING_MODIFY' :
+            case 'TRAININGSESSION_MODIFY' :
+            case 'AUDIT_MODIFY' :
+				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_MODIFY';
+				$actioncomm->label = $langs->trans(ucfirst($object->element) . 'ModifyTrigger');
 				$actioncomm->create($user);
 				break;
-
-			case 'SESSION_DELETE' :
-				$actioncomm->code  = 'AC_ ' . strtoupper($object->type) . '_DELETE';
-				$actioncomm->label = $langs->trans(ucfirst($object->type) . 'DeleteTrigger');
-
+            case 'MEETING_DELETE' :
+            case 'TRAININGSESSION_DELETE' :
+            case 'AUDIT_DELETE' :
+				$actioncomm->code  = 'AC_ ' . strtoupper($object->element) . '_DELETE';
+				$actioncomm->label = $langs->trans(ucfirst($object->element) . 'DeleteTrigger');
 				$actioncomm->create($user);
 				break;
-
 			case 'SESSION_ADDATTENDANT' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
 				$actioncomm->code        = 'AC_SESSION_ADDATTENDANT';
 				$actioncomm->label       = $langs->transnoentities('AddAttendantTrigger', $object->firstname . ' ' . $object->lastname);
-
                 if ($object->element_type == 'socpeople') {
                     $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
                 }
-
 				$actioncomm->create($user);
 				break;
-
 			case 'DOLIMEETSIGNATURE_SIGNED' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
 				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_SIGNED';
 				$actioncomm->label       = $langs->transnoentities($object->role . 'Signed') . ' : ' . $object->firstname . ' ' . $object->lastname;
-
                 if ($object->element_type == 'socpeople') {
                     $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
                 }
-
 				$actioncomm->create($user);
 				break;
-
 			case 'DOLIMEETSIGNATURE_PENDING_SIGNATURE' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
 				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_PENDING_SIGNATURE';
 				$actioncomm->label       = $langs->transnoentities('DolimeetSignaturePendingSignatureTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
-
 				if ($object->element_type == 'socpeople') {
 					$actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
 				}
-
 				$actioncomm->create($user);
 				break;
-
 			case 'DOLIMEETSIGNATURE_ABSENT' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
 				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_ABSENT';
 				$actioncomm->label       = $langs->transnoentities('DolimeetSignatureAbsentTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
-
 				if ($object->element_type == 'socpeople') {
 					$actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
 				}
-
 				$actioncomm->create($user);
 				break;
-
 			case 'DOLIMEETSIGNATURE_DELETED' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
 				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_DELETED';
@@ -180,11 +168,9 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 if ($object->element_type == 'socpeople') {
                     $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
                 }
-
 				$actioncomm->create($user);
 				break;
         }
-
 		return 0;
 	}
 }
