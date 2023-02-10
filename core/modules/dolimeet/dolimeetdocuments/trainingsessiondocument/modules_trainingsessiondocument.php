@@ -40,6 +40,6 @@ abstract class ModeleODTTrainingSessionDocument extends CommonDocGenerator
 	public static function liste_modeles(DoliDB $db, int $maxfilenamelength = 0)
 	{
         require_once __DIR__ . '/../../../../../../saturne/lib/documents.lib.php';
-        return saturne_get_list_of_models($db, 'trainingsession', $maxfilenamelength);
+        return saturne_get_list_of_models($db, 'trainingsessiondocument', $maxfilenamelength);
 	}
 }

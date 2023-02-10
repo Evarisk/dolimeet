@@ -25,7 +25,7 @@
 /**
  * 	Class to manage attendancesheetdocument numbering rules Standard
  */
-class mod__attendancesheetdocument_standard
+class mod_attendancesheetdocument_standard
 {
 	/**
 	 * @var string Dolibarr version of the loaded document

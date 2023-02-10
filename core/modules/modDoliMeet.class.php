@@ -181,7 +181,7 @@ class modDoliMeet extends DolibarrModules
 
             // CONST COMPLETIONCERTIFICATE DOCUMENT
             $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON', 'chaine', 'mod_completioncertificatedocument_standard', '', 0, 'current'],
-            $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/completioncertificatedocument/', '', 0, 'current'],
+            $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/trainingsessiondocument/completioncertificatedocument/', '', 0, 'current'],
             $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/dolimeet/completioncertificatedocument/', '', 0, 'current'],
             $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_DEFAULT_MODEL', 'chaine', 'completioncertificatedocument_odt', '', 0, 'current'],
 

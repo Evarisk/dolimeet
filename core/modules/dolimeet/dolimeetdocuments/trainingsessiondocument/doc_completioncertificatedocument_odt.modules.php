@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificate_odt.modules.php
+ *	\file       core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
  *	\ingroup    dolimeet
  *	\brief      File of class to build ODT documents for trainingsessiondocument
  */
@@ -34,7 +34,7 @@ require_once __DIR__ . '/mod_completioncertificatedocument_standard.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_completioncertificate_odt extends ModeleODTTrainingSessionDocument
+class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocument
 {
     /**
      * Issuer
@@ -66,9 +66,9 @@ class doc_completioncertificate_odt extends ModeleODTTrainingSessionDocument
         $langs->loadLangs(['main', 'companies']);
 
         $this->db = $db;
-        $this->name        = $langs->trans('CompletionCertificateDoliMeetTemplate');
+        $this->name        = $langs->trans('CompletionCertificateDocumentDoliMeetTemplate');
         $this->description = $langs->trans('DocumentModelOdt');
-        $this->scandir     = 'DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+        $this->scandir     = 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
         // Page size for A4 format
         $this->type = 'odt';
@@ -108,7 +108,7 @@ class doc_completioncertificate_odt extends ModeleODTTrainingSessionDocument
         // List of directories area
         $texte .= '<tr><td>';
         $texttitle = $langs->trans('ListOfDirectories');
-        $listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH)));
+        $listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH)));
         $listoffiles = [];
         foreach ($listofdir as $key=>$tmpdir) {
             $tmpdir = trim($tmpdir);
@@ -131,7 +131,7 @@ class doc_completioncertificate_odt extends ModeleODTTrainingSessionDocument
 
         // Scan directories
         $nbofiles = count($listoffiles);
-        if (!empty($conf->global->DOLIMEET_COMPLETIONCERTIFICATE_ADDON_ODT_PATH)) {
+        if (!empty($conf->global->DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH)) {
             $texte .= $langs->trans('DoliMeetNumberOfModelFilesFound') . ': <b>';
             $texte .= count($listoffiles);
             $texte .= '</b>';
@@ -171,7 +171,7 @@ class doc_completioncertificate_odt extends ModeleODTTrainingSessionDocument
         global $action, $conf, $hookmanager, $langs, $mysoc, $user;
 
         if (empty($srctemplatepath)) {
-            dol_syslog('doc_attendancesheet_odt::write_file parameter srctemplatepath empty', LOG_WARNING);
+            dol_syslog('doc_completioncertificatedocument_odt::write_file parameter srctemplatepath empty', LOG_WARNING);
             return -1;
         }
 
@@ -189,7 +189,7 @@ class doc_completioncertificate_odt extends ModeleODTTrainingSessionDocument
         $outputlangs->charset_output = 'UTF-8';
         $outputlangs->loadLangs(['main', 'dict', 'companies', 'dolimeet@dolimeet']);
 
-        $refModName          = new $conf->global->DOLIMEET_TRAININGSESSIONDOCUMENT_COMPLETIONCERTIFICATEDOCUMENT_ADDON($this->db);
+        $refModName          = new $conf->global->DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON($this->db);
         $objectDocumentRef   = $refModName->getNextValue($objectDocument);
         $objectDocument->ref = $objectDocumentRef;
         $objectDocumentID    = $objectDocument->create($user, true, $object);

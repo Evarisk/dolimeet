@@ -16,27 +16,27 @@
  */
 
 /**
- * \file        class/dolimeetdocuments/completiondocument.class.php
+ * \file        class/dolimeetdocuments/completioncertificatedocument.class.php
  * \ingroup     dolimeet
- * \brief       This file is a class file for CompletionDocument
+ * \brief       This file is a class file for CompletionCertificateDocument
  */
 
 require_once __DIR__ . '/../dolimeetdocuments.class.php';
 
 /**
- * Class for CompletionDocument
+ * Class for CompletionCertificateDocument
  */
-class CompletionDocument extends DoliSIRHDocuments
+class CompletionCertificateDocument extends DoliSIRHDocuments
 {
 	/**
 	 * @var string Element type of object.
 	 */
-	public $element = 'completiondocument';
+	public $element = 'completioncertificatedocument';
 
 	/**
-	 * @var string String with name of icon for completiondocument. Must be the part after the 'object_' into object_completiondocument.png
+	 * @var string String with name of icon for completioncertificatedocument. Must be the part after the 'object_' into object_completioncertificatedocument.png
 	 */
-	public $picto = 'completiondocument@dolimeet';
+	public $picto = 'completioncertificatedocument@dolimeet';
 
 	/**
 	 * Constructor

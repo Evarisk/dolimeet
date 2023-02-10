@@ -169,8 +169,8 @@ TrainingsessionsCategoriesArea = Catégories de session de formation
 #
 
 # Data - Donnée
-attendancesheet.odt = Feuille de présence
-completioncertificate.odt = Certificat de réalisation
+attendancesheetdocument.odt = Feuille de présence
+completioncertificatedocument.odt = Certificat de réalisation
 
 #
 # Audit - Audit

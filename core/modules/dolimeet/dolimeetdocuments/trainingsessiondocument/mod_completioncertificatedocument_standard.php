@@ -25,7 +25,7 @@
 /**
  * 	Class to manage completioncertificatedocument numbering rules Standard
  */
-class mod__completioncertificatedocument_standard
+class mod_completioncertificatedocument_standard
 {
 	/**
 	 * @var string Dolibarr version of the loaded document
@@ -56,7 +56,7 @@ class mod__completioncertificatedocument_standard
     {
 		global $langs;
 		$langs->load('dolimeet@dolimeet');
-		return $langs->trans('DoliMeetTrainingSessionDocumentCompletionDocumentStandardModel', $this->prefix);
+		return $langs->trans('DoliMeetTrainingSessionDocumentCompletionCertificateDocumentStandardModel', $this->prefix);
 	}
 
 	/**
