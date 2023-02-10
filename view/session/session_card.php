@@ -41,7 +41,7 @@ require_once __DIR__ . '/../../lib/dolimeet_' . $objectType . '.lib.php';
 require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
 
 require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
-require_once __DIR__ . '/../../core/modules/dolimeet/mod_' . $objectType . '_standard.php';
+require_once __DIR__ . '/../../core/modules/dolimeet/session/mod_' . $objectType . '_standard.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
@@ -66,13 +66,13 @@ $sessiondocument  = new SessionDocument($db, $objectType);
 $extrafields      = new ExtraFields($db);
 $thirdparty       = new Societe($db);
 $contact          = new Contact($db);
-$mod              = 'DOLIMEET_'. strtoupper($object->element) .'_ADDON';
+$mod              = 'DOLIMEET_'. strtoupper($objectType) .'_ADDON';
 $refMod           = new $conf->global->$mod();
 
 // Initialize view objects
 $form = new Form($db);
 
-$hookmanager->initHooks([$object->element . 'card', 'saturnecard', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks([$objectType . 'card', 'saturnecard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -132,6 +132,7 @@ if (empty($reshook)) {
     }
 
     // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+    $conf->global->MAIN_DISABLE_PDF_AUTOUPDATE = 1;
     include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
     // Action to build doc

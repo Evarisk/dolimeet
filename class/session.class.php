@@ -128,7 +128,7 @@ class Session extends CommonObject
 		'tms'            => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 1, 'visible' => 0],
 		'import_key'     => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
 		'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190,  'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived']],
-		'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1],
+		'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1, 'autofocusoncreate' => 1],
 		'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'notnull' => 1, 'visible' => 1],
 		'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 1],
 		'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 3, 'validate' => 1],
@@ -491,7 +491,7 @@ class Session extends CommonObject
 
             if (!$error && !$notrigger) {
                 // Call trigger
-                $result = $this->call_trigger('SESSION_VALIDATE', $user);
+                $result = $this->call_trigger($this->type . '_VALIDATE', $user);
                 if ($result < 0) {
                     $error++;
                 }
@@ -499,42 +499,42 @@ class Session extends CommonObject
             }
         }
 
-        if (!$error) {
-            $this->oldref = $this->ref;
-
-            // Rename directory if dir was a temporary ref
-            if (preg_match('/^\(?PROV/i', $this->ref)) {
-                // Now we rename also files into index
-                $sql = 'UPDATE ' . MAIN_DB_PREFIX . "ecm_files set filename = CONCAT('".$this->db->escape($this->newref) . "', SUBSTR(filename, " . (strlen($this->ref) + 1).")), filepath = 'session/" . $this->db->escape($this->newref) . "'";
-                $sql .= " WHERE filename LIKE '" . $this->db->escape($this->ref) . "%' AND filepath = 'session/" . $this->db->escape($this->ref) . "' and entity = " . $conf->entity;
-                $resql = $this->db->query($sql);
-                if (!$resql) {
-                    $error++; $this->error = $this->db->lasterror();
-                }
-
-                // We rename directory ($this->ref = old ref, $num = new ref) in order not to lose the attachments
-                $oldref = dol_sanitizeFileName($this->ref);
-                $newref = dol_sanitizeFileName($num);
-                $dirsource = $conf->dolimeet->dir_output . '/session/' . $oldref;
-                $dirdest = $conf->dolimeet->dir_output . '/session/' . $newref;
-                if (!$error && file_exists($dirsource)) {
-                    dol_syslog(get_class($this) . '::validate() rename dir ' . $dirsource . ' into ' . $dirdest);
-
-                    if (@rename($dirsource, $dirdest)) {
-                        dol_syslog('Rename ok');
-                        // Rename docs starting with $oldref with $newref
-                        $listoffiles = dol_dir_list($conf->dolimeet->dir_output . '/session/' . $newref, 'files', 1, '^'.preg_quote($oldref, '/'));
-                        foreach ($listoffiles as $fileentry) {
-                            $dirsource = $fileentry['name'];
-                            $dirdest   = preg_replace('/^' . preg_quote($oldref, '/') . '/', $newref, $dirsource);
-                            $dirsource = $fileentry['path'] . '/' .$dirsource;
-                            $dirdest   = $fileentry['path'] . '/' . $dirdest;
-                            @rename($dirsource, $dirdest);
-                        }
-                    }
-                }
-            }
-        }
+//        if (!$error) {
+//            $this->oldref = $this->ref;
+//
+//            // Rename directory if dir was a temporary ref
+//            if (preg_match('/^\(?PROV/i', $this->ref)) {
+//                // Now we rename also files into index
+//                $sql = 'UPDATE ' . MAIN_DB_PREFIX . "ecm_files set filename = CONCAT('".$this->db->escape($this->newref) . "', SUBSTR(filename, " . (strlen($this->ref) + 1).")), filepath = 'session/" . $this->db->escape($this->newref) . "'";
+//                $sql .= " WHERE filename LIKE '" . $this->db->escape($this->ref) . "%' AND filepath = 'session/" . $this->db->escape($this->ref) . "' and entity = " . $conf->entity;
+//                $resql = $this->db->query($sql);
+//                if (!$resql) {
+//                    $error++; $this->error = $this->db->lasterror();
+//                }
+//
+//                // We rename directory ($this->ref = old ref, $num = new ref) in order not to lose the attachments
+//                $oldref = dol_sanitizeFileName($this->ref);
+//                $newref = dol_sanitizeFileName($num);
+//                $dirsource = $conf->dolimeet->dir_output . '/session/' . $oldref;
+//                $dirdest = $conf->dolimeet->dir_output . '/session/' . $newref;
+//                if (!$error && file_exists($dirsource)) {
+//                    dol_syslog(get_class($this) . '::validate() rename dir ' . $dirsource . ' into ' . $dirdest);
+//
+//                    if (@rename($dirsource, $dirdest)) {
+//                        dol_syslog('Rename ok');
+//                        // Rename docs starting with $oldref with $newref
+//                        $listoffiles = dol_dir_list($conf->dolimeet->dir_output . '/session/' . $newref, 'files', 1, '^'.preg_quote($oldref, '/'));
+//                        foreach ($listoffiles as $fileentry) {
+//                            $dirsource = $fileentry['name'];
+//                            $dirdest   = preg_replace('/^' . preg_quote($oldref, '/') . '/', $newref, $dirsource);
+//                            $dirsource = $fileentry['path'] . '/' .$dirsource;
+//                            $dirdest   = $fileentry['path'] . '/' . $dirdest;
+//                            @rename($dirsource, $dirdest);
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         // Set new ref and current status
         if (!$error) {
@@ -568,7 +568,7 @@ class Session extends CommonObject
 
 //        $signatory = new SessionSignature($this->db);
 //        $signatory->deleteSignatoriesSignatures($this->id, 'session');
-        return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'SESSION_UNVALIDATE');
+        return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, $this->type . '_UNVALIDATE');
     }
 
     /**
@@ -580,7 +580,7 @@ class Session extends CommonObject
      */
     public function setLocked(User $user, int $notrigger = 0): int
     {
-        return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, 'SESSION_LOCKED');
+        return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, $this->type . '_LOCKED');
     }
 
     /**
@@ -592,7 +592,7 @@ class Session extends CommonObject
      */
     public function setArchived(User $user, int $notrigger = 0): int
     {
-        return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, 'SESSION_ARCHIVED');
+        return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, $this->type . '_ARCHIVED');
     }
 
     /**
@@ -814,15 +814,16 @@ class Session extends CommonObject
         global $langs, $conf;
         $langs->load('dolimeet@dolimeet');
 
-        if (empty($conf->global->DOLIMEET_SESSION_ADDON)) {
-            $conf->global->DOLIMEET_SESSION_ADDON = 'mod_session_standard';
+        $mod = 'DOLIMEET_' . $this->type . '_ADDON';
+        if (empty($conf->global->$mod)) {
+            $conf->global->$mod = 'mod_' . $this->type . '_standard';
         }
 
-        if (!empty($conf->global->DOLIMEET_SESSION_ADDON)) {
+        if (!empty($conf->global->$mod)) {
             $mybool = false;
 
-            $file = $conf->global->DOLIMEET_SESSION_ADDON . '.php';
-            $classname = $conf->global->DOLIMEET_SESSION_ADDON;
+            $file = $conf->global->$mod . '.php';
+            $classname = $conf->global->$mod;
 
             // Include file with class
             $dirmodels = array_merge(['/'], $conf->modules_parts['models']);

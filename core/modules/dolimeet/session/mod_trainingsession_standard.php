@@ -17,17 +17,17 @@
 
 
 /**
- *  \file       core/modules/dolimeet/mod_trainingsession_standard.php
+ *  \file       core/modules/dolimeet/session/mod_trainingsession_standard.php
  *  \ingroup    dolimeet
  *  \brief      File of class to manage traning session numbering rules standard
  */
 
-require_once __DIR__ . '/modules_session.php';
+require_once __DIR__ . '/../modules_dolimeet.php';
 
 /**
  *	Class to manage customer traning session numbering rules standard
  */
-class mod_trainingsession_standard extends ModeleNumRefSession
+class mod_trainingsession_standard extends ModeleNumRefDoliMeet
 {
 	/**
 	 * Dolibarr version of the loaded trainingsession
@@ -43,7 +43,7 @@ class mod_trainingsession_standard extends ModeleNumRefSession
 	/**
 	 * @var string Error code (or message)
 	 */
-	public $error = '';
+	public string $error = '';
 
     /**
      * @var string model name

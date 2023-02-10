@@ -17,20 +17,20 @@
 
 
 /**
- *  \file       core/modules/dolimeet/mod_audit_standard.php
+ *  \file       core/modules/dolimeet/session/mod_meeting_standard.php
  *  \ingroup    dolimeet
- *  \brief      File of class to manage audit numbering rules standard
+ *  \brief      File of class to manage meeting numbering rules standard
  */
 
-require_once __DIR__ . '/modules_session.php';
+require_once __DIR__ . '/../modules_dolimeet.php';
 
 /**
- *	Class to manage customer audit numbering rules standard
+ *	Class to manage customer meeting numbering rules standard
  */
-class mod_audit_standard extends ModeleNumRefSession
+class mod_meeting_standard extends ModeleNumRefDoliMeet
 {
 	/**
-	 * Dolibarr version of the loaded audit
+	 * Dolibarr version of the loaded meeting
 	 * @var string
 	 */
 	public string $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
@@ -38,17 +38,17 @@ class mod_audit_standard extends ModeleNumRefSession
     /**
      * @var string document prefix
      */
-	public string $prefix = 'AU';
+	public string $prefix = 'ME';
 
 	/**
 	 * @var string Error code (or message)
 	 */
-	public $error = '';
+	public string $error = '';
 
     /**
      * @var string model name
      */
-	public string $name = 'Audit';
+	public string $name = 'Meeting';
 
 	/**
 	 * Return description of numbering module
@@ -57,9 +57,9 @@ class mod_audit_standard extends ModeleNumRefSession
 	 */
 	public function info(): string
     {
-		global $langs;
+        global $langs;
         $langs->load('dolimeet@dolimeet');
-		return $langs->trans('DolimeetAuditStandardModel', $this->prefix);
+        return $langs->trans('DolimeetMeetingStandardModel', $this->prefix);
 	}
 
 	/**
@@ -76,10 +76,11 @@ class mod_audit_standard extends ModeleNumRefSession
 	 * Checks if the numbers already in the database do not
 	 * cause conflicts that would prevent this numbering working.
 	 *
-	 * @param  Object $object Object we need next value for
-	 * @return bool           False if conflicted, true if ok
+	 * @param  Object  $object Object we need next value for
+	 * @return bool            False if conflicted, true if ok
 	 */
-	public function canBeActivated($object) {
+	public function canBeActivated($object): bool
+    {
 		global $conf, $langs, $db;
 
 		$coyymm = ''; $max = '';
@@ -137,7 +138,7 @@ class mod_audit_standard extends ModeleNumRefSession
 		}
 		else
 		{
-			dol_syslog('mod_audit_standard::getNextValue', LOG_DEBUG);
+			dol_syslog('mod_meeting_standard::getNextValue', LOG_DEBUG);
 			return -1;
 		}
 
@@ -151,7 +152,7 @@ class mod_audit_standard extends ModeleNumRefSession
 			$num = sprintf('%04s', $max + 1);
 		}
 
-		dol_syslog('mod_audit_standard::getNextValue return ' .$this->prefix.$yymm. '-' .$num);
+		dol_syslog('mod_meeting_standard::getNextValue return ' .$this->prefix.$yymm. '-' .$num);
 		return $this->prefix.$yymm. '-' .$num;
 	}
 }
