@@ -121,7 +121,7 @@ class ActionsDolimeet
 			$outputline = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block">' . $picto . $langs->transnoentities('SessionListOnProject') . '</div></td></tr></table>';
 			$outputline .= '<table><div class="div-table-responsive-no-min"><table class="liste formdoc noborder centpercent"><tbody>';
 			$outputline .= '<tr class="liste_titre">';
-			$outputline .= '<td class="float">' . $langs->transnoentities('ObjectType') . '</td>';
+			$outputline .= '<td class="float">' . $langs->transnoentities('Type') . '</td>';
 			$outputline .= '<td class="float">' . $langs->transnoentities('Ref') . '</td>';
 			$outputline .= '<td class="float">' . $langs->transnoentities('Date') . '</td>';
             $outputline .= '<td class="float">' . $langs->transnoentities('Status') . '</td>';

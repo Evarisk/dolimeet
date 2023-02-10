@@ -24,6 +24,8 @@ ModuleDoliMeetDesc = Suivi des réunions, sessions de formation, audit
 DoliMeetDescription = Suivi des réunions, sessions de formation, audit
 DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
+
+
 #
 # Page d'administration
 #
@@ -31,12 +33,16 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 Settings = Réglages
 DoliMeetSetup = Configuration du module DoliMeet
 
+
+
 #
 # Page À propos
 #
 
 About = À propos
 DoliMeetAbout = À propos de DoliMeet
+
+
 
 #
 # Page index
@@ -50,6 +56,8 @@ DoliMeetPatchNote = Note de mise à jour DoliMeet %s
 ShowPatchNote = Consulter la note de mise à jour
 DontShowPatchNote = Ne plus afficher la note de mise à jour
 
+
+
 #
 # DoliMeet
 #
@@ -58,6 +66,8 @@ DontShowPatchNote = Ne plus afficher la note de mise à jour
 LireDoliMeet = Consulter DoliMeet
 ReadDoliMeet = Consulter DoliMeet (read)
 ReadAdminPage = Accéder à la configuration du module
+
+
 
 #
 # Session - Session
@@ -70,7 +80,6 @@ DeleteDoliMeetSession = Supprimer les sessions de DoliMeet
 
 # Data - Donnée
 ContactLinked = Contact
-ProjectLinked = Projet lié
 NewSession = Nouvelle session
 SessionList = Liste des sessions
 SessionTypes = Types de session
@@ -79,17 +88,16 @@ SessionConfig = Configuration des sessions
 Deleted = Supprimé
 ValidatePendingSignature = Validé (en attente de signature)
 Locked = Verrouillé
-DurationH = Durée (en h)
 Schedules = Horaires
 ContratSchedules = Horaires de la formation
-ObjectType = Type
-Object = Objet
 SessionTrainer = Formateur
 TRAININGSESSION_SESSION_TRAINER = Formateur
 TRAININGSESSION_SOCIETY_ATTENDANT = Participant
 SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
 SignatureEmailSubject = Signature de la feuille de présence
-SessionListOnProject = Liste des sessions liés au projet
+SessionListOnProject = Liste des sessions liées au projet
+
+
 
 #
 # Meeting - Réunion
@@ -110,10 +118,13 @@ Meeting = Réunion
 MeetingList = Liste des réunions
 MeetingCreate = Créer une réunion
 NewMeeting = Nouvelle réunion
+ModifyMeeting = Modifier une réunion
 EnableMeetingDescription = Activer l'objet Réunion
 CloneMeeting = Cloner la réunion
 ConfirmCloneMeeting = Voulez-vous cloner cette réunion ?
 MeetingsCategoriesArea = Catégories de réunion
+
+
 
 #
 # Training Session - Session de formation
@@ -125,9 +136,9 @@ WriteTrainingSession = Créer/Modifier les sessions de formation
 DeleteTrainingSession = Supprimer les sessions de formation
 
 # Trigger - Déclencheur
-TrainingSessionCreateTrigger = La session de formation a été créée
-TrainingSessionModifyTrigger = La session de formation a été modifiée
-TrainingSessionDeleteTrigger = La session de formation a été supprimée
+TrainingsessionCreateTrigger = La session de formation a été créée
+TrainingsessionModifyTrigger = La session de formation a été modifiée
+TrainingsessionDeleteTrigger = La session de formation a été supprimée
 
 # Data - Donnée
 TrainingSession = Session de formation
@@ -135,9 +146,9 @@ Trainingsession = Session de formation
 TrainingsessionList = Liste des sessions de formation
 TrainingSessionList = Liste des sessions de formation
 TrainingSessionCreate = Créer une session de formation
-ContractLinked = Contrat lié
 Contract = Contrat
 NewTrainingsession = Nouvelle session de formation
+ModifyTrainingsession = Modifier une session de formation
 EnableTrainingSessionDescription = Activer l'objet Session de Formation
 CloneTrainingsession = Cloner la session de formation
 ConfirmCloneTrainingsession = Voulez-vous cloner cette session de formation ?
@@ -150,6 +161,16 @@ BilanCompetences = Bilan de compétences
 TrainingSessionType = Type de formation
 TrainingSessionLocation = Lieu de la formation
 TrainingsessionsCategoriesArea = Catégories de session de formation
+
+
+
+#
+# Training Session Document - Document lié au session de formation
+#
+
+# Data - Donnée
+attendancesheet.odt = Feuille de présence
+completioncertificate.odt = Certificat de réalisation
 
 #
 # Audit - Audit
@@ -169,21 +190,20 @@ AuditDeleteTrigger = L'audit a été supprimé
 Audit = Audit
 AuditList = Liste des audits
 AuditCreate = Créer un audit
-AuditAttendants = Participants - Audit
-CardAudit = Fiche - Audit
 NewAudit = Nouvel audit
+ModifyAudit = Modifier un audit
 EnableAuditDescription = Activer l'objet Audit
 CloneAudit = Cloner l'audit ?
 ConfirmCloneAudit = Voulez-vous cloner cet audit ?
 AuditsCategoriesArea = Catégories d'audit
+
+
 
 #
 # Other
 #
 
 # Data - Donnée
-DoliMeetObjects = Objets de DoliMeet
-LinkedDocuments = Documents liés
 Hour(s) = Heure(s)
 Minute(s) = Minute(s)
 TrainingOrganizationNumber = Numéro de déclaration de l\'organisme de formation
