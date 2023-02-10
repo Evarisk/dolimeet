@@ -126,7 +126,7 @@ class modDoliMeet extends DolibarrModules
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/dolimeet/temp","/dolimeet/subdir");
-		$this->dirs = ['/dolimeet/temp', 'ecm/dolimeet/attendancesheetdocument/', 'ecm/dolimeet/completioncertificatedocument/'];
+		$this->dirs = ['/dolimeet/temp', '/ecm/dolimeet/attendancesheetdocument/', '/ecm/dolimeet/completioncertificatedocument/'];
 
 		// Config pages. Put here list of php page, stored into dolimeet/admin directory, to use to setup module.
 		$this->config_page_url = ['setup.php@dolimeet'];
