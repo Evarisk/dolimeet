@@ -95,7 +95,6 @@ if (empty($action) && empty($id) && empty($ref)) {
 // Load object
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
-// @todo a finir
 $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 
 // Security check - Protection if external user
@@ -499,7 +498,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             //print '<a class="' . ($object->status == $object::STATUS_LOCKED ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("ObjectMustBeLockedToSendEmail")) . '" href="' . ($object->status == $object::STATUS_LOCKED ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
 
             // Archive
-            if ($object->status == $object::STATUS_LOCKED  && !empty(dol_dir_list($upload_dir . '/timesheetdocument/' . dol_sanitizeFileName($object->ref)))) {
+            if ($object->status == $object::STATUS_LOCKED) {
                 print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=setArchived' . '">' . $langs->trans('Archive') . '</a>';
             } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedGenerated')) . '">' . $langs->trans('Archive') . '</span>';

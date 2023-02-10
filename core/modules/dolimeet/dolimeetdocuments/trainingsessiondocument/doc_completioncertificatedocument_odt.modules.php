@@ -197,7 +197,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
         $objectDocument->fetch($objectDocumentID);
 
         $objectref = dol_sanitizeFileName($objectDocument->ref);
-        $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/'. $object->type .'/'. $object->ref;
+        $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
 
         if (!file_exists($dir)) {
             if (dol_mkdir($dir) < 0) {
