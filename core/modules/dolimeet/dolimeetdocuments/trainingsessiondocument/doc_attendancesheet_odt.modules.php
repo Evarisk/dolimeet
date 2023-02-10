@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once __DIR__ . '/modules_trainingsessiondocument.php';
-require_once __DIR__ . '/mod_trainingsessiondocument_attendancesheetdocument_standard.php';
+require_once __DIR__ . '/mod_attendancesheetdocument_standard.php';
 
 /**
  *	Class to build documents using ODF templates generator

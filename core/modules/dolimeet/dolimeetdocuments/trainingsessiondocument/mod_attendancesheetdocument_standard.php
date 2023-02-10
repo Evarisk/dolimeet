@@ -17,15 +17,15 @@
  */
 
 /**
- *	\file       core/modules/dolimeet/dolimeetdocumets/trainingsessiondocument/mod_trainingsessiondocument_attendancesheetdocument_standard.php
+ *	\file       core/modules/dolimeet/dolimeetdocumets/trainingsessiondocument/mod_attendancesheetdocument_standard.php
  * \ingroup     dolimeet
  *	\brief      File of class to manage TrainingSessionDocument AttendanceSheetDocument numbering rules standard
  */
 
 /**
- * 	Class to manage trainingsessiondocument_attendancesheetdocument numbering rules Standard
+ * 	Class to manage attendancesheetdocument numbering rules Standard
  */
-class mod_trainingsessiondocument_attendancesheetdocument_standard
+class mod__attendancesheetdocument_standard
 {
 	/**
 	 * @var string Dolibarr version of the loaded document
@@ -35,12 +35,12 @@ class mod_trainingsessiondocument_attendancesheetdocument_standard
 	/**
 	 * @var string Document prefix
 	 */
-	public string $prefix = 'FCD';
+	public string $prefix = 'ASD';
 
 	/**
 	 * @var string Model name
 	 */
-	public string $name = 'Dioné';
+	public string $name = 'Loge';
 
 	/**
 	 * @var string Error code (or message)
@@ -145,7 +145,7 @@ class mod_trainingsessiondocument_attendancesheetdocument_standard
                 $max = 0;
             }
         } else {
-            dol_syslog('mod_trainingsessiondocument_attendancesheetdocument_standard::getNextValue', LOG_DEBUG);
+            dol_syslog('mod_attendancesheetdocument_standard::getNextValue', LOG_DEBUG);
             return -1;
         }
 
@@ -158,7 +158,7 @@ class mod_trainingsessiondocument_attendancesheetdocument_standard
             $num = sprintf('%04s', $max + 1);
         }
 
-        dol_syslog('mod_trainingsessiondocument_attendancesheetdocument_standard::getNextValue return ' . $this->prefix.$yymm. '-' .$num);
+        dol_syslog('mod_attendancesheetdocument_standard::getNextValue return ' . $this->prefix.$yymm. '-' .$num);
         return $this->prefix . $yymm . '-' . $num;
     }
 

@@ -173,19 +173,17 @@ class modDoliMeet extends DolibarrModules
 
             // CONST DOLIMEET DOCUMENTS
 
-            // CONST TRAININGSESSION DOCUMENT
-
             // CONST ATTENDANCESHEET DOCUMENT
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_ATTENDANCESHEETDOCUMENT_ADDON', 'chaine', 'mod_trainingsessiondocument_attendancesheetdocument_standard', '', 0, 'current'],
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/trainingsessiondocument_attendancesheetdocumentdocument/', '', 0, 'current'],
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_ATTENDANCESHEETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/dolimeet/trainingsessiondocument_attendancesheetdocument/', '', 0, 'current'],
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_ATTENDANCESHEETDOCUMENT_DEFAULT_MODEL', 'chaine', 'trainingsessiondocument_attendancesheetdocument_odt', '', 0, 'current'],
+            $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON', 'chaine', 'mod_attendancesheetdocument_standard', '', 0, 'current'],
+            $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/trainingsessiondocument/attendancesheetdocument/', '', 0, 'current'],
+            $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/dolimeet/attendancesheetdocument/', '', 0, 'current'],
+            $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_DEFAULT_MODEL', 'chaine', 'attendancesheetdocument_odt', '', 0, 'current'],
 
             // CONST COMPLETIONCERTIFICATE DOCUMENT
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_COMPLETIONCERTIFICATEDOCUMENT_ADDON', 'chaine', 'mod_trainingsessiondocument_completioncertificatedocument_standard', '', 0, 'current'],
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/trainingsessiondocument_completioncertificatedocument/', '', 0, 'current'],
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_COMPLETIONCERTIFICATEDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/dolimeet/trainingsessiondocument_completioncertificatedocument/', '', 0, 'current'],
-            $i++ => ['DOLIMEET_TRAININGSESSIONDOCUMENT_COMPLETIONCERTIFICATEDOCUMENT_DEFAULT_MODEL', 'chaine', 'trainingsessiondocument_completioncertificatedocument_odt', '', 0, 'current'],
+            $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON', 'chaine', 'mod_completioncertificatedocument_standard', '', 0, 'current'],
+            $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/completioncertificatedocument/', '', 0, 'current'],
+            $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/dolimeet/completioncertificatedocument/', '', 0, 'current'],
+            $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_DEFAULT_MODEL', 'chaine', 'completioncertificatedocument_odt', '', 0, 'current'],
 
             // CONST CONFIGURATION
             $i++ => ['MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', 'chaine', '', '', 0, 'current'],
@@ -631,11 +629,11 @@ class modDoliMeet extends DolibarrModules
 			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
 		}
 
-		delDocumentModel('trainingsessiondocument_attendancesheetdocument_odt', 'trainingsessiondocument');
-		delDocumentModel('trainingsessiondocument_completioncertificatedocument_odt', 'trainingsessiondocument');
+		delDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument');
+		delDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument');
 
-		addDocumentModel('trainingsessiondocument_attendancesheetdocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_TRAININGSESSIONDOCUMENT_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH');
-		addDocumentModel('trainingsessiondocument_completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_TRAININGSESSIONDOCUMENT_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
