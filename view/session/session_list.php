@@ -31,13 +31,8 @@ if (file_exists('../../dolimeet.main.inc.php')) {
 // Get module parameters
 $objectType = GETPOST('object_type', 'alpha');
 
-// Libraries @todo
-require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
+// Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/propal.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/contact.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/contract.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
@@ -53,11 +48,7 @@ if (!empty($conf->categorie->enabled)) {
     require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 }
 
-// load session libraries
-require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
 require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
-
-// @fin todo
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
@@ -105,16 +96,11 @@ $extrafields = new ExtraFields($db);
 $usertmp     = new User($db);
 $thirdparty  = new Societe($db);
 $contact     = new Contact($db);
-$project     = new Project($db);
 
 // Initialize view objects
 $form        = new Form($db);
 $formproject = new FormProjets($db);
 $formcontrat = new FormContract($db);
-
-if (!$fromtype || !$fromid) {
-    unset($object->fields['type']);
-}
 
 if ($objectType != 'trainingsession' && GETPOST('fromtype') != 'contrat') {
     unset($object->fields['fk_contrat']);
@@ -136,36 +122,6 @@ if (!$sortorder) {
     $sortorder = 'ASC';
 }
 
-// @todo merge switch
-if (!empty($fromtype)) {
-    switch ($fromtype) {
-        case 'thirdparty' :
-            $objectLinked = new Societe($db);
-            $prehead = 'societe_prepare_head';
-            break;
-        case 'project' :
-            $objectLinked = new Project($db);
-            $prehead = 'project_prepare_head';
-            break;
-        case 'socpeople' :
-            $objectLinked = new Contact($db);
-            $prehead = 'contact_prepare_head';
-            break;
-        case 'contrat' :
-            $objectLinked = new Contrat($db);
-            $prehead = 'contract_prepare_head';
-            break;
-        case 'user' :
-            $objectLinked = new User($db);
-            $prehead = 'user_prepare_head';
-            break;
-    }
-    $objectLinked->fetch($fromid);
-    $head = $prehead($objectLinked);
-    $linkedObjectsArray = ['project', 'contrat'];
-    $signatoryObjectsArray = ['user', 'thirdparty', 'socpeople'];
-}
-
 // Initialize array of search criterias
 $search_all = GETPOST('search_all') ? GETPOST('search_all') : GETPOST('sall');
 $search = [];
@@ -185,28 +141,42 @@ if (!empty($conf->categorie->enabled)) {
 
 if (!empty($fromtype)) {
     switch ($fromtype) {
-//		case 'thirdparty':
-//			$search['fk_soc'] = $fromid;
-//			break;
-//		case 'contact':
-//			$search['fk_contact'] = $fromid;
-//			break;
-        case 'project':
-            $search['fk_project'] = $fromid;
-            break;
-        case 'contrat':
-            $search['fk_contrat'] = $fromid;
-            break;
-        case 'user':
-            $search['search_society_attendants'] = $fromid;
-            break;
-        case 'socpeople':
-            $search['search_external_attendants'] = $fromid;
-            break;
-        case 'thirdparty':
+        case 'thirdparty' :
+            $objectLinked = new Societe($db);
+            $prehead = 'societe_prepare_head';
+            $search['fk_soc'] = $fromid;
             $search['search_attendant_thirdparties'] = $fromid;
             break;
+        case 'project' :
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
+            $objectLinked = new Project($db);
+            $prehead = 'project_prepare_head';
+            $search['fk_project'] = $fromid;
+            break;
+        case 'contact' :
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/contact.lib.php';
+            $objectLinked = new Contact($db);
+            $prehead = 'contact_prepare_head';
+            $search['fk_contact'] = $fromid;
+            $search['search_external_attendants'] = $fromid;
+            break;
+        case 'contrat' :
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/contract.lib.php';
+            $objectLinked = new Contrat($db);
+            $prehead = 'contract_prepare_head';
+            $search['fk_contrat'] = $fromid;
+            break;
+        case 'user' :
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
+            $objectLinked = new User($db);
+            $prehead = 'user_prepare_head';
+            $search['search_society_attendants'] = $fromid;
+            break;
     }
+    $objectLinked->fetch($fromid);
+    $head = $prehead($objectLinked);
+    $linkedObjectsArray = ['project', 'contrat'];
+    $signatoryObjectsArray = ['user', 'thirdparty', 'socpeople'];
 }
 
 // List of fields to search into when doing a "search in all"
@@ -300,8 +270,6 @@ if (empty($reshook)) {
 
 $title    = $langs->trans(ucfirst($objectType) . 'List');
 $help_url = 'FR:Module_DoliMeet';
-//$morejs   = ['/dolimeet/js/dolimeet.js.php'];
-//$morecss  = ['/dolimeet/css/dolimeet.css'];
 
 // Build and execute select
 // --------------------------------------------------------------------
@@ -466,7 +434,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 // Output page
 // --------------------------------------------------------------------
 
-llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss, '', 'bodyforlist');
+saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 $contract = new Contrat($db);
@@ -875,44 +843,44 @@ while ($i < $imaxinloop) {
                 }
             } elseif ($key == 'Custom') {
                 foreach ($val as $resource) {
-                    if ($resource['checked']) {
-                        if ($resource['label'] == 'SocietyAttendants') {
-                            $signatories = $signatory->fetchSignatory(strtoupper($objectType) . '_SOCIETY_ATTENDANT', $object->id, $objectType);
-                            print '<td>';
-                            if (is_array($signatories) && !empty($signatories)) {
-                                foreach ($signatories as $object_signatory) {
-                                    $usertmp = $user;
-                                    $usertmp->fetch($object_signatory->element_id);
-                                    print $usertmp->getNomUrl(1);
-                                    print '<br>';
-                                }
-                            }
-                            print '</td>';
-                        } elseif ($resource['label'] == 'ExternalAttendants') {
-                            $signatories = $signatory->fetchSignatory(strtoupper($objectType) . '_EXTERNAL_ATTENDANT', $object->id, $objectType);
-                            print '<td>';
-                            if (is_array($signatories) && !empty($signatories)) {
-                                foreach ($signatories as $object_signatory) {
-                                    $contact->fetch($object_signatory->element_id);
-                                    print $contact->getNomUrl(1);
-                                    print '<br>';
-                                }
-                            }
-                            print '</td>';
-                        } elseif ($resource['label'] == 'AttendantThirdparties') {
-                            $signatories = $signatory->fetchSignatory(strtoupper($objectType) . '_EXTERNAL_ATTENDANT', $object->id, $objectType);
-                            print '<td>';
-                            if (is_array($signatories) && !empty($signatories)) {
-                                foreach ($signatories as $object_signatory) {
-                                    $contact->fetch($object_signatory->element_id);
-                                    $thirdparty->fetch($contact->fk_soc);
-                                    print $thirdparty->getNomUrl(1);
-                                    print '<br>';
-                                }
-                            }
-                            print '</td>';
-                        }
-                    }
+//                    if ($resource['checked']) {
+//                        if ($resource['label'] == 'SocietyAttendants') {
+//                            $signatories = $signatory->fetchSignatory(strtoupper($objectType) . '_SOCIETY_ATTENDANT', $object->id, $objectType);
+//                            print '<td>';
+//                            if (is_array($signatories) && !empty($signatories)) {
+//                                foreach ($signatories as $object_signatory) {
+//                                    $usertmp = $user;
+//                                    $usertmp->fetch($object_signatory->element_id);
+//                                    print $usertmp->getNomUrl(1);
+//                                    print '<br>';
+//                                }
+//                            }
+//                            print '</td>';
+//                        } elseif ($resource['label'] == 'ExternalAttendants') {
+//                            $signatories = $signatory->fetchSignatory(strtoupper($objectType) . '_EXTERNAL_ATTENDANT', $object->id, $objectType);
+//                            print '<td>';
+//                            if (is_array($signatories) && !empty($signatories)) {
+//                                foreach ($signatories as $object_signatory) {
+//                                    $contact->fetch($object_signatory->element_id);
+//                                    print $contact->getNomUrl(1);
+//                                    print '<br>';
+//                                }
+//                            }
+//                            print '</td>';
+//                        } elseif ($resource['label'] == 'AttendantThirdparties') {
+//                            $signatories = $signatory->fetchSignatory(strtoupper($objectType) . '_EXTERNAL_ATTENDANT', $object->id, $objectType);
+//                            print '<td>';
+//                            if (is_array($signatories) && !empty($signatories)) {
+//                                foreach ($signatories as $object_signatory) {
+//                                    $contact->fetch($object_signatory->element_id);
+//                                    $thirdparty->fetch($contact->fk_soc);
+//                                    print $thirdparty->getNomUrl(1);
+//                                    print '<br>';
+//                                }
+//                            }
+//                            print '</td>';
+//                        }
+//                    }
                 }
             }
         }

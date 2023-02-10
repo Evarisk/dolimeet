@@ -50,13 +50,14 @@ global $conf, $db, $hookmanager, $langs, $user;
 $langs->loadLangs(['dolimeet@dolimeet', 'other@saturne']);
 
 // Get parameters
-$id          = GETPOST('id', 'int');
-$ref         = GETPOST('ref', 'alpha');
-$action      = GETPOST('action', 'aZ09');
-$confirm     = GETPOST('confirm', 'alpha');
-$cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : $objectType . 'card'; // To manage different context of search
-$backtopage  = GETPOST('backtopage', 'alpha');
+$id                  = GETPOST('id', 'int');
+$ref                 = GETPOST('ref', 'alpha');
+$action              = GETPOST('action', 'aZ09');
+$confirm             = GETPOST('confirm', 'alpha');
+$cancel              = GETPOST('cancel', 'aZ09');
+$contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : $objectType . 'card'; // To manage different context of search
+$backtopage          = GETPOST('backtopage', 'alpha');
+$backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
 // Initialize technical objects
 $classname        = ucfirst($objectType);
@@ -72,7 +73,7 @@ $refMod           = new $conf->global->$mod();
 // Initialize view objects
 $form = new Form($db);
 
-$hookmanager->initHooks([$objectType . 'card', 'saturnecard', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks([$objectType . 'card', 'sessioncard', 'saturnecard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -353,7 +354,7 @@ if (($id || $ref) && $action == 'edit') {
     // Tags-Categories
     if (isModEnabled('categorie')) {
         print '<tr><td>' . $langs->trans('Categories') . '</td><td>';
-        $cate_arbo = $form->select_all_categories($object->element, '', 'parent', 64, 0, 1);
+        $cate_arbo = $form->select_all_categories('session', '', 'parent', 64, 0, 1);
         $c = new Categorie($db);
         $cats = $c->containing($object->id, 'session');
         $arrayselected = [];
