@@ -328,6 +328,18 @@ if ($id > 0 || !empty($ref) && empty($action)) {
 
     if (is_array($internalAttendants) && is_array($sessionTrainer)) {
         $internalAttendants = array_merge($internalAttendants, $sessionTrainer);
+
+        switch ($object->element) {
+            case 'meeting' :
+                $attendantRole = ['Contributor','Responsible'];
+                break;
+            case 'trainingsession' :
+                $attendantRole = ['Trainee', 'SessionTrainer'];
+                break;
+            case 'audit' :
+                $attendantRole = ['Auditor'];
+                break;
+        }
     }
 
     print load_fiche_titre($langs->trans('Attendants'), '', '');
@@ -395,7 +407,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<tr class="oddeven"><td class="maxwidth200">';
             print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, $alreadyAddedUsers, 0, '', '', $conf->entity);
             print '</td><td>';
-            print $form->selectarray('attendant_role', ['InternalAttendant', 'SessionTrainer'], '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
+            print $form->selectarray('attendant_role', $attendantRole, '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
             print '</td><td>';
             print '-';
             print '</td><td>';
@@ -439,9 +451,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
 
             // Internal attendant
             print '<tr class="oddeven"><td class="maxwidth200">';
-            print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, $alreadyAddedUsers, 0, '', '', $conf->entity);
+            print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, '', 0, '', '', $conf->entity);
             print '</td><td>';
-            print $form->selectarray('attendant_role', ['InternalAttendant', 'SessionTrainer'], '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
+            print $form->selectarray('attendant_role', $attendantRole, '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
             print '</td><td>';
             print '-';
             print '</td><td>';
@@ -616,7 +628,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
 
             print '</td>';
             print '<td class=minwidth400">';
-            print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'attendant', 1, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth300');
+            print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'attendant', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth300');
             $nbofcontacts = $form->num;
             $newcardbutton = '';
             if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {

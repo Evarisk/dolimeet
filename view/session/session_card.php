@@ -420,6 +420,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     print '<table class="border centpercent tableforfield">';
 
     $keyforbreak = 'content';
+    unset($object->fields['label']);      // Hide field already shown in banner
     unset($object->fields['fk_project']); // Hide field already shown in banner
     unset($object->fields['fk_soc']);     // Hide field already shown in banner
     unset($object->fields['fk_contrat']); // Hide field already shown in banner

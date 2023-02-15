@@ -90,7 +90,6 @@ ValidatePendingSignature = Validé (en attente de signature)
 Locked = Verrouillé
 Schedules = Horaires
 ContratSchedules = Horaires de la formation
-SessionTrainer = Formateur
 SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
 SignatureEmailSubject = Signature de la feuille de présence
 SessionListOnProject = Liste des sessions liées au projet
@@ -121,6 +120,8 @@ EnableMeetingDescription = Activer l'objet Réunion
 CloneMeeting = Cloner la réunion
 ConfirmCloneMeeting = Voulez-vous cloner cette réunion ?
 MeetingsCategoriesArea = Catégories de réunion
+Contributor = Contributeur
+Responsible = Responsable
 
 
 
@@ -159,6 +160,9 @@ BilanCompetences = Bilan de compétences
 TrainingSessionType = Type de formation
 TrainingSessionLocation = Lieu de la formation
 TrainingsessionsCategoriesArea = Catégories de session de formation
+SessionTrainer = Formateur
+Trainne = Stagiaire
+
 
 
 
@@ -194,7 +198,7 @@ EnableAuditDescription = Activer l'objet Audit
 CloneAudit = Cloner l'audit ?
 ConfirmCloneAudit = Voulez-vous cloner cet audit ?
 AuditsCategoriesArea = Catégories d'audit
-
+Auditor = Auditeur
 
 
 #
