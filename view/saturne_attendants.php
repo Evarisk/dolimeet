@@ -109,6 +109,10 @@ if (empty($reshook)) {
         $attendantType = GETPOST('attendant_type');
         $attendantRole = GETPOST('attendant_role');
 
+        if ($attendantID < 0) {
+            setEventMessages($langs->trans('ErrorFieldRequired', $langs->trans('Attendant')), [], 'errors');
+        }
+
         $result = $signatory->setSignatory($object->id, $object->element, $attendantType == 'internal' ? 'user' : 'socpeople', [$attendantID], $attendantRole);
 
         if ($result > 0) {
@@ -323,28 +327,31 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     $zone = 'private';
 
     // Internal attendants -- Participants interne
-    $internalAttendants = $signatory->fetchSignatory('InternalAttendant', $object->id, $object->element);
-    $sessionTrainer = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
+    switch ($object->element) {
+        case 'meeting' :
+            $attendantsRole = ['Contributor','Responsible'];
+            break;
+        case 'trainingsession' :
+            $attendantsRole = ['Trainee', 'SessionTrainer'];
+            break;
+        case 'audit' :
+            $attendantsRole = ['Auditor'];
+            break;
+        default :
+            $attendantsRole = ['InternalAttendant'];
+    }
 
-    if (is_array($internalAttendants) && is_array($sessionTrainer)) {
-        $internalAttendants = array_merge($internalAttendants, $sessionTrainer);
-
-        switch ($object->element) {
-            case 'meeting' :
-                $attendantRole = ['Contributor','Responsible'];
-                break;
-            case 'trainingsession' :
-                $attendantRole = ['Trainee', 'SessionTrainer'];
-                break;
-            case 'audit' :
-                $attendantRole = ['Auditor'];
-                break;
+    $internalAttendants = [];
+    foreach ($attendantsRole as $attendantRole) {
+        $result = $signatory->fetchSignatory($attendantRole, $object->id, $object->element);
+        if (is_array($result) && !empty($result)) {
+            $internalAttendants = array_merge($internalAttendants, $result);
         }
     }
 
     print load_fiche_titre($langs->trans('Attendants'), '', '');
 
-    if (!empty($internalAttendants) && $internalAttendants > 0) {
+    if (is_array($internalAttendants) && !empty($internalAttendants) && $internalAttendants > 0) {
         print '<table class="border centpercent tableforfield">';
 
         print '<tr class="liste_titre">';
@@ -407,7 +414,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<tr class="oddeven"><td class="maxwidth200">';
             print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, $alreadyAddedUsers, 0, '', '', $conf->entity);
             print '</td><td>';
-            print $form->selectarray('attendant_role', $attendantRole, '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
+            print $form->selectarray('attendant_role', $attendantsRole, '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
             print '</td><td>';
             print '-';
             print '</td><td>';
@@ -453,7 +460,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<tr class="oddeven"><td class="maxwidth200">';
             print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, '', 0, '', '', $conf->entity);
             print '</td><td>';
-            print $form->selectarray('attendant_role', $attendantRole, '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
+            print $form->selectarray('attendant_role', $attendantsRole, '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
             print '</td><td>';
             print '-';
             print '</td><td>';
