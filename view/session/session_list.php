@@ -29,10 +29,16 @@ if (file_exists('../../dolimeet.main.inc.php')) {
 }
 
 // Get module parameters
-$objectType = GETPOST('object_type', 'alpha');
+$objectType = GETPOST('object_type', 'alpha') ?: 'session';
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/propal.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/contact.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/contract.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
@@ -71,8 +77,6 @@ $fromid      = GETPOST('fromid', 'int'); //element id
 
 $id = GETPOST('id', 'int');
 $type = GETPOST('type');
-
-// @fin todo
 
 // Get pagination parameters
 $limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -143,38 +147,33 @@ if (!empty($fromtype)) {
     switch ($fromtype) {
         case 'thirdparty' :
             $objectLinked = new Societe($db);
-            $prehead = 'societe_prepare_head';
             $search['fk_soc'] = $fromid;
             $search['search_attendant_thirdparties'] = $fromid;
             break;
         case 'project' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
             $objectLinked = new Project($db);
-            $prehead = 'project_prepare_head';
             $search['fk_project'] = $fromid;
             break;
         case 'contact' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/contact.lib.php';
             $objectLinked = new Contact($db);
-            $prehead = 'contact_prepare_head';
             $search['fk_contact'] = $fromid;
             $search['search_external_attendants'] = $fromid;
             break;
         case 'contrat' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/contract.lib.php';
             $objectLinked = new Contrat($db);
-            $prehead = 'contract_prepare_head';
+			$objectLinked->element = 'contract';
             $search['fk_contrat'] = $fromid;
             break;
         case 'user' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
             $objectLinked = new User($db);
-            $prehead = 'user_prepare_head';
             $search['search_society_attendants'] = $fromid;
             break;
     }
     $objectLinked->fetch($fromid);
-    $head = $prehead($objectLinked);
     $linkedObjectsArray = ['project', 'contrat'];
     $signatoryObjectsArray = ['user', 'thirdparty', 'socpeople'];
 }

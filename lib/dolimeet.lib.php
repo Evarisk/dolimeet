@@ -26,7 +26,7 @@
  *
  * @return array
  */
-function dolimeetAdminPrepareHead(): array
+function dolimeet_admin_prepare_head(): array
 {
     // Global variables definitions
 	global $langs, $conf;

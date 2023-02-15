@@ -263,7 +263,7 @@ class Session extends CommonObject
 	 *
 	 * @param DoliDb $db Database handler
 	 */
-	public function __construct(DoliDB $db, $objectType)
+	public function __construct(DoliDB $db, $objectType = '')
     {
 		global $conf, $langs;
 
@@ -621,7 +621,7 @@ class Session extends CommonObject
 		}
 		$label .= '<br>';
 		$label .= '<b>' . $langs->trans('Ref') . ' : </b> ' . $this->ref;
-        
+
 		$url = dol_buildpath('/' . $this->module . '/view/session/session_card.php', 1) . '?id=' . $this->id . '&object_type=' . $this->type;
 
 		if ($option != 'nolink') {
