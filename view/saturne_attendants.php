@@ -113,7 +113,7 @@ if (empty($reshook)) {
             setEventMessages($langs->trans('ErrorFieldRequired', $langs->trans('Attendant')), [], 'errors');
         }
 
-        $result = $signatory->setSignatory($object->id, $object->element, $attendantType == 'internal' ? 'user' : 'socpeople', [$attendantID], $attendantRole);
+        $result = $signatory->setSignatory($object->id, $object->element, $attendantType == 'internal' ? 'user' : 'socpeople', [$attendantID], $attendantRole, 1);
 
         if ($result > 0) {
             // Creation attendant OK

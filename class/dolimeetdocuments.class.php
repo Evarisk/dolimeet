@@ -79,7 +79,7 @@ class DoliMeetDocuments extends CommonObject
 		'entity'        => ['type' => 'integer',      'label' => 'Entity',           'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0, 'index' => 1],
 		'date_creation' => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 0],
 		'tms'           => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0],
-		'import_key'    => ['type' => 'varchar(14)',  'label' => 'ImportId',        'enabled' => 1, 'position' => 60,  'notnull' => 1,  'visible' => 0, 'index' => 0],
+		'import_key'    => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
 		'status'        => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 70,  'notnull' => 0, 'visible' => 0, 'default' => 0, 'index' => 1, 'validate' => 1],
 		'type'          => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 0],
 		'json'          => ['type' => 'text',         'label' => 'JSON',             'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 0],
@@ -231,7 +231,6 @@ class DoliMeetDocuments extends CommonObject
 		$this->parent_type   = $parentObject->element_type ?: $parentObject->element;
 
 		//$this->DocumentFillJSON($this);
-		$this->element = $this->element . '@dolimeet';
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -391,7 +390,7 @@ class DoliMeetDocuments extends CommonObject
 
 		$modelpath = 'custom/dolimeet/core/modules/dolimeet/dolimeetdocuments/' . $this->element . 'document/';
 
-		$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams['object']);
+		$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 		$this->call_trigger(strtoupper($this->type).'_GENERATE', $moreparams['user']);
 

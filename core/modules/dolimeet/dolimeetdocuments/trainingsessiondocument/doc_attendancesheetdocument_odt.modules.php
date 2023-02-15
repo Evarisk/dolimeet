@@ -158,14 +158,16 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
      * @param  int               $hidedetails     Do not show line details
      * @param  int               $hidedesc        Do not show desc
      * @param  int               $hideref         Do not show ref
-     * @param  Session           $object          Session Object
+     * @param  array             $moreparam       More param (Object/user/etc)
      * @return int                                1 if OK, <=0 if KO
      * @throws SegmentException
      * @throws Exception
      */
-	public function write_file(SessionDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails = 0, int $hidedesc = 0, int $hideref = 0, Session $object): int
+	public function write_file(SessionDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails = 0, int $hidedesc = 0, int $hideref = 0, array $moreparam): int
     {
         global $action, $conf, $hookmanager, $langs, $mysoc, $user;
+
+        $object = $moreparam['object'];
 
 		if (empty($srctemplatepath)) {
 			dol_syslog('doc_attendancesheetdocument_odt::write_file parameter srctemplatepath empty', LOG_WARNING);
@@ -307,12 +309,11 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
                 $tmparray['project_ref_label'] = '';
             }
 
-			$tmparray['datestart_session'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
-			$tmparray['dateend_session']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
+			$tmparray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
+			$tmparray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
+			$tmparray['duration']   = convertSecondToTime($object->duration);
 
-			$tmparray['duration'] = convertSecondToTime($object->duration);
-
-			$tmparray['trainer_name'] = $signatory->firstname . ' ' . $signatory->lastname;
+			$tmparray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
 			if (dol_strlen($signatory->signature) > 0) {
 				$encodedImage = explode(',', $signatory->signature)[1];
 				$decodedImage = base64_decode($encodedImage);
@@ -368,7 +369,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 							foreach ($signatoriesArray as $objectSignatory) {
 								if ($objectSignatory->role != 'SessionTrainer') {
 									$tmparray['attendant_number']    = $k;
-									$tmparray['attendant_lastname']  = $objectSignatory->lastname;
+									$tmparray['attendant_lastname']  = strtoupper($objectSignatory->lastname);
 									$tmparray['attendant_firstname'] = $objectSignatory->firstname;
 									if (dol_strlen($objectSignatory->signature) > 0) {
 										$encodedImage = explode(',', $objectSignatory->signature)[1];
@@ -419,8 +420,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			foreach ($tmparray as $key => $value) {
 				try {
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
-				}
-				catch (OdfException $e) {
+				} catch (OdfException $e) {
 					dol_syslog($e->getMessage());
 				}
 			}

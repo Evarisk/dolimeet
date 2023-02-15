@@ -41,6 +41,7 @@ require_once __DIR__ . '/../../lib/dolimeet_' . $objectType . '.lib.php';
 require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
 
 require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
+require_once __DIR__ . '/../../class/saturnesignature.class.php';
 require_once __DIR__ . '/../../core/modules/dolimeet/session/mod_' . $objectType . '_standard.php';
 
 // Global variables definitions
@@ -63,7 +64,7 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $classname        = ucfirst($objectType);
 $object           = new $classname($db);
 $sessiondocument  = new SessionDocument($db, $objectType);
-//$signatory        = new Signature($db);
+$signatory        = new SaturneSignature($db);
 $extrafields      = new ExtraFields($db);
 $thirdparty       = new Societe($db);
 $contact          = new Contact($db);
@@ -166,12 +167,11 @@ if (empty($reshook)) {
         $moreparams['object'] = $object;
         $moreparams['user']   = $user;
 
-        // @todo pertinence ??
         if (preg_match('/completioncertificate/', GETPOST('model'))) {
-            $signatoriesList = $signatory->fetchSignatories($object->id, $object->type);
-            if (!empty($signatoriesList)) {
-                foreach ($signatoriesList as $objectSignatory) {
-                    if ($objectSignatory->role != 'TRAININGSESSION_SESSION_TRAINER') {
+            $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
+            if (!empty($signatoriesArray)) {
+                foreach ($signatoriesArray as $objectSignatory) {
+                    if ($objectSignatory->role != 'SessionTrainer') {
                         $moreparams['attendant'] = $objectSignatory;
                         $result = $sessiondocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
                         if ($result <= 0) {

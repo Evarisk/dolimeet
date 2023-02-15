@@ -24,9 +24,6 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once __DIR__ . '/modules_trainingsessiondocument.php';
 require_once __DIR__ . '/mod_completioncertificatedocument_standard.php';
@@ -161,14 +158,16 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
      * @param  int               $hidedetails     Do not show line details
      * @param  int               $hidedesc        Do not show desc
      * @param  int               $hideref         Do not show ref
-     * @param  Session           $object          Session Object
+     * @param  array             $moreparam       More param (Object/user/etc)
      * @return int                                1 if OK, <=0 if KO
      * @throws SegmentException
      * @throws Exception
      */
-    public function write_file(SessionDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails = 0, int $hidedesc = 0, int $hideref = 0, Session $object): int
+    public function write_file(SessionDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails = 0, int $hidedesc = 0, int $hideref = 0, array $moreparam): int
     {
         global $action, $conf, $hookmanager, $langs, $mysoc, $user;
+
+        $object = $moreparam['object'];
 
         if (empty($srctemplatepath)) {
             dol_syslog('doc_completioncertificatedocument_odt::write_file parameter srctemplatepath empty', LOG_WARNING);
@@ -272,105 +271,94 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             $tmparray = array_merge($substitutionarray, $array_soc);
             complete_substitutions_array($tmparray, $outputlangs, $object);
 
-            $filearray = dol_dir_list($conf->dolimeet->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref . '/thumbs/', 'files', 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
-            if (count($filearray)) {
-                $image = array_shift($filearray);
-                $tmparray['photoDefault'] = $image['fullname'];
-            } else {
-                $nophoto = '/public/theme/common/nophoto.png';
-                $tmparray['photoDefault'] = DOL_DOCUMENT_ROOT.$nophoto;
-            }
+            require_once __DIR__ . '/../../../../../class/saturnesignature.class.php';
 
-            require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-            require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-
-            $project  = new Project($this->db);
-            $contract = new Contrat($this->db);
-            //$signatory = new Signature($db);
-            /*$signatory = $signatory->fetchSignatory('TRAININGSESSION_SESSION_TRAINER', $object->id, $object->type);
+            $signatory = new SaturneSignature($this->db);
+            $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
             if (is_array($signatory) && !empty($signatory)) {
                 $signatory = array_shift($signatory);
-            }*/
+            }
 
-            $contract->fetch($object->fk_contrat);
-            $contract->fetch_optionals();
-            $project->fetch($object->fk_project);
-
-            $trainingsession_type_dict = fetchDictionnary('c_trainingsession_type');
+            if (!empty($object->fk_contrat)) {
+                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+                $contract = new Contrat($this->db);
+                $contract->fetch($object->fk_contrat);
+                $contract->fetch_optionals();
+                $trainingsessionDict = fetchDictionnary('c_trainingsession_type');
+                if (is_array($trainingsessionDict) && !empty($trainingsessionDict) && !empty($contract->array_options['options_trainingsession_type'])) {
+                    $tmparray['action_nature'] = $langs->trans($trainingsessionDict[$contract->array_options['options_trainingsession_type']]->label);
+                } else {
+                    $tmparray['action_nature'] = '';
+                }
+                $tmparray['contract_ref_label'] = $contract->ref;
+                $tmparray['location'] = $contract->array_options['options_trainingsession_location'];
+                if (!empty($contract->array_options['options_label'])) {
+                    $tmparray['contract_ref_label'] .= ' - ' . $contract->array_options['options_label'];
+                }
+            } else {
+                $tmparray['contract_ref_label'] = '';
+                $tmparray['location'] = '';
+                $tmparray['action_nature'] = '';
+            }
 
             $tmparray['mycompany_name'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
 
             $tmparray['date_start'] = dol_print_date($object->date_start, 'dayhour');
             $tmparray['date_end']   = dol_print_date($object->date_end, 'dayhour');
-            $duration_hours = floor($object->duration / 60);
-            $duration_minutes = $object->duration % 60;
-            $duration_minutes = $duration_minutes < 10 ? 0 . $duration_minutes : $duration_minutes;
-            $tmparray['duration']     = $duration_hours . 'h' . $duration_minutes;
+            $tmparray['duration']   = convertSecondToTime($object->duration);
 
-            if (is_array($trainingsession_type_dict) && !empty($trainingsession_type_dict)) {
-                $tmparray['action_nature'] = $langs->trans($trainingsession_type_dict[$contract->array_options['options_trainingsession_type']]->label);
-            } else {
-                $tmparray['action_nature'] = '';
-            }
-
-            $tmparray['attendant_fullname']     = $attendant->firstname . ' ' . $attendant->lastname;
-
-            if ($attendant->element_type == 'user') {
-
-                $tmparray['attendant_company_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
-
-            } else if ($attendant->element_type == 'socpeople') {
-                $contact = new Contact($db);
-                $thirdparty = new Societe($db);
-                $contact->fetch($attendant->element_id);
+            $tmparray['attendant_fullname'] = strtoupper($moreparam['attendant']->lastname) . ' ' . $moreparam['attendant']->firstname;
+            if ($moreparam['attendant']->element_type == 'user') {
+                $tmparray['attendant_company_name'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
+            } elseif ($moreparam['attendant']->element_type == 'socpeople') {
+                $contact = new Contact($this->db);
+                $thirdparty = new Societe($this->db);
+                $contact->fetch($moreparam['attendant']->element_id);
                 $thirdparty->fetch($contact->fk_soc);
-                $tmparray['attendant_company_name']     = $thirdparty->name;
+                $tmparray['attendant_company_name'] = $thirdparty->name;
             }
 
-            $tmparray['trainingsession_name']     = $contract->array_options['options_label'];
-            $tmparray['trainingsession_company_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
-
-            $tmparray['sessiontrainer_fullname']     = $signatorytmp->firstname . ' ' . $signatorytmp->lastname;
-
-            if (dol_strlen($signatorytmp->signature) > 0) {
-                $encoded_image = explode(",", $signatorytmp->signature)[1];
-                $decoded_image = base64_decode($encoded_image);
-                file_put_contents($tempdir . "signature.png", $decoded_image);
-                $tmparray['sessiontrainer_signature'] = $tempdir . "signature.png";
+            $tmparray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
+            $tmparray['trainer_quality']  = $langs->trans($signatory->role);
+            if (dol_strlen($signatory->signature) > 0) {
+                $encodedImage = explode(',', $signatory->signature)[1];
+                $decodedImage = base64_decode($encodedImage);
+                file_put_contents($tempdir . 'signature.png', $decodedImage);
+                $tmparray['trainer_signature'] = $tempdir . 'signature.png';
             } else {
-                $tmparray['sessiontrainer_signature'] = '';
+                $tmparray['trainer_signature'] = '';
             }
 
-            $tmparray['document_date']     = dol_print_date(dol_now('tzuser'), 'dayhour');
-            $tmparray['location']     = $contract->array_options['options_trainingsession_location'];
+            $tmparray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
-            foreach ($tmparray as $key=>$value)
-            {
+            foreach ($tmparray as $key => $value) {
                 try {
-                    if (($key == 'sessiontrainer_signature' || preg_match('/logo$/', $key)) && is_file($value)) // Image
-                    {
-                        $list     = getimagesize($value);
-                        $newWidth = 200;
-                        if ($list[0]) {
-                            $ratio     = $newWidth / $list[0];
-                            $newHeight = $ratio * $list[1];
-                            dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-                        }
-                        if (file_exists($value)) $odfHandler->setImage($key, $value);
-                        else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
-                    }
-                    else    // Text
-                    {
-                        if (empty($value)) {
-                            $odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+                    if ($key == 'trainer_signature') { // Image
+                        if (file_exists($value)) {
+                            $list = getimagesize($value);
+                            $newWidth = 350;
+                            if ($list[0]) {
+                                $ratio = $newWidth / $list[0];
+                                $newHeight = $ratio * $list[1];
+                                dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+                            }
+                            $odfHandler->setImage($key, $value);
                         } else {
-                            $odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+                            $odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
                         }
+                    } elseif (preg_match('/logo$/', $key)) {
+                        if (file_exists($value)) {
+                            $odfHandler->setImage($key, $value);
+                        } else {
+                            $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
+                        }
+                    } elseif (empty($value)) { // Text
+                        $odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+                    } else {
+                        $odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
                     }
-                }
-                catch (OdfException $e)
-                {
-                    dol_syslog($e->getMessage(), LOG_INFO);
+                } catch (OdfException $e) {
+                    dol_syslog($e->getMessage());
                 }
             }
 
@@ -380,8 +368,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             foreach ($tmparray as $key => $value) {
                 try {
                     $odfHandler->setVars($key, $value, true, 'UTF-8');
-                }
-                catch (OdfException $e) {
+                } catch (OdfException $e) {
                     dol_syslog($e->getMessage());
                 }
             }
