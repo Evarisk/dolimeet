@@ -440,8 +440,8 @@ require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 $contract = new Contrat($db);
 
 if (!empty($fromtype)) {
-    print dol_get_fiche_head($head, $objectType . 'List', $langs->trans($objectType), -1, $objectLinked->picto);
-    dol_banner_tab($objectLinked, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+    print saturne_get_fiche_head($objectLinked, $objectType . 'List', $langs->trans($objectType));
+    saturne_banner_tab($objectLinked, 'ref', 1, 'ref', 'ref');
 }
 
 if ($fromid > 0) {

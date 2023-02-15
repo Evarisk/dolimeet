@@ -71,12 +71,10 @@ $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?res
 print load_fiche_titre($title, $linkback, 'dolimeet_color@dolimeet');
 
 // Configuration header
-$head = dolimeetAdminPrepareHead();
-print dol_get_fiche_head($head, 'settings', $title, -1, 'dolimeet_color@dolimeet');
+$head = dolimeet_admin_prepare_head();
+print saturne_get_fiche_head(null, 'about', $title, $head, 'dolimeet_color@dolimeet');
 
-// RISKS
-
-print load_fiche_titre('<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans('SessionConfig'), '', '');
+print load_fiche_titre($langs->trans('SessionConfig'), '', '');
 print '<hr>';
 
 
