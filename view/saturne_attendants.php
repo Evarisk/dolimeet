@@ -296,7 +296,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     // @todo pertinence
     $object->fetch_optionals();
 
-    saturne_fiche_head($object, 'attendants', $title);
+    saturne_get_fiche_head($object, 'attendants', $title);
     saturne_banner_tab($object);
 
     print '<div class="fichecenter">';

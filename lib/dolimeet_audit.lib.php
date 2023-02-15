@@ -30,7 +30,7 @@ require_once __DIR__ . '/dolimeet_session.lib.php';
  * @return array              Array of tabs
  * @throws Exception
  */
-function auditPrepareHead(Audit $object): array
+function audit_prepare_head(Audit $object): array
 {
-    return sessionPrepareHead($object);
+    return session_prepare_head($object);
 }

@@ -28,7 +28,7 @@
  * @return array                Array of tabs
  * @throws Exception
  */
-function sessionPrepareHead(CommonObject $object): array
+function session_prepare_head(CommonObject $object): array
 {
     // Global variables definitions
     global $conf, $db, $langs, $user;

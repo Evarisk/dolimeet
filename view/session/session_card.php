@@ -382,7 +382,7 @@ if (($id || $ref) && $action == 'edit') {
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
     $res = $object->fetch_optionals();
-    saturne_fiche_head($object, 'card', $title);
+    saturne_get_fiche_head($object, 'card', $title);
     saturne_banner_tab($object);
 
     $formconfirm = '';
