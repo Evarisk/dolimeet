@@ -107,9 +107,9 @@ if (empty($reshook)) {
     if ($action == 'add_attendant') {
         $attendantID   = GETPOST('attendant');
         $attendantType = GETPOST('attendant_type');
-        $attendantRole = strtoupper(GETPOST('attendant_role'));
+        $attendantRole = GETPOST('attendant_role');
 
-        $result = $signatory->setSignatory($object->id, $object->element, $attendantType == 'internal' ? 'user' : 'socpeople', [$attendantID], strtoupper($objectType) . '_' . $attendantRole, $attendantRole == 'SESSION_TRAINER' ? 0 : 1);
+        $result = $signatory->setSignatory($object->id, $object->element, $attendantType == 'internal' ? 'user' : 'socpeople', [$attendantID], $attendantRole);
 
         if ($result > 0) {
             // Creation attendant OK
@@ -306,10 +306,10 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     <?php if ($object->status == $object::STATUS_DRAFT) : ?>
         <div class="wpeo-notice notice-warning">
             <div class="notice-content">
-                <div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-                <div class="notice-subtitle"><?php echo $langs->trans(ucfirst($objectType) . 'MustBeValidatedToSign') ?></div>
+                <div class="notice-title"><?php echo $langs->trans('BeCareful') ?></div>
+                <div class="notice-subtitle"><?php echo $langs->trans(ucfirst($object->element) . 'MustBeValidatedToSign') ?></div>
             </div>
-            <a class="butAction" style="width = 100%;margin-right:0" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/' . $objectType . '/' . $objectType . '_card.php?id=' . $id, 1); ?>"><?php echo $langs->trans('GoToValidate') ?></a>;
+            <a class="butAction" style="width = 100%;margin-right:0" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate') ?></a>;
         </div>
     <?php endif; ?>
     <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -322,34 +322,33 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     </div>
     <?php
 
-    // Society attendants -- Participants de la société
-    // @todo problème rôle
-    $society_intervenants = $signatory->fetchSignatory(strtoupper($object->element).'_SOCIETY_ATTENDANT', $object->id, $object->element);
-    $society_trainer = $signatory->fetchSignatory(strtoupper($object->element).'_SESSION_TRAINER', $object->id, $object->element);
+    // Internal attendants -- Participants interne
+    $internalAttendants = $signatory->fetchSignatory('InternalAttendant', $object->id, $object->element);
+    $sessionTrainer = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
 
-    if (is_array($society_intervenants) && is_array($society_trainer)) {
-        $society_intervenants = array_merge($society_intervenants, $society_trainer);
+    if (is_array($internalAttendants) && is_array($sessionTrainer)) {
+        $internalAttendants = array_merge($internalAttendants, $sessionTrainer);
     }
 
     print load_fiche_titre($langs->trans('Attendants'), '', '');
 
-    print '<table class="border centpercent tableforfield">';
+    if (!empty($internalAttendants) && $internalAttendants > 0) {
+        print '<table class="border centpercent tableforfield">';
 
-    print '<tr class="liste_titre">';
-    print '<td>' . $langs->trans('Name') . '</td>';
-    print '<td>' . $langs->trans('Role') . '</td>';
-    print '<td>' . $langs->trans('SignatureLink') . '</td>';
-    print '<td>' . $langs->trans('SendMailDate') . '</td>';
-    print '<td>' . $langs->trans('SignatureDate') . '</td>';
-    print '<td class="center">' . $langs->trans('Status') . '</td>';
-    print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
-    print '<td class="center">' . $langs->trans('Signature') . '</td>';
-    print '</tr>';
+        print '<tr class="liste_titre">';
+        print '<td>' . $langs->trans('Name') . '</td>';
+        print '<td>' . $langs->trans('Role') . '</td>';
+        print '<td>' . $langs->trans('SignatureLink') . '</td>';
+        print '<td>' . $langs->trans('SendMailDate') . '</td>';
+        print '<td>' . $langs->trans('SignatureDate') . '</td>';
+        print '<td class="center">' . $langs->trans('Status') . '</td>';
+        print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
+        print '<td class="center">' . $langs->trans('Signature') . '</td>';
+        print '</tr>';
 
-    $alreadyAddedUsers = [];
-    $j = 1;
-    if (!empty($society_intervenants) && $society_intervenants > 0) {
-        foreach ($society_intervenants as $element) {
+        $alreadyAddedUsers = [];
+        $j = 1;
+        foreach ($internalAttendants as $element) {
             $usertmp = $user;
             $usertmp->fetch($element->element_id);
             print '<tr class="oddeven"><td class="minwidth200">';
@@ -358,7 +357,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print $langs->trans($element->role);
             print '</td><td>';
             if ($object->status == $object::STATUS_VALIDATED) {
-                $signatureUrl = dol_buildpath('/custom/' . $moduleName . '/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $objectType, 3);
+                $signatureUrl = dol_buildpath('/custom/' . $moduleName . '/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
             } else {
                 print '-';
@@ -385,65 +384,108 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             $alreadyAddedUsers[$element->element_id] = $element->element_id;
             $j++;
         }
-    } else {
-        print '<div class="opacitymedium">' . $langs->trans('NoSocietyAttendants') . '</div><br>';
-    }
 
-    // @todo check conf et surement changer la post method
-    if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
-        print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
-        print '<input type="hidden" name="token" value="' . newToken() . '">';
-        print '<input type="hidden" name="action" value="add_attendant">';
-        print '<input type="hidden" name="attendant_type" value="internal">';
-        if (!empty($backtopage)) {
-            print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+        if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
+            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<input type="hidden" name="token" value="' . newToken() . '">';
+            print '<input type="hidden" name="action" value="add_attendant">';
+            print '<input type="hidden" name="attendant_type" value="internal">';
+            if (!empty($backtopage)) {
+                print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+            }
+
+            // Internal attendant
+            print '<tr class="oddeven"><td class="maxwidth200">';
+            print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, $alreadyAddedUsers, 0, '', '', $conf->entity);
+            print '</td><td>';
+            print $form->selectarray('attendant_role', ['InternalAttendant', 'SessionTrainer'], '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
+            print '</td><td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td class="center">';
+            print '-';
+            print '</td><td class="center">';
+            print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
+            print '<td class="center">';
+            print '-';
+            print '</td></tr>';
+            print '</table>';
+            print '</form>';
         }
+    } else {
+        print '<div class="opacitymedium">' . $langs->trans('NoAttendants') . '</div>';
 
-        // Internal attendant
-        print '<tr class="oddeven"><td class="maxwidth200">';
-        print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, $alreadyAddedUsers, 0, '', '', $conf->entity);
-        print '</td><td>';
-        print $form->selectarray('attendant_role', ['SOCIETY_ATTENDANT' => $langs->trans('SocietyAttendant'), 'SESSION_TRAINER' => $langs->trans('SessionTrainer')], '', 0,0, 0, '', 1, 0, 0, '', 'maxwidth200');
-        print '</td><td>';
-        print '-';
-        print '</td><td>';
-        print '-';
-        print '</td><td>';
-        print '-';
-        print '</td><td class="center">';
-        print '-';
-        print '</td><td class="center">';
-        print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
-        print '<td class="center">';
-        print '-';
-        print '</td></tr>';
-        print '</table>';
-        print '</form>';
+        if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
+            print '<br><table class="border centpercent tableforfield">';
+
+            print '<tr class="liste_titre">';
+            print '<td>' . $langs->trans('Name') . '</td>';
+            print '<td>' . $langs->trans('Role') . '</td>';
+            print '<td>' . $langs->trans('SignatureLink') . '</td>';
+            print '<td>' . $langs->trans('SendMailDate') . '</td>';
+            print '<td>' . $langs->trans('SignatureDate') . '</td>';
+            print '<td class="center">' . $langs->trans('Status') . '</td>';
+            print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
+            print '<td class="center">' . $langs->trans('Signature') . '</td>';
+            print '</tr>';
+
+            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<input type="hidden" name="token" value="' . newToken() . '">';
+            print '<input type="hidden" name="action" value="add_attendant">';
+            print '<input type="hidden" name="attendant_type" value="internal">';
+            if (!empty($backtopage)) {
+                print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+            }
+
+            // Internal attendant
+            print '<tr class="oddeven"><td class="maxwidth200">';
+            print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant', 1, $alreadyAddedUsers, 0, '', '', $conf->entity);
+            print '</td><td>';
+            print $form->selectarray('attendant_role', ['InternalAttendant', 'SessionTrainer'], '', 0,0, 1, '', 1, 0, 0, '', 'maxwidth200');
+            print '</td><td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td class="center">';
+            print '-';
+            print '</td><td class="center">';
+            print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
+            print '<td class="center">';
+            print '-';
+            print '</td></tr>';
+            print '</table>';
+            print '</form>';
+        }
     }
 
     // External society attendant
     $thirdparty->fetch($object->fk_soc);
-    $ext_society_intervenants = $signatory->fetchSignatory(strtoupper($objectType) . '_EXTERNAL_ATTENDANT', $object->id, $objectType);
+    $ext_society_intervenants = $signatory->fetchSignatory('ExternalAttendant', $object->id, $object->element);
 
     print load_fiche_titre($langs->trans('ExternalAttendants'), '', '');
 
-    print '<table class="border centpercent tableforfield">';
-
-    print '<tr class="liste_titre">';
-    print '<td>' . $langs->trans('Thirdparty') . '</td>';
-    print '<td>' . $langs->trans('ContactLinked') . '</td>';
-    print '<td>' . $langs->trans('Role') . '</td>';
-    print '<td>' . $langs->trans('SignatureLink') . '</td>';
-    print '<td>' . $langs->trans('SendMailDate') . '</td>';
-    print '<td>' . $langs->trans('SignatureDate') . '</td>';
-    print '<td class="center">' . $langs->trans('Status') . '</td>';
-    print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
-    print '<td class="center">' . $langs->trans('Signature') . '</td>';
-    print '</tr>';
-
-    $already_selected_intervenants = [];
-    $j                                           = 1;
     if (is_array($ext_society_intervenants) && ! empty($ext_society_intervenants) && ($ext_society_intervenants > 0)) {
+        print '<table class="border centpercent tableforfield">';
+
+        print '<tr class="liste_titre">';
+        print '<td>' . $langs->trans('Thirdparty') . '</td>';
+        print '<td>' . $langs->trans('ContactLinked') . '</td>';
+        print '<td>' . $langs->trans('Role') . '</td>';
+        print '<td>' . $langs->trans('SignatureLink') . '</td>';
+        print '<td>' . $langs->trans('SendMailDate') . '</td>';
+        print '<td>' . $langs->trans('SignatureDate') . '</td>';
+        print '<td class="center">' . $langs->trans('Status') . '</td>';
+        print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
+        print '<td class="center">' . $langs->trans('Signature') . '</td>';
+        print '</tr>';
+
+        $already_selected_intervenants = [];
+        $j = 1;
         foreach ($ext_society_intervenants as $element) {
             $contact->fetch($element->element_id);
             print '<tr class="oddeven"><td class="minwidth200">';
@@ -452,10 +494,10 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '</td><td>';
             print $contact->getNomUrl(1);
             print '</td><td>';
-            print $langs->trans('ExtSocietyIntervenant');
+            print $langs->trans('ExternalAttendant');
             print '</td><td>';
             if ($object->status == $object::STATUS_VALIDATED) {
-                $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $objectType, 3);
+                $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
             } else {
                 print '-';
@@ -481,62 +523,130 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             $already_selected_intervenants[$element->element_id] = $element->element_id;
             $j++;
         }
+
+        if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
+            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<input type="hidden" name="token" value="' . newToken() . '">';
+            print '<input type="hidden" name="action" value="add_attendant">';
+            print '<input type="hidden" name="attendant_type" value="external">';
+            print '<input type="hidden" name="attendant_role" value="ExternalAttendant">';
+            if (!empty($backtopage)) {
+                print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+            }
+
+            //Intervenants extérieurs
+            $ext_society = $object->fk_soc;
+            if ($ext_society < 1) {
+                $ext_society = new StdClass();
+            }
+
+            print '<tr class="oddeven">';
+            print '<td>';
+            $selectedCompany = GETPOSTISSET('newcompany') ? GETPOST('newcompany', 'int') : (empty($object->socid) ?  0 : $object->socid);
+            $param           = '&module_name=' . urlencode($moduleName) . '&object_type=' . urlencode($object->element);
+            $urlbacktopage   = $_SERVER['PHP_SELF'] . '?id=' . $object->id . $param;
+            $param          .= '&backtopage=' . urlencode($urlbacktopage);
+            $moreparam       = $param;
+            $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, $moreparam, 'minwidth300imp');
+
+            print '</td>';
+            print '<td class=minwidth400">';
+            print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'attendant', 1, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth300');
+            $nbofcontacts = $form->num;
+            $newcardbutton = '';
+            if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {
+                $newcardbutton .= '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid='.$selectedCompany.'&action=create&backtopage='.urlencode($_SERVER['PHP_SELF'].'?id='.$object->id.'&newcompany=' . GETPOST('newcompany')).'" title="'.$langs->trans('NewContact').'"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
+            }
+            print $newcardbutton;
+            print '</td>';
+            print '<td>' . $langs->trans('ExternalAttendant') . '</td>';
+            print '<td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td class="center">';
+            print '-';
+            print '</td><td class="center">';
+            print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
+            print '<td class="center">';
+            print '-';
+            print '</td>';
+            print '</tr>';
+            print '</table>';
+            print '</form>';
+        }
     } else {
-        print '<div class="opacitymedium">' . $langs->trans('NoExternalAttendants') . '</div><br>';
-    }
+        print '<div class="opacitymedium">' . $langs->trans('NoAttendants') . '</div>';
 
-    if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
-        print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
-        print '<input type="hidden" name="token" value="' . newToken() . '">';
-        print '<input type="hidden" name="action" value="add_attendant">';
-        print '<input type="hidden" name="attendant_type" value="external">';
-        print '<input type="hidden" name="attendant_role" value="EXTERNAL_ATTENDANT">';
-        if (!empty($backtopage)) {
-            print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+        if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
+            print '<br><table class="border centpercent tableforfield">';
+
+            print '<tr class="liste_titre">';
+            print '<td>' . $langs->trans('Thirdparty') . '</td>';
+            print '<td>' . $langs->trans('ContactLinked') . '</td>';
+            print '<td>' . $langs->trans('Role') . '</td>';
+            print '<td>' . $langs->trans('SignatureLink') . '</td>';
+            print '<td>' . $langs->trans('SendMailDate') . '</td>';
+            print '<td>' . $langs->trans('SignatureDate') . '</td>';
+            print '<td class="center">' . $langs->trans('Status') . '</td>';
+            print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
+            print '<td class="center">' . $langs->trans('Signature') . '</td>';
+            print '</tr>';
+
+            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<input type="hidden" name="token" value="' . newToken() . '">';
+            print '<input type="hidden" name="action" value="add_attendant">';
+            print '<input type="hidden" name="attendant_type" value="external">';
+            print '<input type="hidden" name="attendant_role" value="ExternalAttendant">';
+            if (!empty($backtopage)) {
+                print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+            }
+
+            //Intervenants extérieurs
+            $ext_society = $object->fk_soc;
+            if ($ext_society < 1) {
+                $ext_society = new StdClass();
+            }
+
+            print '<tr class="oddeven">';
+            print '<td>';
+            $selectedCompany = GETPOSTISSET('newcompany') ? GETPOST('newcompany', 'int') : (empty($object->socid) ?  0 : $object->socid);
+            $param           = '&module_name=' . urlencode($moduleName) . '&object_type=' . urlencode($object->element);
+            $urlbacktopage   = $_SERVER['PHP_SELF'] . '?id=' . $object->id . $param;
+            $param          .= '&backtopage=' . urlencode($urlbacktopage);
+            $moreparam       = $param;
+            $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, $moreparam, 'minwidth300imp');
+
+            print '</td>';
+            print '<td class=minwidth400">';
+            print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'attendant', 1, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth300');
+            $nbofcontacts = $form->num;
+            $newcardbutton = '';
+            if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {
+                $newcardbutton .= '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid='.$selectedCompany.'&action=create&backtopage='.urlencode($_SERVER['PHP_SELF'].'?id='.$object->id.'&newcompany=' . GETPOST('newcompany')).'" title="'.$langs->trans('NewContact').'"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
+            }
+            print $newcardbutton;
+            print '</td>';
+            print '<td>' . $langs->trans('ExternalAttendant') . '</td>';
+            print '<td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td>';
+            print '-';
+            print '</td><td class="center">';
+            print '-';
+            print '</td><td class="center">';
+            print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
+            print '<td class="center">';
+            print '-';
+            print '</td>';
+            print '</tr>';
+            print '</table>';
+            print '</form>';
         }
-
-        //Intervenants extérieurs
-        $ext_society = $object->fk_soc;
-        if ($ext_society < 1) {
-            $ext_society = new StdClass();
-        }
-
-        print '<tr class="oddeven">';
-        print '<td>';
-        $selectedCompany = GETPOSTISSET('newcompany') ? GETPOST('newcompany', 'int') : (empty($object->socid) ?  0 : $object->socid);
-        $param           = '&module_name=' . urlencode($moduleName) . '&object_type=' . urlencode($objectType);
-        $urlbacktopage   = $_SERVER['PHP_SELF'] . '?id=' . $object->id . $param;
-        $param          .= '&backtopage=' . urlencode($urlbacktopage);
-        $moreparam       = $param;
-        $formcompany->selectCompaniesForNewContact($object, 'id', $selectedCompany, 'newcompany', '', 0, $moreparam, 'minwidth300imp');
-
-        print '</td>';
-        print '<td class=minwidth400">';
-        print img_object('', 'contact', 'class="pictofixedwidth"').$form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), '', 'attendant', 1, $already_selected_intervenants, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth300');
-        $nbofcontacts = $form->num;
-        $newcardbutton = '';
-        if (!empty(GETPOST('newcompany')) && GETPOST('newcompany') > 1 && $user->rights->societe->creer) {
-            $newcardbutton .= '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid='.$selectedCompany.'&action=create&backtopage='.urlencode($_SERVER['PHP_SELF'].'?id='.$object->id.'&newcompany=' . GETPOST('newcompany')).'" title="'.$langs->trans('NewContact').'"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
-        }
-        print $newcardbutton;
-        print '</td>';
-        print '<td>' . $langs->trans('ExtSocietyIntervenant') . '</td>';
-        print '<td>';
-        print '-';
-        print '</td><td>';
-        print '-';
-        print '</td><td>';
-        print '-';
-        print '</td><td class="center">';
-        print '-';
-        print '</td><td class="center">';
-        print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
-        print '<td class="center">';
-        print '-';
-        print '</td>';
-        print '</tr>';
-        print '</table>';
-        print '</form>';
     }
     print '</div>';
 }
