@@ -102,9 +102,8 @@ $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 $permissiontoread   = $user->rights->dolimeet->$objectType->read;
 $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
-if (empty($conf->dolimeet->enabled) || !$permissiontoread) {
-    accessforbidden();
-}
+
+saturne_check_access($permissiontoread);
 
 /*
  * Actions

@@ -46,9 +46,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 // Access control
 $permissiontoread = $user->rights->dolimeet->adminpage->read;
-if (empty($conf->dolimeet->enabled) || !$permissiontoread) {
-    accessforbidden();
-}
+saturne_check_access($permissiontoread);
 
 /*
  * View

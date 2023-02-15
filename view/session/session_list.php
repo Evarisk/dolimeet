@@ -213,9 +213,8 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 $permissiontoread   = $user->rights->dolimeet->$objectType->read;
 $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete;
-if (empty($conf->dolimeet->enabled) || !$permissiontoread) {
-    accessforbidden();
-}
+
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
