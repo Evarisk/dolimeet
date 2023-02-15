@@ -165,14 +165,27 @@ Trainee = Stagiaire
 
 
 
-
 #
 # Training Session Document - Document lié au session de formation
 #
 
+# Mod Numbering - Modèle de numérotation
+NumberingModule = Modèle de numérotation
+StandardModel = Renvoie le numéro sous la forme %syymm-nnnn où yy est l'année, mm le mois et nnnn est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DocumentTemplate = Modèle de documents
+ODTDefaultTemplateName = ODT par défaut des documents %s
+
 # Data - Donnée
+AttendanceSheetDocument = Feuille de présence
+AttendanceSheetDocuments = feuilles de présence
 attendancesheetdocument.odt = Feuille de présence
+CompletionCertificateDocument = Certificat de réalisation
+CompletionCertificateDocuments = certificats de réalisation
 completioncertificatedocument.odt = Certificat de réalisation
+
+
 
 #
 # Audit - Audit

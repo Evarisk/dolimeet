@@ -63,7 +63,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
         $langs->loadLangs(['main', 'companies']);
 
         $this->db = $db;
-        $this->name        = $langs->trans('CompletionCertificateDocumentDoliMeetTemplate');
+        $this->name        = $langs->trans('ODTDefaultTemplateName', $langs->transnoentities('CompletionCertificateDocuments'));
         $this->description = $langs->trans('DocumentModelOdt');
         $this->scandir     = 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
@@ -101,6 +101,11 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
         $langs->loadLangs(['errors', 'companies']);
 
         $texte = $this->description . ' . <br>';
+        $texte .= '<form action="' . $_SERVER['PHP_SELF'] . '" method="POST">';
+        $texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
+        $texte .= '<input type="hidden" name="action" value="setModuleOptions">';
+        $texte .= '<input type="hidden" name="param1" value="DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH">';
+        $texte .= '<table class="nobordernopadding">';
 
         // List of directories area
         $texte .= '<tr><td>';
@@ -129,7 +134,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
         // Scan directories
         $nbofiles = count($listoffiles);
         if (!empty($conf->global->DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH)) {
-            $texte .= $langs->trans('DoliMeetNumberOfModelFilesFound') . ': <b>';
+            $texte .= $langs->trans('NumberOfModelFilesFound') . ': <b>';
             $texte .= count($listoffiles);
             $texte .= '</b>';
         }

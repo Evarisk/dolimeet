@@ -56,7 +56,7 @@ class mod_attendancesheetdocument_standard
     {
 		global $langs;
 		$langs->load('dolimeet@dolimeet');
-		return $langs->trans('DoliMeetTrainingSessionDocumentAttendancesheetDocumentStandardModel', $this->prefix);
+		return $langs->trans('StandardModel', $this->prefix);
 	}
 
 	/**

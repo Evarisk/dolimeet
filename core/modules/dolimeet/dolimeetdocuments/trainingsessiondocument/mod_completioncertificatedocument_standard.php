@@ -56,7 +56,7 @@ class mod_completioncertificatedocument_standard
     {
 		global $langs;
 		$langs->load('dolimeet@dolimeet');
-		return $langs->trans('DoliMeetTrainingSessionDocumentCompletionCertificateDocumentStandardModel', $this->prefix);
+		return $langs->trans('StandardModel', $this->prefix);
 	}
 
 	/**

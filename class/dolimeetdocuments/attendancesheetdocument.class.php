@@ -26,7 +26,7 @@ require_once __DIR__ . '/../dolimeetdocuments.class.php';
 /**
  * Class for AttendancesheetDocument
  */
-class AttendancesheetDocument extends DoliSIRHDocuments
+class AttendancesheetDocument extends DoliMeetDocuments
 {
 	/**
 	 * @var string Element type of object.
@@ -36,7 +36,7 @@ class AttendancesheetDocument extends DoliSIRHDocuments
 	/**
 	 * @var string String with name of icon for attendancesheetdocument. Must be the part after the 'object_' into object_attendancesheetdocument.png
 	 */
-	public $picto = 'attendancesheetdocument@dolimeet';
+	public string $picto = 'attendancesheetdocument@dolimeet';
 
 	/**
 	 * Constructor

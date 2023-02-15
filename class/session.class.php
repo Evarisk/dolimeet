@@ -1030,7 +1030,7 @@ class SessionDocument extends DoliMeetDocuments
     public $element = 'sessiondocument';
 
     /**
-     * @var string Name of icon for trainingsession. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'trainingsession@dolimeet' if picto is file 'img/object_trainingsession.png'.
+     * @var string Name of icon for sessiondocument. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'sessiondocument@dolimeet' if picto is file 'img/object_sessiondocument.png'.
      */
     public string $picto = '';
 
