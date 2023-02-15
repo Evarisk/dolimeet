@@ -62,7 +62,7 @@ $title    = $langs->trans('DoliMeetSetup');
 $morejs   = ['/dolimeet/js/dolimeet.js.php'];
 $morecss  = ['/dolimeet/css/dolimeet.css'];
 
-llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
+saturne_header(0,'', $title, $help_url, '', 0, 0, $morejs, $morecss);
 
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans('BackToModuleList') . '</a>';

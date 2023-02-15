@@ -55,7 +55,7 @@ saturne_check_access($permissiontoread);
 $help_url  = 'FR:Module_DoliMeet';
 $title = $langs->trans('DoliMeetAbout');
 
-llxHeader('', $title, $help_url);
+saturne_header(0,'', $title, $help_url);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ?: DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans('BackToModuleList').'</a>';
