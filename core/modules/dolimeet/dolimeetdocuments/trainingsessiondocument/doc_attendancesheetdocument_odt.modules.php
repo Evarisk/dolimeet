@@ -24,9 +24,6 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once __DIR__ . '/modules_trainingsessiondocument.php';
 require_once __DIR__ . '/mod_attendancesheetdocument_standard.php';
@@ -272,11 +269,13 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			$tmparray = array_merge($substitutionarray, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
-			//$signatory = new Signature($db);
-			/*$signatory = $signatory->fetchSignatory('TRAININGSESSION_SESSION_TRAINER', $object->id, $object->type);
+            require_once __DIR__ . '/../../../../../class/saturnesignature.class.php';
+
+			$signatory = new SaturneSignature($this->db);
+			$signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
 			if (is_array($signatory) && !empty($signatory)) {
 				$signatory = array_shift($signatory);
-			}*/
+			}
 
 			$tmparray['mycompany_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$tmparray['address']            = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
@@ -313,21 +312,21 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 
 			$tmparray['duration'] = convertSecondToTime($object->duration);
 
-//			$tmparray['intervenant_name'] = $signatory->firstname . ' ' . $signatory->lastname;
-//			if (dol_strlen($signatory->signature) > 0) {
-//				$encoded_image = explode(',', $signatory->signature)[1];
-//				$decoded_image = base64_decode($encoded_image);
-//				file_put_contents($tempdir . 'signature.png', $decoded_image);
-//				$tmparray['intervenant_signature'] = $tempdir . 'signature.png';
-//			} else {
-//				$tmparray['intervenant_signature'] = '';
-//			}
+			$tmparray['trainer_name'] = $signatory->firstname . ' ' . $signatory->lastname;
+			if (dol_strlen($signatory->signature) > 0) {
+				$encodedImage = explode(',', $signatory->signature)[1];
+				$decodedImage = base64_decode($encodedImage);
+				file_put_contents($tempdir . 'signature.png', $decodedImage);
+				$tmparray['trainer_signature'] = $tempdir . 'signature.png';
+			} else {
+				$tmparray['trainer_signature'] = '';
+			}
 
             $tmparray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
             foreach ($tmparray as $key => $value) {
                 try {
-                    if ($key == 'intervenant_signature') { // Image
+                    if ($key == 'trainer_signature') { // Image
                         if (file_exists($value)) {
                             $list = getimagesize($value);
                             $newWidth = 350;
@@ -357,69 +356,62 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
             }
 
 			// Replace tags of lines
-//			try {
-//				$foundtagforlines = 1;
-//				if ($foundtagforlines) {
-//					if (!empty($object)) {
-//						$listlines = $odfHandler->setSegment('attendants');
-//						$signatory = new Signature($db);
-//						$signatoriesList = $signatory->fetchSignatories($object->id, $object->type);
-//						if ( ! empty($signatoriesList) && is_array($signatoriesList)) {
-//							$k = 1;
-//							foreach ($signatoriesList as $objectSignatory) {
-//								if ($objectSignatory->role != 'TRAININGSESSION_SESSION_TRAINER') {
-//									$tmparray['attendant_number'] = $k;
-//									$tmparray['attendant_lastname'] = $objectSignatory->lastname;
-//									$tmparray['attendant_firstname'] = $objectSignatory->firstname;
-//									if (dol_strlen($objectSignatory->signature) > 0) {
-//										$encoded_image = explode(',', $objectSignatory->signature)[1];
-//										$decoded_image = base64_decode($encoded_image);
-//										file_put_contents($tempdir . 'signature' . $k . '.png', $decoded_image);
-//										$tmparray['attendant_signature'] = $tempdir . 'signature' . $k . '.png';
-//									} else {
-//										$tmparray['attendant_signature'] = '';
-//									}
-//									foreach ($tmparray as $key=>$value)
-//									{
-//										try {
-//											if ($key == 'attendant_signature' && is_file($value)) { // Image
-//												$list     = getimagesize($value);
-//
-//												$newWidth = 200;
-//												if ($list[0]) {
-//													$ratio     = $newWidth / $list[0];
-//													$newHeight = $ratio * $list[1];
-//													dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-//												}
-//												$listlines->setImage($key, $value);
-//											} else if (empty($value)) {
-//												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-//											} else if (!is_array($value)) {
-//												$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-//											}
-//										}
-//										catch (OdfException $e)
-//										{
-//											dol_syslog($e->getMessage(), LOG_INFO);
-//										}
-//									}
-//									$listlines->merge();
-//									dol_delete_file($tempdir . 'signature' . $k . '.png');
-//									$k++;
-//								}
-//
-//							}
-//							$odfHandler->mergeSegment($listlines);
-//
-//						}
-//					}
-//				}
-//			}
-//			catch (OdfException $e) {
-//				$this->error = $e->getMessage();
-//				dol_syslog($this->error, LOG_WARNING);
-//				return -1;
-//			}
+			try {
+				$foundtagforlines = 1;
+				if ($foundtagforlines) {
+					if (!empty($object)) {
+						$listlines = $odfHandler->setSegment('attendants');
+						$signatory = new SaturneSignature($this->db);
+                            $signatoriesArray = $signatory->fetchSignatories($object->id, $object->element);
+						if (!empty($signatoriesArray) && is_array($signatoriesArray)) {
+							$k = 1;
+							foreach ($signatoriesArray as $objectSignatory) {
+								if ($objectSignatory->role != 'SessionTrainer') {
+									$tmparray['attendant_number']    = $k;
+									$tmparray['attendant_lastname']  = $objectSignatory->lastname;
+									$tmparray['attendant_firstname'] = $objectSignatory->firstname;
+									if (dol_strlen($objectSignatory->signature) > 0) {
+										$encodedImage = explode(',', $objectSignatory->signature)[1];
+										$decodedImage = base64_decode($encodedImage);
+										file_put_contents($tempdir . 'signature' . $k . '.png', $decodedImage);
+										$tmparray['attendant_signature'] = $tempdir . 'signature' . $k . '.png';
+									} else {
+										$tmparray['attendant_signature'] = '';
+									}
+									foreach ($tmparray as $key => $value) {
+										try {
+											if ($key == 'attendant_signature' && is_file($value)) { // Image
+												$list = getimagesize($value);
+												$newWidth = 200;
+												if ($list[0]) {
+													$ratio     = $newWidth / $list[0];
+													$newHeight = $ratio * $list[1];
+													dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+												}
+												$listlines->setImage($key, $value);
+											} elseif (empty($value)) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} elseif (!is_array($value)) {
+												$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											}
+										} catch (OdfException $e) {
+											dol_syslog($e->getMessage());
+										}
+									}
+									$listlines->merge();
+									dol_delete_file($tempdir . 'signature' . $k . '.png');
+									$k++;
+								}
+							}
+							$odfHandler->mergeSegment($listlines);
+						}
+					}
+				}
+			} catch (OdfException $e) {
+				$this->error = $e->getMessage();
+				dol_syslog($this->error, LOG_WARNING);
+				return -1;
+			}
 
 			// Replace labels translated
 			$tmparray = $outputlangs->get_translations_for_substitutions();
