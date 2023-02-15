@@ -299,9 +299,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     saturne_get_fiche_head($object, 'attendants', $title);
     saturne_banner_tab($object);
 
-    print '<div class="fichecenter">';
-
-    print dol_get_fiche_end(); ?>
+    print '<div class="signatures-container">'; ?>
 
     <?php if ($object->status == $object::STATUS_DRAFT) : ?>
         <div class="wpeo-notice notice-warning">
@@ -312,15 +310,17 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             <a class="butAction" style="width = 100%;margin-right:0" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate') ?></a>;
         </div>
     <?php endif; ?>
-    <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
-        <div class="all-notice-content">
-            <div class="notice-content">
-                <div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
-                <div class="notice-subtitle"><?php echo $langs->trans('AddSignatureSuccessText') . GETPOST('signature_id')?></div>
+        <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
+            <div class="all-notice-content">
+                <div class="notice-content">
+                    <div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
+                    <div class="notice-subtitle"><?php echo $langs->trans('AddSignatureSuccessText') . GETPOST('signature_id')?></div>
+                </div>
             </div>
         </div>
-    </div>
     <?php
+
+    $zone = 'private';
 
     // Internal attendants -- Participants interne
     $internalAttendants = $signatory->fetchSignatory('InternalAttendant', $object->id, $object->element);
@@ -357,12 +357,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print $langs->trans($element->role);
             print '</td><td>';
             if ($object->status == $object::STATUS_VALIDATED) {
-                $signatureUrl = dol_buildpath('/custom/' . $moduleName . '/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
+                $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&object_type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
-            } else {
-                print '-';
             }
-
             print '</td><td>';
             print dol_print_date($element->last_email_sent_date, 'dayhour');
             print '</td><td>';
@@ -497,10 +494,8 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print $langs->trans('ExternalAttendant');
             print '</td><td>';
             if ($object->status == $object::STATUS_VALIDATED) {
-                $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
+                $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&object_type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
-            } else {
-                print '-';
             }
             print '</td><td>';
             print dol_print_date($element->last_email_sent_date, 'dayhour');
@@ -649,6 +644,8 @@ if ($id > 0 || !empty($ref) && empty($action)) {
         }
     }
     print '</div>';
+
+    print dol_get_fiche_end();
 }
 
 // End of page

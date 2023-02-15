@@ -63,3 +63,6 @@ InternalAttendant = Participant interne
 ExternalAttendants = Participants externe
 ExternalAttendant = Participant externe
 NoAttendants = Pas de participants liés. Pour ajouter des participants, le statut doit être "Brouillon (à valider)".
+
+# Public interface - Interface publique
+FullName = NOM Prénom

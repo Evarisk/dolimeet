@@ -6,7 +6,7 @@ if (empty($conf) || !is_object($conf)) {
     exit;
 }
 
-if (empty($element->signature)) : ?>
+if (empty($element->signature) && ($object->status == $object::STATUS_VALIDATED || $element->signature == $langs->transnoentities('FileGenerated')) && $element->status != $element::STATUS_ABSENT) : ?>
     <div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
         <input type="hidden" class="modal-to-open" value="modal-signature<?php echo $element->id ?>">
         <input type="hidden" class="from-id" value="<?php echo $element->id ?>">
@@ -33,13 +33,12 @@ if (empty($element->signature)) : ?>
             <!-- Modal-Footer-->
             <div class="modal-footer">
                 <div class="signature-erase wpeo-button button-grey">
-                    <span><i class="fas fa-eraser"></i><?php echo $langs->trans('Erase'); ?></span>
+                    <span><i class="fas fa-eraser"></i> <?php echo $langs->trans('Erase'); ?></span>
                 </div>
                 <div class="wpeo-button button-grey modal-close">
                     <span><?php echo $langs->trans('Cancel'); ?></span>
                 </div>
                 <div class="signature-validate wpeo-button button-primary" value="<?php echo $element->id ?>">
-                    <input type="hidden" id="redirect<?php echo $element->id ?>" value="<?php echo $url ?>">
                     <input type="hidden" id="zone<?php echo $element->id ?>" value="<?php echo $zone ?>">
                     <span><?php echo $langs->trans('Validate'); ?></span>
                 </div>
