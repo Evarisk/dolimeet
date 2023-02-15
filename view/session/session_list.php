@@ -54,7 +54,7 @@ require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(['dolimeet@dolimeet', 'other']);
+saturne_load_langs();
 
 // @todo
 $action      = GETPOST('action', 'aZ09') ? GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...

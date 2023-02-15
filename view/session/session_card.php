@@ -47,7 +47,7 @@ require_once __DIR__ . '/../../core/modules/dolimeet/session/mod_' . $objectType
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(['dolimeet@dolimeet', 'other@saturne']);
+saturne_load_langs();
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
