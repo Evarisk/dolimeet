@@ -283,7 +283,10 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			$signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
 			if (is_array($signatory) && !empty($signatory)) {
 				$signatory = array_shift($signatory);
-			}
+                $tmparray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
+			} else {
+                $tmparray['trainer_fullname'] = '';
+            }
 
 			$tmparray['mycompany_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$tmparray['address']            = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
@@ -319,7 +322,6 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			$tmparray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
 			$tmparray['duration']   = convertSecondToTime($object->duration);
 
-			$tmparray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
 			if (dol_strlen($signatory->signature) > 0) {
 				$encodedImage = explode(',', $signatory->signature)[1];
 				$decodedImage = base64_decode($encodedImage);
@@ -410,9 +412,26 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 									$k++;
 								}
 							}
-							$odfHandler->mergeSegment($listlines);
-						}
-					}
+                        } else {
+                            $tmparray['attendant_number']    = '';
+                            $tmparray['attendant_lastname']  = '';
+                            $tmparray['attendant_firstname'] = '';
+                            $tmparray['attendant_signature'] = '';
+                            foreach ($tmparray as $key => $val) {
+                                try {
+                                    if (empty($val)) {
+                                        $listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+                                    } else {
+                                        $listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+                                    }
+                                } catch (SegmentException $e) {
+                                    dol_syslog($e->getMessage());
+                                }
+                            }
+                            $listlines->merge();
+                        }
+                        $odfHandler->mergeSegment($listlines);
+                    }
 				}
 			} catch (OdfException $e) {
 				$this->error = $e->getMessage();

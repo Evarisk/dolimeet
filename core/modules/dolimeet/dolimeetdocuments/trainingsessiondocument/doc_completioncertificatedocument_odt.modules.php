@@ -283,6 +283,11 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
             if (is_array($signatory) && !empty($signatory)) {
                 $signatory = array_shift($signatory);
+                $tmparray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
+                $tmparray['trainer_quality']  = $langs->trans($signatory->role);
+            } else {
+                $tmparray['trainer_fullname'] = '';
+                $tmparray['trainer_quality']  =  '';
             }
 
             if (!empty($object->fk_contrat)) {
@@ -322,10 +327,11 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                 $contact->fetch($moreparam['attendant']->element_id);
                 $thirdparty->fetch($contact->fk_soc);
                 $tmparray['attendant_company_name'] = $thirdparty->name;
+            } else {
+                $tmparray['attendant_fullname']     = '';
+                $tmparray['attendant_company_name'] = '';
             }
 
-            $tmparray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
-            $tmparray['trainer_quality']  = $langs->trans($signatory->role);
             if (dol_strlen($signatory->signature) > 0) {
                 $encodedImage = explode(',', $signatory->signature)[1];
                 $decodedImage = base64_decode($encodedImage);
