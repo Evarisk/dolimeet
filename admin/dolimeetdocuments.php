@@ -183,13 +183,14 @@ $help_url = 'FR:Module_DoliMeet';
 saturne_header(0, '', $title, $help_url);
 
 $types = [
-    'AttendanceSheetDocument'       => 'trainingsessiondocument_attendancesheetdocument',
-    'CompletionCertificateDocument' => 'trainingsessiondocument_completioncertificatedocument'
-];
-
-$pictos = [
-    'AttendanceSheetDocument'       => 'fontawesome_fa-people-arrows_fas_#d35968',
-    'CompletionCertificateDocument' => 'fontawesome_fa-people-arrows_fas_#d35968'
+    'AttendanceSheetDocument' => [
+        'documentType' => 'trainingsessiondocument_attendancesheetdocument',
+        'picto'        => 'fontawesome_fa-people-arrows_fas_#d35968'
+    ],
+    'CompletionCertificateDocument' => [
+        'documentType' => 'trainingsessiondocument_completioncertificatedocument',
+        'picto'        => 'fontawesome_fa-people-arrows_fas_#d35968'
+    ]
 ];
 
 // Subheader
@@ -238,17 +239,17 @@ print '</tr>';
 
 print '</table>';
 
-foreach ($types as $type => $documentType) {
+foreach ($types as $type => $documentData) {
     $filelist = [];
-    if (preg_match('/_/', $documentType)) {
-        $documentType       = preg_split('/_/', $documentType);
+    if (preg_match('/_/', $documentData['documentType'])) {
+        $documentType       = preg_split('/_/', $documentData['documentType']);
         $documentParentType = $documentType[0];
         $documentType       = $documentType[1];
     } else {
         $documentParentType = $documentType;
     }
 
-	print load_fiche_titre($langs->trans($type), '', $pictos[$type], 0, $langs->trans($type));
+	print load_fiche_titre($langs->trans($type), '', $documentData['picto'], 0, $langs->trans($type));
 	print '<hr>';
 
 	print load_fiche_titre($langs->trans('NumberingModule'), '', '');
@@ -273,65 +274,66 @@ foreach ($types as $type => $documentType) {
             }
             closedir($handle);
             arsort($filelist);
-            
-            foreach ($filelist as $file) {
-                if (preg_match('/mod_/', $file) && preg_match('/' . $documentType . '/i', $file)) {
-                    if (file_exists($dir . '/' . $file)) {
-                        $classname = substr($file, 0, dol_strlen($file) - 4);
+            if (is_array($filelist) && !empty($filelist)) {
+                foreach ($filelist as $file) {
+                    if (preg_match('/mod_/', $file) && preg_match('/' . $documentType . '/i', $file)) {
+                        if (file_exists($dir . '/' . $file)) {
+                            $classname = substr($file, 0, dol_strlen($file) - 4);
 
-                        require_once $dir . '/' . $file;
-                        $module = new $classname($db);
+                            require_once $dir . '/' . $file;
+                            $module = new $classname($db);
 
-                        if ($module->isEnabled()) {
-                            print '<tr class="oddeven"><td>';
-                            print $langs->trans($module->name);
-                            print '</td><td>';
-                            print $module->info();
-                            print '</td>';
+                            if ($module->isEnabled()) {
+                                print '<tr class="oddeven"><td>';
+                                print $langs->trans($module->name);
+                                print '</td><td>';
+                                print $module->info();
+                                print '</td>';
 
-                            // Show example of numbering module
-                            print '<td class="nowrap">';
-                            $tmp = $module->getExample();
-                            if (preg_match('/^Error/', $tmp)) print '<div class="error">' . $langs->trans($tmp) . '</div>';
-                            elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
-                            else print $tmp;
-                            print '</td>';
+                                // Show example of numbering module
+                                print '<td class="nowrap">';
+                                $tmp = $module->getExample();
+                                if (preg_match('/^Error/', $tmp)) print '<div class="error">' . $langs->trans($tmp) . '</div>';
+                                elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
+                                else print $tmp;
+                                print '</td>';
 
-                            print '<td class="center">';
-                            $confType = 'DOLIMEET_' . strtoupper($documentType) . '_ADDON';
-                            if ($conf->global->$confType == $file || $conf->global->$confType . '.php' == $file) {
-                                print img_picto($langs->trans('Activated'), 'switch_on');
-                            } else {
-                                print '<a class="reposition" href="' . $_SERVER['PHP_SELF'] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&const=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
-                            }
-                            print '</td>';
+                                print '<td class="center">';
+                                $confType = 'DOLIMEET_' . strtoupper($documentType) . '_ADDON';
+                                if ($conf->global->$confType == $file || $conf->global->$confType . '.php' == $file) {
+                                    print img_picto($langs->trans('Activated'), 'switch_on');
+                                } else {
+                                    print '<a class="reposition" href="' . $_SERVER['PHP_SELF'] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&const=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
+                                }
+                                print '</td>';
 
-                            // Example for listing risks action
-                            $htmltooltip = '' . $langs->trans('Version') . ': <b>' . $module->getVersion() . '</b><br>';
+                                // Example for listing risks action
+                                $htmltooltip = '' . $langs->trans('Version') . ': <b>' . $module->getVersion() . '</b><br>';
 
 //                            require_once __DIR__ . '/../class/dolimeetdocuments/'.$type.'document.class.php';
 //                            $classdocumentname = $type.'Document';
 //                            $object_document   = new $classdocumentname($db);
 //
 //                            $nextval = $module->getNextValue($object_document);
-                            if ("$nextval" != $langs->trans('NotAvailable')) {  // Keep " on nextval
-                                $htmltooltip .= $langs->trans('NextValue') . ': ';
-                                if ($nextval) {
-                                    if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
-                                        $nextval = $langs->trans($nextval);
-                                    $htmltooltip .= $nextval . '<br>';
-                                } else {
-                                    $htmltooltip .= $langs->trans($module->error) . '<br>';
+                                if ("$nextval" != $langs->trans('NotAvailable')) {  // Keep " on nextval
+                                    $htmltooltip .= $langs->trans('NextValue') . ': ';
+                                    if ($nextval) {
+                                        if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
+                                            $nextval = $langs->trans($nextval);
+                                        $htmltooltip .= $nextval . '<br>';
+                                    } else {
+                                        $htmltooltip .= $langs->trans($module->error) . '<br>';
+                                    }
                                 }
-                            }
 
-                            print '<td class="center">';
-                            print $form->textwithpicto('', $htmltooltip, 1, 0);
-                            if ($conf->global->$confType . '.php' == $file) { // If module is the one used, we show existing errors
-                                if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
+                                print '<td class="center">';
+                                print $form->textwithpicto('', $htmltooltip, 1, 0);
+                                if ($conf->global->$confType . '.php' == $file) { // If module is the one used, we show existing errors
+                                    if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
+                                }
+                                print '</td>';
+                                print '</tr>';
                             }
-                            print '</td>';
-                            print '</tr>';
                         }
                     }
                 }
@@ -371,81 +373,80 @@ foreach ($types as $type => $documentType) {
 	print '<td class="center">'.$langs->trans('Preview').'</td>';
 	print '</tr>';
 
-	foreach ($filelist as $file) {
-				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/' . $documentType . '/i', $file) && preg_match('/odt/i', $file)) {
-					if (file_exists($dir . '/' . $file)) {
-						$name = substr($file, 4, dol_strlen($file) - 16);
-						$classname = substr($file, 0, dol_strlen($file) - 12);
+    if (is_array($filelist) && !empty($filelist)) {
+        foreach ($filelist as $file) {
+            if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/' . $documentType . '/i', $file) && preg_match('/odt/i', $file)) {
+                if (file_exists($dir . '/' . $file)) {
+                    $name = substr($file, 4, dol_strlen($file) - 16);
+                    $classname = substr($file, 0, dol_strlen($file) - 12);
 
-						require_once $dir . '/' . $file;
-						$module = new $classname($db);
+                    require_once $dir . '/' . $file;
+                    $module = new $classname($db);
 
-                        $modulequalified = 1;
-                        if ($module->version == 'development' && $conf->global->MAIN_FEATURES_LEVEL < 2) {
-                            $modulequalified = 0;
+                    $modulequalified = 1;
+                    if ($module->version == 'development' && $conf->global->MAIN_FEATURES_LEVEL < 2) {
+                        $modulequalified = 0;
+                    }
+                    if ($module->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) {
+                        $modulequalified = 0;
+                    }
+
+                    if ($modulequalified) {
+                        print '<tr class="oddeven"><td>';
+                        print (empty($module->name) ? $name : $module->name);
+                        print '</td><td>';
+                        if (method_exists($module, 'info')) {
+                            print $module->info($langs);
+                        } else {
+                            print $module->description;
                         }
-                        if ($module->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) {
-                            $modulequalified = 0;
+                        print '</td>';
+
+                        // Active
+                        print '<td class="center">';
+                        if (in_array($name, $def)) {
+                            print '<a href="' . $_SERVER['PHP_SELF'] . '?action=del&amp;value=' . $name . '&amp;const=' . $module->scandir . '&amp;label=' . urlencode($module->name) . '&type=' . preg_split('/_/', $name)[0] . '&token=' . newToken() . '">';
+                            print img_picto($langs->trans('Enabled'), 'switch_on');
+                            print '</a>';
+                        } else {
+                            print '<a href="' . $_SERVER['PHP_SELF'] . '?action=set&amp;value=' . $name . '&amp;const=' . $module->scandir . '&amp;label=' . urlencode($module->name) . '&type=' . preg_split('/_/', $name)[0] . '&token=' . newToken() . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
                         }
+                        print '</td>';
 
-                        if ($modulequalified) {
-							print '<tr class="oddeven"><td>';
-							print (empty($module->name) ? $name : $module->name);
-							print '</td><td>';
-							if (method_exists($module, 'info')) {
-                                print $module->info($langs);
-                            } else {
-                                print $module->description;
-                            }
-							print '</td>';
+                        // Default
+                        print '<td class="center">';
+                        $defaultModelConf = 'DOLIMEET_' . strtoupper($documentType) . '_DEFAULT_MODEL';
+                        if ($conf->global->$defaultModelConf == $name) {
+                            print img_picto($langs->trans('Default'), 'on');
+                        } else {
+                            print '<a href="' . $_SERVER['PHP_SELF'] . '?action=setdoc&amp;value=' . $name . '&amp;const=' . $module->scandir . '&amp;label=' . urlencode($module->name) . '&token=' . newToken() . '">' . img_picto($langs->trans('Disabled'), 'off') . '</a>';
+                        }
+                        print '</td>';
 
-							// Active
-							print '<td class="center">';
-							if (in_array($name, $def)) {
-								print '<a href="'.$_SERVER['PHP_SELF'].'?action=del&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'&token='.newToken().'">';
-								print img_picto($langs->trans('Enabled'), 'switch_on');
-								print '</a>';
-							}
-							else {
-								print '<a href="'.$_SERVER['PHP_SELF'].'?action=set&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'&token='.newToken().'">'.img_picto($langs->trans('Disabled'), 'switch_off').'</a>';
-							}
-							print '</td>';
+                        // Info
+                        $htmltooltip = '' . $langs->trans('Name') . ': ' . $module->name;
+                        $htmltooltip .= '<br>' . $langs->trans('Type') . ': ' . ($module->type ?: $langs->trans('Unknown'));
+                        $htmltooltip .= '<br>' . $langs->trans('Width') . '/' . $langs->trans('Height') . ': ' . $module->page_largeur . '/' . $module->page_hauteur;
+                        $htmltooltip .= '<br><br><u>' . $langs->trans('FeaturesSupported') . ':</u>';
+                        $htmltooltip .= '<br>' . $langs->trans('Logo') . ': ' . yn($module->option_logo, 1, 1);
+                        print '<td class="center">';
+                        print $form->textwithpicto('', $htmltooltip, -1, 0);
+                        print '</td>';
 
-							// Default
-							print '<td class="center">';
-							$defaultModelConf = 'DOLIMEET_' . strtoupper($documentType) . '_DEFAULT_MODEL';
-							if ($conf->global->$defaultModelConf == $name) {
-								print img_picto($langs->trans('Default'), 'on');
-							}
-							else {
-								print '<a href="'.$_SERVER['PHP_SELF'].'?action=setdoc&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&token='.newToken().'">'.img_picto($langs->trans('Disabled'), 'off').'</a>';
-							}
-							print '</td>';
-
-							// Info
-							$htmltooltip = ''.$langs->trans('Name').': '.$module->name;
-							$htmltooltip .= '<br>'.$langs->trans('Type').': '.($module->type ?: $langs->trans('Unknown'));
-							$htmltooltip .= '<br>'.$langs->trans('Width').'/'.$langs->trans('Height').': '.$module->page_largeur.'/'.$module->page_hauteur;
-							$htmltooltip .= '<br><br><u>'.$langs->trans('FeaturesSupported').':</u>';
-							$htmltooltip .= '<br>'.$langs->trans('Logo').': '.yn($module->option_logo, 1, 1);
-							print '<td class="center">';
-							print $form->textwithpicto('', $htmltooltip, -1, 0);
-							print '</td>';
-
-							// Preview
-							print '<td class="center">';
-							if ($module->type == 'pdf') {
-								print '<a href="'.$_SERVER['PHP_SELF'].'?action=specimen&module='.$name.'">'.img_object($langs->trans('Preview'), 'intervention').'</a>';
-							}
-							else {
-								print img_object($langs->trans('PreviewNotAvailable'), 'generic');
-							}
-							print '</td>';
-							print '</tr>';
-						}
-					}
-				}
-			}
+                        // Preview
+                        print '<td class="center">';
+                        if ($module->type == 'pdf') {
+                            print '<a href="' . $_SERVER['PHP_SELF'] . '?action=specimen&module=' . $name . '">' . img_object($langs->trans('Preview'), 'intervention') . '</a>';
+                        } else {
+                            print img_object($langs->trans('PreviewNotAvailable'), 'generic');
+                        }
+                        print '</td>';
+                        print '</tr>';
+                    }
+                }
+            }
+        }
+    }
 	print '</table>';
 	print '<hr>';
 }
