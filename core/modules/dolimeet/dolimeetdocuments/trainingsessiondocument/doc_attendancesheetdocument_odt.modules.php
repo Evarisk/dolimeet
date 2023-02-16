@@ -435,26 +435,33 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			$parameters = ['odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray];
 			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			// Write new file
-			if (!empty($conf->global->MAIN_ODT_AS_PDF)) {
-				try {
-					$odfHandler->exportAsAttachedPDF($file);
-				} catch (Exception $e) {
-					$this->error = $e->getMessage();
-					dol_syslog($e->getMessage());
-					return -1;
-				}
-			} else {
-				try {
-					$odfHandler->saveToDisk($file);
-				} catch (Exception $e) {
-					$this->error = $e->getMessage();
-					dol_syslog($e->getMessage());
-					return -1;
-				}
-			}
+            $fileInfos = pathinfo($filename);
+            $pdfName   = $fileInfos['filename'] . '.pdf';
 
-			$parameters = ['odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray];
+			// Write new file
+            if (!empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DOLIMEET_AUTOMATIC_PDF_GENERATION > 0) {
+                try {
+                    $odfHandler->exportAsAttachedPDF($file);
+
+                    global $moduleNameLowerCase;
+                    $documentUrl = DOL_URL_ROOT . '/document.php';
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . $documentUrl . '?modulepart=' . $moduleNameLowerCase . '&file=' . urlencode('attendancesheetdocument/' . $object->ref . '/' . $pdfName) . '&entity='. $conf->entity .'"' . '>' . $pdfName  . '</a>', []);
+                } catch (Exception $e) {
+                    $this->error = $e->getMessage();
+                    dol_syslog($e->getMessage());
+                    setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), [], 'errors');
+                }
+            } else {
+                try {
+                    $odfHandler->saveToDisk($file);
+                } catch (Exception $e) {
+                    $this->error = $e->getMessage();
+                    dol_syslog($e->getMessage());
+                    return -1;
+                }
+            }
+
+            $parameters = ['odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray];
 			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			if (!empty($conf->global->MAIN_UMASK)) {

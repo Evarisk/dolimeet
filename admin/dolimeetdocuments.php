@@ -205,6 +205,39 @@ print load_fiche_titre($title, $selectorAnchor, 'dolimeet_color.png@dolimeet');
 $head = dolimeet_admin_prepare_head();
 print dol_get_fiche_head($head, 'dolimeetdocuments', $title, -1, 'dolimeet_color@dolimeet');
 
+print load_fiche_titre($langs->trans('DocumentsData'), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '</tr>';
+
+// Automatic PDF generation
+print '<tr class="oddeven"><td>';
+print  $langs->trans("AutomaticPdfGeneration");
+print '</td><td>';
+print $langs->trans('AutomaticPdfGenerationDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DOLIMEET_AUTOMATIC_PDF_GENERATION');
+print '</td>';
+print '</tr>';
+
+// Manual PDF generation
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ManualPdfGeneration");
+print '</td><td>';
+print $langs->trans('ManualPdfGenerationDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DOLIMEET_MANUAL_PDF_GENERATION');
+print '</td>';
+print '</tr>';
+
+print '</table>';
+
 foreach ($types as $type => $documentType) {
     $filelist = [];
     if (preg_match('/_/', $documentType)) {

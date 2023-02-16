@@ -383,14 +383,21 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             $parameters = ['odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray];
             $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
+            $fileInfos = pathinfo($filename);
+            $pdfName   = $fileInfos['filename'] . '.pdf';
+
             // Write new file
-            if (empty($conf->global->MAIN_ODT_AS_PDF)) {
+            if (!empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DOLIMEET_AUTOMATIC_PDF_GENERATION > 0) {
                 try {
                     $odfHandler->exportAsAttachedPDF($file);
+
+                    global $moduleNameLowerCase;
+                    $documentUrl = DOL_URL_ROOT . '/document.php';
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . $documentUrl . '?modulepart=' . $moduleNameLowerCase . '&file=' . urlencode('completioncertificatedocument/' . $object->ref . '/' . $pdfName) . '&entity='. $conf->entity .'"' . '>' . $pdfName  . '</a>', []);
                 } catch (Exception $e) {
                     $this->error = $e->getMessage();
                     dol_syslog($e->getMessage());
-                    return -1;
+                    setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), [], 'errors');
                 }
             } else {
                 try {

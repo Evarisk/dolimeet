@@ -191,7 +191,12 @@ class modDoliMeet extends DolibarrModules
 
             // CONST MODULE
 			$i++ => ['DOLIMEET_VERSION','chaine', $this->version, '', 0, 'current'],
-			$i   => ['DOLIMEET_DB_VERSION', 'chaine', $this->version, '', 0, 'current']
+			$i++ => ['DOLIMEET_DB_VERSION', 'chaine', $this->version, '', 0, 'current'],
+            $i++ => ['DOLIMEET_AUTOMATIC_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
+
+            // CONST GENERAL CONST
+			$i  => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current']
         ];
 
 		// Some keys to add into the overwriting translation tables
