@@ -133,6 +133,18 @@ if (empty($reshook)) {
 
     // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
     $conf->global->MAIN_DISABLE_PDF_AUTOUPDATE = 1;
+
+    if ($action == 'add' && $permissiontoadd) {
+        $durationhour = GETPOST('durationhour');
+        $durationmin  = GETPOST('durationmin');
+        if (empty($durationhour)) {
+            $_POST['durationhour'] = 0;
+        }
+        if (empty($durationmin)) {
+            $_POST['durationmin'] = 0;
+        }
+    }
+
     include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
     // Action to build doc
