@@ -135,10 +135,25 @@ class ActionsDolimeet
 
 			if (is_array($linkedSessions) && !empty($linkedSessions)) {
 				foreach($linkedSessions as $linkedSession) {
+                    switch ($linkedSession->type) {
+                        case 'trainingsession':
+                            $linkedSession->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
+                            break;
+                        case 'meeting':
+                            $linkedSession->picto = 'fontawesome_fa-comments_fas_#d35968';
+                            break;
+                        case 'audit':
+                            $linkedSession->picto = 'fontawesome_fa-tasks_fas_#d35968';
+                            break;
+                        default :
+                            $linkedSession->picto = 'dolimeet_color@dolimeet';
+                            break;
+                    }
+
 					$outputline .= '<tr><td>';
 					$outputline .= $langs->trans(ucfirst($linkedSession->type));
 					$outputline .= '</td><td>';
-					$outputline .= $linkedSession->getNomUrl();
+					$outputline .= $linkedSession->getNomUrl(1);
 					$outputline .= '</td><td>';
 					$outputline .= dol_print_date($linkedSession->date_start, 'dayhour') . ' - ' . dol_print_date($linkedSession->date_end, 'dayhour');
                     $outputline .= '</td><td>';
