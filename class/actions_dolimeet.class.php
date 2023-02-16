@@ -110,13 +110,19 @@ class ActionsDolimeet
 
         // Do something only for the current context
 		if ($parameters['currentcontext'] == 'projectOverview') {
-			require_once DOL_DOCUMENT_ROOT . '/custom/dolimeet/class/session.class.php';
+            require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+			require_once __DIR__ . '/session.class.php';
 
             $pictopath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
             $picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 
 			$session = new Session($db, 'session');
-			$linkedSessions = $session->fetchAll('','',0,0, ['fk_project' => GETPOST('id')]);
+            $project = new Project($db);
+
+            $project->fetch(GETPOST('id'), GETPOST('ref'));
+			$linkedSessions = $session->fetchAll('','',0,0, ['fk_project' => $project->id]);
+
+            saturne_load_langs();
 
 			$outputline = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block">' . $picto . $langs->transnoentities('SessionListOnProject') . '</div></td></tr></table>';
 			$outputline .= '<table><div class="div-table-responsive-no-min"><table class="liste formdoc noborder centpercent"><tbody>';
@@ -127,7 +133,7 @@ class ActionsDolimeet
             $outputline .= '<td class="float">' . $langs->transnoentities('Status') . '</td>';
 			$outputline .= '</tr>';
 
-			if (!empty($linkedSessions)) {
+			if (is_array($linkedSessions) && !empty($linkedSessions)) {
 				foreach($linkedSessions as $linkedSession) {
 					$outputline .= '<tr><td>';
 					$outputline .= $langs->trans(ucfirst($linkedSession->type));
