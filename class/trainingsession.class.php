@@ -34,18 +34,12 @@ class Trainingsession extends Session
     public $element = 'trainingsession';
 
     /**
-     * @var string Name of icon for trainingsession. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'trainingsession@dolimeet' if picto is file 'img/object_trainingsession.png'.
-     */
-    public string $picto = 'fontawesome_fa-people-arrows_fas_#fcba03';
-
-    /**
      * Constructor
      *
      * @param DoliDb $db Database handler
      */
     public function __construct(DoliDB $db)
     {
-        $this->type = 'trainingsession';
-        parent::__construct($db, $this->type);
+        parent::__construct($db, $this->element);
     }
 }

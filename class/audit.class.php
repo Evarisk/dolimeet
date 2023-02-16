@@ -34,18 +34,12 @@ class Audit extends Session
     public $element = 'audit';
 
     /**
-     * @var string Name of icon for audit. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'audit@dolimeet' if picto is file 'img/object_audit.png'.
-     */
-    public string $picto = 'fontawesome_fa-tasks_fas_#fcba03';
-
-    /**
      * Constructor
      *
      * @param DoliDb $db Database handler
      */
     public function __construct(DoliDB $db)
     {
-        $this->type = 'audit';
-        parent::__construct($db, $this->type);
+        parent::__construct($db, $this->element);
     }
 }
