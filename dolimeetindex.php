@@ -35,7 +35,7 @@ global $conf, $db, $langs, $moduleName, $moduleNameLowerCase, $user;
 require_once __DIR__ . '/core/modules/mod' . $moduleName . '.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs([$moduleNameLowerCase . '@' . $moduleNameLowerCase]);
+saturne_load_langs();
 
 // Initialize technical objects
 $classname = 'mod' . $moduleName;
@@ -43,20 +43,16 @@ $modModule = new $classname($db);
 
 // Security check
 $permissiontoread = $user->rights->$moduleNameLowerCase->read;
-if (empty($conf->$moduleNameLowerCase->enabled) || !$permissiontoread) {
-    accessforbidden();
-}
+saturne_check_access($permissiontoread);
 
 /*
  * View
  */
 
-$title    = $langs->trans($moduleName . 'Area');
+$title   = $langs->trans($moduleName . 'Area');
 $helpUrl = 'FR:Module_' . $moduleName;
-$morejs   = ['/' . $moduleNameLowerCase . '/js/' . $moduleNameLowerCase . '.js'];
-$morecss  = ['/' . $moduleNameLowerCase . '/css/' . $moduleNameLowerCase . '.css'];
 
-llxHeader('', $title . ' ' . $modModule->version, $helpUrl, '', 0, 0, $morejs, $morecss);
+saturne_header(0, '', $title . ' ' . $modModule->version, $helpUrl);
 
 print load_fiche_titre($title . ' ' . $modModule->version, '', $moduleNameLowerCase . '_color.png@' . $moduleNameLowerCase);
 

@@ -60,8 +60,9 @@ Erase = Effacer
 Attendant = Participant
 Attendants = Participants
 InternalAttendant = Participant interne
-ExternalAttendants = Participants externe
+InternalAttendants = Participants interne
 ExternalAttendant = Participant externe
+ExternalAttendants = Participants externe
 NoAttendants = Pas de participants liés. Pour ajouter des participants, le statut doit être "Brouillon (à valider)".
 
 # Public interface - Interface publique
