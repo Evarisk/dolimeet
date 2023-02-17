@@ -216,8 +216,14 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             $newfiletmp = preg_replace('/template_/i', '', $newfiletmp);
             $societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
+            if (!empty($moreparam['attendant'])) {
+                $attandent = strtoupper($moreparam['attendant']->lastname) . '_' . $moreparam['attendant']->firstname;
+            } else {
+                $attandent = '';
+            }
+
             $date       = dol_print_date(dol_now(),'dayxcard');
-            $newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $societyname;
+            $newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $attandent . '_' . $societyname;
 
             $objectDocument->last_main_doc = $newfiletmp;
 
