@@ -51,6 +51,7 @@ $id         = GETPOST('id', 'int');
 $ref        = GETPOST('ref', 'alpha');
 $action     = GETPOST('action', 'aZ09') ? GETPOST('action', 'aZ09') : 'view';
 $confirm    = GETPOST('confirm', 'alpha');
+$cancel     = GETPOST('cancel', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha'); // Go back to a dedicated page
 
 // Get list parameters
@@ -345,7 +346,7 @@ foreach ($search as $key => $val) {
             $mode_search = 2;
         }
         if ($val != '') {
-            $sql .= natural_search('t.'.$key, $val, (($key == 'status') ? 2 : $mode_search));
+            $sql .= natural_search('t.'. $db->escape($key), $val, (($key == 'status') ? 2 : $mode_search));
         }
     } elseif (preg_match('/(_dtstart|_dtend)$/', $key) && $val != '') {
         $columnName = preg_replace('/(_dtstart|_dtend)$/', '', $key);
@@ -423,7 +424,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 if (!empty($fromtype) && !$error) {
-    print saturne_get_fiche_head($objectLinked, $objectType . 'List', $langs->trans($objectType));
+    saturne_get_fiche_head($objectLinked, $objectType . 'List', $langs->trans($objectType));
     saturne_banner_tab($objectLinked);
 }
 
@@ -456,8 +457,11 @@ if ($optioncss != '') {
     $param .= '&optioncss=' . urlencode($optioncss);
 }
 if (!empty($fromtype) && $fromid > 0) {
-    // @todo param ?
     $fromurl = '&fromtype=' . urlencode($fromtype) . '&fromid=' . urlencode($fromid);
+    $param .= $fromurl;
+}
+if (!empty($objectType)) {
+    $param .= '&object_type='.urlencode($objectType);
 }
 
 // Add $param from extra fields
@@ -500,20 +504,11 @@ print '<input type="hidden" name="mode" value="' . $mode . '">'; ?>
     });
 </script>
 
-<?php if ($objectType == 'session' || !empty($fromtype) && $fromid > 0) {
-    $newcardbutton = '<select name="object_type" id="object_type_select">';
-    $objectTypes = ['meeting', 'trainingsession', 'audit'];
-    if ($objectType == 'session') {
-        $objectType = 'meeting';
-    }
-    foreach ($objectTypes as $type) {
-        $newcardbutton .= '<option value="' . $type . '"' . ($objectType == $type ? ' selected' : '') . '>' . $langs->trans(ucfirst($type)) . '</option>';
-    }
-    $newcardbutton .= '</select>';
-} else {
-    $newcardbutton = '';
+<?php $newcardbutton = '';
+if ($objectType == 'session' || !empty($fromtype) && $fromid > 0) {
+    $objectTypes = ['meeting' => $langs->trans('Meeting'), 'trainingsession' => $langs->trans('Trainingsession'), 'audit' => $langs->trans('Audit')];
+    $newcardbutton .= $form->selectarray('object_type_select', $objectTypes, '', 1);
 }
-
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewList'), '', 'fa fa-bars imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=common' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ((empty($mode) || $mode == 'common') ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewKanban'), '', 'fa fa-th-list imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=kanban' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ($mode == 'kanban' ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitleSeparator();
@@ -687,6 +682,7 @@ foreach ($object->fields as $key => $val) {
                 print '<td>';
                 print $langs->trans($resource['label']);
                 print '</td>';
+                $totalarray['nbfield']++;
             }
         }
     }
@@ -701,7 +697,6 @@ print $hookmanager->resPrint;
 if (empty($conf->global->MAIN_CHECKBOX_LEFT_COLUMN)) {
     print getTitleFieldOfList(($mode != 'kanban' ? $selectedfields : ''), 0, $_SERVER['PHP_SELF'], '', '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ');
 }
-$totalarray['nbfield']++;
 print '</tr>';
 
 // Detect if we need a fetch on each output line
@@ -873,30 +868,29 @@ while ($i < $imaxinloop) {
                 }
             }
         }
-    }
-    // Extra fields
-    include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_print_fields.tpl.php';
-    // Fields from hook
-    $parameters = array('arrayfields' => $arrayfields, 'object' => $object, 'obj' => $obj, 'i' => $i, 'totalarray' => &$totalarray);
-    $reshook = $hookmanager->executeHooks('printFieldListValue', $parameters, $object); // Note that $action and $object may have been modified by hook
-    print $hookmanager->resPrint;
-    // Action column
-    if (empty($conf->global->MAIN_CHECKBOX_LEFT_COLUMN)) {
-        print '<td class="nowrap center">';
-        if ($massactionbutton || $massaction) { // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
-            $selected = 0;
-            if (in_array($object->id, $arrayofselected)) {
-                $selected = 1;
+        // Extra fields
+        include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_print_fields.tpl.php';
+        // Fields from hook
+        $parameters = ['arrayfields' => $arrayfields, 'object' => $object, 'obj' => $obj, 'i' => $i, 'totalarray' => &$totalarray];
+        $reshook = $hookmanager->executeHooks('printFieldListValue', $parameters, $object); // Note that $action and $object may have been modified by hook
+        print $hookmanager->resPrint;
+        // Action column
+        if (empty($conf->global->MAIN_CHECKBOX_LEFT_COLUMN)) {
+            print '<td class="nowrap center">';
+            if ($massactionbutton || $massaction) { // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
+                $selected = 0;
+                if (in_array($object->id, $arrayofselected)) {
+                    $selected = 1;
+                }
+                print '<input id="cb' . $object->id . '" class="flat checkforselect" type="checkbox" name="toselect[]" value="' . $object->id . '"' . ($selected ? ' checked="checked"' : '') . '>';
             }
-            print '<input id="cb' . $object->id . '" class="flat checkforselect" type="checkbox" name="toselect[]" value="' . $object->id . '"' . ($selected ? ' checked="checked"' : '') . '>';
+            print '</td>';
         }
-        print '</td>';
+        if (!$i) {
+            $totalarray['nbfield']++;
+        }
+        print '</tr>';
     }
-    if (!$i) {
-        $totalarray['nbfield']++;
-    }
-
-    print '</tr>';
     $i++;
 }
 
