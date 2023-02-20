@@ -48,7 +48,7 @@ require_once __DIR__ . '/../../' . $moduleNameLowerCase . '/lib/' . $moduleNameL
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs([$moduleNameLowerCase . '@' . $moduleNameLowerCase, 'signature@dolimeet']);
+saturne_load_langs();
 
 // Get parameters
 $id          = GETPOST('id', 'int');
@@ -489,8 +489,8 @@ if ($id > 0 || !empty($ref) && empty($action)) {
         print '<table class="border centpercent tableforfield">';
 
         print '<tr class="liste_titre">';
-        print '<td>' . $langs->trans('Thirdparty') . '</td>';
-        print '<td>' . $langs->trans('ContactLinked') . '</td>';
+        print '<td>' . $langs->trans('ThirdParty') . '</td>';
+        print '<td>' . $langs->trans('Contact') . '</td>';
         print '<td>' . $langs->trans('Role') . '</td>';
         print '<td>' . $langs->trans('SignatureLink') . '</td>';
         print '<td>' . $langs->trans('SendMailDate') . '</td>';
@@ -598,8 +598,8 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<br><table class="border centpercent tableforfield">';
 
             print '<tr class="liste_titre">';
-            print '<td>' . $langs->trans('Thirdparty') . '</td>';
-            print '<td>' . $langs->trans('ContactLinked') . '</td>';
+            print '<td>' . $langs->trans('ThirdParty') . '</td>';
+            print '<td>' . $langs->trans('Contact') . '</td>';
             print '<td>' . $langs->trans('Role') . '</td>';
             print '<td>' . $langs->trans('SignatureLink') . '</td>';
             print '<td>' . $langs->trans('SendMailDate') . '</td>';

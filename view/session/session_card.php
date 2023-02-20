@@ -257,24 +257,7 @@ if (empty($reshook)) {
         }
     }
 
-    // Action to set status STATUS_ARCHIVED
-    if ($action == 'setArchived' && $permissiontoadd) {
-        $object->fetch($id);
-        if (!$error) {
-            $result = $object->setArchived($user);
-            if ($result > 0) {
-                // Set Archived OK
-                $urltogo = str_replace('__ID__', $result, $backtopage);
-                $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-                header('Location: ' . $urltogo);
-                exit;
-            } elseif (!empty($object->errors)) { // Set Archived KO
-                setEventMessages('', $object->errors, 'errors');
-            } else {
-                setEventMessages($object->error, [], 'errors');
-            }
-        }
-    }
+    require_once __DIR__ . '/../../core/tpl/signature/signature_action_workflow.tpl.php';
 }
 
 /*
@@ -305,7 +288,7 @@ if ($action == 'create') {
         print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
     }
 
-    print saturne_get_fiche_head();
+    print dol_get_fiche_head();
 
     print '<table class="border centpercent tableforfieldcreate">';
 
@@ -323,7 +306,7 @@ if ($action == 'create') {
     // Categories
     if (isModEnabled('categorie')) {
         print '<tr><td>' . $langs->trans('Categories') . '</td><td>';
-        $cate_arbo = $form->select_all_categories('session', '', 'parent', 64, 0, 1);
+        $cate_arbo = $form->select_all_categories($objectType, '', 'parent', 64, 0, 1);
         print img_picto('', 'category') . $form->multiselectarray('categories', $cate_arbo, GETPOST('categories', 'array'), '', 0, 'quatrevingtpercent widthcentpercentminusx');
         print '</td></tr>';
     }
@@ -355,7 +338,7 @@ if (($id || $ref) && $action == 'edit') {
         print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
     }
 
-    print saturne_get_fiche_head();
+    print dol_get_fiche_head();
 
     print '<table class="border centpercent tableforfieldedit">';
 
@@ -365,7 +348,7 @@ if (($id || $ref) && $action == 'edit') {
     // Tags-Categories
     if (isModEnabled('categorie')) {
         print '<tr><td>' . $langs->trans('Categories') . '</td><td>';
-        $cate_arbo = $form->select_all_categories('session', '', 'parent', 64, 0, 1);
+        $cate_arbo = $form->select_all_categories($objectType, '', 'parent', 64, 0, 1);
         $c = new Categorie($db);
         $cats = $c->containing($object->id, 'session');
         $arrayselected = [];
@@ -399,20 +382,32 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     $formconfirm = '';
 
     // setDraft confirmation
-    if (($action == 'setDraft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('ReOpenObject', ucfirst($object->element)), $langs->trans('ConfirmReOpenObject', ucfirst($object->element), $object->ref), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
+    if (($action == 'draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
     }
     // setPendingSignature confirmation
-    if (($action == 'setPendingSignature' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('ValidateObject', ucfirst($object->element)), $langs->trans('ConfirmValidateObject', ucfirst($object->element), $object->ref), 'confirm_validate', '', 'yes', 'actionButtonPendingSignature', 350, 600);
+    if (($action == 'pending_signature' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_validate', '', 'yes', 'actionButtonPendingSignature', 350, 600);
     }
     // setLocked confirmation
-    if (($action == 'setLocked' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('LockObject', ucfirst($object->element)), $langs->trans('ConfirmLockObject', ucfirst($object->element), $object->ref), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
+    if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
     }
+
+    // Clone confirmation
+    if (($action == 'clone' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile))) || ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        // Define confirmation messages
+        $formquestionclone = [
+            'text' => $langs->trans('ConfirmClone'),
+            ['type' => 'text', 'name' => 'clone_label', 'label' => $langs->trans('NewLabelForClone'), 'value' => empty($tmpcode) ? $langs->trans('CopyOf') . ' ' . $object->ref : $tmpcode, 'size' => 24],
+            ['type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans('CloneAttendants'), 'value' => 1],
+        ];
+        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('CloneObject'), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
+    }
+
     // Confirmation to delete
     if ($action == 'delete') {
-        $formconfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('DeleteObject', ucfirst($object->element)), $langs->trans('ConfirmDeleteObject', ucfirst($object->element)), 'confirm_delete', '', 'yes', 1);
+        $formconfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_delete', '', 'yes', 1);
     }
 
     // Call Hook formConfirm
@@ -472,50 +467,53 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             if ($object->status == $object::STATUS_DRAFT) {
                 print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=edit' . '">' . $langs->trans('Modify') . '</a>';
             } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft')) . '">' . $langs->trans('Modify') . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $langs->trans('Modify') . '</span>';
             }
 
             // Validate
             if ($object->status == $object::STATUS_DRAFT) {
-                print '<span class="butAction" id="actionButtonPendingSignature"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=setPendingSignature' . '">' . $langs->trans('Validate') . '</span>';
+                print '<span class="butAction" id="actionButtonPendingSignature"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=pending_signature' . '">' . $langs->trans('Validate') . '</span>';
             } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraftToValidate')) . '">' . $langs->trans('Validate') . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraftToValidate', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $langs->trans('Validate') . '</span>';
             }
 
             // ReOpen
             if ($object->status == $object::STATUS_VALIDATED) {
-                print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=setDraft' . '">' . $langs->trans('ReOpenDoli') . '</span>';
+                print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=draft' . '">' . $langs->trans('ReOpenDoli') . '</span>';
             } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated')) . '">' . $langs->trans('ReOpenDoli') . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $langs->trans('ReOpenDoli') . '</span>';
             }
 
             // Sign
-//            if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-//                print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/dolisirh/view/timesheet/timesheet_attendants.php?id=' . $object->id, 3) . '">' . $langs->trans('Sign') . '</a>';
-//            } else {
-//                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign')) . '">' . $langs->trans('Sign') . '</span>';
-//            }
+            if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+                print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/dolimeet/view/saturne_attendants.php?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element, 3) . '">' . $langs->trans('Sign') . '</a>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $langs->trans('Sign') . '</span>';
+            }
 
             // Lock
-//            if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-//                print '<span class="butAction" id="actionButtonLock">' . $langs->trans('Lock') . '</span>';
-//            } else {
-//                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned')) . '">' . $langs->trans('Lock') . '</span>';
-//            }
+            if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+                print '<span class="butAction" id="actionButtonLock">' . $langs->trans('Lock') . '</span>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', $langs->transnoentities('The' . ucfirst($object->element)))) . '">' . $langs->trans('Lock') . '</span>';
+            }
 
-            // Clone
-            // Check digi
-
-            // Send
-            //@TODO changer le send to
-            //print '<a class="' . ($object->status == $object::STATUS_LOCKED ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("ObjectMustBeLockedToSendEmail")) . '" href="' . ($object->status == $object::STATUS_LOCKED ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
+            // Send mail
+            if ($object->status == $object::STATUS_LOCKED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+                print '<a class="butAction" id="actionButtonSign" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=presend&mode=init#formmailbeforetitle' . '">' . $langs->trans('SendMail') . '</a>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $langs->trans('SendMail') . '</span>';
+            }
 
             // Archive
             if ($object->status == $object::STATUS_LOCKED) {
-                print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=setArchived' . '">' . $langs->trans('Archive') . '</a>';
+                print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=confirm_archive&token=' . newToken() . '">' . $langs->trans('Archive') . '</a>';
             } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedGenerated')) . '">' . $langs->trans('Archive') . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $langs->trans('Archive') . '</span>';
             }
+
+            // Clone
+            print '<span class="butAction" id="actionButtonClone">' . $langs->trans('Clone') . '</span>';
 
             // Delete (need delete permission, or if draft, just need create/modify permission)
             print dolGetButtonAction($langs->trans('Delete'), '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=delete', '', $permissiontodelete || ($object->status == $object::STATUS_DRAFT && $permissiontoadd));

@@ -34,7 +34,7 @@ function session_prepare_head(CommonObject $object): array
     global $conf, $db, $langs, $user;
 
     // Load translation files required by the page
-    $langs->load('dolimeet@dolimeet');
+    saturne_load_langs();
 
     // Initialize values
     $h = 0;

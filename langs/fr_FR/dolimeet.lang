@@ -79,15 +79,12 @@ WriteDoliMeetSession = Créer/mettre à jour les sessions de DoliMeet
 DeleteDoliMeetSession = Supprimer les sessions de DoliMeet
 
 # Data - Donnée
-ContactLinked = Contact
 NewSession = Nouvelle session
 SessionList = Liste des sessions
 SessionTypes = Types de session
 SessionNumberingModule = Numérotation des sessions
 SessionConfig = Configuration des sessions
 Deleted = Supprimé
-ValidatePendingSignature = Validé (en attente de signature)
-Locked = Verrouillé
 Schedules = Horaires
 ContratSchedules = Horaires de la formation
 SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
@@ -106,13 +103,9 @@ ReadMeeting = Consulter les réunions
 WriteMeeting = Créer/Modifier les réunions
 DeleteMeeting = Supprimer les réunions
 
-# Trigger - Déclencheur
-MeetingCreateTrigger = La réunion a été créée
-MeetingModifyTrigger = La réunion a été modifiée
-MeetingDeleteTrigger = La réunion a été supprimée
-
 # Data - Donnée
 Meeting = Réunion
+TheMeeting = la réunion
 MeetingList = Liste des réunions
 MeetingCreate = Créer une réunion
 NewMeeting = Nouvelle réunion
@@ -134,14 +127,10 @@ ReadTrainingSession = Consulter les sessions de formation
 WriteTrainingSession = Créer/Modifier les sessions de formation
 DeleteTrainingSession = Supprimer les sessions de formation
 
-# Trigger - Déclencheur
-TrainingsessionCreateTrigger = La session de formation a été créée
-TrainingsessionModifyTrigger = La session de formation a été modifiée
-TrainingsessionDeleteTrigger = La session de formation a été supprimée
-
 # Data - Donnée
 TrainingSession = Session de formation
 Trainingsession = Session de formation
+TheTrainingsession = la session de formation
 TrainingsessionList = Liste des sessions de formation
 TrainingSessionList = Liste des sessions de formation
 TrainingSessionCreate = Créer une session de formation
@@ -195,13 +184,9 @@ ReadAudit = Consulter les audits
 WriteAudit = Créer/Modifier les audits
 DeleteAudit = Supprimer les audits
 
-# Trigger - Déclencheur
-AuditCreateTrigger = L'audit a été créé
-AuditModifyTrigger = L'audit a été modifié
-AuditDeleteTrigger = L'audit a été supprimé
-
 # Data - Donnée
 Audit = Audit
+TheAudit = l'audit
 AuditList = Liste des audits
 AuditCreate = Créer un audit
 NewAudit = Nouvel audit

@@ -108,66 +108,106 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_CREATE' :
             case 'AUDIT_CREATE' :
 				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
-				$actioncomm->label = $langs->trans(ucfirst($object->element) . 'CreateTrigger');
+				$actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
+
             case 'MEETING_MODIFY' :
             case 'TRAININGSESSION_MODIFY' :
             case 'AUDIT_MODIFY' :
 				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_MODIFY';
-				$actioncomm->label = $langs->trans(ucfirst($object->element) . 'ModifyTrigger');
+				$actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
+
             case 'MEETING_DELETE' :
             case 'TRAININGSESSION_DELETE' :
             case 'AUDIT_DELETE' :
 				$actioncomm->code  = 'AC_ ' . strtoupper($object->element) . '_DELETE';
-				$actioncomm->label = $langs->trans(ucfirst($object->element) . 'DeleteTrigger');
+				$actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
-			case 'SESSION_ADDATTENDANT' :
+
+            case 'MEETING_VALIDATE' :
+            case 'TRAININGSESSION_VALIDATE' :
+            case 'AUDIT_VALIDATE' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_VALIDATE';
+                $actioncomm->label = $langs->trans('ObjectValidateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
+
+            case 'MEETING_UNVALIDATE' :
+            case 'TRAININGSESSION_UNVALIDATE' :
+            case 'AUDIT_UNVALIDATE' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_UNVALIDATE';
+                $actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
+
+            case 'MEETING_LOCKED' :
+            case 'TRAININGSESSION_LOCKED' :
+            case 'AUDIT_LOCKED' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_LOCKED';
+                $actioncomm->label = $langs->trans('ObjectLockedTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
+
+            case 'MEETING_ARCHIVED' :
+            case 'TRAININGSESSION_ARCHIVED' :
+            case 'AUDIT_ARCHIVED' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_ARCHIVED';
+                $actioncomm->label = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
+
+			case 'SATURNESIGNATURE_ADDATTENDANT' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
-				$actioncomm->code        = 'AC_SESSION_ADDATTENDANT';
-				$actioncomm->label       = $langs->transnoentities('AddAttendantTrigger', $object->firstname . ' ' . $object->lastname);
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_ADDATTENDANT';
+				$actioncomm->label       = $langs->transnoentities('AddAttendantTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
                 if ($object->element_type == 'socpeople') {
                     $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
                 }
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-			case 'DOLIMEETSIGNATURE_SIGNED' :
+			case 'SATURNESIGNATURE_SIGNED' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
-				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_SIGNED';
-				$actioncomm->label       = $langs->transnoentities($object->role . 'Signed') . ' : ' . $object->firstname . ' ' . $object->lastname;
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_SIGNED';
+				$actioncomm->label       = $langs->transnoentities('SignedTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
                 if ($object->element_type == 'socpeople') {
                     $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
                 }
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-			case 'DOLIMEETSIGNATURE_PENDING_SIGNATURE' :
+			case 'SATURNESIGNATURE_PENDING_SIGNATURE' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
-				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_PENDING_SIGNATURE';
-				$actioncomm->label       = $langs->transnoentities('DolimeetSignaturePendingSignatureTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_PENDING_SIGNATURE';
+				$actioncomm->label       = $langs->transnoentities('PendingSignatureTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
 				if ($object->element_type == 'socpeople') {
 					$actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
 				}
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-			case 'DOLIMEETSIGNATURE_ABSENT' :
+			case 'SATURNESIGNATURE_ABSENT' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
-				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_ABSENT';
-				$actioncomm->label       = $langs->transnoentities('DolimeetSignatureAbsentTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_ABSENT';
+				$actioncomm->label       = $langs->transnoentities('AbsentTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
 				if ($object->element_type == 'socpeople') {
 					$actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
 				}
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-			case 'DOLIMEETSIGNATURE_DELETED' :
+			case 'SATURNESIGNATURE_DELETED' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
-				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_DELETED';
-				$actioncomm->label       = $langs->transnoentities('DolimeetSignatureDeletedTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_DELETED';
+				$actioncomm->label       = $langs->transnoentities('DeletedTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
                 if ($object->element_type == 'socpeople') {
                     $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
                 }
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
         }

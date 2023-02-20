@@ -491,7 +491,7 @@ class Session extends CommonObject
 
             if (!$error && !$notrigger) {
                 // Call trigger
-                $result = $this->call_trigger($this->type . '_VALIDATE', $user);
+                $result = $this->call_trigger(strtoupper($this->type) . '_VALIDATE', $user);
                 if ($result < 0) {
                     $error++;
                 }
@@ -566,9 +566,9 @@ class Session extends CommonObject
             return 0;
         }
 
-//        $signatory = new SessionSignature($this->db);
-//        $signatory->deleteSignatoriesSignatures($this->id, 'session');
-        return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, $this->type . '_UNVALIDATE');
+        $signatory = new SaturneSignature($this->db);
+        $signatory->deleteSignatoriesSignatures($this->id, $this->type);
+        return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, strtoupper($this->type) . '_UNVALIDATE');
     }
 
     /**
@@ -580,7 +580,7 @@ class Session extends CommonObject
      */
     public function setLocked(User $user, int $notrigger = 0): int
     {
-        return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, $this->type . '_LOCKED');
+        return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, strtoupper($this->type) . '_LOCKED');
     }
 
     /**
@@ -592,7 +592,7 @@ class Session extends CommonObject
      */
     public function setArchived(User $user, int $notrigger = 0): int
     {
-        return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, $this->type . '_ARCHIVED');
+        return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, strtoupper($this->type) . '_ARCHIVED');
     }
 
     /**
