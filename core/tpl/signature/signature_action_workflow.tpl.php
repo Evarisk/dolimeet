@@ -1,7 +1,7 @@
 <?php
 
 // Action to set status STATUS_LOCKED
-if ($action == 'confirm_lock') {
+if ($action == 'confirm_lock' && $permissiontoadd) {
     $object->fetch($id);
     if (!$error) {
         $result = $object->setLocked($user, false);

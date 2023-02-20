@@ -258,6 +258,17 @@ class Session extends CommonObject
      */
     public $fk_contrat;
 
+     /**
+      * @var string    Field with ID of parent key if this object has a parent
+      */
+     public $fk_element = 'fk_object';
+     
+     /**
+      * @var array	List of child tables. To test if we can delete object.
+      */
+     protected $childtables = ['saturne_object_signature' => 'Attendant'];
+
+
     /**
 	 * Constructor
 	 *
@@ -439,6 +450,20 @@ class Session extends CommonObject
      */
 	public function delete(User $user, bool $notrigger = false): int
     {
+        switch ($this->type) {
+            case 'trainingsession':
+                $this->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
+                break;
+            case 'meeting':
+                $this->picto = 'fontawesome_fa-comments_fas_#d35968';
+                break;
+            case 'audit':
+                $this->picto = 'fontawesome_fa-tasks_fas_#d35968';
+                break;
+            default :
+                $this->picto = 'dolimeet_color@dolimeet';
+                break;
+        }
         return $this->deleteCommon($user, $notrigger);
 	}
 
