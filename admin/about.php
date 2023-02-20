@@ -36,7 +36,7 @@ require_once __DIR__ . '/../core/modules/modDoliMeet.class.php';
 global $db, $langs, $user;
 
 // Translations
-saturne_load_langs(['errors', 'admin']);
+saturne_load_langs();
 
 // Initialize technical objects
 $modDoliMeet = new modDoliMeet($db);
@@ -53,7 +53,7 @@ saturne_check_access($permissiontoread);
  */
 
 $help_url  = 'FR:Module_DoliMeet';
-$title = $langs->trans('DoliMeetAbout');
+$title = $langs->trans('ModuleAbout', 'DoliMeet');
 
 saturne_header(0,'', $title, $help_url);
 

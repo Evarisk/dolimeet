@@ -42,7 +42,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
 // Translations
-saturne_load_langs(['admin']);
+saturne_load_langs();
 
 // Get parameters
 $backtopage = GETPOST('backtopage', 'alpha');
@@ -57,7 +57,7 @@ saturne_check_access($permissiontoread);
 
 if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 
-$title    = $langs->trans('DoliMeetSetup');
+$title    = $langs->trans('ModuleSetup', 'DoliMeet');
 $help_url = 'FR:Module_DoliMeet';
 
 saturne_header(0,'', $title, $help_url);

@@ -17,56 +17,10 @@
 # Générique
 #
 
-# Module label 'ModuleDoliMeetName'
-ModuleDoliMeetName = DoliMeet
-# Module description 'ModuleDoliMeetDesc'
-ModuleDoliMeetDesc = Suivi des réunions, sessions de formation, audit
-DoliMeetDescription = Suivi des réunions, sessions de formation, audit
+ModuleDoliMeetName      = DoliMeet
+ModuleDoliMeetDesc      = Suivi des réunions, sessions de formation, audit
+DoliMeetDescription     = Suivi des réunions, sessions de formation, audit
 DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
-
-
-
-#
-# Page d'administration
-#
-
-Settings = Réglages
-DoliMeetSetup = Configuration du module DoliMeet
-
-
-
-#
-# Page À propos
-#
-
-About = À propos
-DoliMeetAbout = À propos de DoliMeet
-
-
-
-#
-# Page index
-#
-
-# Data - Donnée
-DoliMeetArea = Bienvenue sur DoliMeet
-DoliMeetUpdate = Mise à jour de DoliMeet :
-DoliMeetHasBeenUpdatedTo = DoliMeet a été mis à jour en version %s
-DoliMeetPatchNote = Note de mise à jour DoliMeet %s
-ShowPatchNote = Consulter la note de mise à jour
-DontShowPatchNote = Ne plus afficher la note de mise à jour
-
-
-
-#
-# DoliMeet
-#
-
-# Right - Droit
-LireDoliMeet = Consulter DoliMeet
-ReadDoliMeet = Consulter DoliMeet (read)
-ReadAdminPage = Accéder à la configuration du module
-
 
 
 #
@@ -74,11 +28,10 @@ ReadAdminPage = Accéder à la configuration du module
 #
 
 # Right - Droit
-ReadDoliMeetSession = Lire les sessions de DoliMeet
-WriteDoliMeetSession = Créer/mettre à jour les sessions de DoliMeet
-DeleteDoliMeetSession = Supprimer les sessions de DoliMeet
+ReadMyObject = Consulter mes %s
 
 # Data - Donnée
+DoliMeetSessions = sessions
 NewSession = Nouvelle session
 SessionList = Liste des sessions
 SessionTypes = Types de session
@@ -98,21 +51,17 @@ EnableObjectDescription = Activer l'objet %s
 # Meeting - Réunion
 #
 
-# Right - Droit
-ReadMeeting = Consulter les réunions
-WriteMeeting = Créer/Modifier les réunions
-DeleteMeeting = Supprimer les réunions
-
 # Data - Donnée
 Meeting = Réunion
+Meetings = réunions
 TheMeeting = la réunion
 MeetingList = Liste des réunions
 MeetingCreate = Créer une réunion
 NewMeeting = Nouvelle réunion
 ModifyMeeting = Modifier une réunion
-CloneMeeting = Cloner la réunion
-ConfirmCloneMeeting = Voulez-vous cloner cette réunion ?
 MeetingsCategoriesArea = Catégories de réunion
+
+# Attendant role - Rôle participant
 Contributor = Contributeur
 Responsible = Responsable
 
@@ -122,14 +71,10 @@ Responsible = Responsable
 # Training Session - Session de formation
 #
 
-# Right - Droit
-ReadTrainingSession = Consulter les sessions de formation
-WriteTrainingSession = Créer/Modifier les sessions de formation
-DeleteTrainingSession = Supprimer les sessions de formation
-
 # Data - Donnée
 TrainingSession = Session de formation
 Trainingsession = Session de formation
+Trainingsessions = sessions de formation
 TheTrainingsession = la session de formation
 TrainingsessionList = Liste des sessions de formation
 TrainingSessionList = Liste des sessions de formation
@@ -137,8 +82,6 @@ TrainingSessionCreate = Créer une session de formation
 Contract = Contrat
 NewTrainingsession = Nouvelle session de formation
 ModifyTrainingsession = Modifier une session de formation
-CloneTrainingsession = Cloner la session de formation
-ConfirmCloneTrainingsession = Voulez-vous cloner cette session de formation ?
 TrainingSessionStart = Date de début de la formation
 TrainingSessionEnd = Date de fin de la formation
 ActionFormation = Action de formation
@@ -148,6 +91,8 @@ BilanCompetences = Bilan de compétences
 TrainingSessionType = Type de formation
 TrainingSessionLocation = Lieu de la formation
 TrainingsessionsCategoriesArea = Catégories de session de formation
+
+# Attendant role - Rôle participant
 SessionTrainer = Formateur
 Trainee = Stagiaire
 
@@ -156,14 +101,6 @@ Trainee = Stagiaire
 #
 # Training Session Document - Document lié au session de formation
 #
-
-# Mod Numbering - Modèle de numérotation
-NumberingModule = Modèle de numérotation
-StandardModel = Renvoie le numéro sous la forme %syymm-nnnn où yy est l'année, mm le mois et nnnn est un compteur séquentiel sans rupture et sans remise à 0.
-
-# ODT Template - Template ODT
-DocumentTemplate = Modèle de documents
-ODTDefaultTemplateName = ODT par défaut des documents %s
 
 # Data - Donnée
 AttendanceSheetDocument = Feuille de présence
@@ -179,21 +116,17 @@ completioncertificatedocument.odt = Certificat de réalisation
 # Audit - Audit
 #
 
-# Right - Droit
-ReadAudit = Consulter les audits
-WriteAudit = Créer/Modifier les audits
-DeleteAudit = Supprimer les audits
-
 # Data - Donnée
 Audit = Audit
+Audits = audits
 TheAudit = l'audit
 AuditList = Liste des audits
 AuditCreate = Créer un audit
 NewAudit = Nouvel audit
 ModifyAudit = Modifier un audit
-CloneAudit = Cloner l'audit ?
-ConfirmCloneAudit = Voulez-vous cloner cet audit ?
 AuditsCategoriesArea = Catégories d'audit
+
+# Attendant role - Rôle participant
 Auditor = Auditeur
 
 
@@ -202,8 +135,6 @@ Auditor = Auditeur
 #
 
 # Data - Donnée
-Hour(s) = Heure(s)
-Minute(s) = Minute(s)
 TrainingOrganizationNumber = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants = Tiers des participants externe

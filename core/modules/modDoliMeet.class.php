@@ -41,7 +41,9 @@ class modDoliMeet extends DolibarrModules
 		global $langs, $conf;
 		$this->db = $db;
 
-        $langs->load('dolimeet@dolimeet');
+        require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+
+        saturne_load_langs(['dolimeet@dolimeet']);
 
         // ID for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used module id).
@@ -129,7 +131,7 @@ class modDoliMeet extends DolibarrModules
 		// Example: this->dirs = array("/dolimeet/temp","/dolimeet/subdir");
 		$this->dirs = ['/dolimeet/temp', '/ecm/dolimeet/attendancesheetdocument/', '/ecm/dolimeet/completioncertificatedocument/'];
 
-		// Config pages. Put here list of php page, stored into dolimeet/admin directory, to use to setup module.
+		// Config pages. Put here list of php page, stored into dolimeet/admin directory, to use to set up module.
 		$this->config_page_url = ['setup.php@dolimeet'];
 
 		// Dependencies
@@ -214,11 +216,11 @@ class modDoliMeet extends DolibarrModules
         $this->tabs   = [];
         $pictopath    = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
         $picto        = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . $langs->trans('Sessions') . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'user:+sessionList:' . $picto . $langs->trans('Sessions') . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . $langs->trans('Sessions') . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'project:+sessionList:' . $picto . $langs->trans('Sessions') . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . $langs->trans('Sessions') . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__']; // To add a new tab identified by code tabname1
+        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'user:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'project:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'contract:+schedules:'. $picto . $langs->trans('Schedules') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/saturne/view/saturne_schedules.php?module_name=DoliMeet&element_type=contrat&id=__ID__']; // To add a new tab identified by code tabname1
         // Example:
         // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@dolimeet:$user->rights->othermodule->read:/dolimeet/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
@@ -277,87 +279,107 @@ class modDoliMeet extends DolibarrModules
 
         /* DOLIMEET PERMISSIONS */
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->trans('LireDoliMeet');
+        $this->rights[$r][1] = $langs->trans('LireModule', 'DoliMeet');
         $this->rights[$r][4] = 'lire';
         $this->rights[$r][5] = 1;
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->trans('ReadDoliMeet');
+        $this->rights[$r][1] = $langs->trans('ReadModule', 'DoliMeet');
         $this->rights[$r][4] = 'read';
         $this->rights[$r][5] = 1;
         $r++;
 
         /* SESSION PERMISSSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('ReadSession'); // Permission label
+		$this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('DoliMeetSessions')); // Permission label
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->read)
 		$r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('DoliMeetSessions')); // Permission label
+        $this->rights[$r][4] = 'meeting';
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('CreateSession'); // Permission label
+		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('DoliMeetSessions')); // Permission label
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->write)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('DeleteDoliMeetSession'); // Permission label
+		$this->rights[$r][1] = $langs->trans('DeleteObject', $langs->trans('DoliMeetSessions')); // Permission label
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->delete)
 		$r++;
-
+        
         /* MEETING PERMISSSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('ReadMeeting'); // Permission label
+		$this->rights[$r][1] = $langs->transnoentities('ReadObject', $langs->transnoentities('Meetings')); // Permission label
 		$this->rights[$r][4] = 'meeting';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
 		$r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->transnoentities('Meetings')); // Permission label
+        $this->rights[$r][4] = 'meeting';
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('CreateMeeting'); // Permission label
+		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->transnoentities('Meetings')); // Permission label
 		$this->rights[$r][4] = 'meeting';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->write)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('DeleteMeeting'); // Permission label
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObject', $langs->transnoentities('Meetings')); // Permission label
 		$this->rights[$r][4] = 'meeting';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
 		$r++;
 
         /* TRAINING SESSION PERMISSSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('ReadTrainingSession'); // Permission label
+		$this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('Trainingsessions')); // Permission label
 		$this->rights[$r][4] = 'trainingsession';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->trainingsession->read)
 		$r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Trainingsessions')); // Permission label
+        $this->rights[$r][4] = 'meeting';
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('CreateTrainingSession'); // Permission label
+		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Trainingsessions')); // Permission label
 		$this->rights[$r][4] = 'trainingsession';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->trainingsession->write)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('DeleteTrainingSession'); // Permission label
+		$this->rights[$r][1] = $langs->trans('DeleteObject', $langs->trans('Trainingsessions')); // Permission label
 		$this->rights[$r][4] = 'trainingsession';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
 		$r++;
 
         /* AUDIT PERMISSSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('ReadAudit'); // Permission label
+		$this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('Audits')); // Permission label
 		$this->rights[$r][4] = 'audit';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->audit->read)
 		$r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Audits')); // Permission label
+        $this->rights[$r][4] = 'meeting';
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('CreateAudit'); // Permission label
+		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Audits')); // Permission label
 		$this->rights[$r][4] = 'audit';
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->audit->write)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('DeleteAudit'); // Permission label
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObject', $langs->trans('Audits')); // Permission label
 		$this->rights[$r][4] = 'audit';
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->delete)
         $r++;
 
         /* ADMINPAGE PANEL ACCESS PERMISSIONS */
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->transnoentities('ReadAdminPage');
+        $this->rights[$r][1] = $langs->transnoentities('ReadAdminPage', 'DoliMeet');
         $this->rights[$r][4] = 'adminpage';
         $this->rights[$r][5] = 'read';
 

@@ -44,7 +44,7 @@ function dolimeet_admin_prepare_head(): array
     $h++;
 
     $head[$h][0] = dol_buildpath('/dolimeet/admin/setup.php', 1);
-    $head[$h][1] = '<i class="fas fa-cog pictofixedwidth"></i>' . $langs->trans('Settings');
+    $head[$h][1] = '<i class="fas fa-cog pictofixedwidth"></i>' . $langs->trans('ModuleSettings');
     $head[$h][2] = 'settings';
     $h++;
 

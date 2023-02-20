@@ -49,7 +49,7 @@ saturne_check_access($permissiontoread);
  * View
  */
 
-$title   = $langs->trans($moduleName . 'Area');
+$title   = $langs->trans('ModuleArea', $moduleName);
 $helpUrl = 'FR:Module_' . $moduleName;
 
 saturne_header(0, '', $title . ' ' . $modModule->version, $helpUrl);
