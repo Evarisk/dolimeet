@@ -624,7 +624,7 @@ class SaturneSignature extends CommonObject
      */
     public function fetchSignatory($role, $fk_object, $object_type)
     {
-        $filter = array('customsql' => 'fk_object=' . $fk_object . ' AND status!=0 AND object_type="' . $object_type . '"');
+        $filter = array('customsql' => 'fk_object=' . $fk_object . ' AND status > 0 AND object_type="' . $object_type . '"');
         if (strlen($role)) {
             $filter['customsql'] .= ' AND role = "' . $role . '"';
             return $this->fetchAll('', '', 0, 0, $filter, 'AND');
