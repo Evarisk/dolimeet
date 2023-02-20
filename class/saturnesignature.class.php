@@ -738,4 +738,63 @@ class SaturneSignature extends CommonObject
             return -1;
         }
     }
+
+    /**
+     * Clone an object into another one
+     *
+     * @param  User       $user     User that creates
+     * @param  int        $fromid   ID of object to clone
+     * @param  int        $objectID ID of object element to link with signatory
+     * @return int                  New object created, <0 if KO
+     * @throws Exception
+     */
+    public function createFromClone(User $user, int $fromid, int $objectID): int
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $object = new self($this->db);
+
+        $this->db->begin();
+
+        // Load source object
+        $object->fetchCommon($fromid);
+
+        // Reset some properties
+        unset($object->id);
+        unset($object->fk_user_creat);
+        unset($object->import_key);
+        unset($object->signature_date);
+        unset($object->last_email_sent_date);
+
+        // Clear fields
+        if (property_exists($object, 'date_creation')) {
+            $object->date_creation = dol_now();
+        }
+        if (property_exists($object, 'fk_object')) {
+            $object->fk_object = $objectID;
+        }
+        if (property_exists($object, 'status')) {
+            $object->status = 1;
+        }
+        if (property_exists($object, 'signature')) {
+            $object->signature = '';
+        }
+        if (property_exists($object, 'signature_url')) {
+            $object->signature_url = generate_random_id();
+        }
+
+        // Create clone
+        $object->context['createfromclone'] = 'createfromclone';
+        $result                             = $object->createCommon($user);
+        unset($object->context['createfromclone']);
+
+        // End
+        if ($result > 0) {
+            $this->db->commit();
+            return $result;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 }

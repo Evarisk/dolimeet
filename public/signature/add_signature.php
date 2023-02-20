@@ -210,7 +210,7 @@ if (empty($reshook)) {
 
 $title   = $langs->trans('Signature');
 $morejs  = ['/dolimeet/js/signature-pad.min.js', '/saturne/js/saturne.min.js'];
-$morecss = ['/saturne/css/saturne.css'];
+$morecss = ['/saturne/css/saturne.min.css'];
 
 llxHeaderSignature($title, '', 0, 0, $morejs, $morecss);
 

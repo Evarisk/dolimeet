@@ -131,6 +131,20 @@ if (empty($reshook)) {
         }
     }
 
+    // Action clone object
+    if ($action == 'confirm_clone' && $confirm == 'yes') {
+        $options['label'] = GETPOST('clone_label');
+        $options['attendants'] = GETPOST('clone_attendants');
+        $result = $object->createFromClone($user, $object->id, $options);
+        if ($result > 0) {
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $result . '&object_type=' . $object->element);
+            exit;
+        } else {
+            setEventMessages($object->error, $object->errors, 'errors');
+            $action = '';
+        }
+    }
+
     // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
     $conf->global->MAIN_DISABLE_PDF_AUTOUPDATE = 1;
 
@@ -244,18 +258,6 @@ if (empty($reshook)) {
     $triggersendname = 'DOLIMEET_' . strtoupper($object->element) . '_SENTBYMAIL';
     $autocopy = 'MAIN_MAIL_AUTOCOPY_' . strtoupper($object->element) . '_TO';
     $trackid = $object->element . $object->id;
-
-    // Action clone object
-    if ($action == 'confirm_clone' && $confirm == 'yes') {
-        $options = array();
-        $object->ref = $refMod->getNextValue($object);
-        $result = $object->createFromClone($user, $object->id, $options);
-
-        if ($result > 0) {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $result);
-            exit;
-        }
-    }
 
     require_once __DIR__ . '/../../core/tpl/signature/signature_action_workflow.tpl.php';
 }
@@ -399,10 +401,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         // Define confirmation messages
         $formquestionclone = [
             'text' => $langs->trans('ConfirmClone'),
-            ['type' => 'text', 'name' => 'clone_label', 'label' => $langs->trans('NewLabelForClone'), 'value' => empty($tmpcode) ? $langs->trans('CopyOf') . ' ' . $object->ref : $tmpcode, 'size' => 24],
+            ['type' => 'text', 'name' => 'clone_label', 'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
             ['type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans('CloneAttendants'), 'value' => 1],
         ];
-        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('CloneObject'), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
+        $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element)), $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
     }
 
     // Confirmation to delete

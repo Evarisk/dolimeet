@@ -297,7 +297,6 @@ $morejs  = ['/dolimeet/js/signature-pad.min.js'];
 saturne_header(0,'', $title, $helpUrl, '', 0, 0, $morejs);
 
 if ($id > 0 || !empty($ref) && empty($action)) {
-    // @todo pertinence
     $object->fetch_optionals();
 
     saturne_get_fiche_head($object, 'attendants', $title);
@@ -309,9 +308,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
         <div class="wpeo-notice notice-warning">
             <div class="notice-content">
                 <div class="notice-title"><?php echo $langs->trans('BeCareful') ?></div>
-                <div class="notice-subtitle"><?php echo $langs->trans(ucfirst($object->element) . 'MustBeValidatedToSign') ?></div>
+                <div class="notice-subtitle"><?php echo $langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) ?></div>
             </div>
-            <a class="butAction" style="width = 100%;margin-right:0" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate') ?></a>;
+            <a class="butAction" style="width = 100%;margin-right:0" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate', $langs->transnoentities('The' . ucfirst($object->element))) ?></a>;
         </div>
     <?php endif; ?>
         <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -323,6 +322,12 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             </div>
         </div>
     <?php
+
+    if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED) {
+        print '<div style="text-align: right">';
+        print '<br><a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
+        print '</div>';
+    }
 
     $zone = 'private';
 
@@ -375,7 +380,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '</td><td>';
             print $langs->trans($element->role);
             print '</td><td>';
-            if ($object->status == $object::STATUS_VALIDATED) {
+            if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
                 $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&object_type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
             }
@@ -512,7 +517,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '</td><td>';
             print $langs->trans('ExternalAttendant');
             print '</td><td>';
-            if ($object->status == $object::STATUS_VALIDATED) {
+            if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
                 $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&object_type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
             }

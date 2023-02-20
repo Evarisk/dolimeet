@@ -875,148 +875,84 @@ class Session extends CommonObject
 		return parent::setCategoriesCommon($categories, 'session');
 	}
 
-//	/**
-//	 * Clone an object into another one
-//	 *
-//	 * @param User $user User that creates
-//	 * @param int $fromid Id of object to clone
-//	 * @param $options
-//	 * @return    mixed                New object created, <0 if KO
-//	 * @throws Exception
-//	 */
-//	public function createFromClone(User $user, $fromid, $options)
-//	{
-//		global $conf, $langs;
-//		$error = 0;
-//
-//		require_once __DIR__ . '/meeting.class.php';
-//		require_once __DIR__ . '/trainingsession.class.php';
-//		require_once __DIR__ . '/audit.class.php';
-//
-//
-//		switch ($this->type) {
-//			case 'meeting':
-//				$signatory = new TrainingSessionSignature($this->db);
-//				break;
-//			case 'trainingsession':
-//				$signatory = new MeetingSignature($this->db);
-//				break;
-//			case 'audit':
-//				$signatory = new AuditSignature($this->db);
-//				break;
-//		}
-//
-//		$conf_mod = 'DOLIMEET_' . strtoupper($this->type) . '_ADDON';
-//		$refObjectMod    = new $conf->global->$conf_mod($this->db);
-//
-//		dol_syslog(__METHOD__, LOG_DEBUG);
-//
-//		$object = new self($this->db);
-//
-//		$this->db->begin();
-//
-//		// Load source object
-//		$result = $object->fetchCommon($fromid);
-//		if ($result > 0 && ! empty($object->table_element_line)) {
-//			$object->fetchLines();
-//		}
-//
-//		// Load signatory and ressources from source object
-//		$signatories = $signatory->fetchSignatory('', $fromid, $this->type);
-//
-//		if ( ! empty($signatories) && $signatories > 0) {
-//			foreach ($signatories as $arrayRole) {
-//				foreach ($arrayRole as $signatoryRole) {
-//					$signatoriesID[$signatoryRole->role] = $signatoryRole->id;
-//					if ($signatoryRole->role == strtoupper($this->type) . '_EXTERNAL_ATTENDANT') {
-//						$extintervenant_ids[] = $signatoryRole->id;
-//					}
-//				}
-//			}
-//		}
-//
-//		// Reset some properties
-//		unset($object->id);
-//		unset($object->fk_user_creat);
-//		unset($object->import_key);
-//
-//		// Clear fields
-//		if (property_exists($object, 'ref')) {
-//			$object->ref = $refObjectMod->getNextValue($object);
-//		}
-//		if (property_exists($object, 'ref_ext')) {
-//			$object->ref_ext = 'dolimeet_' . $object->ref;
-//		}
-//		if (property_exists($object, 'label')) {
-//			$object->label = empty($this->fields['label']['default']) ? $langs->trans('CopyOf') . ' ' . $object->label : $this->fields['label']['default'];
-//		}
-//		if (property_exists($object, 'date_creation')) {
-//			$object->date_creation = dol_now();
-//		}
-//		if (property_exists($object, 'status')) {
-//			$object->status = 1;
-//		}
-//
-//		// Create clone
-//		$object->context['createfromclone'] = 'createfromclone';
-//		$object_id                   = $object->create($user);
-//
-//		if ($object_id > 0) {
-//			if (!empty($signatoriesID)) {
-//				$signatory->createFromClone($user, $signatoriesID[strtoupper($this->type) . '_EXTERNAL_ATTENDANT'], $object_id);
-//				$signatory->createFromClone($user, $signatoriesID[strtoupper($this->type) . '_SOCIETY_ATTENDANT'], $object_id);
-//			}
-//
-//			if ( ! empty($options['schedule'])) {
-//				if ( ! empty($openinghours)) {
-//					$openinghours->element_id = $object_id;
-//					$openinghours->create($user);
-//				}
-//			}
-//
-//			if ( ! empty($options['attendants'])) {
-//				if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
-//					foreach ($extintervenant_ids as $extintervenant_id) {
-//						$signatory->createFromClone($user, $extintervenant_id, $object_id);
-//					}
-//				}
-//			}
-//
-//			if ( ! empty($options['preventionplan_risk'])) {
-//				$num = (!empty($object->lines) ? count($object->lines) : 0);
-//				for ($i = 0; $i < $num; $i++) {
-//					$line                    = $object->lines[$i];
-//					if (property_exists($line, 'ref')) {
-//						$line->ref = $refPreventionPlanDetMod->getNextValue($line);
-//					}
-//					$line->category          = empty($line->category) ? 0 : $line->category;
-//					$line->fk_preventionplan = $object_id;
-//
-//					$result = $line->insert($user, 1);
-//					if ($result < 0) {
-//						$this->error = $this->db->lasterror();
-//						$this->db->rollback();
-//						return -1;
-//					}
-//				}
-//			}
-//		} else {
-//			$error++;
-//			$this->error  = $object->error;
-//			$this->errors = $object->errors;
-//		}
-//
-//		unset($object->context['createfromclone']);
-//
-//		// End
-//		if ( ! $error) {
-//			$this->db->commit();
-//			return $object_id;
-//		} else {
-//			$this->db->rollback();
-//			return -1;
-//		}
-//	}
+    /**
+     * Clone an object into another one
+     *
+     * @param  User      $user    User that creates
+     * @param  int       $fromid  ID of object to clone
+     * @param  array     $options Options array
+     * @return int                New object created, <0 if KO
+     * @throws Exception
+     */
+    public function createFromClone(User $user, int $fromid, array $options): int
+    {
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		global $conf, $langs;
+		$error = 0;
+
+		$object = new self($this->db);
+
+		$this->db->begin();
+
+		// Load source object
+		$object->fetchCommon($fromid);
+
+		// Reset some properties
+		unset($object->id);
+		unset($object->fk_user_creat);
+		unset($object->import_key);
+
+		// Clear fields
+		if (property_exists($object, 'ref')) {
+			$object->ref = '';
+		}
+        if (!empty($options['label'])) {
+            if (property_exists($object, 'label')) {
+                $object->label = $options['label'];
+            }
+        }
+		if (property_exists($object, 'date_creation')) {
+			$object->date_creation = dol_now();
+		}
+		if (property_exists($object, 'status')) {
+			$object->status = 0;
+		}
+
+		// Create clone
+		$object->context['createfromclone'] = 'createfromclone';
+		$result                             = $object->create($user);
+
+		if ($result > 0) {
+			if (!empty($options['attendants'])) {
+                // Load signatory from source object
+                $signatory   = new SaturneSignature($this->db);
+                $signatories = $signatory->fetchSignatory('', $fromid, $this->type);
+                if (is_array($signatories) && !empty($signatories)) {
+                    foreach ($signatories as $arrayRole) {
+                        foreach ($arrayRole as $signatoryRole) {
+                            $signatory->createFromClone($user, $signatoryRole->id, $result);
+                        }
+                    }
+                }
+			}
+		} else {
+			$error++;
+			$this->error  = $object->error;
+			$this->errors = $object->errors;
+		}
+
+		unset($object->context['createfromclone']);
+
+		// End
+		if (!$error) {
+			$this->db->commit();
+			return $result;
+		} else {
+			$this->db->rollback();
+			return -1;
+		}
+	}
 }
 
 /**
