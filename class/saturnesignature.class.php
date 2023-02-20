@@ -453,13 +453,14 @@ class SaturneSignature extends CommonObject
     /**
      *	Set signed status
      *
-     *	@param  User $user      Object user that modify
-     *  @param  int  $notrigger	1 = Does not execute triggers, 0 = Execute triggers
-     *	@return int             0 < if KO, > 0 if OK
+     *	@param  User   $user      Object user that modify
+     *  @param  int    $notrigger 1 = Does not execute triggers, 0 = Execute triggers
+     * @param   string $zone      Zone (private or public)
+     *	@return int               0 < if KO, > 0 if OK
      */
-    public function setSigned(User $user, int $notrigger = 0): int
+    public function setSigned(User $user, int $notrigger = 0, string $zone = 'private'): int
     {
-        return $this->setStatusCommon($user, self::STATUS_SIGNED, $notrigger, 'SATURNESIGNATURE_SIGNED');
+        return $this->setStatusCommon($user, self::STATUS_SIGNED, $notrigger, 'SATURNESIGNATURE_SIGNED' . (($zone == 'public') ? '_PUBLIC' : ''));
     }
 
     /**

@@ -170,7 +170,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
      */
 	public function write_file(SessionDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails = 0, int $hidedesc = 0, int $hideref = 0, array $moreparam): int
     {
-        global $action, $conf, $hookmanager, $langs, $mysoc, $user;
+        global $action, $conf, $hookmanager, $langs, $mysoc;
 
         $object = $moreparam['object'];
 
@@ -196,12 +196,16 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
         $refModName          = new $conf->global->DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON($this->db);
         $objectDocumentRef   = $refModName->getNextValue($objectDocument);
         $objectDocument->ref = $objectDocumentRef;
-        $objectDocumentID    = $objectDocument->create($user, true, $object);
+        $objectDocumentID    = $objectDocument->create($moreparam['user'], true, $object);
 
         $objectDocument->fetch($objectDocumentID);
 
         $objectref = dol_sanitizeFileName($objectDocument->ref);
-		$dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
+        if ($moreparam['specimen'] == 0) {
+            $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
+        } else {
+            $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp';
+        }
 
 		if (!file_exists($dir)) {
 			if (dol_mkdir($dir) < 0) {
@@ -217,7 +221,11 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
             $societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date       = dol_print_date(dol_now(),'dayxcard');
-			$newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $societyname;
+            if ($moreparam['specimen'] == 0) {
+                $newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $societyname;
+            } else {
+                $newfiletmp = $newfiletmp . '_specimen';
+            }
 
             $objectDocument->last_main_doc = $newfiletmp;
 

@@ -170,7 +170,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
      */
     public function write_file(SessionDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails = 0, int $hidedesc = 0, int $hideref = 0, array $moreparam): int
     {
-        global $action, $conf, $hookmanager, $langs, $mysoc, $user;
+        global $action, $conf, $hookmanager, $langs, $mysoc;
 
         $object = $moreparam['object'];
 
@@ -196,7 +196,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
         $refModName          = new $conf->global->DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON($this->db);
         $objectDocumentRef   = $refModName->getNextValue($objectDocument);
         $objectDocument->ref = $objectDocumentRef;
-        $objectDocumentID    = $objectDocument->create($user, true, $object);
+        $objectDocumentID    = $objectDocument->create($moreparam['user'], true, $object);
 
         $objectDocument->fetch($objectDocumentID);
 

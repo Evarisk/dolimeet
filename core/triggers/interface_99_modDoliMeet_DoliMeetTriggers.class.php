@@ -179,7 +179,18 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 }
                 $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
-				break;
+                break;
+            case 'SATURNESIGNATURE_SIGNED_PUBLIC' :
+                $actioncomm->elementtype = $object->object_type . '@dolimeet';
+                $actioncomm->code        = 'AC_SATURNESIGNATURE_SIGNED_PUBLIC';
+                $actioncomm->label       = $langs->transnoentities('SignedTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                if ($object->element_type == 'socpeople') {
+                    $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
+                }
+                $actioncomm->fk_element = $object->fk_object;
+                $actioncomm->userownerid = $object->element_id;
+                $actioncomm->create($user);
+                break;
 			case 'SATURNESIGNATURE_PENDING_SIGNATURE' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
 				$actioncomm->code        = 'AC_SATURNESIGNATURE_PENDING_SIGNATURE';

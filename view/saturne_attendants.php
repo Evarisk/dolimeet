@@ -302,9 +302,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     saturne_get_fiche_head($object, 'attendants', $title);
     saturne_banner_tab($object);
 
-    print '<div class="signatures-container">'; ?>
+    print '<div class="fichecenter">';
 
-    <?php if ($object->status == $object::STATUS_DRAFT) : ?>
+    if ($object->status == $object::STATUS_DRAFT) : ?>
         <div class="wpeo-notice notice-warning">
             <div class="notice-content">
                 <div class="notice-title"><?php echo $langs->trans('BeCareful') ?></div>
@@ -322,6 +322,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             </div>
         </div>
     <?php
+    print '</div>';
+
+    print '<div class="signatures-container">';
 
     if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED) {
         print '<div style="text-align: right">';
