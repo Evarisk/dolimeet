@@ -378,8 +378,9 @@ if (($id || $ref) && $action == 'edit') {
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
     $res = $object->fetch_optionals();
+    $linkback = '<a href="' . dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?restore_lastsearch_values=1&object_type=' . $object->element . '">' . $langs->trans('BackToList') . '</a>';
     saturne_get_fiche_head($object, 'card', $title);
-    saturne_banner_tab($object);
+    saturne_banner_tab($object, 'ref', $linkback);
 
     $formconfirm = '';
 
