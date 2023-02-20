@@ -132,7 +132,7 @@ if (!empty($fromtype)) {
         case 'thirdparty' :
             $objectLinked = new Societe($db);
             $search['fk_soc'] = $fromid;
-            $search['search_attendant_thirdparties'] = $fromid;
+            $search['search_society_attendants'] = $fromid;
             break;
         case 'project' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
@@ -155,7 +155,7 @@ if (!empty($fromtype)) {
         case 'user' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
             $objectLinked = new User($db);
-            $search['search_society_attendants'] = $fromid;
+            $search['search_internal_attendants'] = $fromid;
             break;
         default :
             $error++;
@@ -289,15 +289,15 @@ if (dol_strlen($fromtype) > 0 && !in_array($fromtype, $linkedObjectsArray) && !i
     }
 }
 
-if (GETPOST('search_society_attendants') > 0) {
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_society_attendants on (search_society_attendants.element_id = ' . GETPOST('search_society_attendants') . ' AND search_society_attendants.element_type="user" AND search_society_attendants.status > 0)';
+if (GETPOST('search_internal_attendants') > 0) {
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_internal_attendants on (search_internal_attendants.element_id = ' . GETPOST('search_internal_attendants') . ' AND search_internal_attendants.element_type="user" AND search_internal_attendants.status > 0)';
 }
 if (GETPOST('search_external_attendants') > 0) {
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_external_attendants on (search_external_attendants.element_id = ' . GETPOST('search_external_attendants') . ' AND search_external_attendants.element_type="socpeople" AND search_external_attendants.status > 0)';
 }
-if (GETPOST('search_attendant_thirdparties') > 0) {
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople as cf on (cf.fk_soc = ' . GETPOST('search_attendant_thirdparties') . ')';
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_attendant_thirdparties on (search_attendant_thirdparties.element_id = cf.rowid AND search_attendant_thirdparties.element_type="socpeople" AND search_attendant_thirdparties.status > 0)';
+if (GETPOST('search_society_attendants') > 0) {
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople as cf on (cf.fk_soc = ' . GETPOST('search_society_attendants') . ')';
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_society_attendants on (search_society_attendants.element_id = cf.rowid AND search_society_attendants.element_type="socpeople" AND search_society_attendants.status > 0)';
 }
 
 // Add table from hooks
@@ -318,14 +318,14 @@ if (is_array($signatoryObjectsArray) && dol_strlen($fromtype) > 0 && !in_array($
     $sql .= ' AND t.rowid = e.fk_object ';
 }
 
-if (GETPOST('search_society_attendants') > 0) {
-    $sql .= ' AND t.rowid = search_society_attendants.fk_object ';
+if (GETPOST('search_internal_attendants') > 0) {
+    $sql .= ' AND t.rowid = search_internal_attendants.fk_object ';
 }
 if (GETPOST('search_external_attendants') > 0) {
     $sql .= ' AND t.rowid = search_external_attendants.fk_object ';
 }
-if (GETPOST('search_attendant_thirdparties') > 0) {
-    $sql .= ' AND t.rowid = search_attendant_thirdparties.fk_object ';
+if (GETPOST('search_society_attendants') > 0) {
+    $sql .= ' AND t.rowid = search_society_attendants.fk_object ';
 }
 if ($objectType != 'session') {
     $sql .= " AND type = '" . $objectType . "'";
@@ -621,7 +621,7 @@ foreach ($object->fields as $key => $val) {
             if ($resource['checked']) {
                 if ($resource['label'] == 'InternalAttendants') {
                     print '<td>';
-                    print $form->select_dolusers($fromtype == 'user' ? $fromid : GETPOST('search_society_attendants'), 'search_society_attendants', 1);
+                    print $form->select_dolusers($fromtype == 'user' ? $fromid : GETPOST('search_internal_attendants'), 'search_internal_attendants', 1);
                     print '</td>';
                 } elseif ($resource['label'] == 'ExternalAttendants') {
                     print '<td>';
@@ -629,7 +629,7 @@ foreach ($object->fields as $key => $val) {
                     print '</td>';
                 } elseif ($resource['label'] == 'SocietyAttendants') {
                     print '<td>';
-                    print $form->select_company($fromtype == 'thirdparty' ? $fromid : GETPOST('search_attendant_thirdparties'), 'search_attendant_thirdparties', '', 1);
+                    print $form->select_company($fromtype == 'thirdparty' ? $fromid : GETPOST('search_society_attendants'), 'search_society_attendants', '', 1);
                     print '</td>';
                 }
             }
@@ -835,7 +835,7 @@ while ($i < $imaxinloop) {
                                 foreach ($internalAttendants as $object_signatory) {
                                     $usertmp = $user;
                                     $usertmp->fetch($object_signatory->element_id);
-                                    print $usertmp->getNomUrl(1);
+                                    print $usertmp->getNomUrl(1) . ' ' . $langs->trans($object_signatory->role);
                                     print '<br>';
                                 }
                             }
@@ -846,7 +846,7 @@ while ($i < $imaxinloop) {
                             if (is_array($signatories) && !empty($signatories)) {
                                 foreach ($signatories as $object_signatory) {
                                     $contact->fetch($object_signatory->element_id);
-                                    print $contact->getNomUrl(1);
+                                    print $contact->getNomUrl(1) . ' ' . $langs->trans($object_signatory->role);
                                     print '<br>';
                                 }
                             }
