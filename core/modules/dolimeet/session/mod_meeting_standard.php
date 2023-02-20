@@ -59,7 +59,7 @@ class mod_meeting_standard extends ModeleNumRefDoliMeet
     {
         global $langs;
         $langs->load('dolimeet@dolimeet');
-        return $langs->trans('DolimeetMeetingStandardModel', $this->prefix);
+        return $langs->trans('StandardModel', $this->prefix);
 	}
 
 	/**

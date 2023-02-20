@@ -57,12 +57,10 @@ saturne_check_access($permissiontoread);
 
 if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 
-$help_url = 'FR:Module_DoliMeet';
 $title    = $langs->trans('DoliMeetSetup');
-$morejs   = ['/dolimeet/js/dolimeet.js.php'];
-$morecss  = ['/dolimeet/css/dolimeet.css'];
+$help_url = 'FR:Module_DoliMeet';
 
-saturne_header(0,'', $title, $help_url, '', 0, 0, $morejs, $morecss);
+saturne_header(0,'', $title, $help_url);
 
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans('BackToModuleList') . '</a>';
@@ -70,7 +68,7 @@ print load_fiche_titre($title, $linkback, 'dolimeet_color@dolimeet');
 
 // Configuration header
 $head = dolimeet_admin_prepare_head();
-print saturne_get_fiche_head(null, 'about', $title, $head, 'dolimeet_color@dolimeet');
+print dol_get_fiche_head($head, 'settings', $title, -1, 'dolimeet_color@dolimeet');
 
 print load_fiche_titre($langs->trans('SessionConfig'), '', '');
 print '<hr>';
@@ -89,7 +87,7 @@ print '</tr>';
 
 clearstatcache();
 
-$dir = dol_buildpath('/custom/dolimeet/core/modules/dolimeet/');
+$dir = dol_buildpath('/custom/dolimeet/core/modules/dolimeet/session/');
 if (is_dir($dir)) {
 	$handle = opendir($dir);
 	if (is_resource($handle)) {
@@ -174,7 +172,7 @@ print '</tr>';
 print '<tr class="oddeven"><td>';
 print $langs->trans('Meeting');
 print '</td><td>';
-print $langs->trans('EnableMeetingDescription');
+print $langs->trans('EnableObjectDescription', $langs->transnoentities('Meeting'));
 print '</td>';
 
 print '<td class="center">';
@@ -185,7 +183,7 @@ print '</tr>';
 print '<tr class="oddeven"><td>';
 print $langs->trans('TrainingSession');
 print '</td><td>';
-print $langs->trans('EnableTrainingSessionDescription');
+print $langs->trans('EnableObjectDescription', $langs->trans('TrainingSession'));
 print '</td>';
 
 print '<td class="center">';
@@ -196,7 +194,7 @@ print '</tr>';
 print '<tr class="oddeven"><td>';
 print $langs->trans('Audit');
 print '</td><td>';
-print $langs->trans('EnableAuditDescription');
+print $langs->trans('EnableObjectDescription', $langs->trans('Audit'));
 print '</td>';
 
 print '<td class="center">';

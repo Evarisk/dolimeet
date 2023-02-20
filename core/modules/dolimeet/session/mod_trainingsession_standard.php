@@ -59,7 +59,7 @@ class mod_trainingsession_standard extends ModeleNumRefDoliMeet
     {
 		global $langs;
         $langs->load('dolimeet@dolimeet');
-        return $langs->trans('DolimeetTrainingSessionStandardModel', $this->prefix);
+        return $langs->trans('StandardModel', $this->prefix);
 	}
 
 	/**

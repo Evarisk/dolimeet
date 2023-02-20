@@ -59,7 +59,7 @@ class mod_audit_standard extends ModeleNumRefDoliMeet
     {
 		global $langs;
         $langs->load('dolimeet@dolimeet');
-		return $langs->trans('DolimeetAuditStandardModel', $this->prefix);
+		return $langs->trans('StandardModel', $this->prefix);
 	}
 
 	/**

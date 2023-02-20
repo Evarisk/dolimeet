@@ -32,15 +32,15 @@ function dolimeet_admin_prepare_head(): array
 	global $langs, $conf;
 
     // Load translation files required by the page
-	$langs->load('dolimeet@dolimeet');
+	saturne_load_langs();
 
     // Initialize values
 	$h = 0;
 	$head = [];
 
-    $head[$h][0] = dol_buildpath("/dolimeet/admin/dolimeetdocuments.php", 1);
-    $head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans("YourDocuments");
-    $head[$h][2] = 'dolimeetdocuments';
+    $head[$h][0] = dol_buildpath('/dolimeet/admin/dolimeetdocuments.php', 1);
+    $head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('YourDocuments');
+    $head[$h][2] = 'documents';
     $h++;
 
     $head[$h][0] = dol_buildpath('/dolimeet/admin/setup.php', 1);
