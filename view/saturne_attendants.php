@@ -87,7 +87,6 @@ saturne_check_access($permissiontoread);
 *  Actions
 */
 
-// @todo finir le clean actions
 $parameters = ['id' => $id];
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) {
@@ -118,10 +117,10 @@ if (empty($reshook)) {
             if ($attendantType == 'internal') {
                 $usertmp = $user;
                 $usertmp->fetch($attendantID);
-                setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $usertmp->getFullName($langs, 1), []);
+                setEventMessages($langs->trans('AddAttendantMessage', $langs->trans($attendantRole) . ' ' . $usertmp->getFullName($langs, 1)), []);
             } else {
                 $contact->fetch($attendantID);
-                setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $contact->getFullName($langs, 1), []);
+                setEventMessages($langs->trans('AddAttendantMessage', $langs->trans($attendantRole) . ' ' . $contact->getFullName($langs, 1)), []);
             }
         } elseif (!empty($signatory->errors)) {
             // Creation attendant KO
@@ -129,6 +128,7 @@ if (empty($reshook)) {
         } else {
             setEventMessages($signatory->error, [], 'errors');
         }
+        $action = '';
     }
 
     // Action to add signature
@@ -140,22 +140,19 @@ if (empty($reshook)) {
         $signatory->signature      = $data['signature'];
         $signatory->signature_date = dol_now('tzuser');
 
-        $result = $signatory->update($user, false);
+        $result = $signatory->update($user);
 
         if ($result > 0) {
             // Creation signature OK
             $signatory->setSigned($user);
-            setEventMessages($langs->trans('SignatureEvent') . ' ' . $contact->getFullName($langs, 1), []);
-//            $urltogo = str_replace('__ID__', $result, $backtopage);
-//            $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-//            header('Location: ' . $urltogo);
-//            exit;
+            setEventMessages($langs->trans('SignAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
         } elseif (!empty($signatory->errors)) {
             // Creation signature KO
             setEventMessages('', $signatory->errors, 'errors');
         } else {
             setEventMessages($signatory->error, [], 'errors');
         }
+        $action = '';
     }
 
     // Action to set status STATUS_ABSENT
@@ -168,16 +165,14 @@ if (empty($reshook)) {
 
         if ($result > 0) {
             // set absent OK
-            setEventMessages($langs->trans('Attendant') . ' ' . $signatory->firstname . ' ' . $signatory->lastname . ' ' . $langs->trans('SetAbsentAttendant'), []);
-//            $urltogo = str_replace('__ID__', $result, $backtopage);
-//            $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-//            header('Location: ' . $urltogo);
+            setEventMessages($langs->trans('AbsentAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
         } elseif (!empty($signatory->errors)) {
             // Creation absent KO
             setEventMessages('', $signatory->errors, 'errors');
         } else {
             setEventMessages($signatory->error, [], 'errors');
         }
+        $action = '';
     }
 
     // Action to send Email
@@ -269,18 +264,14 @@ if (empty($reshook)) {
         $result = $signatory->setDeleted($user, 0);
 
         if ($result > 0) {
-            setEventMessages($langs->trans('DeleteAttendantMessage') . ' ' . $signatory->firstname . ' ' . $signatory->lastname, []);
-            // Deletion attendant OK
-            // @todo utilité ??
-//            $urltogo = str_replace('__ID__', $result, $backtopage);
-//            $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-//            header('Location: ' . $urltogo);
+            setEventMessages($langs->trans('DeleteAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
         } elseif (!empty($signatory->errors)) {
             // Deletion attendant KO
             setEventMessages('', $signatory->errors, 'errors');
         } else {
             setEventMessages($signatory->error, [], 'errors');
         }
+        $action = '';
     }
 }
 
@@ -408,7 +399,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
         }
 
         if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
-            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
             print '<input type="hidden" name="token" value="' . newToken() . '">';
             print '<input type="hidden" name="action" value="add_attendant">';
             print '<input type="hidden" name="attendant_type" value="internal">';
@@ -454,7 +445,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<td class="center">' . $langs->trans('Signature') . '</td>';
             print '</tr>';
 
-            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
             print '<input type="hidden" name="token" value="' . newToken() . '">';
             print '<input type="hidden" name="action" value="add_attendant">';
             print '<input type="hidden" name="attendant_type" value="internal">';
@@ -545,7 +536,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
         }
 
         if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
-            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
             print '<input type="hidden" name="token" value="' . newToken() . '">';
             print '<input type="hidden" name="action" value="add_attendant">';
             print '<input type="hidden" name="attendant_type" value="external">';
@@ -615,7 +606,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<td class="center">' . $langs->trans('Signature') . '</td>';
             print '</tr>';
 
-            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
             print '<input type="hidden" name="token" value="' . newToken() . '">';
             print '<input type="hidden" name="action" value="add_attendant">';
             print '<input type="hidden" name="attendant_type" value="external">';

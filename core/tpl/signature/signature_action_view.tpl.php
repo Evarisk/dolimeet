@@ -14,7 +14,7 @@ if (empty($conf) || !is_object($conf)) {
         <?php if ($object->status < $object::STATUS_LOCKED) {
             if (empty($element->signature) && $element->status != $element::STATUS_ABSENT) {
                 print '<li class="dropdown-item">';
-                print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+                print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
                 print '<input type="hidden" name="token" value="' . newToken() . '">';
                 print '<input type="hidden" name="action" value="set_absent">';
                 print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
@@ -26,7 +26,7 @@ if (empty($conf) || !is_object($conf)) {
                 print '</li>';
             }
             print '<li class="dropdown-item">';
-            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element .'">';
             print '<input type="hidden" name="token" value="' . newToken() . '">';
             print '<input type="hidden" name="action" value="send">';
             print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
@@ -39,7 +39,7 @@ if (empty($conf) || !is_object($conf)) {
         }
         if ($object->status < $object::STATUS_LOCKED) {
             print '<li class="dropdown-item">';
-            print '<form method="POST" action="' . $_SERVER['REQUEST_URI'] . '">';
+            print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
             print '<input type="hidden" name="token" value="' . newToken() . '">';
             print '<input type="hidden" name="action" value="delete_attendant">';
             print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
