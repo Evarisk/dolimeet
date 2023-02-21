@@ -106,7 +106,7 @@ if (empty($reshook)) {
         $attendantTypeUser    = GETPOST('attendant' . $attendantRole . 'user');
         $attendantTypeContact = GETPOST('attendant' . $attendantRole . 'contact');
 
-        if ($attendantTypeUser < 0 && $attendantTypeContact < 0) {
+        if ($attendantTypeUser < 0 || $attendantTypeContact <= 0) {
             setEventMessages($langs->trans('ErrorFieldRequired', $langs->trans('Attendant')), [], 'errors');
         }
 
