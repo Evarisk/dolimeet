@@ -117,6 +117,7 @@ completioncertificatedocument.odt = Certificat de réalisation
 
 # Data - Donnée
 Audit                = Audit
+AuditReport          = Audit
 Audits               = audits
 TheAudit             = l'audit
 AuditList            = Liste des audits
