@@ -31,18 +31,17 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 ReadMyObject = Consulter mes %s
 
 # Data - Donnée
-DoliMeetSessions = sessions
-NewSession = Nouvelle session
-SessionList = Liste des sessions
-SessionTypes = Types de session
-SessionNumberingModule = Numérotation des sessions
-SessionConfig = Configuration des sessions
-Deleted = Supprimé
-Schedules = Horaires
-ContratSchedules = Horaires de la formation
-SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
-SignatureEmailSubject = Signature de la feuille de présence
-SessionListOnProject = Liste des sessions liées au projet
+DoliMeetSessions        = sessions
+NewSession              = Nouvelle session
+SessionList             = Liste des sessions
+SessionTypes            = Types de session
+SessionNumberingModule  = Numérotation des sessions
+SessionConfig           = Configuration des sessions
+Schedules               = Horaires
+ContratSchedules        = Horaires de la formation
+SignatureEmailMessage   = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
+SignatureEmailSubject   = Signature de la feuille de présence
+SessionListOnProject    = Liste des sessions liées au projet
 EnableObjectDescription = Activer l'objet %s
 
 
@@ -52,14 +51,14 @@ EnableObjectDescription = Activer l'objet %s
 #
 
 # Data - Donnée
-Meeting = Réunion
-Meetings = réunions
-TheMeeting = la réunion
-MeetingList = Liste des réunions
-MeetingCreate = Créer une réunion
-NewMeeting = Nouvelle réunion
-ModifyMeeting = Modifier une réunion
-MeetingsCategoriesArea = Catégories de réunion
+Meeting                = Réunion
+Meetings               = réunions
+TheMeeting             = la réunion
+MeetingList            = Liste des réunions
+MeetingCreate          = Créer une réunion
+NewMeeting             = Nouvelle réunion
+ModifyMeeting          = Modifier une réunion
+MeetingsCategoriesArea = Espace des tags/catégories des réunions
 
 # Attendant role - Rôle participant
 Contributor = Contributeur
@@ -72,29 +71,29 @@ Responsible = Responsable
 #
 
 # Data - Donnée
-TrainingSession = Session de formation
-Trainingsession = Session de formation
-Trainingsessions = sessions de formation
-TheTrainingsession = la session de formation
-TrainingsessionList = Liste des sessions de formation
-TrainingSessionList = Liste des sessions de formation
-TrainingSessionCreate = Créer une session de formation
-Contract = Contrat
-NewTrainingsession = Nouvelle session de formation
-ModifyTrainingsession = Modifier une session de formation
-TrainingSessionStart = Date de début de la formation
-TrainingSessionEnd = Date de fin de la formation
-ActionFormation = Action de formation
-ActionFormationApprentissage = Action de formation par apprentissage
-ActionVAE = Action de VAE
-BilanCompetences = Bilan de compétences
-TrainingSessionType = Type de formation
-TrainingSessionLocation = Lieu de la formation
-TrainingsessionsCategoriesArea = Catégories de session de formation
+TrainingSession                = Session de formation
+Trainingsession                = Session de formation
+Trainingsessions               = sessions de formation
+TheTrainingsession             = la session de formation
+TrainingsessionList            = Liste des sessions de formation
+TrainingSessionList            = Liste des sessions de formation
+TrainingSessionCreate          = Créer une session de formation
+Contract                       = Contrat
+NewTrainingsession             = Nouvelle session de formation
+ModifyTrainingsession          = Modifier une session de formation
+TrainingSessionStart           = Date de début de la formation
+TrainingSessionEnd             = Date de fin de la formation
+ActionFormation                = Action de formation
+ActionFormationApprentissage   = Action de formation par apprentissage
+ActionVAE                      = Action de VAE
+BilanCompetences               = Bilan de compétences
+TrainingSessionType            = Type de formation
+TrainingSessionLocation        = Lieu de la formation
+TrainingsessionsCategoriesArea = Espace des tags/catégories des sessions de formations
 
 # Attendant role - Rôle participant
 SessionTrainer = Formateur
-Trainee = Stagiaire
+Trainee        = Stagiaire
 
 
 
@@ -103,11 +102,11 @@ Trainee = Stagiaire
 #
 
 # Data - Donnée
-AttendanceSheetDocument = Feuille de présence
-AttendanceSheetDocuments = feuilles de présence
-attendancesheetdocument.odt = Feuille de présence
-CompletionCertificateDocument = Certificat de réalisation
-CompletionCertificateDocuments = certificats de réalisation
+AttendanceSheetDocument           = Feuille de présence
+AttendanceSheetDocuments          = feuilles de présence
+attendancesheetdocument.odt       = Feuille de présence
+CompletionCertificateDocument     = Certificat de réalisation
+CompletionCertificateDocuments    = certificats de réalisation
 completioncertificatedocument.odt = Certificat de réalisation
 
 
@@ -117,14 +116,14 @@ completioncertificatedocument.odt = Certificat de réalisation
 #
 
 # Data - Donnée
-Audit = Audit
-Audits = audits
-TheAudit = l'audit
-AuditList = Liste des audits
-AuditCreate = Créer un audit
-NewAudit = Nouvel audit
-ModifyAudit = Modifier un audit
-AuditsCategoriesArea = Catégories d'audit
+Audit                = Audit
+Audits               = audits
+TheAudit             = l'audit
+AuditList            = Liste des audits
+AuditCreate          = Créer un audit
+NewAudit             = Nouvel audit
+ModifyAudit          = Modifier un audit
+AuditsCategoriesArea = Espace des tags/catégories des audits
 
 # Attendant role - Rôle participant
 Auditor = Auditeur
@@ -135,6 +134,6 @@ Auditor = Auditeur
 #
 
 # Data - Donnée
-TrainingOrganizationNumber = Numéro de déclaration de l\'organisme de formation
+TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
-SocietyAttendants = Tiers des participants externe
+SocietyAttendants                 = Tiers des participants externe
