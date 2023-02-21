@@ -309,6 +309,8 @@ class Session extends CommonObject
         switch ($objectType) {
             case 'trainingsession':
                 $this->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
+                $this->fields['fk_project']['notnull'] = 1;
+                $this->fields['fk_contrat']['notnull'] = 1;
                 break;
             case 'meeting':
                 $this->picto = 'fontawesome_fa-comments_fas_#d35968';
