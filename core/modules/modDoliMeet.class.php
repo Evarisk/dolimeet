@@ -297,8 +297,8 @@ class modDoliMeet extends DolibarrModules
 		$r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('DoliMeetSessions')); // Permission label
-        $this->rights[$r][4] = 'meeting';
-        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $this->rights[$r][4] = 'session';
+        $this->rights[$r][5] = 'assigntome'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->assigntome)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('DoliMeetSessions')); // Permission label
@@ -320,7 +320,7 @@ class modDoliMeet extends DolibarrModules
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->transnoentities('Meetings')); // Permission label
         $this->rights[$r][4] = 'meeting';
-        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $this->rights[$r][5] = 'assigntome'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->assigntome)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->transnoentities('Meetings')); // Permission label
@@ -341,8 +341,8 @@ class modDoliMeet extends DolibarrModules
 		$r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Trainingsessions')); // Permission label
-        $this->rights[$r][4] = 'meeting';
-        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $this->rights[$r][4] = 'trainingsession';
+        $this->rights[$r][5] = 'assigntome'; // In php code, permission will be checked by test if ($user->rights->dolimeet->trainingsession->assigntome)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Trainingsessions')); // Permission label
@@ -363,8 +363,8 @@ class modDoliMeet extends DolibarrModules
 		$r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Audits')); // Permission label
-        $this->rights[$r][4] = 'meeting';
-        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->meeting->read)
+        $this->rights[$r][4] = 'audit';
+        $this->rights[$r][5] = 'assigntome'; // In php code, permission will be checked by test if ($user->rights->dolimeet->audit->assigntome)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Audits')); // Permission label

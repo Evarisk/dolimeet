@@ -231,6 +231,9 @@ if (empty($reshook)) {
         }
     }
 
+    // Action to generate pdf from odt file
+    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+
     if ($action == 'remove_file') {
         if (!empty($upload_dir)) {
             require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
@@ -239,8 +242,11 @@ if (empty($reshook)) {
             $filetodelete = GETPOST('file', 'alpha');
             $file = $upload_dir . '/' . $filetodelete;
             $ret = dol_delete_file($file, 0, 0, 0, $object);
-            if ($ret) setEventMessages($langs->trans('FileWasRemoved', $filetodelete), null, 'mesgs');
-            else setEventMessages($langs->trans('ErrorFailToDeleteFile', $filetodelete), null, 'errors');
+            if ($ret) {
+                setEventMessages($langs->trans('FileWasRemoved', $filetodelete), []);
+            } else {
+                setEventMessages($langs->trans('ErrorFailToDeleteFile', $filetodelete), [], 'errors');
+            }
 
             // Make a redirect to avoid to keep the remove_file into the url that create side effects
             $urltoredirect = $_SERVER['REQUEST_URI'];
@@ -250,7 +256,7 @@ if (empty($reshook)) {
             header('Location: ' . $urltoredirect);
             exit;
         } else {
-            setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
+            setEventMessages('BugFoundVarUploaddirnotDefined', [], 'errors');
         }
     }
 

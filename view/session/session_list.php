@@ -113,8 +113,8 @@ if (!$sortorder) {
 $search_all = GETPOST('search_all') ? GETPOST('search_all') : GETPOST('sall');
 $search = [];
 foreach ($object->fields as $key => $val) {
-    if (GETPOST($key, 'alpha') !== '') {
-        $search[$key] = GETPOST($key, 'alpha');
+    if (GETPOST('search_' . $key, 'alpha') !== '') {
+        $search[$key] = GETPOST('search_' . $key, 'alpha');
     }
     if (preg_match('/^(date|timestamp|datetime)/', $val['type'])) {
         $search[$key . '_dtstart'] = dol_mktime(0, 0, 0, GETPOST('search_' . $key . '_dtstartmonth', 'int'), GETPOST('search_' . $key . '_dtstartday', 'int'), GETPOST('search_' . $key . '_dtstartyear', 'int'));
@@ -123,8 +123,12 @@ foreach ($object->fields as $key => $val) {
 }
 
 if (!empty($conf->categorie->enabled)) {
-    $search_category_array = GETPOST("search_category_' . $objectType . '_list", 'array');
+    $search_category_array = GETPOST('search_category_' . $objectType . '_list', 'array');
 }
+
+$search_internal_attendants = GETPOST('search_internal_attendants', 'int');
+$search_external_attendants = GETPOST('search_external_attendants', 'int');
+$search_society_attendants  = GETPOST('search_society_attendants', 'int');
 
 $error = 0;
 if (!empty($fromtype)) {
@@ -238,6 +242,9 @@ if (empty($reshook)) {
         $toselect = [];
         $search_array_options = [];
         $search_category_array = [];
+        $search_internal_attendants = -1;
+        $search_external_attendants = -1;
+        $search_society_attendants  = -1;
     }
     if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
         || GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
@@ -289,14 +296,14 @@ if (dol_strlen($fromtype) > 0 && !in_array($fromtype, $linkedObjectsArray) && !i
     }
 }
 
-if (GETPOST('search_internal_attendants') > 0) {
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_internal_attendants on (search_internal_attendants.element_id = ' . GETPOST('search_internal_attendants') . ' AND search_internal_attendants.element_type="user" AND search_internal_attendants.status > 0)';
+if ($search_internal_attendants > 0) {
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_internal_attendants on (search_internal_attendants.element_id = ' . $search_internal_attendants . ' AND search_internal_attendants.element_type="user" AND search_internal_attendants.status > 0)';
 }
-if (GETPOST('search_external_attendants') > 0) {
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_external_attendants on (search_external_attendants.element_id = ' . GETPOST('search_external_attendants') . ' AND search_external_attendants.element_type="socpeople" AND search_external_attendants.status > 0)';
+if ($search_external_attendants > 0) {
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_external_attendants on (search_external_attendants.element_id = ' . $search_external_attendants . ' AND search_external_attendants.element_type="socpeople" AND search_external_attendants.status > 0)';
 }
-if (GETPOST('search_society_attendants') > 0) {
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople as cf on (cf.fk_soc = ' . GETPOST('search_society_attendants') . ')';
+if ($search_society_attendants > 0) {
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople as cf on (cf.fk_soc = ' . $search_society_attendants . ')';
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_society_attendants on (search_society_attendants.element_id = cf.rowid AND search_society_attendants.element_type="socpeople" AND search_society_attendants.status > 0)';
 }
 
@@ -311,20 +318,19 @@ if ($object->ismultientitymanaged == 1) {
     $sql .= ' WHERE 1 = 1';
 }
 
-$sql .= ' AND t.status > -1';
 if (is_array($signatoryObjectsArray) && dol_strlen($fromtype) > 0 && !in_array($fromtype, $linkedObjectsArray) && !in_array($fromtype, $signatoryObjectsArray)) {
     $sql .= ' AND t.rowid = e.fk_target ';
-} else if (is_array($signatoryObjectsArray) && in_array($fromtype, $signatoryObjectsArray)) {
+} elseif (is_array($signatoryObjectsArray) && in_array($fromtype, $signatoryObjectsArray)) {
     $sql .= ' AND t.rowid = e.fk_object ';
 }
 
-if (GETPOST('search_internal_attendants') > 0) {
+if ($search_internal_attendants > 0) {
     $sql .= ' AND t.rowid = search_internal_attendants.fk_object ';
 }
-if (GETPOST('search_external_attendants') > 0) {
+if ($search_external_attendants > 0) {
     $sql .= ' AND t.rowid = search_external_attendants.fk_object ';
 }
-if (GETPOST('search_society_attendants') > 0) {
+if ($search_society_attendants > 0) {
     $sql .= ' AND t.rowid = search_society_attendants.fk_object ';
 }
 if ($objectType != 'session') {
@@ -333,9 +339,6 @@ if ($objectType != 'session') {
 foreach ($search as $key => $val) {
     if (array_key_exists($key, $object->fields)) {
         if ($key == 'status' && $val == -1) {
-            continue;
-        }
-        if ($val < 1) {
             continue;
         }
         $mode_search = (($object->isInt($object->fields[$key]) || $object->isFloat($object->fields[$key])) ? 1 : 0);
@@ -365,7 +368,7 @@ if ($search_all) {
 }
 
 if (!empty($conf->categorie->enabled)) {
-    $sql .= Categorie::getFilterSelectQuery($objectType, 't.rowid', $search_category_array);
+    $sql .= Categorie::getFilterSelectQuery('session', 't.rowid', $search_category_array);
 }
 
 // Add where from extra fields
@@ -381,6 +384,9 @@ $nbtotalofrecords = '';
 if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
     /* The fast and low memory method to get and count full list converts the sql into a sql count */
     $sqlforcount = preg_replace('/^SELECT[a-zA-Z0-9\._\s\(\),=<>\:\-\']+\sFROM/', 'SELECT COUNT(*) as nbtotalofrecords FROM', $sql);
+    if (!empty($search_category_array)) {
+        $sqlforcount = substr($sqlforcount, 0, -2);
+    }
     $resql = $db->query($sqlforcount);
     if ($resql) {
         $objforcount = $db->fetch_object($resql);
@@ -621,15 +627,15 @@ foreach ($object->fields as $key => $val) {
             if ($resource['checked']) {
                 if ($resource['label'] == 'InternalAttendants') {
                     print '<td>';
-                    print $form->select_dolusers($fromtype == 'user' ? $fromid : GETPOST('search_internal_attendants'), 'search_internal_attendants', 1);
+                    print $form->select_dolusers($fromtype == 'user' ? $fromid : $search_internal_attendants, 'search_internal_attendants', 1);
                     print '</td>';
                 } elseif ($resource['label'] == 'ExternalAttendants') {
                     print '<td>';
-                    print $form->selectcontacts(0, $fromtype == 'socpeople' ? $fromid : GETPOST('search_external_attendants'), 'search_external_attendants', 1);
+                    print $form->selectcontacts(0, $fromtype == 'socpeople' ? $fromid : $search_external_attendants, 'search_external_attendants', 1);
                     print '</td>';
                 } elseif ($resource['label'] == 'SocietyAttendants') {
                     print '<td>';
-                    print $form->select_company($fromtype == 'thirdparty' ? $fromid : GETPOST('search_society_attendants'), 'search_society_attendants', '', 1);
+                    print $form->select_company($fromtype == 'thirdparty' ? $fromid : $search_society_attendants, 'search_society_attendants', '', 1);
                     print '</td>';
                 }
             }
