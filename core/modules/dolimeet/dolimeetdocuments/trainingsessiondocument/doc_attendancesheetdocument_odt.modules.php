@@ -330,7 +330,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			$tmparray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
 			$tmparray['duration']   = convertSecondToTime($object->duration);
 
-			if (dol_strlen($signatory->signature) > 0) {
+			if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
 				$encodedImage = explode(',', $signatory->signature)[1];
 				$decodedImage = base64_decode($encodedImage);
 				file_put_contents($tempdir . 'signature.png', $decodedImage);
@@ -387,7 +387,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 									$tmparray['attendant_number']    = $k;
 									$tmparray['attendant_lastname']  = strtoupper($objectSignatory->lastname);
 									$tmparray['attendant_firstname'] = $objectSignatory->firstname;
-									if (dol_strlen($objectSignatory->signature) > 0) {
+									if (dol_strlen($objectSignatory->signature) > 0 && $objectSignatory->signature != $langs->transnoentities('FileGenerated')) {
 										$encodedImage = explode(',', $objectSignatory->signature)[1];
 										$decodedImage = base64_decode($encodedImage);
 										file_put_contents($tempdir . 'signature' . $k . '.png', $decodedImage);

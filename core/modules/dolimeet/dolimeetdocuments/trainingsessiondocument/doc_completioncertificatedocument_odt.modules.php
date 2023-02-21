@@ -338,7 +338,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                 $tmparray['attendant_company_name'] = '';
             }
 
-            if (dol_strlen($signatory->signature) > 0) {
+            if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
                 $encodedImage = explode(',', $signatory->signature)[1];
                 $decodedImage = base64_decode($encodedImage);
                 file_put_contents($tempdir . 'signature.png', $decodedImage);
