@@ -74,7 +74,7 @@ $refMod           = new $conf->global->$mod();
 // Initialize view objects
 $form = new Form($db);
 
-$hookmanager->initHooks([$objectType . 'card', 'sessioncard', 'saturnecard', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks([$objectType . 'card', 'sessioncard', 'saturneglobal', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -103,7 +103,6 @@ $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 $permissiontoread   = $user->rights->dolimeet->$objectType->read;
 $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
-
 saturne_check_access($permissiontoread);
 
 /*

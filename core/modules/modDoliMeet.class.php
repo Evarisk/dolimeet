@@ -120,7 +120,7 @@ class modDoliMeet extends DolibarrModules
 				'projectOverview',
 				'printOverviewDetail',
 				'admincompany',
-                'saturnecard',
+                'saturneglobal',
                 'sessioncard'
             ],
 			// Set this to 1 if features of module are opened to external users

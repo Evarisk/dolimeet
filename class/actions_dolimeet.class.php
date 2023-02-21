@@ -228,7 +228,7 @@ class ActionsDolimeet
         global $db, $langs;
 
         // Do something only for the current context
-        if (in_array($parameters['currentcontext'], ['saturnecard', 'sessioncard'])) {
+        if (in_array($parameters['currentcontext'], ['saturneglobal', 'sessioncard'])) {
             if (isModEnabled('contrat')) {
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
                 if (GETPOST('object_type') == 'trainingsession') {

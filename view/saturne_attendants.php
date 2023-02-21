@@ -72,7 +72,7 @@ if (isModEnabled('societe')) {
 $form        = new Form($db);
 $formcompany = new FormCompany($db);
 
-$hookmanager->initHooks([$objectType . 'signature', $object->element . 'signature', 'saturnecard', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks([$objectType . 'signature', $object->element . 'signature', 'saturneglobal', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Load object
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
@@ -81,9 +81,7 @@ include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be incl
 $permissiontoread   = $user->rights->$moduleNameLowerCase->$objectType->read;
 $permissiontoadd    = $user->rights->$moduleNameLowerCase->$objectType->write;
 $permissiontodelete = $user->rights->$moduleNameLowerCase->$objectType->delete;
-if (empty($conf->$moduleNameLowerCase->enabled) || !$permissiontoread) {
-    accessforbidden();
-}
+saturne_check_access($permissiontoread);
 
 /*
 *  Actions
