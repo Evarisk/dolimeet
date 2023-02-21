@@ -265,6 +265,8 @@ if (empty($reshook)) {
     $autocopy = 'MAIN_MAIL_AUTOCOPY_' . strtoupper($object->element) . '_TO';
     $trackid = $object->element . $object->id;
 
+    include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
+
     require_once __DIR__ . '/../../core/tpl/signature/signature_action_workflow.tpl.php';
 }
 
@@ -557,6 +559,14 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
         print '</div></div>';
     }
+
+    // Presend form
+    //$modelmail = 'myobject';
+    $defaulttopic = 'InformationMessage';
+    //$diroutput = $conf->mymodule->dir_output;
+    // $trackid = 'myobject'.$object->id;
+
+    include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 }
 
 // End of page
