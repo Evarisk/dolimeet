@@ -29,7 +29,7 @@ if (file_exists('../../dolimeet.main.inc.php')) {
 }
 
 // Get module parameters
-$objectType = GETPOST('object_type', 'alpha') ?: 'session';
+$objectType = GETPOST('object_type', 'aZ') ?: 'session';
 
 // Libraries
 if (isModEnabled('categorie')) {
@@ -515,7 +515,11 @@ print '<input type="hidden" name="mode" value="' . $mode . '">'; ?>
     $(document).ready(function(){
         $('#object_type_select').on('change', function(){
             let value = $(this).val();
-            location.href = document.URL + '&object_type=' + value;
+            let url = new URL(document.URL)
+            let search_params = url.searchParams;
+            search_params.set('object_type', value);
+            url.search = search_params.toString();
+            location.href = url.toString()
         });
     });
 </script>
@@ -523,7 +527,7 @@ print '<input type="hidden" name="mode" value="' . $mode . '">'; ?>
 <?php $newcardbutton = '';
 if ($objectType == 'session' || !empty($fromtype) && $fromid > 0) {
     $objectTypes = ['meeting' => $langs->trans('Meeting'), 'trainingsession' => $langs->trans('Trainingsession'), 'audit' => $langs->trans('Audit')];
-    $newcardbutton .= $form->selectarray('object_type_select', $objectTypes, '', 1);
+    $newcardbutton .= $form->selectarray('object_type_select', $objectTypes, $objectType, 1);
 }
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewList'), '', 'fa fa-bars imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=common' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ((empty($mode) || $mode == 'common') ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewKanban'), '', 'fa fa-th-list imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=kanban' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ($mode == 'kanban' ? 2 : 1), ['morecss'=>'reposition']);
