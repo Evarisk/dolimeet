@@ -427,7 +427,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 // Output page
 // --------------------------------------------------------------------
 
-saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
+saturne_header(0, '', $title, $help_url, '', 0, 0, [], ['/dolimeet/css/dolimeet.css'], '', 'bodyforlist');
 
 if (!empty($fromtype) && !$error) {
     saturne_get_fiche_head($objectLinked, $objectType . 'List', $langs->trans($objectType));
@@ -718,7 +718,7 @@ if (isset($extrafields->attributes[$object->table_element]['computed']) && is_ar
 // Loop on record
 // --------------------------------------------------------------------
 $i = 0;
-$savnbfield = $totalarray['nbfield'];
+$savnbfield = $totalarray['nbfield'] + 1;
 $totalarray = [];
 $totalarray['nbfield'] = 0;
 $imaxinloop = ($limit ? min($num, $limit) : $num);
