@@ -29,7 +29,7 @@ if (file_exists('../dolimeet.main.inc.php')) {
 }
 
 // Libraries
-require_once DOL_DOCUMENT_ROOT. '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 
 require_once __DIR__ . '/../lib/dolimeet.lib.php';
@@ -37,17 +37,15 @@ require_once __DIR__ . '/../lib/dolimeet.lib.php';
 // Global variables definitions
 global $db, $langs, $user;
 
-$action     = GETPOST('action', 'alpha');
-$backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
-
-// Translations
+// Load translation files required by the page
 saturne_load_langs();
 
 // Get parameters
+$action     = GETPOST('action', 'alpha');
+$value      = GETPOST('value', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
-// Access control
+// Security check - Protection if external user
 $permissiontoread = $user->rights->dolimeet->adminpage->read;
 saturne_check_access($permissiontoread);
 

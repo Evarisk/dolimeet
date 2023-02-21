@@ -1,4 +1,4 @@
-# DoliMeet - Suivi des réunions, séance de formation, audits sur [DOLIBARR ERP CRM](https://www.dolibarr.org)
+# DoliMeet sur [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
 ## Informations
 
@@ -6,7 +6,7 @@
 - Version :  1.0.0
 - Dernière mise à jour : 17/01/2023
 - Éditeur : [Evarisk](https://www.evarisk.com)
-- Compatibilité : Dolibarr 15.0.0 - 16.0.3
+- Compatibilité : Dolibarr 15.0.0 - 16.0.4
 - Thème : eldy
 - Licence : GPLv3
 - Disponible sur : Windows - MacOS - Linux
@@ -16,7 +16,7 @@
 - Support & Assistance : [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
 - Demo : [Demo DoliMeet](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki DoliMeet](https://wiki.dolibarr.org/index.php/Module_DoliMeet)
-- Projet Github : [Projet DoliMeet](https://github.com/Evarisk/dolimeet/projects?query=is%3Aopen)
+- Projet GitHub : [Projet DoliMeet](https://github.com/Evarisk/dolimeet/projects?query=is%3Aopen)
 - D'autres modules développés par Evarisk disponible sur [DoliStore.com](https://www.dolistore.com)
 
 ## Fonctionnalités

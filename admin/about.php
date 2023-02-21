@@ -35,7 +35,7 @@ require_once __DIR__ . '/../core/modules/modDoliMeet.class.php';
 // Global variables definitions
 global $db, $langs, $user;
 
-// Translations
+// Load translation files required by the page
 saturne_load_langs();
 
 // Initialize technical objects
@@ -44,7 +44,7 @@ $modDoliMeet = new modDoliMeet($db);
 // Get parameters
 $backtopage = GETPOST('backtopage', 'alpha');
 
-// Access control
+// Security check - Protection if external user
 $permissiontoread = $user->rights->dolimeet->adminpage->read;
 saturne_check_access($permissiontoread);
 
@@ -52,13 +52,13 @@ saturne_check_access($permissiontoread);
  * View
  */
 
-$help_url  = 'FR:Module_DoliMeet';
-$title = $langs->trans('ModuleAbout', 'DoliMeet');
+$title    = $langs->trans('ModuleAbout', 'DoliMeet');
+$help_url = 'FR:Module_DoliMeet';
 
 saturne_header(0,'', $title, $help_url);
 
 // Subheader
-$linkback = '<a href="'.($backtopage ?: DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans('BackToModuleList').'</a>';
+$linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans('BackToModuleList') . '</a>';
 print load_fiche_titre($title, $linkback, 'dolimeet_color@dolimeet');
 
 // Configuration header
