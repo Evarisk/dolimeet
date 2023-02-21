@@ -78,7 +78,7 @@ $hookmanager->initHooks([$objectType . 'signature', $object->element . 'signatur
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->$moduleNameLowerCase->$objectType->read;
+$permissiontoread   = $user->rights->$moduleNameLowerCase->$objectType->read || $user->rights->$moduleNameLowerCase->assigntome->$objectType;
 $permissiontoadd    = $user->rights->$moduleNameLowerCase->$objectType->write;
 $permissiontodelete = $user->rights->$moduleNameLowerCase->$objectType->delete;
 saturne_check_access($permissiontoread);
@@ -293,7 +293,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
 
     print '<div class="fichecenter">';
 
-    if ($object->status == $object::STATUS_DRAFT) : ?>
+    if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) : ?>
         <div class="wpeo-notice notice-warning">
             <div class="notice-content">
                 <div class="notice-title"><?php echo $langs->trans('BeCareful') ?></div>
@@ -315,7 +315,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
 
     print '<div class="signatures-container">';
 
-    if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED) {
+    if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED && $permissiontoadd) {
         print '<div style="text-align: right">';
         print '<br><a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
         print '</div>';
@@ -372,7 +372,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '</td><td>';
             print $langs->trans($element->role);
             print '</td><td>';
-            if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
+            if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT && $permissiontoadd) {
                 $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&object_type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
             }
@@ -389,7 +389,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             }
             print '</td>';
             print '<td class="center">';
-            if ($element->signature != $langs->transnoentities('FileGenerated') && $permissiontoadd) {
+            if ($element->signature != $langs->transnoentities('FileGenerated') && $permissiontoread) {
                 require __DIR__ . '/../core/tpl/signature/signature_view.tpl.php';
             }
             print '</td>';
@@ -509,7 +509,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '</td><td>';
             print $langs->trans('ExternalAttendant');
             print '</td><td>';
-            if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
+            if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT && $permissiontoadd) {
                 $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&object_type=' . $object->element, 3);
                 print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
             }
@@ -526,7 +526,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             }
             print '</td>';
             print '<td class="center">';
-            if ($element->signature != $langs->transnoentities('FileGenerated') && $permissiontoadd) {
+            if ($element->signature != $langs->transnoentities('FileGenerated') && $permissiontoread) {
                 require __DIR__ . '/../core/tpl/signature/signature_view.tpl.php';
             }
             print '</td>';

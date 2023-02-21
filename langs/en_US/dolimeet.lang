@@ -28,7 +28,7 @@ DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 #
 
 # Right - Droit
-ReadMyObject = Read my %s
+ReadMyObject = Read my %s (if assigned as a participant)
 
 # Data - Donnée
 DoliMeetSessions        = sessions

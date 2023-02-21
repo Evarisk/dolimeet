@@ -28,7 +28,7 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 #
 
 # Right - Droit
-ReadMyObject = Consulter mes %s
+ReadMyObject = Consulter mes %s (si affecté en tant que participant)
 
 # Data - Donnée
 DoliMeetSessions        = sessions

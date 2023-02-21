@@ -100,7 +100,7 @@ include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be incl
 $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->dolimeet->$objectType->read;
+$permissiontoread   = $user->rights->dolimeet->$objectType->read || $user->rights->dolimeet->assigntome->$objectType;
 $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
 saturne_check_access($permissiontoread);
@@ -548,8 +548,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
         $MAXEVENT = 10;
 
-        $morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element);
-
+        if ($user->rights->dolimeet->$objectType->read) {
+            $morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element);
+        } else {
+            $morehtmlcenter = '';
+        }
         // List of actions on element
         include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
         $formactions = new FormActions($db);
