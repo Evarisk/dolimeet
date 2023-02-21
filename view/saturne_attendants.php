@@ -302,12 +302,12 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             <a class="butAction" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate', $langs->transnoentities('The' . ucfirst($object->element))) ?></a>;
         </div>
     <?php endif; ?>
-        <div class="noticeSignatureSuccess wpeo-notice notice-success<?php echo (($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED && $permissiontoadd) ? '' : ' hidden') ?>">
+        <div class="noticeSignatureSuccess wpeo-notice notice-success<?php echo (($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status == $object::STATUS_VALIDATED && $permissiontoadd) ? '' : ' hidden') ?>">
             <div class="notice-content">
                 <div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
                 <div class="notice-subtitle"><?php echo $langs->trans('AddSignatureSuccessText') . GETPOST('signature_id')?></div>
             </div>
-            <?php if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED && $permissiontoadd) {
+            <?php if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
                 print '<a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
             } ?>
         </div>
@@ -409,9 +409,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td>';
                 print '<td class=minwidth400">';
                 if ($selectedCompany <= 0) {
-                    print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, '', 0, '', '', $conf->entity) . '<br>';
+                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
                 }
-                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth300');
+                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
                 if (!empty($selectedCompany) && $selectedCompany > 0 && $user->rights->societe->creer) {
                     $newcardbutton = '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid=' . $selectedCompany . '&action=create&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&module_name=' . urlencode($moduleName) . '&object_type=' . urlencode($object->element) . '&newcompany' . $attendantRole . '=' . GETPOST('newcompany' . $attendantRole) . '&contactID=&#95;&#95;ID&#95;&#95;') . '" title="' . $langs->trans('NewContact') . '"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
                     print $newcardbutton;
@@ -465,9 +465,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td>';
                 print '<td class=minwidth400">';
                 if ($selectedCompany <= 0) {
-                    print img_picto('', 'user', 'class="paddingright pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, '', 0, '', '', $conf->entity) . '<br>';
+                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
                 }
-                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth300');
+                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
                 if (!empty($selectedCompany) && $selectedCompany > 0 && $user->rights->societe->creer) {
                     $newcardbutton = '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid=' . $selectedCompany . '&action=create&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&module_name=' . urlencode($moduleName) . '&object_type=' . urlencode($object->element) . '&newcompany' . $attendantRole . '=' . GETPOST('newcompany' . $attendantRole) . '&contactID=&#95;&#95;ID&#95;&#95;') . '" title="' . $langs->trans('NewContact') . '"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
                     print $newcardbutton;
