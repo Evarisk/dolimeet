@@ -299,31 +299,25 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 <div class="notice-title"><?php echo $langs->trans('BeCareful') ?></div>
                 <div class="notice-subtitle"><?php echo $langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) ?></div>
             </div>
-            <a class="butAction" style="width = 100%;margin-right:0" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate', $langs->transnoentities('The' . ucfirst($object->element))) ?></a>;
+            <a class="butAction" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate', $langs->transnoentities('The' . ucfirst($object->element))) ?></a>;
         </div>
     <?php endif; ?>
-        <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
-            <div class="all-notice-content">
-                <div class="notice-content">
-                    <div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
-                    <div class="notice-subtitle"><?php echo $langs->trans('AddSignatureSuccessText') . GETPOST('signature_id')?></div>
-                </div>
+        <div class="noticeSignatureSuccess wpeo-notice notice-success<?php echo (($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED && $permissiontoadd) ? '' : ' hidden') ?>">
+            <div class="notice-content">
+                <div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
+                <div class="notice-subtitle"><?php echo $langs->trans('AddSignatureSuccessText') . GETPOST('signature_id')?></div>
             </div>
+            <?php if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED && $permissiontoadd) {
+                print '<a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
+            } ?>
         </div>
     <?php
     print '</div>';
 
     print '<div class="signatures-container">';
 
-    if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status < $object::STATUS_LOCKED && $permissiontoadd) {
-        print '<div style="text-align: right">';
-        print '<br><a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
-        print '</div>';
-    }
-
     $zone = 'private';
 
-    // Internal attendants -- Participants interne
     switch ($object->element) {
         case 'meeting' :
             $attendantsRole = ['Responsible', 'Contributor'];
