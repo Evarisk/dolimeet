@@ -246,10 +246,8 @@ if (empty($reshook)) {
                 setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')), [], 'warnings');
                 dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
             }
-        } elseif (!empty($signatory->errors)) // Mail sent KO
-            setEventMessages(null, $signatory->errors, 'errors');
-        else {
-            setEventMessages($signatory->error, [], 'errors');
+        } else {
+            setEventMessage($langs->trans('NoEmailSet', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), 'warnings');
         }
         $action = '';
     }
