@@ -748,19 +748,19 @@ while ($i < $imaxinloop) {
     switch ($object->type) {
         case 'meeting':
             $object->picto = 'fontawesome_fa-comments_fas_#d35968';
-            $internalAttendantsRole = ['Contributor','Responsible'];
+            $attendantsRole = ['Responsible', 'Contributor'];
             break;
         case 'trainingsession':
             $object->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
-            $internalAttendantsRole = ['Trainee', 'SessionTrainer'];
+            $attendantsRole = ['SessionTrainer', 'Trainee'];
             break;
         case 'audit':
             $object->picto = 'fontawesome_fa-tasks_fas_#d35968';
-            $internalAttendantsRole = ['Auditor'];
+            $attendantsRole = ['Auditor'];
             break;
         default :
             $object->picto = 'dolimeet_color@dolimeet';
-            $internalAttendantsRole = ['InternalAttendant'];
+            $attendantsRole = ['Attendant'];
             break;
     }
 
@@ -791,6 +791,10 @@ while ($i < $imaxinloop) {
             }
             print '</td>';
         }
+
+        $filter = ['customsql' => 'fk_object=' . $object->id . ' AND status > 0 AND object_type="' . $object->type . '"'];
+        $signatories = $signatory->fetchAll('', '', 0, 0, $filter);
+
         foreach ($object->fields as $key => $val) {
             $cssforfield = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
             if (in_array($val['type'], ['date', 'datetime', 'timestamp'])) {
@@ -843,43 +847,40 @@ while ($i < $imaxinloop) {
                 foreach ($val as $resource) {
                     if ($resource['checked']) {
                         if ($resource['label'] == 'InternalAttendants') {
-                            $internalAttendants = [];
-                            foreach ($internalAttendantsRole as $internalAttendantRole) {
-                                $result = $signatory->fetchSignatory($internalAttendantRole, $object->id, $object->type);
-                                if (is_array($result) && !empty($result)) {
-                                    $internalAttendants = array_merge($internalAttendants, $result);
-                                }
-                            }
                             print '<td>';
-                            if (is_array($internalAttendants) && !empty($internalAttendants) && $internalAttendants > 0)  {
-                                foreach ($internalAttendants as $object_signatory) {
-                                    $usertmp = $user;
-                                    $usertmp->fetch($object_signatory->element_id);
-                                    print $usertmp->getNomUrl(1) . ' ' . $langs->trans($object_signatory->role);
-                                    print '<br>';
+                            if (is_array($signatories) && !empty($signatories) && $signatories > 0)  {
+                                foreach ($signatories as $objectSignatory) {
+                                    if ($objectSignatory->element_type == 'user') {
+                                        $usertmp = $user;
+                                        $usertmp->fetch($objectSignatory->element_id);
+                                        print $usertmp->getNomUrl(1) . ' ' . $langs->trans($objectSignatory->role);
+                                        print '<br>';
+                                    }
                                 }
                             }
                             print '</td>';
                         } elseif ($resource['label'] == 'ExternalAttendants') {
-                            $signatories = $signatory->fetchSignatory('ExternalAttendant', $object->id, $objectType);
                             print '<td>';
                             if (is_array($signatories) && !empty($signatories)) {
-                                foreach ($signatories as $object_signatory) {
-                                    $contact->fetch($object_signatory->element_id);
-                                    print $contact->getNomUrl(1) . ' ' . $langs->trans($object_signatory->role);
-                                    print '<br>';
+                                foreach ($signatories as $objectSignatory) {
+                                    if ($objectSignatory->element_type == 'socpeople') {
+                                        $contact->fetch($objectSignatory->element_id);
+                                        print $contact->getNomUrl(1) . ' ' . $langs->trans($objectSignatory->role);
+                                        print '<br>';
+                                    }
                                 }
                             }
                             print '</td>';
                         } elseif ($resource['label'] == 'SocietyAttendants') {
-                            $signatories = $signatory->fetchSignatory('ExternalAttendant', $object->id, $objectType);
                             print '<td>';
                             if (is_array($signatories) && !empty($signatories)) {
-                                foreach ($signatories as $object_signatory) {
-                                    $contact->fetch($object_signatory->element_id);
-                                    $thirdparty->fetch($contact->fk_soc);
-                                    print $thirdparty->getNomUrl(1);
-                                    print '<br>';
+                                foreach ($signatories as $objectSignatory) {
+                                    if ($objectSignatory->element_type == 'socpeople') {
+                                        $contact->fetch($objectSignatory->element_id);
+                                        $thirdparty->fetch($contact->fk_soc);
+                                        print $thirdparty->getNomUrl(1);
+                                        print '<br>';
+                                    }
                                 }
                             }
                             print '</td>';

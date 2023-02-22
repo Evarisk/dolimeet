@@ -234,15 +234,13 @@ if (empty($reshook)) {
                         exit;
                     } else {
                         $langs->load('other');
-                        $mesg = '<div class="error">';
+                        $errorMessage = '<div class="error">';
+                        $errorMessage .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
                         if ($mailfile->error) {
-                            $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                            $mesg .= '<br>' . $mailfile->error;
-                        } else {
-                            $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                            $errorMessage .= '<br>' . $mailfile->error;
                         }
-                        $mesg .= '</div>';
-                        setEventMessages($mesg, [], 'warnings');
+                        $errorMessage .= '</div>';
+                        setEventMessages($errorMessage, [], 'warnings');
                     }
                 } else {
                     setEventMessages($langs->trans('ErrorSetupEmail'), [], 'errors');
@@ -265,7 +263,7 @@ if (empty($reshook)) {
         $signatoryToDeleteID = GETPOST('signatoryID');
         $signatory->fetch($signatoryToDeleteID);
 
-        $result = $signatory->setDeleted($user, 0);
+        $result = $signatory->setDeleted($user);
 
         if ($result > 0) {
             setEventMessages($langs->trans('DeleteAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
