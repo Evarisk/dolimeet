@@ -353,6 +353,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             foreach ($signatories as $element) {
                 print '<tr class="oddeven"><td class="minwidth200">';
                 if ($element->element_type == 'socpeople') {
+                    $contact->fetch($element->element_id);
                     $thirdparty->fetch($contact->fk_soc);
                     print $thirdparty->getNomUrl(1);
                 }
