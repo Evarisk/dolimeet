@@ -295,21 +295,6 @@ class modDoliMeet extends DolibarrModules
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->read)
 		$r++;
-        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-        $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('DoliMeetSessions')); // Permission label
-        $this->rights[$r][4] = 'assignedtome';
-        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assignedtome->read)
-        $r++;
-		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('DoliMeetSessions')); // Permission label
-		$this->rights[$r][4] = 'session';
-		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->write)
-		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('DeleteObject', $langs->trans('DoliMeetSessions')); // Permission label
-		$this->rights[$r][4] = 'session';
-		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->delete)
-		$r++;
         
         /* MEETING PERMISSSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
