@@ -39,8 +39,6 @@ SessionNumberingModule  = Numérotation des sessions
 SessionConfig           = Configuration des sessions
 Schedules               = Horaires
 ContratSchedules        = Horaires de la formation
-SignatureEmailMessage   = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
-SignatureEmailSubject   = Signature de la feuille de présence
 SessionListOnProject    = Liste des sessions liées au projet
 EnableObjectDescription = Activer l'objet %s
 

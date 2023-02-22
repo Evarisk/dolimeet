@@ -122,6 +122,9 @@ if (empty($reshook)) {
                 $contact->fetch($attendantTypeContact);
                 setEventMessages($langs->trans('AddAttendantMessage', $langs->trans($attendantRole) . ' ' . $contact->getFullName($langs, 1)), []);
             }
+            // Prevent form reloading page
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
+            exit;
         } elseif (!empty($signatory->errors)) {
             // Creation attendant KO
             setEventMessages('', $signatory->errors, 'errors');
@@ -146,6 +149,9 @@ if (empty($reshook)) {
             // Creation signature OK
             $signatory->setSigned($user);
             setEventMessages($langs->trans('SignAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
+            // Prevent form reloading page
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
+            exit;
         } elseif (!empty($signatory->errors)) {
             // Creation signature KO
             setEventMessages('', $signatory->errors, 'errors');
@@ -161,11 +167,14 @@ if (empty($reshook)) {
 
         $signatory->fetch($signatoryID);
 
-        $result = $signatory->setAbsent($user, 0);
+        $result = $signatory->setAbsent($user);
 
         if ($result > 0) {
             // set absent OK
             setEventMessages($langs->trans('AbsentAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
+            // Prevent form reloading page
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
+            exit;
         } elseif (!empty($signatory->errors)) {
             // Creation absent KO
             setEventMessages('', $signatory->errors, 'errors');
@@ -180,80 +189,75 @@ if (empty($reshook)) {
         $signatoryID = GETPOST('signatoryID');
         $signatory->fetch($signatoryID);
 
-        if ( ! $error) {
-            $langs->load('mails');
-
-            if (!dol_strlen($signatory->email)) {
-                if ($signatory->element_type == 'user') {
-                    $usertmp = $user;
-                    $usertmp->fetch($signatory->element_id);
-                    if (dol_strlen($usertmp->email)) {
-                        $signatory->email = $usertmp->email;
-                        $signatory->update($user, true);
-                    }
-                } else if ($signatory->element_type == 'socpeople') {
-                    $contact->fetch($signatory->element_id);
-                    if (dol_strlen($contact->email)) {
-                        $signatory->email = $contact->email;
-                        $signatory->update($user, true);
-                    }
+        $langs->load('mails');
+        if (dol_strlen($signatory->email)) {
+            if ($signatory->element_type == 'user') {
+                $usertmp = $user;
+                $usertmp->fetch($signatory->element_id);
+                if (dol_strlen($usertmp->email)) {
+                    $signatory->email = $usertmp->email;
+                    $signatory->update($user, true);
+                }
+            } elseif ($signatory->element_type == 'socpeople') {
+                $contact->fetch($signatory->element_id);
+                if (dol_strlen($contact->email)) {
+                    $signatory->email = $contact->email;
+                    $signatory->update($user, true);
                 }
             }
 
             $sendto = $signatory->email;
-
-            if (dol_strlen($sendto) && ( ! empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
+            if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
                 require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
-                $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-                $url  = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&type=' . $objectType, 3);
 
-                $message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
-                $subject = $langs->trans('SignatureEmailSubject') . ' ' . $object->ref;
+                $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
+                $url  = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&object_type=' . $object->element, 3);
+
+                $message = $langs->trans('SignatureEmailMessage', $url);
+                $subject = $langs->trans('SignatureEmailSubject', $langs->transnoentities('The' . ucfirst($object->element)), $object->ref);
 
                 // Create form object
                 // Send mail (substitutionarray must be done just before this)
-                $mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), '', '', 0, -1, '', '', '', '', 'mail');
-
+                $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
                 if ($mailfile->error) {
                     setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-                } else {
-                    if ( ! empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
-                        $result = $mailfile->sendfile();
-                        if ($result) {
-                            $signatory->last_email_sent_date = dol_now('tzuser');
-                            $signatory->update($user, true);
-                            $signatory->setPending($user, false);
-                            setEventMessages($langs->trans('SendEmailAt') . ' ' . $signatory->email, array());
-                            // This avoid sending mail twice if going out and then back to page
-                            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
-                            exit;
-                        } else {
-                            $langs->load('other');
-                            $mesg = '<div class="error">';
-                            if ($mailfile->error) {
-                                $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                                $mesg .= '<br>' . $mailfile->error;
-                            } else {
-                                $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                            }
-                            $mesg .= '</div>';
-                            setEventMessages($mesg, null, 'warnings');
-                        }
+                } elseif (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+                    $result = $mailfile->sendfile();
+                    if ($result) {
+                        $signatory->last_email_sent_date = dol_now('tzuser');
+                        $signatory->update($user, true);
+                        $signatory->setPending($user, false);
+                        setEventMessages($langs->trans('SendEmailAt', $signatory->email), []);
+                        // Prevent form reloading page
+                        header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
+                        exit;
                     } else {
-                        setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
+                        $langs->load('other');
+                        $mesg = '<div class="error">';
+                        if ($mailfile->error) {
+                            $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                            $mesg .= '<br>' . $mailfile->error;
+                        } else {
+                            $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                        }
+                        $mesg .= '</div>';
+                        setEventMessages($mesg, [], 'warnings');
                     }
+                } else {
+                    setEventMessages($langs->trans('ErrorSetupEmail'), [], 'errors');
                 }
             } else {
                 $langs->load('errors');
-                setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')), null, 'warnings');
+                setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')), [], 'warnings');
                 dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
             }
-        } else {
-            // Mail sent KO
-            if ( ! empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
-            else setEventMessages($signatory->error, null, 'errors');
+        } elseif (!empty($signatory->errors)) // Mail sent KO
+            setEventMessages(null, $signatory->errors, 'errors');
+        else {
+            setEventMessages($signatory->error, [], 'errors');
         }
+        $action = '';
     }
 
     // Action to delete attendant
@@ -265,6 +269,9 @@ if (empty($reshook)) {
 
         if ($result > 0) {
             setEventMessages($langs->trans('DeleteAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
+            // Prevent form reloading page
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
+            exit;
         } elseif (!empty($signatory->errors)) {
             // Deletion attendant KO
             setEventMessages('', $signatory->errors, 'errors');

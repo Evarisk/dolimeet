@@ -39,8 +39,6 @@ SessionNumberingModule  = Numbering of sessions
 SessionConfig           = Session setup
 Schedules               = Schedules
 ContratSchedules        = Training schedule
-SignatureEmailMessage   = Hello, <br> Please find attached the link to sign the document.<br>
-SignatureEmailSubject   = Signature of the attendance sheet
 SessionListOnProject    = List of sessions related to the project
 EnableObjectDescription = Activate object %s
 
