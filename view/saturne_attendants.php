@@ -280,7 +280,7 @@ if (empty($reshook)) {
 
 $title   = $langs->trans('Attendants') . ' - ' . $langs->trans(ucfirst($object->element));
 $helpUrl = 'FR:Module_' . $moduleName;
-$morejs  = ['/dolimeet/js/signature-pad.min.js'];
+$morejs  = ['/saturne/js/includes/signature-pad.min.js'];
 
 saturne_header(0,'', $title, $helpUrl, '', 0, 0, $morejs);
 
