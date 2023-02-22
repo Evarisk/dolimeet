@@ -148,10 +148,6 @@ if (empty($reshook)) {
         if ($result > 0) {
             // Creation signature OK
             $signatory->setSigned($user);
-            setEventMessages($langs->trans('SignAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
-            // Prevent form reloading page
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
-            exit;
         } elseif (!empty($signatory->errors)) {
             // Creation signature KO
             setEventMessages('', $signatory->errors, 'errors');
