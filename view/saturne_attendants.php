@@ -366,9 +366,11 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                     print $contact->getNomUrl(1);
                 }
                 print '</td><td class="center">';
-                if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT && $permissiontoadd) {
-                    $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&object_type=' . $object->element, 3);
-                    print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+                if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
+                    if ((!$user->rights->$moduleNameLowerCase->$objectType->read && $user->rights->$moduleNameLowerCase->assignedtome->$objectType && ($element->element_id == $user->id || $element->element_id == $user->contact_id)) || $permissiontoadd) {
+                        $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url . '&object_type=' . $object->element, 3);
+                        print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+                    }
                 }
                 print '</td><td>';
                 print dol_print_date($element->last_email_sent_date, 'dayhour');

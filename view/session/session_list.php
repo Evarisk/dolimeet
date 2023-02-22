@@ -308,7 +308,7 @@ if ($search_society_attendants > 0) {
 }
 if (!$user->rights->dolimeet->$objectType->read && $user->rights->dolimeet->assignedtome->$objectType) {
     if (!empty($user->contact_id)) {
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assignedtome on (search_assignedtome.element_id = ' . $user->contact_id . ' AND search_assignedtome.element_type="socpeople" AND search_assignedtome.status > 0)';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assignedtome on ((search_assignedtome.element_id = ' . $user->contact_id . ' AND search_assignedtome.element_type="socpeople") OR (search_assignedtome.element_id = ' . $user->id . ' AND search_assignedtome.element_type="user") AND search_assignedtome.status > 0)';
     } else {
         $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assignedtome on (search_assignedtome.element_id = ' . $user->id . ' AND search_assignedtome.element_type="user" AND search_assignedtome.status > 0)';
     }
@@ -793,7 +793,7 @@ while ($i < $imaxinloop) {
         }
 
         $filter = ['customsql' => 'fk_object=' . $object->id . ' AND status > 0 AND object_type="' . $object->type . '"'];
-        $signatories = $signatory->fetchAll('', '', 0, 0, $filter);
+        $signatories = $signatory->fetchAll('', 'role', 0, 0, $filter);
 
         foreach ($object->fields as $key => $val) {
             $cssforfield = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
