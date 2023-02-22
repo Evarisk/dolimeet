@@ -214,19 +214,6 @@ if (empty($reshook)) {
                 }
                 if (empty($donotredirect)) {
                     setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
-
-                    if ($object->status == $object::STATUS_LOCKED) {
-                        $signatories = $signatory->fetchSignatory('', $object->id, $object->element);
-                        if (!empty($signatories) && $signatories > 0) {
-                            foreach ($signatories as $arrayRole) {
-                                foreach ($arrayRole as $signatory) {
-                                    $signatory->signature = $langs->transnoentities('FileGenerated');
-                                    $signatory->update($user, false);
-                                }
-                            }
-                        }
-                    }
-
                     $urltoredirect = $_SERVER['REQUEST_URI'];
                     $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
                     $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
@@ -242,19 +229,6 @@ if (empty($reshook)) {
             $action = '';
         } elseif (empty($donotredirect)) {
             setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
-
-            if ($object->status == $object::STATUS_LOCKED) {
-                $signatories = $signatory->fetchSignatory('', $object->id, $object->element);
-                if (!empty($signatories) && $signatories > 0) {
-                    foreach ($signatories as $arrayRole) {
-                        foreach ($arrayRole as $signatory) {
-                            $signatory->signature = $langs->transnoentities('FileGenerated');
-                            $signatory->update($user, false);
-                        }
-                    }
-                }
-            }
-
             $urltoredirect = $_SERVER['REQUEST_URI'];
             $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
             $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop

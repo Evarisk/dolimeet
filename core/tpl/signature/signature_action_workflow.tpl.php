@@ -25,6 +25,15 @@ if ($action == 'confirm_archive' && $permissiontoadd) {
     if (!$error) {
         $result = $object->setArchived($user);
         if ($result > 0) {
+            $signatories = $signatory->fetchSignatory('', $object->id, $object->element);
+            if (!empty($signatories) && $signatories > 0) {
+                foreach ($signatories as $arrayRole) {
+                    foreach ($arrayRole as $signatory) {
+                        $signatory->signature = $langs->transnoentities('FileGenerated');
+                        $signatory->update($user, false);
+                    }
+                }
+            }
             // Set Archived OK
             $urltogo = str_replace('__ID__', $result, $backtopage);
             $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
