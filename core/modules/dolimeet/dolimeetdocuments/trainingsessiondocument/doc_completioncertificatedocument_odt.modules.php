@@ -201,7 +201,11 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
         $objectDocument->fetch($objectDocumentID);
 
         $objectref = dol_sanitizeFileName($objectDocument->ref);
-        $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
+        if ($moreparam['specimen'] == 0 || $moreparam['zone'] == 'private') {
+            $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
+        } else {
+            $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp';
+        }
 
         if (!file_exists($dir)) {
             if (dol_mkdir($dir) < 0) {
@@ -222,8 +226,12 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                 $attandent = '';
             }
 
-            $date       = dol_print_date(dol_now(),'dayxcard');
-            $newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $attandent . '_' . $societyname;
+            $date = dol_print_date(dol_now(),'dayxcard');
+            if ($moreparam['specimen'] == 0) {
+                $newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $attandent . '_' . $societyname;
+            } else {
+                $newfiletmp = $newfiletmp . '_' . $attandent . '_specimen';
+            }
 
             $objectDocument->last_main_doc = $newfiletmp;
 
@@ -338,7 +346,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                 $tmparray['attendant_company_name'] = '';
             }
 
-            if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
+            if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated') && $moreparam['specimen'] == 0) {
                 $encodedImage = explode(',', $signatory->signature)[1];
                 $decodedImage = base64_decode($encodedImage);
                 file_put_contents($tempdir . 'signature.png', $decodedImage);

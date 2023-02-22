@@ -317,7 +317,6 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     print '<div class="signatures-container">';
 
     $zone = 'private';
-
     switch ($object->element) {
         case 'meeting' :
             $attendantsRole = ['Responsible', 'Contributor'];
@@ -331,6 +330,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
         default :
             $attendantsRole = ['Attendant'];
     }
+    $alreadyAddedUsers = [];
 
     foreach ($attendantsRole as $attendantRole) {
         $signatories = $signatory->fetchSignatory($attendantRole, $object->id, $object->element);
@@ -351,7 +351,6 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<td class="center">' . $langs->trans('Signature') . '</td>';
             print '</tr>';
 
-            $alreadyAddedUsers = [];
             foreach ($signatories as $element) {
                 print '<tr class="oddeven"><td class="minwidth200">';
                 if ($element->element_type == 'socpeople') {
@@ -409,7 +408,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td>';
                 print '<td class=minwidth400">';
                 if ($selectedCompany <= 0) {
-                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
+                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, $alreadyAddedUsers, 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
                 }
                 print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
                 if (!empty($selectedCompany) && $selectedCompany > 0 && $user->rights->societe->creer) {
@@ -465,7 +464,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td>';
                 print '<td class=minwidth400">';
                 if ($selectedCompany <= 0) {
-                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
+                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, $alreadyAddedUsers, 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
                 }
                 print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
                 if (!empty($selectedCompany) && $selectedCompany > 0 && $user->rights->societe->creer) {

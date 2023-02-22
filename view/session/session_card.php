@@ -192,6 +192,13 @@ if (empty($reshook)) {
         $moreparams['object'] = $object;
         $moreparams['user']   = $user;
 
+        if ($object->status < $object::STATUS_LOCKED) {
+            $moreparams['specimen'] = 1;
+            $moreparams['zone']     = 'private';
+        } else {
+            $moreparams['specimen'] = 0;
+        }
+
         if (preg_match('/completioncertificate/', GETPOST('model'))) {
             $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
             if (!empty($signatoriesArray)) {

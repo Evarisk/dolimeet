@@ -201,7 +201,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
         $objectDocument->fetch($objectDocumentID);
 
         $objectref = dol_sanitizeFileName($objectDocument->ref);
-        if ($moreparam['specimen'] == 0) {
+        if ($moreparam['specimen'] == 0 || $moreparam['zone'] == 'private') {
             $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
         } else {
             $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp';
@@ -220,7 +220,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
             $newfiletmp = preg_replace('/template_/i', '', $newfiletmp);
             $societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
-			$date       = dol_print_date(dol_now(),'dayxcard');
+			$date = dol_print_date(dol_now(),'dayxcard');
             if ($moreparam['specimen'] == 0) {
                 $newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $societyname;
             } else {
@@ -330,7 +330,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 			$tmparray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
 			$tmparray['duration']   = convertSecondToTime($object->duration);
 
-			if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
+			if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated') && $moreparam['specimen'] == 0) {
 				$encodedImage = explode(',', $signatory->signature)[1];
 				$decodedImage = base64_decode($encodedImage);
 				file_put_contents($tempdir . 'signature.png', $decodedImage);
@@ -387,7 +387,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 									$tmparray['attendant_number']    = $k;
 									$tmparray['attendant_lastname']  = strtoupper($objectSignatory->lastname);
 									$tmparray['attendant_firstname'] = $objectSignatory->firstname;
-									if (dol_strlen($objectSignatory->signature) > 0 && $objectSignatory->signature != $langs->transnoentities('FileGenerated')) {
+									if (dol_strlen($objectSignatory->signature) > 0 && $objectSignatory->signature != $langs->transnoentities('FileGenerated') && $moreparam['specimen'] == 0) {
 										$encodedImage = explode(',', $objectSignatory->signature)[1];
 										$decodedImage = base64_decode($encodedImage);
 										file_put_contents($tempdir . 'signature' . $k . '.png', $decodedImage);
