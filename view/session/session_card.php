@@ -201,19 +201,25 @@ if (empty($reshook)) {
 
         if (preg_match('/completioncertificate/', GETPOST('model'))) {
             $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
+            $nbTrainee = 0;
             if (!empty($signatoriesArray)) {
                 foreach ($signatoriesArray as $objectSignatory) {
-                    if ($objectSignatory->role != 'SessionTrainer') {
+                    if ($objectSignatory->role == 'Trainee') {
                         $moreparams['attendant'] = $objectSignatory;
                         $result = $sessiondocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
                         if ($result <= 0) {
                             setEventMessages($sessiondocument->error, $object->errors, 'errors');
                             $action = '';
                         }
+                        $nbTrainee++;
                     }
                 }
                 if (empty($donotredirect)) {
-                    setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
+                    if ($nbTrainee > 0) {
+                        setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
+                    } else {
+                        setEventMessage($langs->trans('NoTraineeOnTrainingsession'), 'warnings');
+                    }
                     $urltoredirect = $_SERVER['REQUEST_URI'];
                     $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
                     $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
