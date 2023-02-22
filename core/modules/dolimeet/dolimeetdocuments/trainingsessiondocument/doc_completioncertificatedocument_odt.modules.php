@@ -200,7 +200,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 
         $objectDocument->fetch($objectDocumentID);
 
-        $objectref = dol_sanitizeFileName($objectDocument->ref);
+        $objectDocumentRef = dol_sanitizeFileName($objectDocument->ref);
         if ($moreparam['specimen'] == 0 || $moreparam['zone'] == 'private') {
             $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
         } else {
@@ -227,10 +227,9 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             }
 
             $date = dol_print_date(dol_now(),'dayxcard');
-            if ($moreparam['specimen'] == 0) {
-                $newfiletmp = $objectref . '_' . $date . '_' . $newfiletmp . '_' . $attandent . '_' . $societyname;
-            } else {
-                $newfiletmp = $newfiletmp . '_' . $attandent . '_specimen';
+            $newfiletmp = $date . '_' . $object->ref . '_' . $objectDocumentRef .'_' . $newfiletmp . '_' . $societyname;
+            if ($moreparam['specimen'] == 1) {
+                $newfiletmp .= '_specimen';
             }
 
             $objectDocument->last_main_doc = $newfiletmp;
