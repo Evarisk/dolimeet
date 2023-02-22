@@ -43,7 +43,7 @@ $modModule = new $classname($db);
 
 // Security check
 $permissiontoread = $user->rights->$moduleNameLowerCase->read;
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, null, true);
 
 /*
  * View

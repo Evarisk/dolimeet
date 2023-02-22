@@ -81,7 +81,7 @@ include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be incl
 $permissiontoread   = $user->rights->$moduleNameLowerCase->$objectType->read || $user->rights->$moduleNameLowerCase->assigntome->$objectType;
 $permissiontoadd    = $user->rights->$moduleNameLowerCase->$objectType->write;
 $permissiontodelete = $user->rights->$moduleNameLowerCase->$objectType->delete;
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, null, true);
 
 /*
 *  Actions
