@@ -203,7 +203,7 @@ $object->fields = dol_sort_array($object->fields, 'position');
 $arrayfields = dol_sort_array($arrayfields, 'position');
 
 // Security check (enable the most restrictive one) - Protection if external user
-$permissiontoread   = $user->rights->dolimeet->$objectType->read || $user->rights->dolimeet->assigntome->$objectType;
+$permissiontoread   = $user->rights->dolimeet->$objectType->read || $user->rights->dolimeet->assignedtome->$objectType;
 $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete;
 saturne_check_access($permissiontoread, null, true);
@@ -306,11 +306,11 @@ if ($search_society_attendants > 0) {
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople as cf on (cf.fk_soc = ' . $search_society_attendants . ')';
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_society_attendants on (search_society_attendants.element_id = cf.rowid AND search_society_attendants.element_type="socpeople" AND search_society_attendants.status > 0)';
 }
-if (!$user->rights->dolimeet->$objectType->read && $user->rights->dolimeet->assigntome->$objectType) {
+if (!$user->rights->dolimeet->$objectType->read && $user->rights->dolimeet->assignedtome->$objectType) {
     if (!empty($user->contact_id)) {
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assigntome on (search_assigntome.element_id = ' . $user->contact_id . ' AND search_assigntome.element_type="socpeople" AND search_assigntome.status > 0)';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assignedtome on (search_assignedtome.element_id = ' . $user->contact_id . ' AND search_assignedtome.element_type="socpeople" AND search_assignedtome.status > 0)';
     } else {
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assigntome on (search_assigntome.element_id = ' . $user->id . ' AND search_assigntome.element_type="user" AND search_assigntome.status > 0)';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assignedtome on (search_assignedtome.element_id = ' . $user->id . ' AND search_assignedtome.element_type="user" AND search_assignedtome.status > 0)';
     }
 }
 
@@ -340,8 +340,8 @@ if ($search_external_attendants > 0) {
 if ($search_society_attendants > 0) {
     $sql .= ' AND t.rowid = search_society_attendants.fk_object ';
 }
-if (!$user->rights->dolimeet->$objectType->read && $user->rights->dolimeet->assigntome->$objectType) {
-    $sql .= ' AND t.rowid = search_assigntome.fk_object ';
+if (!$user->rights->dolimeet->$objectType->read && $user->rights->dolimeet->assignedtome->$objectType) {
+    $sql .= ' AND t.rowid = search_assignedtome.fk_object ';
 }
 if ($objectType != 'session') {
     $sql .= " AND type = '" . $objectType . "'";

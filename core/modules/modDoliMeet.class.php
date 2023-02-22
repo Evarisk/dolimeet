@@ -297,8 +297,8 @@ class modDoliMeet extends DolibarrModules
 		$r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('DoliMeetSessions')); // Permission label
-        $this->rights[$r][4] = 'assigntome';
-        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assigntome->read)
+        $this->rights[$r][4] = 'assignedtome';
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assignedtome->read)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('DoliMeetSessions')); // Permission label
@@ -319,8 +319,8 @@ class modDoliMeet extends DolibarrModules
 		$r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->transnoentities('Meetings')); // Permission label
-        $this->rights[$r][4] = 'assigntome';
-        $this->rights[$r][5] = 'meeting'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assigntome->meeting)
+        $this->rights[$r][4] = 'assignedtome';
+        $this->rights[$r][5] = 'meeting'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assignedtome->meeting)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->transnoentities('Meetings')); // Permission label
@@ -341,8 +341,8 @@ class modDoliMeet extends DolibarrModules
 		$r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Trainingsessions')); // Permission label
-        $this->rights[$r][4] = 'assigntome';
-        $this->rights[$r][5] = 'trainingsession'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assigntome->trainingsession)
+        $this->rights[$r][4] = 'assignedtome';
+        $this->rights[$r][5] = 'trainingsession'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assignedtome->trainingsession)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Trainingsessions')); // Permission label
@@ -363,8 +363,8 @@ class modDoliMeet extends DolibarrModules
 		$r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Audits')); // Permission label
-        $this->rights[$r][4] = 'assigntome';
-        $this->rights[$r][5] = 'audit'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assigntome->audit)
+        $this->rights[$r][4] = 'assignedtome';
+        $this->rights[$r][5] = 'audit'; // In php code, permission will be checked by test if ($user->rights->dolimeet->assignedtome->audit)
         $r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Audits')); // Permission label
@@ -415,7 +415,7 @@ class modDoliMeet extends DolibarrModules
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
             'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->meeting->read || $user->rights->dolimeet->assigntome->meeting',
+            'perms'    => '$user->rights->dolimeet->meeting->read || $user->rights->dolimeet->assignedtome->meeting',
             'target'   => '',
             'user'     => 2,
         ];
@@ -446,7 +446,7 @@ class modDoliMeet extends DolibarrModules
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
             'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->trainingsession->read || $user->rights->dolimeet->assigntome->trainingsession',
+            'perms'    => '$user->rights->dolimeet->trainingsession->read || $user->rights->dolimeet->assignedtome->trainingsession',
             'target'   => '',
             'user'     => 2,
         ];
@@ -477,7 +477,7 @@ class modDoliMeet extends DolibarrModules
 			'langs'    => 'dolimeet@dolimeet',
 			'position' => 1000 + $r,
 			'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
-			'perms'    => '$user->rights->dolimeet->audit->read || $user->rights->dolimeet->assigntome->audit',
+			'perms'    => '$user->rights->dolimeet->audit->read || $user->rights->dolimeet->assignedtome->audit',
 			'target'   => '',
 			'user'     => 2,
         ];

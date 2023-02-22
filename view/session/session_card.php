@@ -100,7 +100,7 @@ include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be incl
 $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->dolimeet->$objectType->read || $user->rights->dolimeet->assigntome->$objectType;
+$permissiontoread   = $user->rights->dolimeet->$objectType->read || $user->rights->dolimeet->assignedtome->$objectType;
 $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
 saturne_check_access($permissiontoread, null, true);
