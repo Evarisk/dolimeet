@@ -88,7 +88,7 @@ $form = new Form($db);
 $signatory->fetch(0, '', ' AND signature_url =' . "'" . $track_id . "'");
 $object->fetch($signatory->fk_object);
 
-$upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp/';
+$upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 
 /*
  * Actions
@@ -173,6 +173,7 @@ if (empty($reshook)) {
         $moreparams['object']   = $object;
         $moreparams['user']     = $user;
         $moreparams['specimen'] = 1;
+        $moreparams['zone']     = 'public';
 
         $result = $sessiondocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
@@ -180,6 +181,7 @@ if (empty($reshook)) {
             setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
             $action = '';
         } elseif (empty($donotredirect)) {
+            copy($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref . '/specimen/' . $sessiondocument->last_main_doc, DOL_DOCUMENT_ROOT . '/custom/dolimeet/documents/temp/' . $object->element . '_specimen_' . $track_id . '.odt');
             setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
             $urltoredirect = $_SERVER['REQUEST_URI'];
             $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
@@ -190,7 +192,7 @@ if (empty($reshook)) {
     }
 
     if ($action == 'remove_file') {
-        $files = dol_dir_list($upload_dir); // get all file names
+        $files = dol_dir_list(DOL_DOCUMENT_ROOT . '/custom/dolimeet/documents/temp/'); // get all file names
 
         foreach ($files as $file) {
             if (is_file($file['fullname'])) {
@@ -225,8 +227,9 @@ $element = $signatory; ?>
 <!--			<input type="hidden" id="confCAPTCHA" value="--><?php //echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?><!--"/>-->
 			<div class="wpeo-gridlayout grid-2 file-generation">
 				<strong class="grid-align-middle"><?php echo $langs->trans('Document'); ?></strong>
-				<input type="hidden" class="specimen-name" value="<?php echo 'attendancesheetdocument_specimen.odt' ?>">
-				<input type="hidden" class="specimen-path" value="<?php echo $upload_dir ?>">
+                <?php $path = DOL_MAIN_URL_ROOT . '/custom/dolimeet/documents/temp/'; ?>
+                <input type="hidden" class="specimen-name" value="<?php echo $object->element . '_specimen_' . $track_id . '.odt' ?>">
+                <input type="hidden" class="specimen-path" value="<?php echo $path ?>">
 				<span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-print"></i></span>
 			</div>
 			<br>

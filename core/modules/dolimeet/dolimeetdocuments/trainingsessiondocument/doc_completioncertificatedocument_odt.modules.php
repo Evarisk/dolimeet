@@ -201,10 +201,9 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
         $objectDocument->fetch($objectDocumentID);
 
         $objectDocumentRef = dol_sanitizeFileName($objectDocument->ref);
-        if ($moreparam['specimen'] == 0 || $moreparam['zone'] == 'private') {
-            $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
-        } else {
-            $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp';
+        $dir = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/' . $object->type . 'document/' . $object->ref;
+        if ($moreparam['specimen'] == 1 && $moreparam['zone'] == 'public') {
+            $dir .= '/specimen';
         }
 
         if (!file_exists($dir)) {
@@ -227,25 +226,24 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             }
 
             $date = dol_print_date(dol_now(),'dayxcard');
-            $newfiletmp = $date . '_' . $object->ref . '_' . $objectDocumentRef .'_' . $newfiletmp . '_' . $societyname;
+            $newfiletmp = $date . '_' . $object->ref . '_' . $objectDocumentRef .'_' . $newfiletmp . '_' . $attandent . '_' . $societyname;
             if ($moreparam['specimen'] == 1) {
                 $newfiletmp .= '_specimen';
             }
 
-            $objectDocument->last_main_doc = $newfiletmp;
+            // Get extension (ods or odt)
+            $newfileformat = substr($newfile, strrpos($newfile, '.') + 1);
+            $filename      = $newfiletmp . '.' . $newfileformat;
+            $file          = $dir . '/' . $filename;
+
+            $objectDocument->last_main_doc = $filename;
 
             $sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'dolimeet_dolimeetdocuments';
-            $sql .= ' SET last_main_doc =' . (!empty($newfiletmp) ? "'" . $this->db->escape($newfiletmp) . "'" : 'null');
+            $sql .= ' SET last_main_doc =' . (!empty($objectDocument->last_main_doc) ? "'" . $this->db->escape($objectDocument->last_main_doc) . "'" : 'null');
             $sql .= ' WHERE rowid = ' . $objectDocument->id;
 
             dol_syslog('dolimeet_dolimeetdocuments::Insert last main doc', LOG_DEBUG);
             $this->db->query($sql);
-
-            // Get extension (ods or odt)
-            $newfileformat = substr($newfile, strrpos($newfile, '.') + 1);
-
-            $filename = $newfiletmp . '.' . $newfileformat;
-            $file     = $dir . '/' . $filename;
 
             dol_mkdir($conf->dolimeet->dir_temp);
 
