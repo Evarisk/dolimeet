@@ -698,6 +698,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $formmail->setSubstitFromObject($object, $langs);
         }
         $substitutionarray = getCommonSubstitutionArray($outputlangs, 0, $arrayoffamiliestoexclude, $object);
+        $substitutionarray['__TYPE__']    = $langs->trans(ucfirst($object->element));
+        $substitutionarray['__THETYPE__'] = $langs->trans('The'. ucfirst($object->element));
         $parameters = ['mode' => 'formemail'];
         complete_substitutions_array($substitutionarray, $outputlangs, $object, $parameters);
 
@@ -752,9 +754,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         $formmail->substit = $substitutionarray;
 
         // Array of other parameters
-        $formmail->param['action'] = 'send';
-        //$formmail->param['models'] = $modelmail;
-        //$formmail->param['models_id'] = GETPOST('modelmailselected', 'int');
+        $formmail->param['action']    = 'send';
+        $formmail->param['models']    = 'saturne';
+        $formmail->param['models_id'] = GETPOST('modelmailselected', 'int');
         $formmail->param['id']        = $object->id;
         $formmail->param['returnurl'] = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
         $formmail->param['fileinit']  = $files;
