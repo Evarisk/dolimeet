@@ -46,8 +46,19 @@ function session_prepare_head(CommonObject $object): array
 	$head[$h][2] = 'card';
 	$h++;
 
+    $signatory = new SaturneSignature($db);
+    $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
+    if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
+        $nbAttendants = count($signatoriesArray);
+    } else {
+        $nbAttendants = 0;
+    }
+
 	$head[$h][0] = dol_buildpath('/dolimeet/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->type;
 	$head[$h][1] = '<i class="fas fa-file-signature pictofixedwidth"></i>' . $langs->trans('Attendants');
+    if ($nbAttendants > 0) {
+        $head[$h][1] .= '<span class="badge marginleftonlyshort">' . $nbAttendants . '</span>';
+    }
 	$head[$h][2] = 'attendants';
 	$h++;
 
