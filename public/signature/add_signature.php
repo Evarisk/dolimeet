@@ -277,7 +277,7 @@ $element = $signatory; ?>
 //		print '</div>';
 //	}?>
     <?php else :
-        print $langs->trans('SignaturePublicInterfaceForbidden');
+        print '<div class="center">' . $langs->trans('SignaturePublicInterfaceForbidden') . '</div>';
     endif; ?>
 </div>
 
