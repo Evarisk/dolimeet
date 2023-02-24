@@ -25,17 +25,19 @@ if (empty($conf) || !is_object($conf)) {
                 print '</form>';
                 print '</li>';
             }
-            print '<li class="dropdown-item">';
-            print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element .'">';
-            print '<input type="hidden" name="token" value="' . newToken() . '">';
-            print '<input type="hidden" name="action" value="send">';
-            print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
-            print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-            print '<button type="submit" class="signature-email wpeo-button button-primary" value="' . $element->id . '">';
-            print '<span><i class="fas fa-at"></i> ' . $langs->trans('SendEmail') . '</span>';
-            print '</button>';
-            print '</form>';
-            print '</li>';
+            if ($object->status > $object::STATUS_DRAFT) {
+                print '<li class="dropdown-item">';
+                print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
+                print '<input type="hidden" name="token" value="' . newToken() . '">';
+                print '<input type="hidden" name="action" value="send">';
+                print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
+                print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+                print '<button type="submit" class="signature-email wpeo-button button-primary" value="' . $element->id . '">';
+                print '<span><i class="fas fa-at"></i> ' . $langs->trans('SendEmail') . '</span>';
+                print '</button>';
+                print '</form>';
+                print '</li>';
+            }
         }
         if ($object->status < $object::STATUS_LOCKED) {
             print '<li class="dropdown-item">';
