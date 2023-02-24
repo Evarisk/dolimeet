@@ -17,13 +17,13 @@
 - Demo : [Demo DoliMeet](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki DoliMeet](https://wiki.dolibarr.org/index.php/Module_DoliMeet)
 - Projet GitHub : [Projet DoliMeet](https://github.com/Evarisk/dolimeet/projects?query=is%3Aopen)
-- D'autres modules développés par Evarisk disponible sur [DoliStore.com](https://www.dolistore.com)
+- D'autres modules développés par Evarisk disponibles sur [DoliStore.com](https://www.dolistore.com)
 
 ## Fonctionnalités
 
-- Réunions et compte rendu
-- Séance de formation avec attestation de présence et certification de réalisation
-- Audits avec le compte rendu
+- Réunions et compte-rendus
+- Sessions de formation avec attestation de présence et certificat de réalisation
+- Audits et compte-rendus
 
 ## Traductions
 
