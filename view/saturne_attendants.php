@@ -301,19 +301,22 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             <a class="butAction" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate', $langs->transnoentities('The' . ucfirst($object->element))) ?></a>;
         </div>
     <?php endif; ?>
-        <div class="noticeSignatureSuccess wpeo-notice notice-success<?php echo (($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status == $object::STATUS_VALIDATED && $permissiontoadd) ? '' : ' hidden') ?>">
+        <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
             <div class="notice-content">
                 <div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
                 <div class="notice-subtitle"><?php echo $langs->trans('AddSignatureSuccessText') . GETPOST('signature_id')?></div>
             </div>
-            <?php if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
-                print '<a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
-            } ?>
         </div>
     <?php
     print '</div>';
 
     print '<div class="signatures-container">';
+
+    if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
+        print '<div class="tabsAction" style="margin-bottom: 0">';
+        print '<a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
+        print '</div>';
+    }
 
     $zone = 'private';
     switch ($object->element) {
