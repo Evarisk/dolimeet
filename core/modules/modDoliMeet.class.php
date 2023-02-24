@@ -121,7 +121,8 @@ class modDoliMeet extends DolibarrModules
 				'printOverviewDetail',
 				'admincompany',
                 'saturneglobal',
-                'sessioncard'
+                'sessioncard',
+                'saturnepublicsignature'
             ],
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 1,
@@ -216,11 +217,11 @@ class modDoliMeet extends DolibarrModules
         $this->tabs   = [];
         $pictopath    = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
         $picto        = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'user:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'project:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . ucfirst($langs->trans('DoliMeetSessions')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__']; // To add a new tab identified by code tabname1
+        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . ucfirst($langs->trans('SessionsMin')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'user:+sessionList:' . $picto . ucfirst($langs->trans('SessionsMin')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . ucfirst($langs->trans('SessionsMin')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'project:+sessionList:' . $picto . ucfirst($langs->trans('SessionsMin')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . ucfirst($langs->trans('SessionsMin')) . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'contract:+schedules:'. $picto . $langs->trans('Schedules') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/saturne/view/saturne_schedules.php?module_name=DoliMeet&element_type=contrat&id=__ID__']; // To add a new tab identified by code tabname1
         // Example:
         // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@dolimeet:$user->rights->othermodule->read:/dolimeet/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
@@ -291,7 +292,7 @@ class modDoliMeet extends DolibarrModules
 
         /* SESSION PERMISSSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('DoliMeetSessions')); // Permission label
+		$this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('SessionsMin')); // Permission label
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->read)
 		$r++;

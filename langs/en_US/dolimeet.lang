@@ -31,12 +31,11 @@ DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 ReadMyObject = Read my %s (if assigned as a participant)
 
 # Data - Donnée
-DoliMeetSessions        = sessions
+SessionsMin             = sessions
 NewSession              = New session
 SessionList             = List of sessions
 SessionTypes            = Session types
 SessionNumberingModule  = Numbering of sessions
-SessionConfig           = Session setup
 Schedules               = Schedules
 ContratSchedules        = Training schedule
 SessionListOnProject    = List of sessions related to the project

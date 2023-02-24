@@ -85,6 +85,8 @@ $user            = new User($db);
 // Initialize view objects
 $form = new Form($db);
 
+$hookmanager->initHooks([$objectType . 'publicsignature', 'saturnepublicsignature', 'saturnepublicinterface', 'saturneglobal', 'globalcard']); // Note that conf->hooks_modules contains array
+
 $signatory->fetch(0, '', ' AND signature_url =' . "'" . $track_id . "'");
 $object->fetch($signatory->fk_object);
 
@@ -206,61 +208,59 @@ if (empty($reshook)) {
  * View
  */
 
-//
-//if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
-//	print $langs->trans('SignaturePublicInterfaceForbidden');
-//	exit;
-//}
-
 $title   = $langs->trans('Signature');
-$morejs  = ['/saturne/js/includes/signature-pad.min.js', '/saturne/js/saturne.min.js'];
+$morejs  = ['/saturne/js/includes/signature-pad.min.js'];
 $morecss = ['/saturne/css/saturne.min.css'];
 
-llxHeaderSignature($title, '', 0, 0, $morejs, $morecss);
+$conf->dol_hide_topmenu  = 1;
+$conf->dol_hide_leftmenu = 1;
+
+saturne_header(0,'', $title, '', '', 0, 0, $morejs, $morecss);
 
 $element = $signatory; ?>
 
 <div class="signature-container">
-	<input type="hidden" name="token" value="<?php echo newToken(); ?>">
-	<div class="wpeo-gridlayout grid-2">
-		<div class="informations">
-<!--			<input type="hidden" id="confCAPTCHA" value="--><?php //echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?><!--"/>-->
-			<div class="wpeo-gridlayout grid-2 file-generation">
-				<strong class="grid-align-middle"><?php echo $langs->trans('Document'); ?></strong>
-                <?php $path = DOL_MAIN_URL_ROOT . '/custom/dolimeet/documents/temp/'; ?>
-                <input type="hidden" class="specimen-name" value="<?php echo $object->element . '_specimen_' . $track_id . '.odt' ?>">
-                <input type="hidden" class="specimen-path" value="<?php echo $path ?>">
-				<span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-print"></i></span>
-			</div>
-			<br>
-			<div class="wpeo-table table-flex table-2">
-				<div class="table-row">
-					<div class="table-cell"><?php echo $langs->trans('FullName'); ?></div>
-					<div class="table-cell table-end"><?php echo strtoupper($signatory->lastname) . ' ' . $signatory->firstname; ?></div>
-				</div>
-				<div class="table-row">
-					<div class="table-cell"><?php echo $langs->trans($langs->trans(ucfirst($object->element))); ?></div>
-					<div class="table-cell table-end"><?php echo $object->ref . ' ' . $object->label; ?></div>
-				</div>
-			</div>
-		</div>
-		<div class="signature">
-			<div class="wpeo-gridlayout grid-2">
-				<strong class="grid-align-middle"><?php echo $langs->trans('Signature'); ?></strong>
-                <?php if (!dol_strlen($element->signature)) : ?>
-                    <div class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
-                        <input type="hidden" class="modal-to-open" value="modal-signature<?php echo $element->id ?>">
-                        <input type="hidden" class="from-id" value="<?php echo $element->id ?>">
-                        <span><i class="fas fa-pen-nib"></i> <?php echo $langs->trans('Sign'); ?></span>
+    <?php if (!empty($conf->global->SATURNE_ENABLE_PUBLIC_INTERFACE)) : ?>
+        <input type="hidden" name="token" value="<?php echo newToken(); ?>">
+        <div class="wpeo-gridlayout grid-2">
+            <div class="informations">
+    <!--			<input type="hidden" id="confCAPTCHA" value="--><?php //echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?><!--"/>-->
+                <div class="wpeo-gridlayout grid-2 file-generation">
+                    <strong class="grid-align-middle"><?php echo $langs->trans('Document'); ?></strong>
+                    <?php $path = DOL_MAIN_URL_ROOT . '/custom/dolimeet/documents/temp/'; ?>
+                    <input type="hidden" class="specimen-name" value="<?php echo $object->element . '_specimen_' . $track_id . '.odt' ?>">
+                    <input type="hidden" class="specimen-path" value="<?php echo $path ?>">
+                    <span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-print"></i></span>
+                </div>
+                <br>
+                <div class="wpeo-table table-flex table-2">
+                    <div class="table-row">
+                        <div class="table-cell"><?php echo $langs->trans('FullName'); ?></div>
+                        <div class="table-cell table-end"><?php echo strtoupper($signatory->lastname) . ' ' . $signatory->firstname; ?></div>
                     </div>
-                <?php endif; ?>
-			</div>
-			<br>
-			<div class="signature-element">
-				<?php require __DIR__ . '/../../core/tpl/signature/signature_view.tpl.php'; ?>
-			</div>
-		</div>
-	</div>
+                    <div class="table-row">
+                        <div class="table-cell"><?php echo $langs->trans($langs->trans(ucfirst($object->element))); ?></div>
+                        <div class="table-cell table-end"><?php echo $object->ref . ' ' . $object->label; ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="signature">
+                <div class="wpeo-gridlayout grid-2">
+                    <strong class="grid-align-middle"><?php echo $langs->trans('Signature'); ?></strong>
+                    <?php if (!dol_strlen($element->signature)) : ?>
+                        <div class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
+                            <input type="hidden" class="modal-to-open" value="modal-signature<?php echo $element->id ?>">
+                            <input type="hidden" class="from-id" value="<?php echo $element->id ?>">
+                            <span><i class="fas fa-pen-nib"></i> <?php echo $langs->trans('Sign'); ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <br>
+                <div class="signature-element">
+                    <?php require __DIR__ . '/../../core/tpl/signature/signature_view.tpl.php'; ?>
+                </div>
+            </div>
+        </div>
 <!--	--><?php
 //	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 //		require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
@@ -276,6 +276,9 @@ $element = $signatory; ?>
 //		print '</span>';
 //		print '</div>';
 //	}?>
+    <?php else :
+        print $langs->trans('SignaturePublicInterfaceForbidden');
+    endif; ?>
 </div>
 
 <?php

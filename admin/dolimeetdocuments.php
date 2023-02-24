@@ -206,7 +206,7 @@ print load_fiche_titre($title, $selectorAnchor, 'dolimeet_color.png@dolimeet');
 $head = dolimeet_admin_prepare_head();
 print dol_get_fiche_head($head, 'documents', $title, -1, 'dolimeet_color@dolimeet');
 
-print load_fiche_titre($langs->trans('DocumentsConfig'), '', '');
+print load_fiche_titre($langs->trans('Configs', $langs->trans('DocumentsMin')), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';

@@ -306,7 +306,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                 $contract = new Contrat($this->db);
                 $contract->fetch($object->fk_contrat);
                 $contract->fetch_optionals();
-                $trainingsessionDict = fetchDictionnary('c_trainingsession_type');
+                $trainingsessionDict = fetch_dolimeet_dictionnary('c_trainingsession_type');
                 if (is_array($trainingsessionDict) && !empty($trainingsessionDict) && !empty($contract->array_options['options_trainingsession_type'])) {
                     $tmparray['action_nature'] = $langs->trans($trainingsessionDict[$contract->array_options['options_trainingsession_type']]->label);
                 } else {

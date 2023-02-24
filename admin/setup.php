@@ -68,7 +68,7 @@ print load_fiche_titre($title, $linkback, 'dolimeet_color@dolimeet');
 $head = dolimeet_admin_prepare_head();
 print dol_get_fiche_head($head, 'settings', $title, -1, 'dolimeet_color@dolimeet');
 
-print load_fiche_titre($langs->trans('SessionConfig'), '', '');
+print load_fiche_titre($langs->trans('Configs', $langs->trans('SessionsMin')), '', '');
 print '<hr>';
 
 
