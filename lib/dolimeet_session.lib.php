@@ -46,6 +46,8 @@ function session_prepare_head(CommonObject $object): array
 	$head[$h][2] = 'card';
 	$h++;
 
+    require_once __DIR__ . '/../class/saturnesignature.class.php';
+
     $signatory = new SaturneSignature($db);
     $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
     if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
