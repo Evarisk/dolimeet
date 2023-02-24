@@ -298,7 +298,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 <div class="notice-title"><?php echo $langs->trans('BeCareful') ?></div>
                 <div class="notice-subtitle"><?php echo $langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) ?></div>
             </div>
-            <a class="butAction" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><?php echo $langs->trans('GoToValidate', $langs->transnoentities('The' . ucfirst($object->element))) ?></a>;
+            <a class="butAction" href="<?php echo dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element, 1); ?>"><i class="fas fa-check"></i> <?php echo $langs->trans('GoToValidate', $langs->transnoentities('The' . ucfirst($object->element))) ?></a>;
         </div>
     <?php endif; ?>
         <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -314,7 +314,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
 
     if ($signatory->checkSignatoriesSignatures($object->id, $object->element) && $object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
         print '<div class="tabsAction" style="margin-bottom: 0">';
-        print '<a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '">' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
+        print '<a class="butAction" href="' . DOL_URL_ROOT . '/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $id . '&object_type=' . $object->element . '"><i class="fas fa-lock"></i> ' . $langs->trans('GoToLock', $langs->transnoentities('The' . ucfirst($object->element))) . '</a>';
         print '</div>';
     }
 
