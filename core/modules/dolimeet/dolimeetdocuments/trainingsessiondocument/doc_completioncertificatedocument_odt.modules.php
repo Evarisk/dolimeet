@@ -343,11 +343,13 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                 $tmparray['attendant_company_name'] = '';
             }
 
-            if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated') && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1) {
-                $encodedImage = explode(',', $signatory->signature)[1];
-                $decodedImage = base64_decode($encodedImage);
-                file_put_contents($tempdir . 'signature.png', $decodedImage);
-                $tmparray['trainer_signature'] = $tempdir . 'signature.png';
+            if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
+                if ($moreparam['specimen'] == 0 || ($moreparam['specimen'] == 1 && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1)) {
+                    $encodedImage = explode(',', $signatory->signature)[1];
+                    $decodedImage = base64_decode($encodedImage);
+                    file_put_contents($tempdir . 'signature.png', $decodedImage);
+                    $tmparray['trainer_signature'] = $tempdir . 'signature.png';
+                }
             } else {
                 $tmparray['trainer_signature'] = '';
             }
