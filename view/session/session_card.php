@@ -243,20 +243,20 @@ if (empty($reshook)) {
             }  else {
                 setEventMessage($langs->trans('NoTraineeOnTrainingsession'), 'warnings');
             }
-        } else {
-            $result = $sessiondocument->generateDocument((!empty($models) ? $models[0] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-            if ($result <= 0) {
-                setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
-                $action = '';
-            } elseif (empty($donotredirect)) {
-                setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
-                $urltoredirect = $_SERVER['REQUEST_URI'];
-                $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-                $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-                $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
-                header('Location: ' . $urltoredirect . '#builddoc');
-                exit;
-            }
+        }
+
+        $result = $sessiondocument->generateDocument((!empty($models) ? $models[0] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+        if ($result <= 0) {
+            setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
+            $action = '';
+        } elseif (empty($donotredirect)) {
+            setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
+            $urltoredirect = $_SERVER['REQUEST_URI'];
+            $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+            $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+            $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
+            header('Location: ' . $urltoredirect . '#builddoc');
+            exit;
         }
     }
 
@@ -541,7 +541,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             if ($object->status == $object::STATUS_LOCKED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
                 $fileparams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
                 $file       = $fileparams['fullname'];
-                if (file_exists($file) && !preg_match('/specimen/', $fileparams['file'])) {
+                if (file_exists($file) && !preg_match('/specimen/', $fileparams['name'])) {
                     $forcebuilddoc = 0;
                 } else {
                     $forcebuilddoc = 1;
