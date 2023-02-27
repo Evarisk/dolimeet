@@ -240,21 +240,23 @@ if (empty($reshook)) {
                         exit;
                     }
                 }
+            }  else {
+                setEventMessage($langs->trans('NoTraineeOnTrainingsession'), 'warnings');
             }
-        }
-
-        $result = $sessiondocument->generateDocument((!empty($models) ? $models[0] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-        if ($result <= 0) {
-            setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
-            $action = '';
-        } elseif (empty($donotredirect)) {
-            setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
-            $urltoredirect = $_SERVER['REQUEST_URI'];
-            $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-            $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-            $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
-            header('Location: ' . $urltoredirect . '#builddoc');
-            exit;
+        } else {
+            $result = $sessiondocument->generateDocument((!empty($models) ? $models[0] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+            if ($result <= 0) {
+                setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
+                $action = '';
+            } elseif (empty($donotredirect)) {
+                setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
+                $urltoredirect = $_SERVER['REQUEST_URI'];
+                $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+                $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+                $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
+                header('Location: ' . $urltoredirect . '#builddoc');
+                exit;
+            }
         }
     }
 
