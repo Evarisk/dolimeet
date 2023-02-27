@@ -855,7 +855,7 @@ while ($i < $imaxinloop) {
                                         if ($objectSignatory->element_type == 'user' && $objectSignatory->role == $attendantRole) {
                                             $usertmp = $user;
                                             $usertmp->fetch($objectSignatory->element_id);
-                                            print $usertmp->getNomUrl(1);
+                                            print $usertmp->getNomUrl(1, '', 0, 0, 24, 1);
                                             print '<br>';
                                         }
                                     }
@@ -888,6 +888,14 @@ while ($i < $imaxinloop) {
                                         $thirdparty->fetch($contact->fk_soc);
                                         print $thirdparty->getNomUrl(1);
                                         print '<br>';
+                                    } else {
+                                        $usertmp->fetch($objectSignatory->element_id);
+                                        if ($usertmp->contact_id > 0) {
+                                            $contact->fetch($usertmp->contact_id);
+                                            $thirdparty->fetch($contact->fk_soc);
+                                            print $thirdparty->getNomUrl(1);
+                                            print '<br>';
+                                        }
                                     }
                                 }
                             }
