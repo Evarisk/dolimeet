@@ -88,7 +88,7 @@ BilanCompetences               = Bilan de compétences
 TrainingSessionType            = Type de formation
 TrainingSessionLocation        = Lieu de la formation
 TrainingsessionsCategoriesArea = Espace des tags/catégories des sessions de formations
-NoTraineeOnTrainingsession     = Aucun stagiaire présent pour la sessions de formation. <br> Impossible de générer le certificat de réalisation
+NoTraineeOnTrainingsession     = Aucun stagiaire présent pour la session de formation. <br> Impossible de générer le certificat de réalisation
 
 # Attendant role - Rôle participant
 SessionTrainer = Formateur
