@@ -848,26 +848,34 @@ while ($i < $imaxinloop) {
                     if ($resource['checked']) {
                         if ($resource['label'] == 'InternalAttendants') {
                             print '<td>';
-                            if (is_array($signatories) && !empty($signatories) && $signatories > 0)  {
-                                foreach ($signatories as $objectSignatory) {
-                                    if ($objectSignatory->element_type == 'user') {
-                                        $usertmp = $user;
-                                        $usertmp->fetch($objectSignatory->element_id);
-                                        print $usertmp->getNomUrl(1) . ' ' . $langs->trans($objectSignatory->role);
-                                        print '<br>';
+                            if (is_array($signatories) && !empty($signatories) && $signatories > 0) {
+                                foreach ($attendantsRole as $attendantRole) {
+                                    print '<b>' . $langs->trans($attendantRole) . '</b><br><br>';
+                                    foreach ($signatories as $objectSignatory) {
+                                        if ($objectSignatory->element_type == 'user' && $objectSignatory->role == $attendantRole) {
+                                            $usertmp = $user;
+                                            $usertmp->fetch($objectSignatory->element_id);
+                                            print $usertmp->getNomUrl(1);
+                                            print '<br>';
+                                        }
                                     }
+                                    print '<br>';
                                 }
                             }
                             print '</td>';
                         } elseif ($resource['label'] == 'ExternalAttendants') {
                             print '<td>';
                             if (is_array($signatories) && !empty($signatories)) {
-                                foreach ($signatories as $objectSignatory) {
-                                    if ($objectSignatory->element_type == 'socpeople') {
-                                        $contact->fetch($objectSignatory->element_id);
-                                        print $contact->getNomUrl(1) . ' ' . $langs->trans($objectSignatory->role);
-                                        print '<br>';
+                                foreach ($attendantsRole as $attendantRole) {
+                                    print '<b>' . $langs->trans($attendantRole) . '</b><br><br>';
+                                    foreach ($signatories as $objectSignatory) {
+                                        if ($objectSignatory->element_type == 'socpeople' && $objectSignatory->role == $attendantRole) {
+                                            $contact->fetch($objectSignatory->element_id);
+                                            print $contact->getNomUrl(1);
+                                            print '<br>';
+                                        }
                                     }
+                                    print '<br>';
                                 }
                             }
                             print '</td>';
