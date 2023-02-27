@@ -136,3 +136,5 @@ Auditor = Auditor
 TrainingOrganizationNumber        = Declaration number of the training organisation
 TrainingOrganizationNumberTooltip = Enter your registration number here if you are recognised as a training organisation
 SocietyAttendants                 = Third party external participants
+ShowSpecimen                      = See signatures on specimen documents
+ShowSpecimenDescription           = Allows viewing of signatures on specimen documents

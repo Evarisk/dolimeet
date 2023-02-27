@@ -210,14 +210,14 @@ print load_fiche_titre($langs->trans('Configs', $langs->trans('DocumentsMin')), 
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
 print '</tr>';
 
 // Automatic PDF generation
 print '<tr class="oddeven"><td>';
-print  $langs->trans("AutomaticPdfGeneration");
+print  $langs->trans('AutomaticPdfGeneration');
 print '</td><td>';
 print $langs->trans('AutomaticPdfGenerationDescription');
 print '</td>';
@@ -228,12 +228,23 @@ print '</tr>';
 
 // Manual PDF generation
 print '<tr class="oddeven"><td>';
-print  $langs->trans("ManualPdfGeneration");
+print  $langs->trans('ManualPdfGeneration');
 print '</td><td>';
 print $langs->trans('ManualPdfGenerationDescription');
 print '</td>';
 print '<td class="center">';
 print ajax_constantonoff('DOLIMEET_MANUAL_PDF_GENERATION');
+print '</td>';
+print '</tr>';
+
+// Show signature specimen
+print '<tr class="oddeven"><td>';
+print  $langs->trans('ShowSignatureSpecimen');
+print '</td><td>';
+print $langs->trans('ShowSignatureSpecimenDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DOLIMEET_SHOW_SIGNATURE_SPECIMEN');
 print '</td>';
 print '</tr>';
 

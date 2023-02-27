@@ -176,6 +176,9 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_AUDIT_MENU_ENABLED', 'integer', 1,'', 0, 'current'],
 
             // CONST DOLIMEET DOCUMENTS
+            $i++ => ['DOLIMEET_SHOW_SIGNATURE_SPECIMEN', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_AUTOMATIC_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
 
             // CONST ATTENDANCESHEET DOCUMENT
             $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON', 'chaine', 'mod_attendancesheetdocument_standard', '', 0, 'current'],
@@ -195,8 +198,6 @@ class modDoliMeet extends DolibarrModules
             // CONST MODULE
 			$i++ => ['DOLIMEET_VERSION','chaine', $this->version, '', 0, 'current'],
 			$i++ => ['DOLIMEET_DB_VERSION', 'chaine', $this->version, '', 0, 'current'],
-            $i++ => ['DOLIMEET_AUTOMATIC_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
-            $i++ => ['DOLIMEET_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
 
             // CONST GENERAL CONST
 			$i  => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current']
