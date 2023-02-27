@@ -359,11 +359,18 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                     $contact->fetch($element->element_id);
                     $thirdparty->fetch($contact->fk_soc);
                     print $thirdparty->getNomUrl(1);
+                } else {
+                    $usertmp->fetch($element->element_id);
+                    if ($usertmp->contact_id > 0) {
+                        $contact->fetch($usertmp->contact_id);
+                        $thirdparty->fetch($contact->fk_soc);
+                        print $thirdparty->getNomUrl(1);
+                    }
                 }
                 print '</td><td>';
                 if ($element->element_type == 'user') {
                     $usertmp->fetch($element->element_id);
-                    print $usertmp->getNomUrl(1);
+                    print $usertmp->getNomUrl(1, '', 0, 0, 24, 1);
                 } else {
                     $contact->fetch($element->element_id);
                     print $contact->getNomUrl(1);
