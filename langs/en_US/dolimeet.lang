@@ -88,7 +88,6 @@ BilanCompetences               = Skills assessment
 TrainingSessionType            = Type of training
 TrainingSessionLocation        = Location of the training
 TrainingsessionsCategoriesArea = Trainingsession tags/categories area
-NoTrainee                      = No trainees present for the training session. <br> Unable to generate the certificate of completion
 
 # Attendant role
 SessionTrainer = Trainer

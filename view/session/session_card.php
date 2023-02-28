@@ -213,8 +213,7 @@ if (empty($reshook)) {
 
         if (preg_match('/completioncertificate/', (!empty($models) ? $models[1] : $model))) {
             $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
-            $nbTrainee = 0;
-            if (!empty($signatoriesArray)) {
+            if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
                 foreach ($signatoriesArray as $objectSignatory) {
                     if ($objectSignatory->role == 'Trainee') {
                         $moreparams['attendant'] = $objectSignatory;
@@ -223,15 +222,10 @@ if (empty($reshook)) {
                             setEventMessages($sessiondocument->error, $object->errors, 'errors');
                             $action = '';
                         }
-                        $nbTrainee++;
                     }
                 }
                 if (empty($donotredirect)) {
-                    if ($nbTrainee > 0) {
-                        setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
-                    } else {
-                        setEventMessage($langs->trans('NoTraineeOnTrainingsession'), 'warnings');
-                    }
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
                     $urltoredirect = $_SERVER['REQUEST_URI'];
                     $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
                     $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
@@ -240,11 +234,8 @@ if (empty($reshook)) {
                         exit;
                     }
                 }
-            }  else {
-                setEventMessage($langs->trans('NoTraineeOnTrainingsession'), 'warnings');
             }
         }
-
         $result = $sessiondocument->generateDocument((!empty($models) ? $models[0] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
         if ($result <= 0) {
             setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
@@ -461,6 +452,25 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     // Print form confirm
     print $formconfirm;
 
+    $signatoriesArray = $signatory->fetchSignatories($object->id, $object->element);
+    $nbSessionTrainer = 0;
+    $nbTrainee        = 0;
+    foreach ($signatoriesArray as $objectSignatory) {
+        if ($objectSignatory->role == 'SessionTrainer') {
+            $nbSessionTrainer++;
+        } else {
+            $nbTrainee++;
+        }
+    }
+
+    $mesg = '';
+    if ($nbSessionTrainer == 0) {
+        $mesg .= $langs->trans('NoAttendant', $langs-> trans('SessionTrainer'), $langs->transnoentities('The' . ucfirst($object->element))) . '<br>';
+    }
+    if ($nbTrainee == 0) {
+        $mesg .= $langs->trans('NoAttendant', $langs-> trans('Trainee'), $langs->transnoentities('The' . ucfirst($object->element)));
+    }
+
     print '<div class="fichecenter">';
     print '<div class="fichehalfleft">';
     print '<table class="border centpercent tableforfield">';
@@ -531,10 +541,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             }
 
             // Lock
-            if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+            if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element) && $nbSessionTrainer > 0 && $nbTrainee > 0) {
                 print '<span class="butAction" id="actionButtonLock"><i class="fas fa-lock"></i> ' . $langs->trans('Lock') . '</span>';
             } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', $langs->transnoentities('The' . ucfirst($object->element)))) . '"><i class="fas fa-lock"></i> ' . $langs->trans('Lock') . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', $langs->transnoentities('The' . ucfirst($object->element))) . '<br>' . $mesg) . '"><i class="fas fa-lock"></i> ' . $langs->trans('Lock') . '</span>';
             }
 
             // Send mail
@@ -578,7 +588,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $filedir = $upload_dir . '/' . $dir_files;
             $urlsource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', $object->status > $object::STATUS_DRAFT, $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbSessionTrainer > 0 && $nbTrainee > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
         }
 
         print '</div><div class="fichehalfright">';
