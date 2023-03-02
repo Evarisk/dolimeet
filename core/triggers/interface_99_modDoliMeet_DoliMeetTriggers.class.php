@@ -85,7 +85,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
      */
 	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf): int
 	{
-		if (empty($conf->dolimeet->enabled)) {
+		if (!isModEnabled('dolimeet')) {
             return 0; // If module is not enabled, we do nothing
         }
 

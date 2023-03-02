@@ -882,21 +882,27 @@ while ($i < $imaxinloop) {
                         } elseif ($resource['label'] == 'SocietyAttendants') {
                             print '<td>';
                             if (is_array($signatories) && !empty($signatories)) {
+                                $alreadyAddedThirdParties = [];
                                 foreach ($signatories as $objectSignatory) {
                                     if ($objectSignatory->element_type == 'socpeople') {
                                         $contact->fetch($objectSignatory->element_id);
                                         $thirdparty->fetch($contact->fk_soc);
-                                        print $thirdparty->getNomUrl(1);
-                                        print '<br>';
+                                        if (!in_array($thirdparty->id, $alreadyAddedThirdParties)) {
+                                            print $thirdparty->getNomUrl(1);
+                                            print '<br>';
+                                        }
                                     } else {
                                         $usertmp->fetch($objectSignatory->element_id);
                                         if ($usertmp->contact_id > 0) {
                                             $contact->fetch($usertmp->contact_id);
                                             $thirdparty->fetch($contact->fk_soc);
-                                            print $thirdparty->getNomUrl(1);
-                                            print '<br>';
+                                            if (!in_array($thirdparty->id, $alreadyAddedThirdParties)) {
+                                                print $thirdparty->getNomUrl(1);
+                                                print '<br>';
+                                            }
                                         }
                                     }
+                                    $alreadyAddedThirdParties[] = $thirdparty->id;
                                 }
                             }
                             print '</td>';
