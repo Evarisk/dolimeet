@@ -41,9 +41,13 @@ class modDoliMeet extends DolibarrModules
 		global $langs, $conf;
 		$this->db = $db;
 
-        require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
-
-        saturne_load_langs(['dolimeet@dolimeet']);
+        if (isModEnabled('saturne')) {
+            require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+            saturne_load_langs(['dolimeet@dolimeet']);
+        } else {
+            $this->error++;
+            $this->errors[] = $langs->trans('activateModuleDependNotSatisfied', 'DoliMeet', 'Saturne');
+        }
 
         // ID for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used module id).
@@ -564,7 +568,8 @@ class modDoliMeet extends DolibarrModules
         dolibarr_set_const($this->db, 'DOLIMEET_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
         dolibarr_set_const($this->db, 'DOLIMEET_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 
-		if ($result < 0) {
+		if ($result < 0 || $this->error > 0) {
+            setEventMessages('', $this->errors, 'errors');
 			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
 		}
 
