@@ -226,10 +226,12 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             }
 
             $date = dol_print_date(dol_now(),'dayxcard');
-            $newfiletmp = $date . '_' . $object->ref . '_' . $objectDocumentRef .'_' . $newfiletmp . '_' . $attandent . '_' . $societyname;
+            $newfiletmp = $date . '_' . $object->ref . '_' . $objectDocumentRef .'_' . $langs->transnoentities($newfiletmp) . '_' . $attandent . '_' . $societyname;
             if ($moreparam['specimen'] == 1) {
                 $newfiletmp .= '_specimen';
             }
+
+            $newfiletmp = str_replace(' ', '_', $newfiletmp);
 
             // Get extension (ods or odt)
             $newfileformat = substr($newfile, strrpos($newfile, '.') + 1);

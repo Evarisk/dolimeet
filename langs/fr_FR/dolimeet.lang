@@ -102,9 +102,11 @@ Trainee        = Stagiaire
 # Data - Donnée
 AttendanceSheetDocument           = Feuille de présence
 AttendanceSheetDocuments          = feuilles de présence
+attendancesheetdocument           = feuille de présence
 attendancesheetdocument.odt       = Feuille de présence
 CompletionCertificateDocument     = Certificat de réalisation
 CompletionCertificateDocuments    = certificats de réalisation
+completioncertificatedocument     = certificat de réalisation
 completioncertificatedocument.odt = Certificat de réalisation
 
 

@@ -102,9 +102,11 @@ Trainee        = Trainee
 # Data
 AttendanceSheetDocument           = Attendance sheet
 AttendanceSheetDocuments          = attendance sheets
+attendancesheetdocument           = attendance sheet
 attendancesheetdocument.odt       = Attendance sheet
 CompletionCertificateDocument     = Certificate of completion
 CompletionCertificateDocuments    = certificates of completion
+completioncertificatedocument     = certificate of completion
 completioncertificatedocument.odt = Certificate of completion
 
 
