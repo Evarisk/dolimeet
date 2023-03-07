@@ -200,7 +200,8 @@ class modDoliMeet extends DolibarrModules
 			$i++ => ['DOLIMEET_DB_VERSION', 'chaine', $this->version, '', 0, 'current'],
 
             // CONST GENERAL CONST
-			$i  => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current']
+            $i++ => ['CONTACT_SHOW_EMAIL_PHONE_TOWN_SELECTLIST', 'integer', 1, '', 0, 'current'],
+			$i   => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current']
         ];
 
 		// Some keys to add into the overwriting translation tables

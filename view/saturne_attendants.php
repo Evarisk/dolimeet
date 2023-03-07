@@ -134,45 +134,29 @@ if (empty($reshook)) {
         $action = '';
     }
 
-    // Action to add signature
-    if ($action == 'add_signature') {
-        $data        = json_decode(file_get_contents('php://input'), true);
-        $signatoryID = GETPOST('signatoryID');
+    // Action to toggle status STATUS_ABSENT and STATUS_REGISTERED
+    if ($action == 'toggle_absent') {
+        $signatoryID     = GETPOST('signatoryID', 'int');
+        $signatoryStatus = GETPOST('signatoryStatus');
 
         $signatory->fetch($signatoryID);
-        $signatory->signature      = $data['signature'];
-        $signatory->signature_date = dol_now('tzuser');
 
-        $result = $signatory->update($user);
-
-        if ($result > 0) {
-            // Creation signature OK
-            $signatory->setSigned($user);
-        } elseif (!empty($signatory->errors)) {
-            // Creation signature KO
-            setEventMessages('', $signatory->errors, 'errors');
+        if ($signatoryStatus != $signatory::STATUS_ABSENT) {
+            $result = $signatory->setAbsent($user);
         } else {
-            setEventMessages($signatory->error, [], 'errors');
+            $result = $signatory->setRegistered($user);
         }
-        $action = '';
-    }
-
-    // Action to set status STATUS_ABSENT
-    if ($action == 'set_absent') {
-        $signatoryID = GETPOST('signatoryID');
-
-        $signatory->fetch($signatoryID);
-
-        $result = $signatory->setAbsent($user);
 
         if ($result > 0) {
-            // set absent OK
-            setEventMessages($langs->trans('AbsentAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
+            // Toggle absent OK
+            if ($signatoryStatus != $signatory::STATUS_ABSENT) {
+                setEventMessages($langs->trans('AbsentAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
+            }
             // Prevent form reloading page
             header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
             exit;
         } elseif (!empty($signatory->errors)) {
-            // Creation absent KO
+            // Toggle absent KO
             setEventMessages('', $signatory->errors, 'errors');
         } else {
             setEventMessages($signatory->error, [], 'errors');
@@ -182,7 +166,7 @@ if (empty($reshook)) {
 
     // Action to send Email
     if ($action == 'send') {
-        $signatoryID = GETPOST('signatoryID');
+        $signatoryID = GETPOST('signatoryID', 'int');
         $signatory->fetch($signatoryID);
 
         $langs->load('mails');
@@ -206,7 +190,6 @@ if (empty($reshook)) {
             if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
                 require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
-
                 $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
                 $url  = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&object_type=' . $object->element, 3);
 
@@ -218,7 +201,7 @@ if (empty($reshook)) {
                 $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
                 if ($mailfile->error) {
                     setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-                } elseif (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+                } elseif (!empty($conf->global->MAIN_MAIL_SMTPS_ID) || $conf->global->SATURNE_USE_ALL_EMAIL_MODE > 0) {
                     $result = $mailfile->sendfile();
                     if ($result) {
                         $signatory->last_email_sent_date = dol_now('tzuser');
@@ -239,7 +222,8 @@ if (empty($reshook)) {
                         setEventMessages($errorMessage, [], 'warnings');
                     }
                 } else {
-                    setEventMessages($langs->trans('ErrorSetupEmail'), [], 'errors');
+                    $url = '<a href="' . dol_buildpath('/admin/mails.php', 1) . '" target="_blank">' . $langs->trans('ConfigEmail') . '</a>';
+                    setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $url, [], 'warnings');
                 }
             } else {
                 $langs->load('errors');
@@ -254,7 +238,7 @@ if (empty($reshook)) {
 
     // Action to delete attendant
     if ($action == 'delete_attendant') {
-        $signatoryToDeleteID = GETPOST('signatoryID');
+        $signatoryToDeleteID = GETPOST('signatoryID', 'int');
         $signatory->fetch($signatoryToDeleteID);
 
         $result = $signatory->setDeleted($user);
@@ -321,10 +305,10 @@ if ($id > 0 || !empty($ref) && empty($action)) {
     $zone = 'private';
     switch ($object->element) {
         case 'meeting' :
-            $attendantsRole = ['Responsible', 'Contributor'];
+            $attendantsRole = ['Contributor', 'Responsible'];
             break;
         case 'trainingsession' :
-            $attendantsRole = ['SessionTrainer', 'Trainee'];
+            $attendantsRole = ['Trainee', 'SessionTrainer'];
             break;
         case 'audit' :
             $attendantsRole = ['Auditor'];
@@ -346,15 +330,15 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '<td>' . img_picto('', 'company') . ' ' . $langs->trans('ThirdParty') . '</td>';
             print '<td>' . img_picto('', 'user') . ' ' . $langs->trans('User') . ' | ' . img_picto('', 'contact') . ' ' . $langs->trans('Contacts') . '</td>';
             print '<td class="center">' . $langs->trans('SignatureLink') . '</td>';
-            print '<td>' . $langs->trans('SendMailDate') . '</td>';
+            print '<td class="center">' . $langs->trans('SendMailDate') . '</td>';
             print '<td>' . $langs->trans('SignatureDate') . '</td>';
             print '<td class="center">' . $langs->trans('Status') . '</td>';
+            print '<td class="center">' . $langs->trans('Attendance') . '</td>';
             print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
-            print '<td class="center">' . $langs->trans('Signature') . '</td>';
             print '</tr>';
 
             foreach ($signatories as $element) {
-                print '<tr class="oddeven"><td class="minwidth200">';
+                print '<tr class="oddeven" data-signatory-id="' . $element->id . '"><td class="minwidth200">';
                 if ($element->element_type == 'socpeople') {
                     $contact->fetch($element->element_id);
                     $thirdparty->fetch($contact->fk_soc);
@@ -365,38 +349,101 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                         $contact->fetch($usertmp->contact_id);
                         $thirdparty->fetch($contact->fk_soc);
                         print $thirdparty->getNomUrl(1);
+                    } else {
+                        print img_picto('', 'company') . ' ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
                     }
                 }
                 print '</td><td>';
                 if ($element->element_type == 'user') {
                     $usertmp->fetch($element->element_id);
                     print $usertmp->getNomUrl(1, '', 0, 0, 24, 1);
+                    if (!empty($usertmp->job)) {
+                        print '<br>' . $usertmp->job;
+                    }
                 } else {
                     $contact->fetch($element->element_id);
                     print $contact->getNomUrl(1);
+                    if (!empty($contact->job)) {
+                        print '<br>' . $contact->job;
+                    }
                 }
                 print '</td><td class="center">';
                 if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
                     if ((!$user->rights->$moduleNameLowerCase->$objectType->read && $user->rights->$moduleNameLowerCase->assignedtome->$objectType && ($element->element_id == $user->id || $element->element_id == $user->contact_id)) || $permissiontoadd) {
                         $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url . '&object_type=' . $object->element, 3);
-                        print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+                        print '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-primary"><i class="fas fa-signature"></i></div></a>';
+                        print ' <i class="fas fa-clipboard copy-signatureurl" data-signature-url="' . $signatureUrl . '" style="color: #666"></i>';
                     }
                 }
-                print '</td><td>';
+                print '</td><td class="center">';
                 print dol_print_date($element->last_email_sent_date, 'dayhour');
+                if ($object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
+                    $nbEmailSent = 0;
+                    // Enable caching of emails sent count actioncomm
+                    require_once DOL_DOCUMENT_ROOT . '/core/lib/memory.lib.php';
+                    $cacheKey = 'count_emails_sent_' . $element->id;
+                    $dataRetrieved = dol_getcache($cacheKey);
+                    if (!is_null($dataRetrieved)) {
+                        $nbEmailSent = $dataRetrieved;
+                    } else {
+                        $sql = 'SELECT COUNT(id) as nb';
+                        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'actioncomm';
+                        $sql .= ' WHERE fk_element = ' . $object->id;
+                        $sql .= " AND code = 'AC_SATURNESIGNATURE_PENDING_SIGNATURE";
+                        $sql .= " AND elementtype = '" . $object->element . '@dolimeet' . "'";
+                        $resql = $db->query($sql);
+                        if ($resql) {
+                            $obj = $db->fetch_object($resql);
+                            $nbEmailSent = $obj->nb;
+                        } else {
+                            dol_syslog('Failed to count actioncomm ' . $db->lasterror(), LOG_ERR);
+                        }
+                        dol_setcache($cacheKey, $nbEmailSent, 120); // If setting cache fails, this is not a problem, so we do not test result.
+                    }
+
+                    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
+                    print '<input type="hidden" name="token" value="' . newToken() . '">';
+                    print '<input type="hidden" name="action" value="send">';
+                    print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
+                    print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+                    print '<button type="submit" class="signature-email wpeo-button button-primary" value="' . $element->id . '">';
+                    print '<i class="fas fa-paper-plane"></i>';
+                    print '</button>';
+                    if ($nbEmailSent > 0) {
+                        print ' <span class="badge badge-info">' . $nbEmailSent . '</span>';
+                    }
+                    print '</form>';
+                }
                 print '</td><td>';
                 print dol_print_date($element->signature_date, 'dayhour');
                 print '</td><td class="center">';
                 print $element->getLibStatut(5);
-                print '</td>';
-                print '<td class="center">';
-                if ($permissiontoadd && $object->status < $object::STATUS_LOCKED) {
-                    require __DIR__ . '/../core/tpl/signature/signature_action_view.tpl.php';
+                print '</td><td class="center">';
+                if ($object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
+                    if (empty($element->signature)) {
+                        print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
+                        print '<input type="hidden" name="token" value="' . newToken() . '">';
+                        print '<input type="hidden" name="action" value="toggle_absent">';
+                        print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
+                        print '<input type="hidden" name="signatoryStatus" value="' . $element->status . '">';
+                        print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+                        print '<button type="submit" class="signature-absent wpeo-button ' . (($element->status != $element::STATUS_ABSENT) ? 'button-green' : 'button-red') . '"" value="' . $element->id . '">';
+                        print '<i class="fas ' . (($element->status != $element::STATUS_ABSENT) ? 'fa-user' : 'fa-user-slash') . '"></i>';
+                        print '</button>';
+                        print '</form>';
+                    }
                 }
-                print '</td>';
-                print '<td class="center">';
-                if ($element->signature != $langs->transnoentities('FileGenerated') && $permissiontoread) {
-                    require __DIR__ . '/../core/tpl/signature/signature_view.tpl.php';
+                print '</td><td class="center">';
+                if ($object->status < $object::STATUS_LOCKED && $permissiontoadd) {
+                    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
+                    print '<input type="hidden" name="token" value="' . newToken() . '">';
+                    print '<input type="hidden" name="action" value="delete_attendant">';
+                    print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
+                    print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+                    print '<button type="submit" name="deleteAttendant" id="deleteAttendant" class="attendant-delete wpeo-button button-grey" value="' . $element->id . '">';
+                    print '<i class="fas fa-trash"></i>';
+                    print '</button>';
+                    print '</form>';
                 }
                 print '</td>';
                 print '</tr>';
@@ -429,16 +476,16 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 }
                 print '</td><td class="center">';
                 print '-';
-                print '</td><td>';
+                print '</td><td class="center">';
                 print '-';
                 print '</td><td>';
+                print '-';
+                print '</td><td class="center">';
                 print '-';
                 print '</td><td class="center">';
                 print '-';
                 print '</td><td class="center">';
                 print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
-                print '<td class="center">';
-                print '-';
                 print '</td></tr>';
                 print '</table>';
                 print '</form>';
@@ -453,11 +500,11 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '<td>' . img_picto('', 'company') . ' ' . $langs->trans('ThirdParty') . '</td>';
                 print '<td>' . img_picto('', 'user') . ' ' . $langs->trans('User') . ' | ' . img_picto('', 'contact') . ' ' . $langs->trans('Contacts') . '</td>';
                 print '<td class="center">' . $langs->trans('SignatureLink') . '</td>';
-                print '<td>' . $langs->trans('SendMailDate') . '</td>';
+                print '<td class="center">' . $langs->trans('SendMailDate') . '</td>';
                 print '<td>' . $langs->trans('SignatureDate') . '</td>';
                 print '<td class="center">' . $langs->trans('Status') . '</td>';
+                print '<td class="center">' . $langs->trans('Attendance') . '</td>';
                 print '<td class="center">' . $langs->trans('SignatureActions') . '</td>';
-                print '<td class="center">' . $langs->trans('Signature') . '</td>';
                 print '</tr>';
 
                 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
@@ -485,16 +532,16 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 }
                 print '</td><td class="center">';
                 print '-';
-                print '</td><td>';
+                print '</td><td class="center">';
                 print '-';
                 print '</td><td>';
+                print '-';
+                print '</td><td class="center">';
                 print '-';
                 print '</td><td class="center">';
                 print '-';
                 print '</td><td class="center">';
                 print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
-                print '<td class="center">';
-                print '-';
                 print '</td></tr>';
                 print '</table>';
                 print '</form>';
