@@ -460,23 +460,41 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     // Print form confirm
     print $formconfirm;
 
-    $signatoriesArray = $signatory->fetchSignatories($object->id, $object->element);
-    $nbSessionTrainer = 0;
-    $nbTrainee        = 0;
-    foreach ($signatoriesArray as $objectSignatory) {
-        if ($objectSignatory->role == 'SessionTrainer') {
-            $nbSessionTrainer++;
+    switch ($object->element) {
+        case 'meeting' :
+            $attendantsRole = ['Contributor', 'Responsible'];
+            break;
+        case 'trainingsession' :
+            $attendantsRole = ['Trainee', 'SessionTrainer'];
+            break;
+        case 'audit' :
+            $attendantsRole = ['Auditor'];
+            break;
+        default :
+            $attendantsRole = ['Attendant'];
+    }
+
+    $mesg              = '';
+    $nbAttendantByRole = [];
+    $nbAttendants      = 0;
+    foreach ($attendantsRole as $attendantRole) {
+        $signatories = $signatory->fetchSignatory($attendantRole, $object->id, $object->element);
+        if (is_array($signatories) && !empty($signatories)) {
+            foreach ($signatories as $objectSignatory) {
+                if ($objectSignatory->role == $attendantRole) {
+                    $nbAttendantByRole[$attendantRole]++;
+                }
+            }
         } else {
-            $nbTrainee++;
+            $nbAttendantByRole[$attendantRole] = 0;
+        }
+        if ($nbAttendantByRole[$attendantRole] == 0) {
+            $mesg .= $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element))) . '<br>';
         }
     }
 
-    $mesg = '';
-    if ($nbSessionTrainer == 0) {
-        $mesg .= $langs->trans('NoAttendant', $langs-> trans('SessionTrainer'), $langs->transnoentities('The' . ucfirst($object->element))) . '<br>';
-    }
-    if ($nbTrainee == 0) {
-        $mesg .= $langs->trans('NoAttendant', $langs-> trans('Trainee'), $langs->transnoentities('The' . ucfirst($object->element)));
+    if (!in_array(0, $nbAttendantByRole)) {
+        $nbAttendants = 1;
     }
 
     print '<div class="fichecenter">';
@@ -528,7 +546,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             }
 
             // Validate
-            if ($object->status == $object::STATUS_DRAFT && $nbSessionTrainer > 0 && $nbTrainee > 0) {
+            if ($object->status == $object::STATUS_DRAFT && $nbAttendants > 0) {
                 print '<span class="butAction" id="actionButtonPendingSignature"><i class="fas fa-check"></i> ' . $langs->trans('Validate') . '</span>';
             } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraftToValidate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg) . '"><i class="fas fa-check"></i> ' . $langs->trans('Validate') . '</span>';
@@ -549,7 +567,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             }
 
             // Lock
-            if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element) && $nbSessionTrainer > 0 && $nbTrainee > 0) {
+            if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element) && $nbAttendants > 0) {
                 print '<span class="butAction" id="actionButtonLock"><i class="fas fa-lock"></i> ' . $langs->trans('Lock') . '</span>';
             } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', $langs->transnoentities('The' . ucfirst($object->element))) . '<br>' . $mesg) . '"><i class="fas fa-lock"></i> ' . $langs->trans('Lock') . '</span>';
@@ -596,7 +614,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $filedir = $upload_dir . '/' . $dir_files;
             $urlsource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbSessionTrainer > 0 && $nbTrainee > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
         }
 
         print '</div><div class="fichehalfright">';
