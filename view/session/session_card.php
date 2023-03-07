@@ -330,6 +330,14 @@ if ($action == 'create') {
     $_POST['date_starthour']  = $now['hours'];
     $_POST['date_startmin']   = $now['minutes'];
 
+    if ($object->element = 'meeting') {
+        $_POST['date_endyear']  = $now['year'];
+        $_POST['date_endmonth'] = $now['mon'];
+        $_POST['date_endday']   = $now['mday'];
+        $_POST['date_endhour']  = $now['hours'] + 1;
+        $_POST['date_endmin']   = $now['minutes'];
+    }
+
     // Common attributes
     include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
 
