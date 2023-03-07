@@ -38,7 +38,7 @@ class mod_meeting_standard extends ModeleNumRefDoliMeet
     /**
      * @var string document prefix
      */
-	public string $prefix = 'ME';
+	public string $prefix = 'RE';
 
 	/**
 	 * @var string Error code (or message)

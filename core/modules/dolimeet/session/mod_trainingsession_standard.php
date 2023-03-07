@@ -38,7 +38,7 @@ class mod_trainingsession_standard extends ModeleNumRefDoliMeet
     /**
      * @var string document prefix
      */
-	public string $prefix = 'TS';
+	public string $prefix = 'SF';
 
 	/**
 	 * @var string Error code (or message)
