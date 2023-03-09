@@ -46,3 +46,6 @@ if (empty($element->signature) && ($object->status == $object::STATUS_VALIDATED 
         </div>
     </div>
 </div>
+<script>
+	window.saturne.signature.modalSignatureOpened($('.modal-signature-open'));
+</script>
