@@ -63,7 +63,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 		$langs->loadLangs(['main', 'companies']);
 
 		$this->db = $db;
-		$this->name        = $langs->trans('ODTDefaultTemplateName', $langs->transnoentities('AttendanceSheetDocuments'));
+		$this->name        = $langs->trans('ODTDefaultTemplateName');
 		$this->description = $langs->trans('DocumentModelOdt');
 		$this->scandir     = 'DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 

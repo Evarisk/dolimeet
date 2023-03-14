@@ -358,13 +358,13 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                     $usertmp->fetch($element->element_id);
                     print $usertmp->getNomUrl(1, '', 0, 0, 24, 1);
                     if (!empty($usertmp->job)) {
-                        print '<br>' . $usertmp->job;
+                        print ' - ' . $usertmp->job;
                     }
                 } else {
                     $contact->fetch($element->element_id);
                     print $contact->getNomUrl(1);
                     if (!empty($contact->job)) {
-                        print '<br>' . $contact->job;
+                        print ' - ' . $contact->job;
                     }
                 }
                 print '</td><td class="center">';
@@ -389,7 +389,12 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                         $sql = 'SELECT COUNT(id) as nb';
                         $sql .= ' FROM ' . MAIN_DB_PREFIX . 'actioncomm';
                         $sql .= ' WHERE fk_element = ' . $object->id;
-                        $sql .= " AND code = 'AC_SATURNESIGNATURE_PENDING_SIGNATURE";
+                        if ($element->element_type == 'user') {
+                            $sql .= ' AND fk_user_action = ' . $element->element_id;
+                        } else {
+                            $sql .= ' AND fk_contact = ' . $element->element_id;
+                        }
+                        $sql .= " AND code = '" . 'AC_SATURNESIGNATURE_PENDING_SIGNATURE' . "'";
                         $sql .= " AND elementtype = '" . $object->element . '@dolimeet' . "'";
                         $resql = $db->query($sql);
                         if ($resql) {

@@ -22,6 +22,14 @@ ModuleDoliMeetDesc      = Suivi des réunions, sessions de formation, audit
 DoliMeetDescription     = Suivi des réunions, sessions de formation, audit
 DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
+#
+# DoliMeet
+#
+
+# Data - Donnée
+EnableDoliMeet = Veuillez activer le module DoliMeet pour accéder à cette page
+
+
 
 #
 # Session - Session
