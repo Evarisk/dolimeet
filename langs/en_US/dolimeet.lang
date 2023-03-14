@@ -41,6 +41,7 @@ ContratSchedules        = Training schedule
 SessionListOnProject    = List of sessions related to the project
 EnableObjectDescription = Activate object %s
 Content                 = Content
+SelectObjectTypeFirst   = Select a session type first
 
 
 

@@ -330,7 +330,7 @@ if ($action == 'create') {
     $_POST['date_starthour']  = $now['hours'];
     $_POST['date_startmin']   = $now['minutes'];
 
-    if ($object->element = 'meeting') {
+    if ($object->element == 'meeting') {
         $_POST['date_endyear']  = $now['year'];
         $_POST['date_endmonth'] = $now['mon'];
         $_POST['date_endday']   = $now['mday'];

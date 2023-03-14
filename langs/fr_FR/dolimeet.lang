@@ -49,6 +49,7 @@ ContratSchedules        = Horaires de la formation
 SessionListOnProject    = Liste des sessions liées au projet
 EnableObjectDescription = Activer l'objet %s
 Content                 = Contenu
+SelectObjectTypeFirst   = Sélectionner un type de session d'abord
 
 
 

@@ -532,9 +532,7 @@ if ($objectType == 'session' || !empty($fromtype) && $fromid > 0) {
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewList'), '', 'fa fa-bars imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=common' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ((empty($mode) || $mode == 'common') ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewKanban'), '', 'fa fa-th-list imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=kanban' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ($mode == 'kanban' ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitleSeparator();
-if ($objectType != 'session') {
-    $newcardbutton .= dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $fromurl . '&object_type=' . $objectType, '', $permissiontoadd);
-}
+$newcardbutton .= dolGetButtonTitle($langs->trans('New'), ($objectType != 'session' ? '' : $langs->trans('SelectObjectTypeFirst')), 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $fromurl . '&object_type=' . $objectType, '', ($objectType != 'session' ? $permissiontoadd : -2));
 
 print_barre_liste($title, $page, $_SERVER['PHP_SELF'], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_' . $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
