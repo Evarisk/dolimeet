@@ -41,7 +41,7 @@ class modDoliMeet extends DolibarrModules
 		global $langs, $conf;
 		$this->db = $db;
 
-        if (isModEnabled('saturne')) {
+        if (file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php')) {
             require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
             saturne_load_langs(['dolimeet@dolimeet']);
         } else {
@@ -302,7 +302,7 @@ class modDoliMeet extends DolibarrModules
 		$this->rights[$r][4] = 'session';
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->dolimeet->session->read)
 		$r++;
-        
+
         /* MEETING PERMISSSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('ReadObject', $langs->transnoentities('Meetings')); // Permission label
@@ -554,6 +554,11 @@ class modDoliMeet extends DolibarrModules
     {
 		global $conf, $langs;
 
+		if ($this->error > 0) {
+			setEventMessages('', $this->errors, 'errors');
+			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
+		}
+
         $sql = [];
         $result = $this->_load_tables('/dolimeet/sql/');
 
@@ -568,10 +573,10 @@ class modDoliMeet extends DolibarrModules
         dolibarr_set_const($this->db, 'DOLIMEET_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
         dolibarr_set_const($this->db, 'DOLIMEET_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 
-		if ($result < 0 || $this->error > 0) {
-            setEventMessages('', $this->errors, 'errors');
-			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
-		}
+		if ($result < 0) {
+			return -1;
+		} // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
+
 
 		delDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument');
 		delDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument');
