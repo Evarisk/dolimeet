@@ -338,6 +338,23 @@ if ($action == 'create') {
         $_POST['date_endmin']   = $now['minutes'];
     }
 
+    $fromtype = GETPOSTISSET('fromtype') ? GETPOST('fromtype', 'alpha') : ''; // element type
+    $fromid   = GETPOSTISSET('fromid') ? GETPOST('fromid', 'int') : 0;        //element id
+
+    if (!empty($fromtype)) {
+        switch ($fromtype) {
+            case 'thirdparty' :
+                $_POST['fk_soc'] = $fromid;
+                break;
+            case 'project' :
+                $_POST['fk_project'] = $fromid;
+                break;
+            case 'contrat' :
+                $_POST['fk_contrat'] = $fromid;
+                break;
+        }
+    }
+
     // Common attributes
     include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
 
