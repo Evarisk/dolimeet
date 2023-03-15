@@ -38,7 +38,7 @@ require_once __DIR__ . '/../lib/dolimeet.lib.php';
 global $db, $langs, $user;
 
 // Load translation files required by the page
-saturne_load_langs();
+saturne_load_langs(['admin']);
 
 // Get parameters
 $action     = GETPOST('action', 'alpha');

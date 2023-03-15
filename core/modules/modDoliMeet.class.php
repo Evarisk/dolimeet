@@ -151,7 +151,7 @@ class modDoliMeet extends DolibarrModules
 		$this->langfiles = ['dolimeet@dolimeet'];
 
 		// Prerequisites
-		$this->phpmin = [7, 0]; // Minimum version of PHP required by module
+		$this->phpmin = [7, 4]; // Minimum version of PHP required by module
 		$this->need_dolibarr_version = [15, 0]; // Minimum version of Dolibarr required by module
 
 		// Messages at activation
@@ -202,6 +202,7 @@ class modDoliMeet extends DolibarrModules
             // CONST MODULE
 			$i++ => ['DOLIMEET_VERSION','chaine', $this->version, '', 0, 'current'],
 			$i++ => ['DOLIMEET_DB_VERSION', 'chaine', $this->version, '', 0, 'current'],
+            $i++ => ['DOLIMEET_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
 
             // CONST GENERAL CONST
             $i++ => ['CONTACT_SHOW_EMAIL_PHONE_TOWN_SELECTLIST', 'integer', 1, '', 0, 'current'],

@@ -38,7 +38,7 @@ require_once '../lib/dolimeet.lib.php';
 global $conf, $db, $langs, $user;
 
 // Translations
-saturne_load_langs();
+saturne_load_langs(['admin']);
 
 // Initialize view objects
 $form = new Form($db);
