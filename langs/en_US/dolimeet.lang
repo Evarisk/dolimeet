@@ -91,9 +91,12 @@ TrainingSessionLocation        = Location of the training
 TrainingsessionsCategoriesArea = Trainingsession tags/categories area
 
 # Attendant role
-SessionTrainer = Trainer
-Trainee        = Trainee
-
+SessionTrainer                              = Trainer
+Trainee                                     = Trainee
+TypeContact_contrat_internal_SESSIONTRAINER = Trainer
+TypeContact_contrat_external_SESSIONTRAINER = Trainer
+TypeContact_contrat_internal_TRAINEE        = Trainee
+TypeContact_contrat_external_TRAINEE        = Trainee
 
 
 #

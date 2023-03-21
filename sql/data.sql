@@ -17,3 +17,9 @@ INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `de
 INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'BilanCompetences', 'BilanCompetences', '', 1);
 INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(3, 0, 'ActionVAE', 'ActionVAE', '', 1);
 INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(4, 0, 'ActionFormationApprentissage', 'ActionFormationApprentissage', '', 1);
+
+-- 1.1.0
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'internal', 'TRAINEE', 'Trainee', 1, null, 0);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'internal', 'SESSIONTRAINER', 'SessionTrainer', 1, null, 0);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'external', 'TRAINEE', 'Trainee', 1, null, 0);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, null, 0);

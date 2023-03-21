@@ -99,10 +99,12 @@ TrainingSessionLocation        = Lieu de la formation
 TrainingsessionsCategoriesArea = Espace des tags/catégories des sessions de formations
 
 # Attendant role - Rôle participant
-SessionTrainer = Formateur
-Trainee        = Stagiaire
-
-
+SessionTrainer                              = Formateur
+Trainee                                     = Stagiaire
+TypeContact_contrat_internal_SESSIONTRAINER = Formateur
+TypeContact_contrat_external_SESSIONTRAINER = Formateur
+TypeContact_contrat_internal_TRAINEE        = Stagiaire
+TypeContact_contrat_external_TRAINEE        = Stagiaire
 
 #
 # Training Session Document - Document lié au session de formation
