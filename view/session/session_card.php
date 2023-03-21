@@ -32,10 +32,11 @@ if (file_exists('../../dolimeet.main.inc.php')) {
 $objectType = GETPOST('object_type', 'alpha');
 
 // Libraries
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
-require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
 require_once __DIR__ . '/../../lib/dolimeet_' . $objectType . '.lib.php';
 require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
@@ -68,6 +69,7 @@ $signatory        = new SaturneSignature($db);
 $extrafields      = new ExtraFields($db);
 $thirdparty       = new Societe($db);
 $contact          = new Contact($db);
+$contract         = new Contrat($db);
 $mod              = 'DOLIMEET_'. strtoupper($objectType) .'_ADDON';
 $refMod           = new $conf->global->$mod();
 
@@ -351,6 +353,13 @@ if ($action == 'create') {
                 break;
             case 'contrat' :
                 $_POST['fk_contrat'] = $fromid;
+                $contract->fetch($fromid);
+                if ($contract->fk_project > 0) {
+                    $_POST['fk_project'] = $contract->fk_project;
+                }
+                if ($contract->fk_soc > 0) {
+                    $_POST['fk_soc'] = $contract->fk_soc;
+                }
                 break;
         }
     }
