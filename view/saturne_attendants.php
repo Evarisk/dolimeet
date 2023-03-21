@@ -367,12 +367,13 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                         print ' - ' . $contact->job;
                     }
                 }
-                print '</td><td class="center">';
+                print '</td><td class="center copy-signatureurl-container">';
                 if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
                     if ((!$user->rights->$moduleNameLowerCase->$objectType->read && $user->rights->$moduleNameLowerCase->assignedtome->$objectType && ($element->element_id == $user->id || $element->element_id == $user->contact_id)) || $permissiontoadd) {
                         $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url . '&object_type=' . $object->element, 3);
                         print '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-primary"><i class="fas fa-signature"></i></div></a>';
                         print ' <i class="fas fa-clipboard copy-signatureurl" data-signature-url="' . $signatureUrl . '" style="color: #666"></i>';
+                        print '<span class="copied-to-clipboard" style="display:none">' . '  ' . $langs->trans('CopiedToClipboard') . '</span>';
                     }
                 }
                 print '</td><td class="center">';
