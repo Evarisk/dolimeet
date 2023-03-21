@@ -382,7 +382,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 					if (!empty($object)) {
 						$listlines = $odfHandler->setSegment('attendants');
 						$signatory = new SaturneSignature($this->db);
-                            $signatoriesArray = $signatory->fetchSignatories($object->id, $object->element);
+                        $signatoriesArray = $signatory->fetchSignatories($object->id, $object->element);
 						if (!empty($signatoriesArray) && is_array($signatoriesArray)) {
 							$k = 1;
 							foreach ($signatoriesArray as $objectSignatory) {
@@ -390,6 +390,18 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 									$tmparray['attendant_number']    = $k;
 									$tmparray['attendant_lastname']  = strtoupper($objectSignatory->lastname);
 									$tmparray['attendant_firstname'] = $objectSignatory->firstname;
+                                    switch ($objectSignatory->attendance) {
+                                        case 1:
+                                            $attendance = $langs->trans('Delay');
+                                            break;
+                                        case 2:
+                                            $attendance = $langs->trans('Absent');
+                                            break;
+                                        default:
+                                            $attendance = $langs->transnoentities('Present');
+                                            break;
+                                    }
+                                    $tmparray['attendant_attendance'] = $attendance;
                                     if (dol_strlen($objectSignatory->signature) > 0 && $objectSignatory->signature != $langs->transnoentities('FileGenerated')) {
                                         if ($moreparam['specimen'] == 0 || ($moreparam['specimen'] == 1 && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1)) {
                                             $encodedImage = explode(',', $objectSignatory->signature)[1];
@@ -428,10 +440,11 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
 								}
 							}
                         } else {
-                            $tmparray['attendant_number']    = '';
-                            $tmparray['attendant_lastname']  = '';
-                            $tmparray['attendant_firstname'] = '';
-                            $tmparray['attendant_signature'] = '';
+                            $tmparray['attendant_number']     = '';
+                            $tmparray['attendant_lastname']   = '';
+                            $tmparray['attendant_firstname']  = '';
+                            $tmparray['attendant_attendance'] = '';
+                            $tmparray['attendant_signature']  = '';
                             foreach ($tmparray as $key => $val) {
                                 try {
                                     if (empty($val)) {
