@@ -105,12 +105,47 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
         switch ($action) {
 			case 'MEETING_CREATE' :
-            case 'TRAININGSESSION_CREATE' :
             case 'AUDIT_CREATE' :
 				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
 				$actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
+
+            case 'TRAININGSESSION_CREATE' :
+                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+
+                require_once __DIR__ . '/../../class/saturnesignature.class.php';
+
+                $contract  = new Contrat($this->db);
+                $signatory = new SaturneSignature($this->db);
+
+                $contract->fetch($object->fk_contrat);
+
+                $contactInternalSessionTrainerArray = $contract->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
+                $contactInternalTraineeArray        = $contract->liste_contact(-1, 'internal', 0, 'TRAINEE');
+                $contactExternalSessionTrainerArray = $contract->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
+                $contactExternalTraineeArray        = $contract->liste_contact(-1, 'external', 0, 'TRAINEE');
+
+                $contactArray = array_merge(
+                    (is_array($contactInternalSessionTrainerArray) ? $contactInternalSessionTrainerArray : []),
+                    (is_array($contactInternalTraineeArray) ? $contactInternalTraineeArray : []),
+                    (is_array($contactExternalSessionTrainerArray) ? $contactExternalSessionTrainerArray : []),
+                    (is_array($contactExternalTraineeArray) ? $contactExternalTraineeArray : [])
+                );
+
+                foreach ($contactArray as $contact) {
+                    if ($contact['code'] == 'TRAINEE') {
+                        $attendantRole = 'Trainee';
+                    } else {
+                        $attendantRole = 'SessionTrainer';
+                    }
+                    $signatory->setSignatory($object->id, $object->element, (($contact['source'] == 'internal') ? 'user' : 'socpeople'), [$contact['id']], $attendantRole, 1);
+                }
+
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
+                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
 
             case 'MEETING_MODIFY' :
             case 'TRAININGSESSION_MODIFY' :
