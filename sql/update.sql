@@ -19,3 +19,4 @@ ALTER TABLE `llx_dolimeet_session` CHANGE `date_end` `date_end` DATETIME NOT NUL
 ALTER TABLE `llx_dolimeet_session` CHANGE `tms` `tms` TIMESTAMP on update CURRENT_TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `llx_dolimeet_session` CHANGE `status` `status` INT(11) NOT NULL;
 ALTER TABLE `llx_dolimeet_session` CHANGE `import_key` `import_key` VARCHAR(14) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;
+ALTER TABLE `llx_saturne_object_signature` ADD `attendance` SMALLINT NULL AFTER `transaction_url`;

@@ -90,6 +90,7 @@ class SaturneSignature extends CommonObject
     const STATUS_UNSIGNED = 6;
     const STATUS_ABSENT = 7;
     const STATUS_JUSTIFIED_ABSENT = 8;
+    const STATUS_DELAY = 9;
 
     /**
      * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -118,6 +119,7 @@ class SaturneSignature extends CommonObject
         'signature_url'        => ['type' => 'varchar(255)', 'label' => 'SignatureUrl',      'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 1],
         'transaction_url'      => ['type' => 'varchar(255)', 'label' => 'TransactionUrl',    'enabled' => 1, 'position' => 180, 'notnull' => 0, 'visible' => 1],
         'last_email_sent_date' => ['type' => 'datetime',     'label' => 'SendMailDate',      'enabled' => 1, 'position' => 190, 'notnull' => 0, 'visible' => 3],
+        'attendance'           => ['type' => 'smallint',     'label' => 'Attendance',        'enabled' => 1, 'position' => 194, 'notnull' => 0, 'visible' => 3],
         'object_type'          => ['type' => 'varchar(255)', 'label' => 'object_type',       'enabled' => 1, 'position' => 195, 'notnull' => 0, 'visible' => 0],
         'fk_object'            => ['type' => 'integer',      'label' => 'FKObject',          'enabled' => 1, 'position' => 200, 'notnull' => 1, 'visible' => 0, 'index' => 1],
     ];
@@ -293,11 +295,7 @@ class SaturneSignature extends CommonObject
      */
     public function create(User $user, bool $notrigger = false): int
     {
-        $result = $this->createCommon($user, $notrigger);
-        if ($result > 0) {
-            $this->call_trigger('SESSION_ADDATTENDANT',$user);
-        }
-        return $result;
+        return $this->createCommon($user, $notrigger);
     }
 
     /**
@@ -464,6 +462,18 @@ class SaturneSignature extends CommonObject
     }
 
     /**
+     *	Set delay status
+     *
+     *	@param  User $user      Object user that modify
+     *  @param  int  $notrigger	1 = Does not execute triggers, 0 = Execute triggers
+     *	@return int             0 < if KO, > 0 if OK
+     */
+    public function setDelay(User $user, int $notrigger = 0): int
+    {
+        return $this->setStatusCommon($user, self::STATUS_DELAY, $notrigger, 'SATURNESIGNATURE_DELAY');
+    }
+
+    /**
      *	Set absent status
      *
      *	@param  User $user      Object user that modify
@@ -509,7 +519,6 @@ class SaturneSignature extends CommonObject
     {
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
-            $langs->load('signature@dolimeet');
             $this->labelStatus[self::STATUS_DELETED]           = $langs->transnoentities('Deleted');
             $this->labelStatus[self::STATUS_REGISTERED]        = $langs->transnoentities('Registered');
             $this->labelStatus[self::STATUS_SIGNATURE_REQUEST] = $langs->transnoentities('SignatureRequest');
@@ -519,6 +528,7 @@ class SaturneSignature extends CommonObject
             $this->labelStatus[self::STATUS_UNSIGNED]          = $langs->transnoentities('Unsigned');
             $this->labelStatus[self::STATUS_ABSENT]            = $langs->transnoentities('Absent');
             $this->labelStatus[self::STATUS_JUSTIFIED_ABSENT]  = $langs->transnoentities('JustifiedAbsent');
+            $this->labelStatus[self::STATUS_DELAY]             = $langs->transnoentities('Delay');
         }
 
         $statusType = 'status' . $status;
@@ -776,6 +786,9 @@ class SaturneSignature extends CommonObject
         }
         if (property_exists($object, 'status')) {
             $object->status = 1;
+        }
+        if (property_exists($object, 'attendance')) {
+            $object->attendance = 0;
         }
         if (property_exists($object, 'signature')) {
             $object->signature = '';

@@ -37,6 +37,7 @@ CREATE TABLE llx_saturne_object_signature(
     last_email_sent_date datetime DEFAULT NULL,
     signature_url        varchar(255),
     transaction_url      varchar(255),
+    attendance           smallint,
     object_type          varchar(255),
     fk_object            integer NOT NULL
 ) ENGINE=innodb;

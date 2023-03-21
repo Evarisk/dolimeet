@@ -236,6 +236,16 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
+            case 'SATURNESIGNATURE_DELAY' :
+                $actioncomm->elementtype = $object->object_type . '@dolimeet';
+                $actioncomm->code        = 'AC_SATURNESIGNATURE_DELAY';
+                $actioncomm->label       = $langs->transnoentities('DelayTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                if ($object->element_type == 'socpeople') {
+                    $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
+                }
+                $actioncomm->fk_element = $object->fk_object;
+                $actioncomm->create($user);
+                break;
 			case 'SATURNESIGNATURE_ABSENT' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
 				$actioncomm->code        = 'AC_SATURNESIGNATURE_ABSENT';

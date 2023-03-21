@@ -134,29 +134,35 @@ if (empty($reshook)) {
         $action = '';
     }
 
-    // Action to toggle status STATUS_ABSENT and STATUS_REGISTERED
-    if ($action == 'toggle_absent') {
-        $signatoryID     = GETPOST('signatoryID', 'int');
-        $signatoryStatus = GETPOST('signatoryStatus');
+    // Action to set attendance and status STATUS_REGISTERED / STATUS_DELAY / STATUS_ABSENT
+    if ($action == 'set_attendance') {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $signatoryID = $data['signatoryID'];
+        $attendance  = $data['attendance'];
 
         $signatory->fetch($signatoryID);
 
-        if ($signatoryStatus != $signatory::STATUS_ABSENT) {
-            $result = $signatory->setAbsent($user);
-        } else {
-            $result = $signatory->setRegistered($user);
+        switch ($attendance) {
+            case 1:
+                $result = $signatory->setDelay($user);
+                $signatory->attendance = 1;
+                break;
+            case 2:
+                $result = $signatory->setAbsent($user);
+                $signatory->attendance = 2;
+                break;
+            default:
+                $result = $signatory->setRegistered($user);
+                $signatory->attendance = 0;
+                break;
         }
 
         if ($result > 0) {
-            // Toggle absent OK
-            if ($signatoryStatus != $signatory::STATUS_ABSENT) {
-                setEventMessages($langs->trans('AbsentAttendantMessage', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), []);
-            }
-            // Prevent form reloading page
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
-            exit;
+            // Set attendance OK
+            $signatory->update($user, true);
         } elseif (!empty($signatory->errors)) {
-            // Toggle absent KO
+            // Set attendance KO
             setEventMessages('', $signatory->errors, 'errors');
         } else {
             setEventMessages($signatory->error, [], 'errors');
@@ -423,21 +429,38 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td><td>';
                 print dol_print_date($element->signature_date, 'dayhour');
                 print '</td><td class="center">';
-                print $element->getLibStatut(5);
+                if ($element->attendance == 0) {
+                    print $element->getLibStatut(5);
+                }
                 print '</td><td class="center">';
+                switch ($element->attendance) {
+                    case 1:
+                        $cssButton = '';
+                        $userIcon  = 'fa-user-clock';
+                        break;
+                    case 2:
+                        $cssButton = 'button-red';
+                        $userIcon  = 'fa-user-slash';
+                        break;
+                    default:
+                        $cssButton = 'button-green';
+                        $userIcon  = 'fa-user';
+                        break;
+                }
                 if ($object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
                     if (empty($element->signature)) {
-                        print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
-                        print '<input type="hidden" name="token" value="' . newToken() . '">';
-                        print '<input type="hidden" name="action" value="toggle_absent">';
+                        print '<div class="wpeo-dropdown dropdown-right attendance-container">';
                         print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
-                        print '<input type="hidden" name="signatoryStatus" value="' . $element->status . '">';
-                        print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-                        print '<button type="submit" class="signature-absent wpeo-button ' . (($element->status != $element::STATUS_ABSENT) ? 'button-green' : 'button-red') . '"" value="' . $element->id . '">';
-                        print '<i class="fas ' . (($element->status != $element::STATUS_ABSENT) ? 'fa-user' : 'fa-user-slash') . '"></i>';
-                        print '</button>';
-                        print '</form>';
+                        print '<div class="dropdown-toggle wpeo-button ' . $cssButton . '"><i class="fas ' . $userIcon . '"></i></div>';
+                        print '<ul class="dropdown-content wpeo-gridlayout grid-3">';
+                        print '<li class="dropdown-item set-attendance" style="padding: 0" value="0"><div class="wpeo-button button-green"><i class="fas fa-user"></i></div></li>';
+                        print '<li class="dropdown-item set-attendance" style="padding: 0" value="1"><div class="wpeo-button"><i class="fas fa-user-clock"></i></div></li>';
+                        print '<li class="dropdown-item set-attendance" style="padding: 0" value="2"><div class="wpeo-button button-red"><i class="fas fa-user-slash"></i></div></li>';
+                        print '</ul>';
+                        print '</div>';
                     }
+                } else {
+                    print '<div class="dropdown-toggle wpeo-button ' . $cssButton . '"><i class="fas ' . $userIcon . '"></i></div>';
                 }
                 print '</td><td class="center">';
                 if ($object->status < $object::STATUS_LOCKED && $permissiontoadd) {
