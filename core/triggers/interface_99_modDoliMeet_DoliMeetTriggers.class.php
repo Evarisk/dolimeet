@@ -236,20 +236,20 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-            case 'SATURNESIGNATURE_DELAY' :
+            case 'SATURNESIGNATURE_ATTENDANCE_DELAY' :
                 $actioncomm->elementtype = $object->object_type . '@dolimeet';
-                $actioncomm->code        = 'AC_SATURNESIGNATURE_DELAY';
-                $actioncomm->label       = $langs->transnoentities('DelayTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                $actioncomm->code        = 'AC_SATURNESIGNATURE_ATTENDANCE_DELAY';
+                $actioncomm->label       = $langs->transnoentities('AttendanceDelayTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
                 if ($object->element_type == 'socpeople') {
                     $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
                 }
                 $actioncomm->fk_element = $object->fk_object;
                 $actioncomm->create($user);
                 break;
-			case 'SATURNESIGNATURE_ABSENT' :
+			case 'SATURNESIGNATURE_ATTENDANCE_ABSENT' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
-				$actioncomm->code        = 'AC_SATURNESIGNATURE_ABSENT';
-				$actioncomm->label       = $langs->transnoentities('AbsentTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_ATTENDANCE_ABSENT';
+				$actioncomm->label       = $langs->transnoentities('AttendanceAbsentTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
 				if ($object->element_type == 'socpeople') {
 					$actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
 				}

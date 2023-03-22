@@ -6,7 +6,7 @@ if (empty($conf) || !is_object($conf)) {
     exit;
 }
 
-if (empty($element->signature) && ($object->status == $object::STATUS_VALIDATED || $element->signature == $langs->transnoentities('FileGenerated')) && $element->status != $element::STATUS_ABSENT && $permissiontoadd) : ?>
+if (empty($element->signature) && ($object->status == $object::STATUS_VALIDATED || $element->signature == $langs->transnoentities('FileGenerated')) && $element->attendance != SaturneSignature::ATTENDANCE_ABSENT && $permissiontoadd) : ?>
     <div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
         <input type="hidden" class="modal-to-open" value="modal-signature<?php echo $element->id ?>">
         <input type="hidden" class="from-id" value="<?php echo $element->id ?>">

@@ -134,7 +134,7 @@ if (empty($reshook)) {
         $action = '';
     }
 
-    // Action to set attendance and status STATUS_REGISTERED / STATUS_DELAY / STATUS_ABSENT
+    // Action to set attendance
     if ($action == 'set_attendance') {
         $data = json_decode(file_get_contents('php://input'), true);
 
@@ -145,22 +145,24 @@ if (empty($reshook)) {
 
         switch ($attendance) {
             case 1:
-                $result = $signatory->setDelay($user);
-                $signatory->attendance = 1;
+                $signatory->attendance = SaturneSignature::ATTENDANCE_DELAY;
+                $triggerName = 'ATTENDANCE_DELAY';
                 break;
             case 2:
-                $result = $signatory->setAbsent($user);
-                $signatory->attendance = 2;
+                $signatory->attendance = SaturneSignature::ATTENDANCE_ABSENT;
+                $triggerName = 'ATTENDANCE_ABSENT';
                 break;
             default:
-                $result = $signatory->setRegistered($user);
-                $signatory->attendance = 0;
+                $signatory->attendance = SaturneSignature::ATTENDANCE_PRESENT;
+                $triggerName = 'ATTENDANCE_PRESENT';
                 break;
         }
 
+        $result = $signatory->update($user, true);
+
         if ($result > 0) {
             // Set attendance OK
-            $signatory->update($user, true);
+            $signatory->call_trigger('SATURNESIGNATURE_' . $triggerName, $user);
         } elseif (!empty($signatory->errors)) {
             // Set attendance KO
             setEventMessages('', $signatory->errors, 'errors');
@@ -374,7 +376,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                     }
                 }
                 print '</td><td class="center copy-signatureurl-container">';
-                if ($object->status == $object::STATUS_VALIDATED && $element->status != $element::STATUS_ABSENT) {
+                if ($object->status == $object::STATUS_VALIDATED && $element->attendance != SaturneSignature::ATTENDANCE_ABSENT) {
                     if ((!$user->rights->$moduleNameLowerCase->$objectType->read && $user->rights->$moduleNameLowerCase->assignedtome->$objectType && ($element->element_id == $user->id || $element->element_id == $user->contact_id)) || $permissiontoadd) {
                         $signatureUrl = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $element->signature_url . '&object_type=' . $object->element, 3);
                         print '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-primary"><i class="fas fa-signature"></i></div></a>';
@@ -429,9 +431,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td><td>';
                 print dol_print_date($element->signature_date, 'dayhour');
                 print '</td><td class="center">';
-                if ($element->attendance == 0) {
-                    print $element->getLibStatut(5);
-                }
+                print $element->getLibStatut(5);
                 print '</td><td class="center">';
                 switch ($element->attendance) {
                     case 1:
@@ -448,17 +448,15 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                         break;
                 }
                 if ($object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
-                    if (empty($element->signature)) {
-                        print '<div class="wpeo-dropdown dropdown-right attendance-container">';
-                        print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
-                        print '<div class="dropdown-toggle wpeo-button ' . $cssButton . '"><i class="fas ' . $userIcon . '"></i></div>';
-                        print '<ul class="dropdown-content wpeo-gridlayout grid-3">';
-                        print '<li class="dropdown-item set-attendance" style="padding: 0" value="0"><div class="wpeo-button button-green"><i class="fas fa-user"></i></div></li>';
-                        print '<li class="dropdown-item set-attendance" style="padding: 0" value="1"><div class="wpeo-button"><i class="fas fa-user-clock"></i></div></li>';
-                        print '<li class="dropdown-item set-attendance" style="padding: 0" value="2"><div class="wpeo-button button-red"><i class="fas fa-user-slash"></i></div></li>';
-                        print '</ul>';
-                        print '</div>';
-                    }
+                    print '<div class="wpeo-dropdown dropdown-right attendance-container">';
+                    print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
+                    print '<div class="dropdown-toggle wpeo-button ' . $cssButton . '"><i class="fas ' . $userIcon . '"></i></div>';
+                    print '<ul class="dropdown-content wpeo-gridlayout grid-3">';
+                    print '<li class="dropdown-item set-attendance" style="padding: 0" value="0"><div class="wpeo-button button-green"><i class="fas fa-user"></i></div></li>';
+                    print '<li class="dropdown-item set-attendance" style="padding: 0" value="1"><div class="wpeo-button"><i class="fas fa-user-clock"></i></div></li>';
+                    print '<li class="dropdown-item set-attendance" style="padding: 0" value="2"><div class="wpeo-button button-red"><i class="fas fa-user-slash"></i></div></li>';
+                    print '</ul>';
+                    print '</div>';
                 } else {
                     print '<div class="dropdown-toggle wpeo-button ' . $cssButton . '"><i class="fas ' . $userIcon . '"></i></div>';
                 }

@@ -83,14 +83,12 @@ class SaturneSignature extends CommonObject
     const STATUS_DELETED = -1;
     const STATUS_DRAFT = 0;
     const STATUS_REGISTERED = 1;
-    const STATUS_SIGNATURE_REQUEST = 2;
     const STATUS_PENDING_SIGNATURE = 3;
-    const STATUS_DENIED = 4;
     const STATUS_SIGNED = 5;
-    const STATUS_UNSIGNED = 6;
-    const STATUS_ABSENT = 7;
-    const STATUS_JUSTIFIED_ABSENT = 8;
-    const STATUS_DELAY = 9;
+
+    const ATTENDANCE_PRESENT = 0;
+    const ATTENDANCE_DELAY   = 1;
+    const ATTENDANCE_ABSENT  = 2;
 
     /**
      * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -238,6 +236,11 @@ class SaturneSignature extends CommonObject
      * @var string Last email sent date
      */
     public string $last_email_sent_date;
+
+    /**
+     * @var int|null Attendance
+     */
+    public ?int $attendance;
 
     /**
      * @var string Object type
@@ -462,30 +465,6 @@ class SaturneSignature extends CommonObject
     }
 
     /**
-     *	Set delay status
-     *
-     *	@param  User $user      Object user that modify
-     *  @param  int  $notrigger	1 = Does not execute triggers, 0 = Execute triggers
-     *	@return int             0 < if KO, > 0 if OK
-     */
-    public function setDelay(User $user, int $notrigger = 0): int
-    {
-        return $this->setStatusCommon($user, self::STATUS_DELAY, $notrigger, 'SATURNESIGNATURE_DELAY');
-    }
-
-    /**
-     *	Set absent status
-     *
-     *	@param  User $user      Object user that modify
-     *  @param  int  $notrigger	1 = Does not execute triggers, 0 = Execute triggers
-     *	@return int             0 < if KO, > 0 if OK
-     */
-    public function setAbsent(User $user, int $notrigger = 0): int
-    {
-        return $this->setStatusCommon($user, self::STATUS_ABSENT, $notrigger, 'SATURNESIGNATURE_ABSENT');
-    }
-
-    /**
      *	Set deleted status
      *
      *	@param  User $user      Object user that modify
@@ -521,22 +500,13 @@ class SaturneSignature extends CommonObject
             global $langs;
             $this->labelStatus[self::STATUS_DELETED]           = $langs->transnoentities('Deleted');
             $this->labelStatus[self::STATUS_REGISTERED]        = $langs->transnoentities('Registered');
-            $this->labelStatus[self::STATUS_SIGNATURE_REQUEST] = $langs->transnoentities('SignatureRequest');
             $this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->transnoentities('PendingSignature');
-            $this->labelStatus[self::STATUS_DENIED]            = $langs->transnoentities('Denied');
             $this->labelStatus[self::STATUS_SIGNED]            = $langs->transnoentities('Signed');
-            $this->labelStatus[self::STATUS_UNSIGNED]          = $langs->transnoentities('Unsigned');
-            $this->labelStatus[self::STATUS_ABSENT]            = $langs->transnoentities('Absent');
-            $this->labelStatus[self::STATUS_JUSTIFIED_ABSENT]  = $langs->transnoentities('JustifiedAbsent');
-            $this->labelStatus[self::STATUS_DELAY]             = $langs->transnoentities('Delay');
         }
 
         $statusType = 'status' . $status;
         if ($status == self::STATUS_SIGNED) {
             $statusType = 'status4';
-        }
-        if ($status == self::STATUS_ABSENT) {
-            $statusType = 'status8';
         }
 
         return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
@@ -605,6 +575,8 @@ class SaturneSignature extends CommonObject
                     $this->element_id   = $element_id;
 
                     $this->signature_url = generate_random_id(16);
+
+                    $this->attendance = self::ATTENDANCE_PRESENT;
 
                     $this->object_type = $object_type;
                     $this->fk_object   = $fk_object;
@@ -684,7 +656,7 @@ class SaturneSignature extends CommonObject
 
         if ( ! empty($signatories) && $signatories > 0) {
             foreach ($signatories as $signatory) {
-                if ($signatory->status == 5 || $signatory->status == 7) {
+                if ($signatory->status == self::STATUS_SIGNED || $signatory->attendance == self::ATTENDANCE_ABSENT) {
                     continue;
                 } else {
                     return 0;
@@ -715,7 +687,8 @@ class SaturneSignature extends CommonObject
                 if (dol_strlen($signatory->signature)) {
                     $signatory->signature      = '';
                     $signatory->signature_date = '';
-                    $signatory->status         = 1;
+                    $signatory->status         = self::STATUS_REGISTERED;
+                    $signatory->attendance     = self::ATTENDANCE_PRESENT;
                     $signatory->update($user);
                 }
             }
@@ -785,10 +758,10 @@ class SaturneSignature extends CommonObject
             $object->fk_object = $objectID;
         }
         if (property_exists($object, 'status')) {
-            $object->status = 1;
+            $object->status = self::STATUS_REGISTERED;
         }
         if (property_exists($object, 'attendance')) {
-            $object->attendance = 0;
+            $object->attendance = self::ATTENDANCE_PRESENT;
         }
         if (property_exists($object, 'signature')) {
             $object->signature = '';
