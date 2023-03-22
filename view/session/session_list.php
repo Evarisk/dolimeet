@@ -134,6 +134,7 @@ $error = 0;
 if (!empty($fromtype)) {
     switch ($fromtype) {
         case 'thirdparty' :
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
             $objectLinked = new Societe($db);
             $search['fk_soc'] = $fromid;
             $search['search_society_attendants'] = $fromid;
