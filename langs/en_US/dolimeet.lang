@@ -41,7 +41,7 @@ ContratSchedules        = Training schedule
 SessionListOnProject    = List of sessions related to the project
 EnableObjectDescription = Activate object %s
 Content                 = Content
-SelectObjectTypeFirst   = Select a session type first
+SelectSessionType       = Select a session type
 
 
 
@@ -99,6 +99,7 @@ TypeContact_contrat_internal_TRAINEE        = Trainee
 TypeContact_contrat_external_TRAINEE        = Trainee
 
 
+
 #
 # Training Session Document
 #
@@ -132,6 +133,7 @@ AuditsCategoriesArea = Audit tags/categories area
 
 # Attendant role
 Auditor = Auditor
+
 
 
 #

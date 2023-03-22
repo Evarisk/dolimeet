@@ -49,7 +49,7 @@ ContratSchedules        = Horaires de la formation
 SessionListOnProject    = Liste des sessions liées au projet
 EnableObjectDescription = Activer l'objet %s
 Content                 = Contenu
-SelectObjectTypeFirst   = Sélectionner un type de session d'abord
+SelectSessionType       = Sélectionner un type de session
 
 
 
@@ -106,6 +106,8 @@ TypeContact_contrat_external_SESSIONTRAINER = Formateur
 TypeContact_contrat_internal_TRAINEE        = Stagiaire
 TypeContact_contrat_external_TRAINEE        = Stagiaire
 
+
+
 #
 # Training Session Document - Document lié au session de formation
 #
@@ -139,6 +141,7 @@ AuditsCategoriesArea = Espace des tags/catégories des audits
 
 # Attendant role - Rôle participant
 Auditor = Auditeur
+
 
 
 #

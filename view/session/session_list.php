@@ -532,12 +532,12 @@ if ($objectType == 'session' || !empty($fromtype) && $fromid > 0) {
     } else {
         $objectTypes = ['meeting' => $langs->trans('Meeting'), 'trainingsession' => $langs->trans('Trainingsession'), 'audit' => $langs->trans('Audit')];
     }
-    $newcardbutton .= $form->selectarray('object_type_select', $objectTypes, $objectType, $langs->trans('SelectObjectTypeFirst'));
+    $newcardbutton .= $form->selectarray('object_type_select', $objectTypes, $objectType, ($fromtype != 'contrat' ? $langs->trans('SelectSessionType') : ''));
 }
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewList'), '', 'fa fa-bars imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=common' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ((empty($mode) || $mode == 'common') ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewKanban'), '', 'fa fa-th-list imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=kanban' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ($mode == 'kanban' ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitleSeparator();
-$newcardbutton .= dolGetButtonTitle($langs->trans('New'), ($objectType != 'session' ? '' : $langs->trans('SelectObjectTypeFirst')), 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $fromurl . '&object_type=' . $objectType, '', ($objectType != 'session' ? $permissiontoadd : -2));
+$newcardbutton .= dolGetButtonTitle($langs->trans('New'), ($objectType != 'session' ? '' : $langs->trans('SelectSessionType')), 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $fromurl . '&object_type=' . $objectType, '', ($objectType != 'session' ? $permissiontoadd : -2));
 
 print_barre_liste($title, $page, $_SERVER['PHP_SELF'], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_' . $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
