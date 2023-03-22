@@ -527,7 +527,11 @@ print '<input type="hidden" name="mode" value="' . $mode . '">'; ?>
 
 <?php $newcardbutton = '';
 if ($objectType == 'session' || !empty($fromtype) && $fromid > 0) {
-    $objectTypes = ['meeting' => $langs->trans('Meeting'), 'trainingsession' => $langs->trans('Trainingsession'), 'audit' => $langs->trans('Audit')];
+    if ($fromtype == 'contrat') {
+        $objectTypes = ['trainingsession' => $langs->trans('Trainingsession')];
+    } else {
+        $objectTypes = ['meeting' => $langs->trans('Meeting'), 'trainingsession' => $langs->trans('Trainingsession'), 'audit' => $langs->trans('Audit')];
+    }
     $newcardbutton .= $form->selectarray('object_type_select', $objectTypes, $objectType, $langs->trans('SelectObjectTypeFirst'));
 }
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewList'), '', 'fa fa-bars imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=common' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ((empty($mode) || $mode == 'common') ? 2 : 1), ['morecss'=>'reposition']);
