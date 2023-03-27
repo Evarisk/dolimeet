@@ -107,7 +107,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 			case 'MEETING_CREATE' :
             case 'AUDIT_CREATE' :
 				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
-				$actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+				$actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
 
@@ -143,7 +143,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 }
 
                 $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
-                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)));
                 $actioncomm->create($user);
                 break;
 
@@ -151,7 +151,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_MODIFY' :
             case 'AUDIT_MODIFY' :
 				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_MODIFY';
-				$actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+				$actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
 
@@ -159,7 +159,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_DELETE' :
             case 'AUDIT_DELETE' :
 				$actioncomm->code  = 'AC_ ' . strtoupper($object->element) . '_DELETE';
-				$actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+				$actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
 
@@ -167,7 +167,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_VALIDATE' :
             case 'AUDIT_VALIDATE' :
                 $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_VALIDATE';
-                $actioncomm->label = $langs->trans('ObjectValidateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->label = $langs->trans('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)));
                 $actioncomm->create($user);
                 break;
 
@@ -175,7 +175,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_UNVALIDATE' :
             case 'AUDIT_UNVALIDATE' :
                 $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_UNVALIDATE';
-                $actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities(ucfirst($object->element)));
                 $actioncomm->create($user);
                 break;
 
@@ -183,7 +183,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_LOCKED' :
             case 'AUDIT_LOCKED' :
                 $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_LOCKED';
-                $actioncomm->label = $langs->trans('ObjectLockedTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->label = $langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)));
                 $actioncomm->create($user);
                 break;
 
@@ -191,7 +191,15 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_ARCHIVED' :
             case 'AUDIT_ARCHIVED' :
                 $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_ARCHIVED';
-                $actioncomm->label = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities('The' . ucfirst($object->element)));
+                $actioncomm->label = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities(ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
+
+            case 'MEETING_SENTBYMAIL' :
+            case 'TRAININGSESSION_SENTBYMAIL' :
+            case 'AUDIT_SENTBYMAIL' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_SENTBYMAIL';
+                $actioncomm->label = $langs->trans('ObjectSentByMailTrigger', $langs->transnoentities(ucfirst($object->element)));
                 $actioncomm->create($user);
                 break;
 

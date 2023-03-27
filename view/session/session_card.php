@@ -283,7 +283,7 @@ if (empty($reshook)) {
     }
 
     // Actions to send emails
-    $triggersendname = 'DOLIMEET_' . strtoupper($object->element) . '_SENTBYMAIL';
+    $triggersendname = strtoupper($object->element) . '_SENTBYMAIL';
     $autocopy        = 'MAIN_MAIL_AUTOCOPY_' . strtoupper($object->element) . '_TO';
     $paramname2      = 'object_type';
     $paramval2       = $object->element;
