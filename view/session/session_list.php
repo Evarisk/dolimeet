@@ -441,7 +441,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 if (!empty($fromtype) && !$error) {
-    saturne_get_fiche_head($objectLinked, $objectType . 'List', $langs->trans($objectType));
+    saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($objectType));
     saturne_banner_tab($objectLinked);
 }
 
