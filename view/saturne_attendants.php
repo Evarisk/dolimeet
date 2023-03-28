@@ -385,8 +385,8 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                     }
                 }
                 print '</td><td class="center">';
-                print dol_print_date($element->last_email_sent_date, 'dayhour');
-                if ($object->status == $object::STATUS_VALIDATED && $permissiontoadd) {
+                if ($object->status == $object::STATUS_VALIDATED && $permissiontoadd && dol_strlen($element->email)) {
+                    print dol_print_date($element->last_email_sent_date, 'dayhour');
                     $nbEmailSent = 0;
                     // Enable caching of emails sent count actioncomm
                     require_once DOL_DOCUMENT_ROOT . '/core/lib/memory.lib.php';
@@ -427,6 +427,8 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                         print ' <span class="badge badge-info">' . $nbEmailSent . '</span>';
                     }
                     print '</form>';
+                } else {
+                    print '<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('NoEmailSet', $langs->trans($element->role) . ' ' . strtoupper($element->lastname) . ' ' . $element->firstname) . '"><i class="fas fa-paper-plane"></i></div>';
                 }
                 print '</td><td>';
                 print dol_print_date($element->signature_date, 'dayhour');
@@ -461,7 +463,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                     print '<div class="dropdown-toggle wpeo-button ' . $cssButton . '"><i class="fas ' . $userIcon . '"></i></div>';
                 }
                 print '</td><td class="center">';
-                if ($object->status < $object::STATUS_LOCKED && $permissiontoadd) {
+                if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
                     print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
                     print '<input type="hidden" name="token" value="' . newToken() . '">';
                     print '<input type="hidden" name="action" value="delete_attendant">';
