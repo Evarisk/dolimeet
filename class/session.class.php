@@ -315,12 +315,10 @@ class Session extends CommonObject
             case 'meeting':
                 $this->picto = 'fontawesome_fa-comments_fas_#d35968';
                 unset($this->fields['duration']);
-                unset($this->fields['fk_contrat']);
                 break;
             case 'audit':
                 $this->picto = 'fontawesome_fa-tasks_fas_#d35968';
                 unset($this->fields['duration']);
-                unset($this->fields['fk_contrat']);
                 break;
             default :
                 $this->picto = 'dolimeet_color@dolimeet';

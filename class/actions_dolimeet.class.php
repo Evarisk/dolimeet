@@ -229,18 +229,16 @@ class ActionsDolimeet
 
         // Do something only for the current context
         if (in_array($parameters['currentcontext'], ['saturneglobal', 'sessioncard'])) {
-            if (isModEnabled('contrat')) {
+            if (isModEnabled('contrat') && property_exists($object, 'fk_contrat')) {
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-                if (GETPOST('object_type') == 'trainingsession') {
-                    $morehtmlref = $langs->trans('Contract') . ' : ';
-                    if (!empty($object->fk_contrat)) {
-                        $contract = new Contrat($db);
-                        $contract->fetch($object->fk_contrat);
-                        $morehtmlref .= $contract->getNomUrl(1);
-                    }
-                    $morehtmlref .= '<br>';
-                    $this->resprints = $morehtmlref;
+                $morehtmlref = $langs->trans('Contract') . ' : ';
+                if (!empty($object->fk_contrat)) {
+                    $contract = new Contrat($db);
+                    $contract->fetch($object->fk_contrat);
+                    $morehtmlref .= $contract->getNomUrl(1);
                 }
+                $morehtmlref .= '<br>';
+                $this->resprints = $morehtmlref;
             }
         }
 
