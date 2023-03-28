@@ -964,6 +964,36 @@ class Session extends CommonObject
                     }
                 }
 			}
+
+            if (!empty($options['contract_attendants'])) {
+                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+
+                $contract  = new Contrat($this->db);
+                $signatory = new SaturneSignature($this->db);
+
+                $contract->fetch($object->fk_contrat);
+
+                $contactInternalSessionTrainerArray = $contract->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
+                $contactInternalTraineeArray        = $contract->liste_contact(-1, 'internal', 0, 'TRAINEE');
+                $contactExternalSessionTrainerArray = $contract->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
+                $contactExternalTraineeArray        = $contract->liste_contact(-1, 'external', 0, 'TRAINEE');
+
+                $contactArray = array_merge(
+                    (is_array($contactInternalSessionTrainerArray) ? $contactInternalSessionTrainerArray : []),
+                    (is_array($contactInternalTraineeArray) ? $contactInternalTraineeArray : []),
+                    (is_array($contactExternalSessionTrainerArray) ? $contactExternalSessionTrainerArray : []),
+                    (is_array($contactExternalTraineeArray) ? $contactExternalTraineeArray : [])
+                );
+
+                foreach ($contactArray as $contact) {
+                    if ($contact['code'] == 'TRAINEE') {
+                        $attendantRole = 'Trainee';
+                    } else {
+                        $attendantRole = 'SessionTrainer';
+                    }
+                    $signatory->setSignatory($result, $object->type, (($contact['source'] == 'internal') ? 'user' : 'socpeople'), [$contact['id']], $attendantRole, 1);
+                }
+            }
 		} else {
 			$error++;
 			$this->error  = $object->error;
