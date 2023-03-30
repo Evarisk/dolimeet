@@ -393,50 +393,52 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                     }
                 }
                 print '</td><td class="center">';
-                if ($object->status == $object::STATUS_VALIDATED && $permissiontoadd && dol_strlen($element->email)) {
-                    print dol_print_date($element->last_email_sent_date, 'dayhour');
-                    $nbEmailSent = 0;
-                    // Enable caching of emails sent count actioncomm
-                    require_once DOL_DOCUMENT_ROOT . '/core/lib/memory.lib.php';
-                    $cacheKey = 'count_emails_sent_' . $element->id;
-                    $dataRetrieved = dol_getcache($cacheKey);
-                    if (!is_null($dataRetrieved)) {
-                        $nbEmailSent = $dataRetrieved;
-                    } else {
-                        $sql = 'SELECT COUNT(id) as nb';
-                        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'actioncomm';
-                        $sql .= ' WHERE fk_element = ' . $object->id;
-                        if ($element->element_type == 'user') {
-                            $sql .= ' AND fk_user_action = ' . $element->element_id;
+                if ($object->status == $object::STATUS_VALIDATED) {
+                    if ($permissiontoadd && dol_strlen($element->email)) {
+                        print dol_print_date($element->last_email_sent_date, 'dayhour');
+                        $nbEmailSent = 0;
+                        // Enable caching of emails sent count actioncomm
+                        require_once DOL_DOCUMENT_ROOT . '/core/lib/memory.lib.php';
+                        $cacheKey = 'count_emails_sent_' . $element->id;
+                        $dataRetrieved = dol_getcache($cacheKey);
+                        if (!is_null($dataRetrieved)) {
+                            $nbEmailSent = $dataRetrieved;
                         } else {
-                            $sql .= ' AND fk_contact = ' . $element->element_id;
+                            $sql = 'SELECT COUNT(id) as nb';
+                            $sql .= ' FROM ' . MAIN_DB_PREFIX . 'actioncomm';
+                            $sql .= ' WHERE fk_element = ' . $object->id;
+                            if ($element->element_type == 'user') {
+                                $sql .= ' AND fk_user_action = ' . $element->element_id;
+                            } else {
+                                $sql .= ' AND fk_contact = ' . $element->element_id;
+                            }
+                            $sql .= " AND code = '" . 'AC_SATURNESIGNATURE_PENDING_SIGNATURE' . "'";
+                            $sql .= " AND elementtype = '" . $object->element . '@dolimeet' . "'";
+                            $resql = $db->query($sql);
+                            if ($resql) {
+                                $obj = $db->fetch_object($resql);
+                                $nbEmailSent = $obj->nb;
+                            } else {
+                                dol_syslog('Failed to count actioncomm ' . $db->lasterror(), LOG_ERR);
+                            }
+                            dol_setcache($cacheKey, $nbEmailSent, 120); // If setting cache fails, this is not a problem, so we do not test result.
                         }
-                        $sql .= " AND code = '" . 'AC_SATURNESIGNATURE_PENDING_SIGNATURE' . "'";
-                        $sql .= " AND elementtype = '" . $object->element . '@dolimeet' . "'";
-                        $resql = $db->query($sql);
-                        if ($resql) {
-                            $obj = $db->fetch_object($resql);
-                            $nbEmailSent = $obj->nb;
-                        } else {
-                            dol_syslog('Failed to count actioncomm ' . $db->lasterror(), LOG_ERR);
-                        }
-                        dol_setcache($cacheKey, $nbEmailSent, 120); // If setting cache fails, this is not a problem, so we do not test result.
-                    }
 
-                    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
-                    print '<input type="hidden" name="token" value="' . newToken() . '">';
-                    print '<input type="hidden" name="action" value="send_email">';
-                    print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
-                    print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-                    print '<button type="submit" class="signature-email wpeo-button button-primary" value="' . $element->id . '">';
-                    print '<i class="fas fa-paper-plane"></i>';
-                    print '</button>';
-                    if ($nbEmailSent > 0) {
-                        print ' <span class="badge badge-info">' . $nbEmailSent . '</span>';
+                        print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
+                        print '<input type="hidden" name="token" value="' . newToken() . '">';
+                        print '<input type="hidden" name="action" value="send_email">';
+                        print '<input type="hidden" name="signatoryID" value="' . $element->id . '">';
+                        print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+                        print '<button type="submit" class="signature-email wpeo-button button-primary" value="' . $element->id . '">';
+                        print '<i class="fas fa-paper-plane"></i>';
+                        print '</button>';
+                        if ($nbEmailSent > 0) {
+                            print ' <span class="badge badge-info">' . $nbEmailSent . '</span>';
+                        }
+                        print '</form>';
+                    } else {
+                        print '<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('NoEmailSet', $langs->trans($element->role) . ' ' . strtoupper($element->lastname) . ' ' . $element->firstname) . '"><i class="fas fa-paper-plane"></i></div>';
                     }
-                    print '</form>';
-                } else {
-                    print '<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('NoEmailSet', $langs->trans($element->role) . ' ' . strtoupper($element->lastname) . ' ' . $element->firstname) . '"><i class="fas fa-paper-plane"></i></div>';
                 }
                 print '</td><td>';
                 print dol_print_date($element->signature_date, 'dayhour');
