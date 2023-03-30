@@ -178,7 +178,7 @@ if (empty($reshook)) {
         $signatory->fetch($signatoryID);
 
         $langs->load('mails');
-        if (dol_strlen($signatory->email)) {
+        if (!dol_strlen($signatory->email)) {
             if ($signatory->element_type == 'user') {
                 $usertmp = $user;
                 $usertmp->fetch($signatory->element_id);
@@ -193,55 +193,54 @@ if (empty($reshook)) {
                     $signatory->update($user, true);
                 }
             }
-
-            $sendto = $signatory->email;
-            if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
-                require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
-
-                $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-                $url  = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&object_type=' . $object->element, 3);
-
-                $message = $langs->trans('SignatureEmailMessage', $url);
-                $subject = $langs->trans('SignatureEmailSubject', $langs->transnoentities('The' . ucfirst($object->element)), $object->ref);
-
-                // Create form object
-                // Send mail (substitutionarray must be done just before this)
-                $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
-                if ($mailfile->error) {
-                    setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-                } elseif (!empty($conf->global->MAIN_MAIL_SMTPS_ID) || $conf->global->SATURNE_USE_ALL_EMAIL_MODE > 0) {
-                    $result = $mailfile->sendfile();
-                    if ($result) {
-                        $signatory->last_email_sent_date = dol_now('tzuser');
-                        $signatory->update($user, true);
-                        $signatory->setPending($user, false);
-                        setEventMessages($langs->trans('SendEmailAt', $signatory->email), []);
-                        // Prevent form reloading page
-                        header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
-                        exit;
-                    } else {
-                        $langs->load('other');
-                        $errorMessage = '<div class="error">';
-                        $errorMessage .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                        if ($mailfile->error) {
-                            $errorMessage .= '<br>' . $mailfile->error;
-                        }
-                        $errorMessage .= '</div>';
-                        setEventMessages($errorMessage, [], 'warnings');
-                    }
-                } else {
-                    $url = '<a href="' . dol_buildpath('/admin/mails.php', 1) . '" target="_blank">' . $langs->trans('ConfigEmail') . '</a>';
-                    setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $url, [], 'warnings');
-                }
-            } else {
-                $langs->load('errors');
-                setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')), [], 'warnings');
-                dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
-            }
         } else {
             setEventMessage($langs->trans('NoEmailSet', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), 'warnings');
         }
-        $action = '';
+
+        $sendto = $signatory->email;
+        if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
+            require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+
+            $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
+            $url  = dol_buildpath('/custom/dolimeet/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&object_type=' . $object->element, 3);
+
+            $message = $langs->trans('SignatureEmailMessage', $url);
+            $subject = $langs->trans('SignatureEmailSubject', $langs->transnoentities('The' . ucfirst($object->element)), $object->ref);
+
+            // Create form object
+            // Send mail (substitutionarray must be done just before this)
+            $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
+            if ($mailfile->error) {
+                setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+            } elseif (!empty($conf->global->MAIN_MAIL_SMTPS_ID) || $conf->global->SATURNE_USE_ALL_EMAIL_MODE > 0) {
+                $result = $mailfile->sendfile();
+                if ($result) {
+                    $signatory->last_email_sent_date = dol_now('tzuser');
+                    $signatory->update($user, true);
+                    $signatory->setPending($user, false);
+                    setEventMessages($langs->trans('SendEmailAt', $signatory->email), []);
+                    // Prevent form reloading page
+                    header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&module_name=' . $moduleName . '&object_type=' . $object->element);
+                    exit;
+                } else {
+                    $langs->load('other');
+                    $errorMessage = '<div class="error">';
+                    $errorMessage .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                    if ($mailfile->error) {
+                        $errorMessage .= '<br>' . $mailfile->error;
+                    }
+                    $errorMessage .= '</div>';
+                    setEventMessages($errorMessage, [], 'warnings');
+                }
+            } else {
+                $url = '<a href="' . dol_buildpath('/admin/mails.php', 1) . '" target="_blank">' . $langs->trans('ConfigEmail') . '</a>';
+                setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $url, [], 'warnings');
+            }
+        } else {
+            $langs->load('errors');
+            setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')), [], 'warnings');
+            dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
+        }
     }
 
     $paramname2 = 'module_name=' . $moduleName . '&object_type';
@@ -354,6 +353,8 @@ if ($id > 0 || !empty($ref) && empty($action)) {
             print '</tr>';
 
             foreach ($signatories as $element) {
+                $usertmp = new User($db);
+                $contact = new Contact($db);
                 print '<tr class="oddeven" data-signatory-id="' . $element->id . '"><td class="minwidth200">';
                 if ($element->element_type == 'socpeople') {
                     $contact->fetch($element->element_id);
@@ -394,7 +395,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 }
                 print '</td><td class="center">';
                 if ($object->status == $object::STATUS_VALIDATED) {
-                    if ($permissiontoadd && dol_strlen($element->email)) {
+                    if (dol_strlen($element->email) || dol_strlen($usertmp->email) || dol_strlen($contact->email)) {
                         print dol_print_date($element->last_email_sent_date, 'dayhour');
                         $nbEmailSent = 0;
                         // Enable caching of emails sent count actioncomm
