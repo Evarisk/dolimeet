@@ -98,7 +98,7 @@ TrainingSessionType                   = Type de formation
 TrainingSessionLocation               = Lieu de la formation
 TrainingsessionsCategoriesArea        = Espace des tags/catégories des sessions de formations
 DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un formateur et un stagiaire au contrat de formation.
-CloneAttendantsFromContract           = Cloner les participants du contrat
+AttendantsFromContract                = Participants du contrat
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur

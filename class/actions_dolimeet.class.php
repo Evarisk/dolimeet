@@ -260,15 +260,15 @@ class ActionsDolimeet
         if ($parameters['currentcontext'] == 'contractcard') {
             if (isModEnabled('contrat')) {
                 $error = 0;
-                $contactInternalSessionTrainerArray = $object->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
-                $contactInternalTraineeArray        = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
-                $contactExternalSessionTrainerArray = $object->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
-                $contactExternalTraineeArray        = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
+                $attendantInternalSessionTrainerArray = $object->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
+                $attendantInternalTraineeArray        = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
+                $attendantExternalSessionTrainerArray = $object->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
+                $attendantExternalTraineeArray        = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
 
-                if ((is_array($contactInternalSessionTrainerArray) && empty($contactInternalSessionTrainerArray)) && (is_array($contactExternalSessionTrainerArray) && empty($contactExternalSessionTrainerArray))) {
+                if ((is_array($attendantInternalSessionTrainerArray) && empty($attendantInternalSessionTrainerArray)) && (is_array($attendantExternalSessionTrainerArray) && empty($attendantExternalSessionTrainerArray))) {
                     $error++;
                 }
-                if ((is_array($contactInternalTraineeArray) && empty($contactInternalTraineeArray)) && (is_array($contactExternalTraineeArray) && empty($contactExternalTraineeArray))) {
+                if ((is_array($attendantInternalTraineeArray) && empty($attendantInternalTraineeArray)) && (is_array($attendantExternalTraineeArray) && empty($attendantExternalTraineeArray))) {
                     $error++;
                 }
 

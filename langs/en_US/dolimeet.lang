@@ -90,7 +90,7 @@ TrainingSessionType                   = Type of training
 TrainingSessionLocation               = Location of the training
 TrainingsessionsCategoriesArea        = Trainingsession tags/categories area
 DontForgotAddSessionTrainerAndTrainee = Remember to add at least one trainer and one trainee to the training contract.
-CloneAttendantsFromContract           = Clone contract participants
+AttendantsFromContract                = Contract participants
 
 # Attendant role
 SessionTrainer                              = Trainer

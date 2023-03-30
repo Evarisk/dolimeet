@@ -952,7 +952,7 @@ class Session extends CommonObject
 		$result                             = $object->create($user);
 
 		if ($result > 0) {
-			if (!empty($options['attendants'])) {
+			if ($options['attendants'] == 0) {
                 // Load signatory from source object
                 $signatory   = new SaturneSignature($this->db);
                 $signatories = $signatory->fetchSignatory('', $fromid, $this->type);
@@ -965,7 +965,7 @@ class Session extends CommonObject
                 }
 			}
 
-            if (!empty($options['contract_attendants'])) {
+            if ($options['attendants'] == 1) {
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
                 $contract  = new Contrat($this->db);
@@ -973,25 +973,25 @@ class Session extends CommonObject
 
                 $contract->fetch($object->fk_contrat);
 
-                $contactInternalSessionTrainerArray = $contract->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
-                $contactInternalTraineeArray        = $contract->liste_contact(-1, 'internal', 0, 'TRAINEE');
-                $contactExternalSessionTrainerArray = $contract->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
-                $contactExternalTraineeArray        = $contract->liste_contact(-1, 'external', 0, 'TRAINEE');
+                $attendantInternalSessionTrainerArray = $contract->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
+                $attendantInternalTraineeArray        = $contract->liste_contact(-1, 'internal', 0, 'TRAINEE');
+                $attendantExternalSessionTrainerArray = $contract->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
+                $attendantExternalTraineeArray        = $contract->liste_contact(-1, 'external', 0, 'TRAINEE');
 
-                $contactArray = array_merge(
-                    (is_array($contactInternalSessionTrainerArray) ? $contactInternalSessionTrainerArray : []),
-                    (is_array($contactInternalTraineeArray) ? $contactInternalTraineeArray : []),
-                    (is_array($contactExternalSessionTrainerArray) ? $contactExternalSessionTrainerArray : []),
-                    (is_array($contactExternalTraineeArray) ? $contactExternalTraineeArray : [])
+                $attendantArray = array_merge(
+                    (is_array($attendantInternalSessionTrainerArray) ? $attendantInternalSessionTrainerArray : []),
+                    (is_array($attendantInternalTraineeArray) ? $attendantInternalTraineeArray : []),
+                    (is_array($attendantExternalSessionTrainerArray) ? $attendantExternalSessionTrainerArray : []),
+                    (is_array($attendantExternalTraineeArray) ? $attendantExternalTraineeArray : [])
                 );
 
-                foreach ($contactArray as $contact) {
-                    if ($contact['code'] == 'TRAINEE') {
+                foreach ($attendantArray as $attendant) {
+                    if ($attendant['code'] == 'TRAINEE') {
                         $attendantRole = 'Trainee';
                     } else {
                         $attendantRole = 'SessionTrainer';
                     }
-                    $signatory->setSignatory($result, $object->type, (($contact['source'] == 'internal') ? 'user' : 'socpeople'), [$contact['id']], $attendantRole, 1);
+                    $signatory->setSignatory($result, $object->type, (($attendant['source'] == 'internal') ? 'user' : 'socpeople'), [$attendant['id']], $attendantRole, 1);
                 }
             }
 		} else {
