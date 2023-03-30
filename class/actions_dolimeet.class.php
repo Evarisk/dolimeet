@@ -272,8 +272,8 @@ class ActionsDolimeet
                     $error++;
                 }
 
-                if ($object->array_options['options_trainingsession_type'] <= 0 || $error > 0) {
-                    $moreHtmlStatus = '<br><br><div><i class="fas fa-2x fa-exclamation-triangle pictowarning"></i> ' . $langs->trans('DontForgotAddSessionTrainerAndTrainee') . '</div>';
+                if (!empty($object->array_options['options_trainingsession_type']) && $error > 0) {
+                    $moreHtmlStatus = '<br><br><div><i class="fas fa-3x fa-exclamation-triangle pictowarning"></i> ' . $langs->trans('DontForgotAddSessionTrainerAndTrainee') . '</div>';
                     $this->resprints = $moreHtmlStatus;
                 }
             }
