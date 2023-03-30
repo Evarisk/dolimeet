@@ -126,7 +126,8 @@ class modDoliMeet extends DolibarrModules
 				'admincompany',
                 'saturneglobal',
                 'sessioncard',
-                'saturnepublicsignature'
+                'saturnepublicsignature',
+                'contractcard'
             ],
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 1,

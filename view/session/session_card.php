@@ -134,8 +134,9 @@ if (empty($reshook)) {
 
     // Action clone object
     if ($action == 'confirm_clone' && $confirm == 'yes') {
-        $options['label'] = GETPOST('clone_label');
-        $options['attendants'] = GETPOST('clone_attendants');
+        $options['label']               = GETPOST('clone_label');
+        $options['attendants']          = GETPOST('clone_attendants');
+        $options['contract_attendants'] = GETPOST('clone_attendants_from_contract');
         $result = $object->createFromClone($user, $object->id, $options);
         if ($result > 0) {
             header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $result . '&object_type=' . $object->element);
@@ -465,6 +466,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         $formquestionclone = [
             ['type' => 'text', 'name' => 'clone_label', 'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
             ['type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans('CloneAttendants'), 'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_attendants_from_contract', 'label' => $langs->trans('CloneAttendantsFromContract'), 'value' => 0],
         ];
         $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element)), $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
     }

@@ -229,17 +229,52 @@ class ActionsDolimeet
 
         // Do something only for the current context
         if (in_array($parameters['currentcontext'], ['saturneglobal', 'sessioncard'])) {
-            if (isModEnabled('contrat')) {
+            if (isModEnabled('contrat') && property_exists($object, 'fk_contrat')) {
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-                if (GETPOST('object_type') == 'trainingsession') {
-                    $morehtmlref = $langs->trans('Contract') . ' : ';
-                    if (!empty($object->fk_contrat)) {
-                        $contract = new Contrat($db);
-                        $contract->fetch($object->fk_contrat);
-                        $morehtmlref .= $contract->getNomUrl(1);
-                    }
-                    $morehtmlref .= '<br>';
-                    $this->resprints = $morehtmlref;
+                $morehtmlref = $langs->trans('Contract') . ' : ';
+                if (!empty($object->fk_contrat)) {
+                    $contract = new Contrat($db);
+                    $contract->fetch($object->fk_contrat);
+                    $morehtmlref .= $contract->getNomUrl(1);
+                }
+                $morehtmlref .= '<br>';
+                $this->resprints = $morehtmlref;
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     *  Overloading the saturneBannerTab function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function moreHtmlStatus(array $parameters, CommonObject $object): int
+    {
+        global $langs;
+
+        // Do something only for the current context
+        if ($parameters['currentcontext'] == 'contractcard') {
+            if (isModEnabled('contrat')) {
+                $error = 0;
+                $contactInternalSessionTrainerArray = $object->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
+                $contactInternalTraineeArray        = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
+                $contactExternalSessionTrainerArray = $object->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
+                $contactExternalTraineeArray        = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
+
+                if ((is_array($contactInternalSessionTrainerArray) && empty($contactInternalSessionTrainerArray)) && (is_array($contactExternalSessionTrainerArray) && empty($contactExternalSessionTrainerArray))) {
+                    $error++;
+                }
+                if ((is_array($contactInternalTraineeArray) && empty($contactInternalTraineeArray)) && (is_array($contactExternalTraineeArray) && empty($contactExternalTraineeArray))) {
+                    $error++;
+                }
+
+                if ($object->array_options['options_trainingsession_type'] <= 0 || $error > 0) {
+                    $moreHtmlStatus = '<br><br><div><i class="fas fa-2x fa-exclamation-triangle pictowarning"></i> ' . $langs->trans('DontForgotAddSessionTrainerAndTrainee') . '</div>';
+                    $this->resprints = $moreHtmlStatus;
                 }
             }
         }

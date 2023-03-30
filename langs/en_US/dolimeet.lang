@@ -70,25 +70,27 @@ Responsible = Responsable
 #
 
 # Data
-TrainingSession                = Training session
-Trainingsession                = Training session
-Trainingsessions               = training sessions
-TheTrainingsession             = the training session
-TrainingsessionList            = List of training sessions
-TrainingSessionList            = List of training sessions
-TrainingSessionCreate          = Create a training session
-Contract                       = Contract
-NewTrainingsession             = New training session
-ModifyTrainingsession          = Modify a training session
-TrainingSessionStart           = Start date of the training
-TrainingSessionEnd             = End date of the training
-ActionFormation                = Training action
-ActionFormationApprentissage   = Apprenticeship training action
-ActionVAE                      = VAE action
-BilanCompetences               = Skills assessment
-TrainingSessionType            = Type of training
-TrainingSessionLocation        = Location of the training
-TrainingsessionsCategoriesArea = Trainingsession tags/categories area
+TrainingSession                       = Training session
+Trainingsession                       = Training session
+Trainingsessions                      = training sessions
+TheTrainingsession                    = the training session
+TrainingsessionList                   = List of training sessions
+TrainingSessionList                   = List of training sessions
+TrainingSessionCreate                 = Create a training session
+Contract                              = Contract
+NewTrainingsession                    = New training session
+ModifyTrainingsession                 = Modify a training session
+TrainingSessionStart                  = Start date of the training
+TrainingSessionEnd                    = End date of the training
+ActionFormation                       = Training action
+ActionFormationApprentissage          = Apprenticeship training action
+ActionVAE                             = VAE action
+BilanCompetences                      = Skills assessment
+TrainingSessionType                   = Type of training
+TrainingSessionLocation               = Location of the training
+TrainingsessionsCategoriesArea        = Trainingsession tags/categories area
+DontForgotAddSessionTrainerAndTrainee = Remember to add at least one trainer and one trainee to the training contract.
+CloneAttendantsFromContract           = Clone contract participants
 
 # Attendant role
 SessionTrainer                              = Trainer
