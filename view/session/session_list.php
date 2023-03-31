@@ -137,7 +137,6 @@ if (!empty($fromtype)) {
             require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
             $objectLinked = new Societe($db);
             $search['fk_soc'] = $fromid;
-            $search['search_society_attendants'] = $fromid;
             break;
         case 'project' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
@@ -169,8 +168,8 @@ if (!empty($fromtype)) {
     if (!$error) {
         $objectLinked->fetch($fromid);
     }
-    $linkedObjectsArray = ['project', 'contrat'];
-    $signatoryObjectsArray = ['user', 'thirdparty', 'socpeople'];
+    $linkedObjectsArray = ['thirdparty', 'project', 'contrat'];
+    $signatoryObjectsArray = ['user', 'socpeople'];
 }
 
 // List of fields to search into when doing a "search in all"
@@ -648,7 +647,7 @@ foreach ($object->fields as $key => $val) {
                     print '</td>';
                 } elseif ($resource['label'] == 'SocietyAttendants') {
                     print '<td>';
-                    print $form->select_company($fromtype == 'thirdparty' ? $fromid : $search_society_attendants, 'search_society_attendants', '', 1);
+                    print $form->select_company($search_society_attendants, 'search_society_attendants', '', 1);
                     print '</td>';
                 }
             }
