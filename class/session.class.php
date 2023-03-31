@@ -62,16 +62,6 @@ class Session extends CommonObject
      */
     public string $picto = '';
 
-    /**
-     * @var array Label status of const.
-     */
-    public array $labelStatus;
-
-    /**
-     * @var array Label status short of const.
-     */
-    public array $labelStatusShort;
-
 	public const STATUS_DELETED = -1;
     public const STATUS_DRAFT = 0;
     public const STATUS_VALIDATED = 1;
