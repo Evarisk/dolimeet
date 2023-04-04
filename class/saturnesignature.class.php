@@ -70,16 +70,6 @@ class SaturneSignature extends CommonObject
      */
     public string $picto = '';
 
-    /**
-     * @var array Label status of const.
-     */
-    public array $labelStatus = [];
-
-    /**
-     * @var array Label status short of const.
-     */
-    public array $labelStatusShort = [];
-
     const STATUS_DELETED = -1;
     const STATUS_DRAFT = 0;
     const STATUS_REGISTERED = 1;
