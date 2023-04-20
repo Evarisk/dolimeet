@@ -115,14 +115,16 @@ TypeContact_contrat_external_TRAINEE        = Stagiaire
 #
 
 # Data - Donnée
-AttendanceSheetDocument           = Feuille de présence
-AttendanceSheetDocuments          = feuilles de présence
-attendancesheetdocument           = feuille de présence
-attendancesheetdocument.odt       = Feuille de présence
-CompletionCertificateDocument     = Certificat de réalisation
-CompletionCertificateDocuments    = certificats de réalisation
-completioncertificatedocument     = certificat de réalisation
-completioncertificatedocument.odt = Certificat de réalisation
+AttendanceSheetDocument                       = Feuille de présence
+AttendanceSheetDocuments                      = feuilles de présence
+attendancesheetdocument                       = feuille de présence
+attendancesheetdocument.odt                   = Feuille de présence
+DisplayAttendanceAbsentInSignature            = Affiche la présence absent dans le champ signature de la feuille de présence
+DisplayAttendanceAbsentInSignatureDescription = Affiche la présence absent si la personne est absente et qu'elle n'a pas signé
+CompletionCertificateDocument                 = Certificat de réalisation
+CompletionCertificateDocuments                = certificats de réalisation
+completioncertificatedocument                 = certificat de réalisation
+completioncertificatedocument.odt             = Certificat de réalisation
 
 
 
@@ -156,3 +158,4 @@ TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration
 SocietyAttendants                 = Tiers des participants externe
 ShowSignatureSpecimen             = Voir les signatures sur les documents specimens
 ShowSignatureSpecimenDescription  = Permet la visualisation des signatures sur les documents specimens
+Config                            = Configuration

@@ -107,14 +107,16 @@ TypeContact_contrat_external_TRAINEE        = Trainee
 #
 
 # Data
-AttendanceSheetDocument           = Attendance sheet
-AttendanceSheetDocuments          = attendance sheets
-attendancesheetdocument           = attendance sheet
-attendancesheetdocument.odt       = Attendance sheet
-CompletionCertificateDocument     = Certificate of completion
-CompletionCertificateDocuments    = certificates of completion
-completioncertificatedocument     = certificate of completion
-completioncertificatedocument.odt = Certificate of completion
+AttendanceSheetDocument                       = Attendance sheet
+AttendanceSheetDocuments                      = attendance sheets
+attendancesheetdocument                       = attendance sheet
+attendancesheetdocument.odt                   = Attendance sheet
+DisplayAttendanceAbsentInSignature            = Displays the absent presence in the signature field of the attendance sheet
+DisplayAttendanceAbsentInSignatureDescription = Displays the absent presence if the person is absent and has not signed
+CompletionCertificateDocument                 = Certificate of completion
+CompletionCertificateDocuments                = certificates of completion
+completioncertificatedocument                 = certificate of completion
+completioncertificatedocument.odt             = Certificate of completion
 
 
 
@@ -148,3 +150,4 @@ TrainingOrganizationNumberTooltip = Enter your registration number here if you a
 SocietyAttendants                 = Third party external participants
 ShowSpecimen                      = See signatures on specimen documents
 ShowSpecimenDescription           = Allows viewing of signatures on specimen documents
+Config                            = Configuration

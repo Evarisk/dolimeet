@@ -263,6 +263,27 @@ foreach ($types as $type => $documentData) {
 	print load_fiche_titre($langs->trans($type), '', $documentData['picto'], 0, $langs->trans($type));
 	print '<hr>';
 
+    print load_fiche_titre($langs->trans('Config'), '', '');
+
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Name') . '</td>';
+    print '<td>' . $langs->trans('Description') . '</td>';
+    print '<td class="center">' . $langs->trans('Status') . '</td>';
+    print '</tr>';
+
+    // Display attendance absent in signature.
+    print '<tr class="oddeven"><td>';
+    print  $langs->trans('DisplayAttendanceAbsentInSignature');
+    print '</td><td>';
+    print $langs->trans('DisplayAttendanceAbsentInSignatureDescription');
+    print '</td>';
+    print '<td class="center">';
+    print ajax_constantonoff('DOLIMEET_ATTENDANCESHEETDOCUMENT_DISPLAY_ATTENDANCE_ABSENT_IN_SIGNATURE');
+    print '</td>';
+    print '</tr>';
+    print '</table>';
+
 	print load_fiche_titre($langs->trans('NumberingModule'), '', '');
 
 	print '<table class="noborder centpercent">';

@@ -409,10 +409,10 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
                                             file_put_contents($tempdir . 'signature' . $k . '.png', $decodedImage);
                                             $tmparray['attendant_signature'] = $tempdir . 'signature' . $k . '.png';
                                         } else {
-                                            $tmparray['attendant_signature'] = '';
+                                            $tmparray['attendant_signature'] = (($conf->global->DOLIMEET_ATTENDANCESHEETDOCUMENT_DISPLAY_ATTENDANCE_ABSENT_IN_SIGNATURE && $objectSignatory->attendance == SaturneSignature::ATTENDANCE_ABSENT) ? $langs->trans('Absent') : '');
                                         }
 									} else {
-										$tmparray['attendant_signature'] = '';
+										$tmparray['attendant_signature'] = (($conf->global->DOLIMEET_ATTENDANCESHEETDOCUMENT_DISPLAY_ATTENDANCE_ABSENT_IN_SIGNATURE && $objectSignatory->attendance == SaturneSignature::ATTENDANCE_ABSENT) ? $langs->trans('Absent') : '');
 									}
 									foreach ($tmparray as $key => $value) {
 										try {

@@ -190,6 +190,7 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/dolimeet/documents/doctemplates/trainingsessiondocument/attendancesheetdocument/', '', 0, 'current'],
             $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/dolimeet/attendancesheetdocument/', '', 0, 'current'],
             $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_DEFAULT_MODEL', 'chaine', 'attendancesheetdocument_odt', '', 0, 'current'],
+            $i++ => ['DOLIMEET_ATTENDANCESHEETDOCUMENT_DISPLAY_ATTENDANCE_ABSENT_IN_SIGNATURE', 'integer', 0, '', 0, 'current'],
 
             // CONST COMPLETIONCERTIFICATE DOCUMENT
             $i++ => ['DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON', 'chaine', 'mod_completioncertificatedocument_standard', '', 0, 'current'],
