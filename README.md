@@ -3,13 +3,17 @@
 ## Informations
 
 - Numéro du module : 436304
-- Version :  1.0.0
-- Dernière mise à jour : 17/01/2023
+- Dernière mise à jour : 04/05/2023
 - Éditeur : [Evarisk](https://www.evarisk.com)
-- Compatibilité : Dolibarr 15.0.0 - 16.0.4
 - Thème : eldy
 - Licence : GPLv3
 - Disponible sur : Windows - MacOS - Linux
+
+## Version
+
+- Version :  1.1.0
+- Compatibilité : Dolibarr 15.0.0 - 16.0.4
+- Saturne framework : 1.0.0
 
 ## Liens
 
@@ -36,6 +40,7 @@
 
 - Depuis le menu "Déployer/Installer un module externe" de Dolibarr :
 - Glisser l'archive ZIP 'module_dolimeet-X.Y.Z' et cliquer sur "ENVOYER FICHIER"
+- Glisser l'archive ZIP 'module_saturne-X.Y.Z' et cliquer sur "ENVOYER FICHIER"
 - Activer le module dans la liste des Modules/Applications installés
 
 ### Méthode 2 :
@@ -43,4 +48,5 @@
 - Dans le dossier "dolibarr/htdocs/custom" copier la ligne suivante :
 ``` 
 git clone https://github.com/Evarisk/dolimeet.git
+git clone https://github.com/Evarisk/saturne.git
 ```
