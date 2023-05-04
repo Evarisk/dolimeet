@@ -202,7 +202,7 @@ if (empty($reshook)) {
         } else {
             $model = GETPOST('model', 'alpha');
         }
-        
+
         $moreparams['object'] = $object;
         $moreparams['user']   = $user;
 
@@ -217,7 +217,7 @@ if (empty($reshook)) {
             $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
             if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
                 foreach ($signatoriesArray as $objectSignatory) {
-                    if ($objectSignatory->role == 'Trainee') {
+                    if ($objectSignatory->role == 'Trainee' && $objectSignatory->attendance != $objectSignatory::ATTENDANCE_ABSENT) {
                         $moreparams['attendant'] = $objectSignatory;
                         $result = $sessiondocument->generateDocument((!empty($models) ? $models[1] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
                         if ($result <= 0) {
