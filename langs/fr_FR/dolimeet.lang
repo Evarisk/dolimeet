@@ -159,3 +159,4 @@ SocietyAttendants                 = Tiers des participants externe
 ShowSignatureSpecimen             = Voir les signatures sur les documents specimens
 ShowSignatureSpecimenDescription  = Permet la visualisation des signatures sur les documents specimens
 Config                            = Configuration
+SendMailSubject                   = [%s] Liens de signature pour %s %s

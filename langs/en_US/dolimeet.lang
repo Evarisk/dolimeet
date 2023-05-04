@@ -151,3 +151,4 @@ SocietyAttendants                 = Third party external participants
 ShowSpecimen                      = See signatures on specimen documents
 ShowSpecimenDescription           = Allows viewing of signatures on specimen documents
 Config                            = Configuration
+SendMailSubject                   = [%s] Signature links for %s %s
