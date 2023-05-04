@@ -674,16 +674,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         }
         $filelist = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC);
         if (!empty($filelist) && is_array($filelist)) {
-            $filetype = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
             foreach ($filelist as $file) {
                 if (!preg_match('/specimen/', $file['name'])) {
-                    if (preg_match('/attendancesheetdocument/', $file['name']) && $filetype['attendancesheetdocument'] == 0) {
-                        $files[] = $file['fullname'];
-                        $filetype['attendancesheetdocument'] = 1;
-                    } elseif (preg_match('/completioncertificatedocument/', $file['name']) && $filetype['completioncertificatedocument'] < $nbTrainee) {
-                        $files[] = $file['fullname'];
-                        $filetype['completioncertificatedocument']++;
-                    }
+                    $files[] = $file['fullname'];
                 }
             }
         }
