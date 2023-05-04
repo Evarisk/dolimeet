@@ -331,7 +331,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
         default :
             $attendantsRole = ['Attendant'];
     }
-    $alreadyAddedUsers = [];
+    $alreadyAddedSignatories = [];
 
     foreach ($attendantsRole as $attendantRole) {
         $signatories = $signatory->fetchSignatory($attendantRole, $object->id, $object->element);
@@ -487,7 +487,7 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 }
                 print '</td>';
                 print '</tr>';
-                $alreadyAddedUsers[$element->element_id] = $element->element_id;
+                $alreadyAddedSignatories[$element->element_type][$element->element_id] = $element->element_id;
             }
 
             if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
@@ -507,9 +507,10 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td>';
                 print '<td class=minwidth400">';
                 if ($selectedCompany <= 0) {
-                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, $alreadyAddedUsers, 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
+                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, $alreadyAddedSignatories['user'], 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
                 }
-                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
+
+                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedSignatories['socpeople'], '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
                 if (!empty($selectedCompany) && $selectedCompany > 0 && $user->rights->societe->creer) {
                     $newcardbutton = '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid=' . $selectedCompany . '&action=create&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&module_name=' . urlencode($moduleName) . '&object_type=' . urlencode($object->element) . '&newcompany' . $attendantRole . '=' . GETPOST('newcompany' . $attendantRole) . '&contactID=&#95;&#95;ID&#95;&#95;') . '" title="' . $langs->trans('NewContact') . '"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
                     print $newcardbutton;
@@ -563,9 +564,9 @@ if ($id > 0 || !empty($ref) && empty($action)) {
                 print '</td>';
                 print '<td class=minwidth400">';
                 if ($selectedCompany <= 0) {
-                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, $alreadyAddedUsers, 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
+                    print img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers('', 'attendant' . $attendantRole . 'user', 1, $alreadyAddedSignatories, 0, '', '', $conf->entity, 0, 0, '', 0, '', 'minwidth200 widthcentpercentminusx maxwidth300') . '<br>';
                 }
-                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedUsers, '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
+                print img_object('', 'contact', 'class="pictofixedwidth"') . $form->selectcontacts(($selectedCompany > 0 ? $selectedCompany : -1), GETPOST('contactID'), 'attendant' . $attendantRole . 'contact', 1, $alreadyAddedSignatories, '', 1, 'minwidth200 widthcentpercentminusx maxwidth300');
                 if (!empty($selectedCompany) && $selectedCompany > 0 && $user->rights->societe->creer) {
                     $newcardbutton = '<a href="'.DOL_URL_ROOT.'/contact/card.php?socid=' . $selectedCompany . '&action=create&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&module_name=' . urlencode($moduleName) . '&object_type=' . urlencode($object->element) . '&newcompany' . $attendantRole . '=' . GETPOST('newcompany' . $attendantRole) . '&contactID=&#95;&#95;ID&#95;&#95;') . '" title="' . $langs->trans('NewContact') . '"><span class="fa fa-plus-circle valignmiddle paddingleft"></span></a>';
                     print $newcardbutton;
