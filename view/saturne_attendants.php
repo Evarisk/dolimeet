@@ -185,16 +185,18 @@ if (empty($reshook)) {
                 if (dol_strlen($usertmp->email)) {
                     $signatory->email = $usertmp->email;
                     $signatory->update($user, true);
+                } else {
+                    setEventMessage($langs->trans('NoEmailSet', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), 'warnings');
                 }
             } elseif ($signatory->element_type == 'socpeople') {
                 $contact->fetch($signatory->element_id);
                 if (dol_strlen($contact->email)) {
                     $signatory->email = $contact->email;
                     $signatory->update($user, true);
+                } else {
+                    setEventMessage($langs->trans('NoEmailSet', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), 'warnings');
                 }
             }
-        } else {
-            setEventMessage($langs->trans('NoEmailSet', $langs->trans($signatory->role) . ' ' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname), 'warnings');
         }
 
         $sendto = $signatory->email;
