@@ -603,7 +603,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             if ($object->status == $object::STATUS_LOCKED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
                 $fileparams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
                 $file       = $fileparams['fullname'];
-                if (file_exists($file) && !preg_match('/specimen/', $fileparams['name'])) {
+                if (file_exists($file) && !strstr($fileparams['name'], 'specimen')) {
                     $forcebuilddoc = 0;
                 } else {
                     $forcebuilddoc = 1;
@@ -674,9 +674,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         }
         $filelist = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC);
         if (!empty($filelist) && is_array($filelist)) {
+            $filetype = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
             foreach ($filelist as $file) {
-                if (!preg_match('/specimen/', $file['name'])) {
-                    $files[] = $file['fullname'];
+                if (!strstr($file['name'], 'specimen')) {
+                    if (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('attendancesheetdocument'))) && $filetype['attendancesheetdocument'] == 0) {
+                        $files[] = $file['fullname'];
+                        $filetype['attendancesheetdocument'] = 1;
+                    } elseif (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('completioncertificatedocument'))) && $filetype['completioncertificatedocument'] < $nbTrainee) {
+                        $files[] = $file['fullname'];
+                        $filetype['completioncertificatedocument']++;
+                    }
                 }
             }
         }
