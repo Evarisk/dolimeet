@@ -601,14 +601,33 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
             // Send mail
             if ($object->status == $object::STATUS_LOCKED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-                $fileparams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
-                $file       = $fileparams['fullname'];
-                if (file_exists($file) && !strstr($fileparams['name'], 'specimen')) {
-                    $forcebuilddoc = 0;
+                $signatoriesArray = $signatory->fetchSignatory('Trainee', $object->id, $object->type);
+                if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
+                    $nbTrainee = count($signatoriesArray);
+                } else {
+                    $nbTrainee = 0;
+                }
+                $filelist = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC);
+                if (!empty($filelist) && is_array($filelist)) {
+                    $filetype = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
+                    foreach ($filelist as $file) {
+                        if (!strstr($file['name'], 'specimen')) {
+                            if (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('attendancesheetdocument'))) && $filetype['attendancesheetdocument'] == 0) {
+                                $filetype['attendancesheetdocument'] = 1;
+                            } elseif (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('completioncertificatedocument'))) && $filetype['completioncertificatedocument'] < $nbTrainee) {
+                                $filetype['completioncertificatedocument']++;
+                            }
+                        }
+                    }
+                    if ($filetype['attendancesheetdocument'] == 1 && $filetype['completioncertificatedocument'] == $nbTrainee) {
+                        $forcebuilddoc = 0;
+                    } else {
+                        $forcebuilddoc = 1;
+                    }
                 } else {
                     $forcebuilddoc = 1;
                 }
-            print '<a class="butAction" id="actionButtonSign" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle' . '"><i class="fas fa-paper-plane"></i> ' .  $langs->trans('SendMail') . '</a>';
+                print '<a class="butAction" id="actionButtonSign" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle' . '"><i class="fas fa-paper-plane"></i> ' .  $langs->trans('SendMail') . '</a>';
             } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '"><i class="fas fa-paper-plane"></i> ' . $langs->trans('SendMail') . '</span>';
             }
