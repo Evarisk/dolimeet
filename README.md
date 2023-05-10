@@ -3,7 +3,7 @@
 ## Informations
 
 - Numéro du module : 436304
-- Dernière mise à jour : 04/05/2023
+- Dernière mise à jour : 10/05/2023
 - Éditeur : [Evarisk](https://www.evarisk.com)
 - Thème : eldy
 - Licence : GPLv3
