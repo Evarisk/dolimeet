@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Theo David <theodavid.perso@gmail.com>
+# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,202 +14,149 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #
-# Generic
+# Générique
 #
 
-# Module label 'ModuleDoliMeetName'
-ModuleDoliMeetName = DoliMeet
-# Module description 'ModuleDoliMeetDesc'
-ModuleDoliMeetDesc = DoliMeet pour Dolibarr
+ModuleDoliMeetName      = DoliMeet
+ModuleDoliMeetDesc      = Suivi des réunions, sessions de formation, audit
+DoliMeetDescription     = Suivi des réunions, sessions de formation, audit
+DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 #
-# Admin page
+# DoliMeet
 #
-DoliMeetSetup = DoliMeet setup
-Settings = Réglages
+
+# Data - Donnée
+EnableDoliMeet = Veuillez activer le module DoliMeet pour accéder à cette page
+
+
 
 #
-# About page
+# Session - Session
 #
-About = About
-DoliMeetAbout = About DoliMeet
-DoliMeetAboutPage = DoliMeet about page
-ModuleConfiguration = Configuration du module
-DoliMeetSettings = Réglages de DoliMeet
-DoliMeetObjects = Objets de DoliMeet
-LinkedDocuments = Documents liés
-Hour(s) = Heure(s)
-Minute(s) = Minute(s)
-TrainingOrganizationNumber = Numéro de déclaration de l\'organisme de formation
+
+# Right - Droit
+ReadMyObject = Consulter mes %s (si affecté en tant que participant)
+
+# Data - Donnée
+SessionsMin             = sessions
+NewSession              = Nouvelle session
+SessionList             = Liste des sessions
+SessionTypes            = Types de session
+SessionNumberingModule  = Numérotation des sessions
+Schedules               = Horaires
+ContratSchedules        = Horaires de la formation
+SessionListOnProject    = Liste des sessions liées au projet
+EnableObjectDescription = Activer l'objet %s
+Content                 = Contenu
+SelectSessionType       = Sélectionner un type de session
+
+
+
+#
+# Meeting - Réunion
+#
+
+# Data - Donnée
+Meeting                = Réunion
+Meetings               = réunions
+TheMeeting             = la réunion
+MeetingList            = Liste des réunions
+MeetingCreate          = Créer une réunion
+NewMeeting             = Nouvelle réunion
+ModifyMeeting          = Modifier une réunion
+MeetingsCategoriesArea = Espace des tags/catégories des réunions
+
+# Attendant role - Rôle participant
+Contributor = Contributeur
+Responsible = Responsable
+
+
+
+#
+# Training Session - Session de formation
+#
+
+# Data - Donnée
+TrainingSession                       = Session de formation
+Trainingsession                       = Session de formation
+Trainingsessions                      = sessions de formation
+TheTrainingsession                    = la session de formation
+TrainingsessionList                   = Liste des sessions de formation
+TrainingSessionList                   = Liste des sessions de formation
+TrainingSessionCreate                 = Créer une session de formation
+Contract                              = Contrat
+NewTrainingsession                    = Nouvelle session de formation
+ModifyTrainingsession                 = Modifier une session de formation
+TrainingSessionStart                  = Date de début de la formation
+TrainingSessionEnd                    = Date de fin de la formation
+ActionFormation                       = Action de formation
+ActionFormationApprentissage          = Action de formation par apprentissage
+ActionVAE                             = Action de VAE
+BilanCompetences                      = Bilan de compétences
+TrainingSessionType                   = Type de formation
+TrainingSessionLocation               = Lieu de la formation
+TrainingsessionsCategoriesArea        = Espace des tags/catégories des sessions de formations
+DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un formateur et un stagiaire au contrat de formation.
+AttendantsFromContract                = Participants du contrat
+
+# Attendant role - Rôle participant
+SessionTrainer                              = Formateur
+Trainee                                     = Stagiaire
+TypeContact_contrat_internal_SESSIONTRAINER = Formateur
+TypeContact_contrat_external_SESSIONTRAINER = Formateur
+TypeContact_contrat_internal_TRAINEE        = Stagiaire
+TypeContact_contrat_external_TRAINEE        = Stagiaire
+
+
+
+#
+# Training Session Document - Document lié au session de formation
+#
+
+# Data - Donnée
+AttendanceSheetDocument                       = Feuille de présence
+AttendanceSheetDocuments                      = feuilles de présence
+attendancesheetdocument                       = feuille de présence
+attendancesheetdocument.odt                   = Feuille de présence
+DisplayAttendanceAbsentInSignature            = Affiche la présence absent dans le champ signature de la feuille de présence
+DisplayAttendanceAbsentInSignatureDescription = Affiche la présence absent si la personne est absente et qu'elle n'a pas signé
+CompletionCertificateDocument                 = Certificat de réalisation
+CompletionCertificateDocuments                = certificats de réalisation
+completioncertificatedocument                 = certificat de réalisation
+completioncertificatedocument.odt             = Certificat de réalisation
+
+
+
+#
+# Audit - Audit
+#
+
+# Data - Donnée
+Audit                = Audit
+AuditReport          = Audit
+Audits               = audits
+TheAudit             = l'audit
+AuditList            = Liste des audits
+AuditCreate          = Créer un audit
+NewAudit             = Nouvel audit
+ModifyAudit          = Modifier un audit
+AuditsCategoriesArea = Espace des tags/catégories des audits
+
+# Attendant role - Rôle participant
+Auditor = Auditeur
+
+
+
+#
+# Other
+#
+
+# Data - Donnée
+TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
-
-#
-# Session
-#
-MyWidget = My widget
-MyWidgetDescription = My widget description
-Tags = Catégories
-Thirdparty = Tiers
-ExternalIntervenants = Intervenants extérieurs
-Name = Nom
-Role = Rôle
-SignatureLink = Lien de signature
-SignatureDate = Date de signature
-LastEmailSentDate = Date d'envoi du mail de signature
-ContactLinked = Contact
-ProjectLinked = Projet lié
-NewSession = Nouvelle session
-SessionList = Liste des sessions
-SessionTypes = Types de session
-SessionNumberingModule = Numérotation des sessions
-SessionConfig = Configuration des sessions
-Deleted = Supprimé
-ValidatePendingSignature = Validé (en attente de signature)
-Signed = Signé
-Locked = Verrouillé
-SentByLetter = Envoyé par courrier
-SentByMail = Envoyé par email
-ReceivedAndSignedByMail = Reçu par mail et signé
-ReceivedAndSignedByLetter = Reçu par courrier et signé
-Registered = Inscrit
-SignatureRequest = Demande de signature envoyée
-PendingSignature = En attente de signature
-Denied = Refusé
-Unsigned = Non signé
-Absent = Absent
-JustifiedAbsent = Absence justifiée
-DurationH = Durée (en h)
-ContratOpeningHours = Horaires de la formation
-ObjectType = Type
-Object = Objet
-SessionTrainer = Formateur
-TRAININGSESSION_SESSION_TRAINER = Formateur
-TRAININGSESSION_SOCIETY_ATTENDANT = Participant
-SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
-SignatureEmailSubject = Signature de la feuille de présence
-
-
-#
-# Meeting
-#
-Meeting = Réunion
-MeetingList = Liste des réunions
-MeetingCreate = Créer une réunion
-MeetingAttendants = Participants - Réunion
-MeetingCreateTrigger = La réunion a été créée
-MeetingModifyTrigger = La réunion a été modifiée
-MeetingDeleteTrigger = La réunion a été supprimée
-CardMeeting = Fiche - Réunion
-AgendaMeeting = Agenda - Réunion
-NoteMeeting = Note - Réunion
-AttendantsMeeting = Participants - Réunion
-DocumentsMeeting = Fichiers joints - Réunion
-NewMeeting = Nouvelle réunion
-EnableMeetingDescription = Activer l'objet Réunion
-CloneMeeting = Cloner la réunion
-ConfirmCloneMeeting = Voulez-vous cloner cette réunion ?
-MeetingsCategoriesArea = Catégories de réunion
-
-#
-# Training Session
-#
-TrainingSession = Session de formation
-Trainingsession = Session de formation
-TrainingsessionList = Liste des sessions de formation
-TrainingSessionList = Liste des sessions de formation
-TrainingSessionCreate = Créer une session de formation
-ContractLinked = Contrat lié
-Contract = Contrat
-TrainingsessionAttendants = Participants - Session de formation
-TrainingSessionCreateTrigger = La session de formation a été créée
-TrainingSessionModifyTrigger = La session de formation a été modifiée
-TrainingSessionDeleteTrigger = La session de formation a été supprimée
-CardTrainingsession = Fiche - Session de formation
-AgendaTrainingsession = Agenda - Session de formation
-NoteTrainingsession = Note - Session de formation
-AttendantsTrainingsession = Participants - Session de formation
-DocumentsTrainingsession = Fichiers joints - Session de formation
-NewTrainingsession = Nouvelle session de formation
-EnableTrainingSessionDescription = Activer l'objet Session de Formation
-CloneTrainingsession = Cloner la session de formation
-ConfirmCloneTrainingsession = Voulez-vous cloner cette session de formation ?
-TrainingSessionStart = Date de début de la formation
-TrainingSessionEnd = Date de fin de la formation
-ActionFormation = Action de formation
-ActionFormationApprentissage = Action de formation par apprentissage
-ActionVAE = Action de VAE
-BilanCompetences = Bilan de compétences
-TrainingSessionType = Type de formation
-TrainingSessionLocation = Lieu de la formation
-TrainingsessionsCategoriesArea = Catégories de session de formation
-
-#
-# Audit
-#
-Audit = Audit
-AuditList = Liste des audits
-AuditCreate = Créer un audit
-AuditAttendants = Participants - Audit
-AuditCreateTrigger = L'audit a été créé
-AuditModifyTrigger = L'audit a été modifié
-AuditDeleteTrigger = L'audit a été supprimé
-CardAudit = Fiche - Audit
-AgendaAudit = Agenda - Audit
-NoteAudit = Note - Audit
-AttendantsAudit = Participants - Audit
-DocumentsAudit = Fichiers joints - Audit
-NewAudit = Nouvel audit
-EnableAuditDescription = Activer l'objet Audit
-CloneAudit = Cloner l'audit ?
-ConfirmCloneAudit = Voulez-vous cloner cet audit ?
-AuditsCategoriesArea = Catégories d'audit
-
-#
-# Attendants
-#
-
-Attendants = Participants
-NoSocietyAttendants = Pas de participant interne
-ExtSocietyIntervenants = Participants
-ExtSocietyIntervenant = Participant
-ExternalAttendants = Participants externes
-SocietyAttendants = Participants internes
-SocietyAttendant = Participant interne
-NoExternalAttendants = Pas d'intervenant externe
-AddAttendantTrigger = Ajout d'un participant : %s
-SendMailDate = Date d'envoi d'email
-ActionsSignature = Actions
-MEETING_EXTERNAL_ATTENDANTSigned = Signature de l'intervenant extérieur :
-AUDIT_EXTERNAL_ATTENDANTSigned = Signature de l'intervenant extérieur :
-TRAININGSESSION_EXTERNAL_ATTENDANTSigned = Signature de l'intervenant extérieur :
-MEETING_SOCIETY_ATTENDANTSigned = Signature du participant :
-AUDIT_SOCIETY_ATTENDANTSigned = Signature du participant :
-TRAININGSESSION_SOCIETY_ATTENDANTSigned = Signature du participant :
-DolimeetSignaturePendingSignatureTrigger = Envoi du mail de signature à
-DolimeetSignatureAbsentTrigger = Participant absent
-DolimeetSignatureDeletedTrigger = Suppression du participant
-SignatureEvent = Le participant a signé : %s
-ExternalAttendants = Participants externes
-AttendantThirdparties = Tiers concernés
-
-#
-# Triggers
-#
-
-
-#
-# Droits
-#
-
-ReadDoliMeetSession = Lire les sessions de DoliMeet
-WriteDoliMeetSession = Créer/mettre à jour les sessions de DoliMeet
-DeleteDoliMeetSession = Supprimer les sessions de DoliMeet
-ReadDoliMeetMeeting = Lire les réunions de DoliMeet
-WriteDoliMeetMeeting = Créer/mettre à jour les réunions de DoliMeet
-DeleteDoliMeetMeeting = Supprimer les réunions de DoliMeet
-ReadDoliMeetTrainingSession = Lire les sessions de formation de DoliMeet
-WriteDoliMeetTrainingSession = Créer/mettre à jour les sessions de formation de DoliMeet
-DeleteDoliMeetTrainingSession = Supprimer les sessions de formation de DoliMeet
-ReadDoliMeetAudit = Lire les audits de DoliMeet
-WriteDoliMeetAudit = Créer/mettre à jour les audits de DoliMeet
-DeleteDoliMeetAudit = Supprimer les audits de DoliMeet
+SocietyAttendants                 = Tiers des participants externe
+ShowSignatureSpecimen             = Voir les signatures sur les documents specimens
+ShowSignatureSpecimenDescription  = Permet la visualisation des signatures sur les documents specimens
+Config                            = Configuration
+SendMailSubject                   = [%s] Liens de signature pour %s %s

@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EVARISK <dev@evarisk.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,26 +13,25 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
 CREATE TABLE llx_dolimeet_session(
 	rowid         integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
 	ref           varchar(128) DEFAULT '(PROV)' NOT NULL,
 	ref_ext       varchar(128),
-    label         varchar(255),
     entity        integer DEFAULT 1 NOT NULL,
+    label         varchar(255),
     date_creation datetime NOT NULL,
-    date_start    datetime,
-    date_end      datetime,
+	tms           timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	import_key    varchar(14),
+    status        integer NOT NULL,
+    date_start    datetime NOT NULL,
+    date_end      datetime NOT NULL,
     duration      integer,
-	tms           timestamp,
-	import_key    varchar(128),
-    status        smallint,
     type          varchar(128),
+	content       text,
 	note_public   text,
 	note_private  text,
 	model_pdf     varchar(255),
 	last_main_doc varchar(255),
-	content       text,
 	document_url  varchar(255),
     fk_project    integer,
     fk_contrat    integer,

@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EVARISK <dev@evarisk.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -15,7 +15,9 @@
 
 ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_rowid (rowid);
 ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_ref (ref);
-ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_soc (fk_soc);
-ALTER TABLE llx_dolimeet_session ADD CONSTRAINT llx_dolimeet_session_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
 ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_status (status);
-
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_project (fk_project);
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_contract (fk_contract);
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_soc (fk_soc);
+ALTER TABLE llx_dolimeet_session ADD UNIQUE INDEX uk_dolimeet_session_ref (ref, entity);
+ALTER TABLE llx_dolimeet_session ADD CONSTRAINT llx_dolimeet_session_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);

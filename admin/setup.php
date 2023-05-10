@@ -1,6 +1,5 @@
 <?php
-/* Copyright (C) 2004-2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2022 Theo David <theodavid.perso@gmail.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,64 +16,38 @@
  */
 
 /**
- * \file    dolimeet/admin/setup.php
+ * \file    admin/setup.php
  * \ingroup dolimeet
  * \brief   DoliMeet setup page.
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) {
-	$res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+// Load DoliMeet environment
+if (file_exists('../dolimeet.main.inc.php')) {
+	require_once __DIR__ . '/../dolimeet.main.inc.php';
+} else {
+	die('Include of dolimeet main fails');
 }
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) {
-	$i--; $j--;
-}
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) {
-	$res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-}
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) {
-	$res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
-}
-// Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) {
-	$res = @include "../../main.inc.php";
-}
-if (!$res && file_exists("../../../main.inc.php")) {
-	$res = @include "../../../main.inc.php";
-}
-if (!$res) {
-	die("Include of main fails");
-}
-
-global $langs, $user;
-
 
 // Libraries
-require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
-require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 
 require_once __DIR__ . '/../lib/dolimeet.lib.php';
 
+// Global variables definitions
+global $db, $langs, $user;
+
+// Load translation files required by the page
+saturne_load_langs(['admin']);
+
+// Get parameters
 $action     = GETPOST('action', 'alpha');
-$backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
-
-// Translations
-$langs->loadLangs(array("admin", "dolimeet@dolimeet"));
-
-// Access control
-if ( ! $user->admin) accessforbidden();
-
-// Parameters
 $backtopage = GETPOST('backtopage', 'alpha');
 
-/*
- * Actions
- */
+// Security check - Protection if external user
+$permissiontoread = $user->rights->dolimeet->adminpage->read;
+saturne_check_access($permissiontoread);
 
 /*
  * View
@@ -82,44 +55,37 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 
-$help_url = '';
-$title    = $langs->trans("DoliMeetSettings");
+$title    = $langs->trans('ModuleSetup', 'DoliMeet');
+$help_url = 'FR:Module_DoliMeet';
 
-$morejs  = array("/dolimeet/js/dolimeet.js.php");
-$morecss = array("/dolimeet/css/dolimeet.css");
-
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0,'', $title, $help_url);
 
 // Subheader
-$linkback = '<a href="' . ($backtopage ? $backtopage : DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
-
-print load_fiche_titre($title, $linkback, 'dolimeet32px@dolimeet');
+$linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans('BackToModuleList') . '</a>';
+print load_fiche_titre($title, $linkback, 'dolimeet_color@dolimeet');
 
 // Configuration header
-$head = dolimeetAdminPrepareHead();
-print dol_get_fiche_head($head, 'settings', '', -1, "dolimeet@dolimeet");
+$head = dolimeet_admin_prepare_head();
+print dol_get_fiche_head($head, 'settings', $title, -1, 'dolimeet_color@dolimeet');
 
-
-// RISKS
-
-print load_fiche_titre('<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans('SessionConfig'), '', '');
+print load_fiche_titre($langs->trans('Configs', $langs->trans('SessionsMin')), '', '');
 print '<hr>';
 
 
-print load_fiche_titre($langs->trans("SessionNumberingModule"), '', '');
+print load_fiche_titre($langs->trans('SessionNumberingModule'), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="nowrap">' . $langs->trans("Example") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
-print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="nowrap">' . $langs->trans('Example') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
+print '<td class="center">' . $langs->trans('ShortInfo') . '</td>';
 print '</tr>';
 
 clearstatcache();
 
-$dir = dol_buildpath("/custom/dolimeet/core/modules/dolimeet/");
+$dir = dol_buildpath('/custom/dolimeet/core/modules/dolimeet/session/');
 if (is_dir($dir)) {
 	$handle = opendir($dir);
 	if (is_resource($handle)) {
@@ -154,18 +120,18 @@ if (is_dir($dir)) {
 						print '<td class="center">';
 						$numbering_module = 'DOLIMEET_' . strtoupper($module->name) . '_ADDON';
 						if ($conf->global->$numbering_module == $file || $conf->global->$numbering_module . '.php' == $file) {
-							print img_picto($langs->trans("Activated"), 'switch_on');
+							print img_picto($langs->trans('Activated'), 'switch_on');
 						} else {
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
+							print '<a class="reposition" href="' . $_SERVER['PHP_SELF'] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans('Default') . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
 						}
 						print '</td>';
 
 						// Example for listing risks action
 						$htmltooltip  = '';
-						$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
+						$htmltooltip .= '' . $langs->trans('Version') . ': <b>' . $module->getVersion() . '</b><br>';
 						$nextval      = $module->getNextValue($object_document);
-						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-							$htmltooltip .= $langs->trans("NextValue") . ': ';
+						if ("$nextval" != $langs->trans('NotAvailable')) {  // Keep " on nextval
+							$htmltooltip .= $langs->trans('NextValue') . ': ';
 							if ($nextval) {
 								if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
 									$nextval  = $langs->trans($nextval);
@@ -192,19 +158,19 @@ if (is_dir($dir)) {
 
 print '</table>';
 
-print load_fiche_titre($langs->trans("SessionTypes"), '', '');
+print load_fiche_titre($langs->trans('SessionTypes'), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('Meeting');
-print "</td><td>";
-print $langs->trans('EnableMeetingDescription');
+print '</td><td>';
+print $langs->trans('EnableObjectDescription', $langs->transnoentities('Meeting'));
 print '</td>';
 
 print '<td class="center">';
@@ -214,8 +180,8 @@ print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('TrainingSession');
-print "</td><td>";
-print $langs->trans('EnableTrainingSessionDescription');
+print '</td><td>';
+print $langs->trans('EnableObjectDescription', $langs->trans('TrainingSession'));
 print '</td>';
 
 print '<td class="center">';
@@ -225,8 +191,8 @@ print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('Audit');
-print "</td><td>";
-print $langs->trans('EnableAuditDescription');
+print '</td><td>';
+print $langs->trans('EnableObjectDescription', $langs->trans('Audit'));
 print '</td>';
 
 print '<td class="center">';

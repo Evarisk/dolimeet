@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Theo David <theodavid.perso@gmail.com>
+# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,40 +14,141 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #
-# Generic
+# DoliMeet
 #
 
-# Module label 'ModuleDoliMeetName'
-ModuleDoliMeetName = DoliMeet
-# Module description 'ModuleDoliMeetDesc'
-ModuleDoliMeetDesc = DoliMeet description
-
-#
-# Admin page
-#
-DoliMeetSetup = DoliMeet setup
-Settings = Settings
-DoliMeetSetupPage = DoliMeet setup page
-DOLIMEET_MYPARAM1 = My param 1
-DOLIMEET_MYPARAM1Tooltip = My param 1 tooltip
-DOLIMEET_MYPARAM2=My param 2
-DOLIMEET_MYPARAM2Tooltip=My param 2 tooltip
+ModuleDoliMeetName      = DoliMeet
+ModuleDoliMeetDesc      = Follow-up of meetings, training sessions, audits
+DoliMeetDescription     = Follow-up of meetings, training sessions, audits
+DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 
 
 #
-# About page
+# Session
 #
-About = About
-DoliMeetAbout = About DoliMeet
-DoliMeetAboutPage = DoliMeet about page
+
+# Right - Droit
+ReadMyObject = Read my %s (if assigned as a participant)
+
+# Data - Donnée
+SessionsMin             = sessions
+NewSession              = New session
+SessionList             = List of sessions
+SessionTypes            = Session types
+SessionNumberingModule  = Numbering of sessions
+Schedules               = Schedules
+ContratSchedules        = Training schedule
+SessionListOnProject    = List of sessions related to the project
+EnableObjectDescription = Activate object %s
+Content                 = Content
+SelectSessionType       = Select a session type
+
+
 
 #
-# Sample page
+# Meeting
 #
-MyPageName = My page name
+
+# Data - Donnée
+Meeting                = Meeting
+Meetings               = meetings
+TheMeeting             = the meeting
+MeetingList            = List of meetings
+MeetingCreate          = Create a meeting
+NewMeeting             = New meeting
+ModifyMeeting          = Modify a meeting
+MeetingsCategoriesArea = Meeting tags/categories area
+
+# Attendant role - Rôle participant
+Contributor = Contributeur
+Responsible = Responsable
+
+
 
 #
-# Sample widget
+# Training Session
 #
-MyWidget = My widget
-MyWidgetDescription = My widget description
+
+# Data
+TrainingSession                       = Training session
+Trainingsession                       = Training session
+Trainingsessions                      = training sessions
+TheTrainingsession                    = the training session
+TrainingsessionList                   = List of training sessions
+TrainingSessionList                   = List of training sessions
+TrainingSessionCreate                 = Create a training session
+Contract                              = Contract
+NewTrainingsession                    = New training session
+ModifyTrainingsession                 = Modify a training session
+TrainingSessionStart                  = Start date of the training
+TrainingSessionEnd                    = End date of the training
+ActionFormation                       = Training action
+ActionFormationApprentissage          = Apprenticeship training action
+ActionVAE                             = VAE action
+BilanCompetences                      = Skills assessment
+TrainingSessionType                   = Type of training
+TrainingSessionLocation               = Location of the training
+TrainingsessionsCategoriesArea        = Trainingsession tags/categories area
+DontForgotAddSessionTrainerAndTrainee = Remember to add at least one trainer and one trainee to the training contract.
+AttendantsFromContract                = Contract participants
+
+# Attendant role
+SessionTrainer                              = Trainer
+Trainee                                     = Trainee
+TypeContact_contrat_internal_SESSIONTRAINER = Trainer
+TypeContact_contrat_external_SESSIONTRAINER = Trainer
+TypeContact_contrat_internal_TRAINEE        = Trainee
+TypeContact_contrat_external_TRAINEE        = Trainee
+
+
+
+#
+# Training Session Document
+#
+
+# Data
+AttendanceSheetDocument                       = Attendance sheet
+AttendanceSheetDocuments                      = attendance sheets
+attendancesheetdocument                       = attendance sheet
+attendancesheetdocument.odt                   = Attendance sheet
+DisplayAttendanceAbsentInSignature            = Displays the absent presence in the signature field of the attendance sheet
+DisplayAttendanceAbsentInSignatureDescription = Displays the absent presence if the person is absent and has not signed
+CompletionCertificateDocument                 = Certificate of completion
+CompletionCertificateDocuments                = certificates of completion
+completioncertificatedocument                 = certificate of completion
+completioncertificatedocument.odt             = Certificate of completion
+
+
+
+#
+# Audit
+#
+
+# Data
+Audit                = Audit
+AuditReport          = Audit
+Audits               = audits
+TheAudit             = the audit
+AuditList            = List of audits
+AuditCreate          = Create an audit
+NewAudit             = New audit
+ModifyAudit          = Modifying an audit
+AuditsCategoriesArea = Audit tags/categories area
+
+# Attendant role
+Auditor = Auditor
+
+
+
+#
+# Other
+#
+
+# Data
+TrainingOrganizationNumber        = Declaration number of the training organisation
+TrainingOrganizationNumberTooltip = Enter your registration number here if you are recognised as a training organisation
+SocietyAttendants                 = Third party external participants
+ShowSpecimen                      = See signatures on specimen documents
+ShowSpecimenDescription           = Allows viewing of signatures on specimen documents
+Config                            = Configuration
+SendMailSubject                   = [%s] Signature links for %s %s

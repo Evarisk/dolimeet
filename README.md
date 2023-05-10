@@ -1,74 +1,52 @@
-# DOLIMEET - Suivi des réunions, sessions de formation, audits pour [DOLIBARR ERP CRM](https://www.dolibarr.org)
+# DoliMeet sur [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
-## Description du module
+## Informations
 
-Dolimeet permet de suivre :
-- Réunions et compte rendu
-- Sessions de formation avec attestions de présence et certification de réalisation
-- Audits avec le compte rendu
+- Numéro du module : 436304
+- Dernière mise à jour : 10/05/2023
+- Éditeur : [Evarisk](https://www.evarisk.com)
+- Thème : eldy
+- Licence : GPLv3
+- Disponible sur : Windows - MacOS - Linux
 
-## Traduction / translate
+## Version
 
-Les traductions sont modifiables dans le répertoire langs 
-Translations can be completed manually by editing files into directories *langs*.
+- Version :  1.1.0
+- Compatibilité : Dolibarr 15.0.0 - 16.0.4
+- Saturne framework : 1.0.0
+
+## Liens
+
+- Support & Assistance : [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
+- Demo : [Demo DoliMeet](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
+- Documentation : [Wiki DoliMeet](https://wiki.dolibarr.org/index.php/Module_DoliMeet)
+- Projet GitHub : [Projet DoliMeet](https://github.com/Evarisk/dolimeet/projects?query=is%3Aopen)
+- D'autres modules développés par Evarisk disponibles sur [DoliStore.com](https://www.dolistore.com)
+
+## Fonctionnalités
+
+- Réunions et compte-rendus
+- Sessions de formation avec attestation de présence et certificat de réalisation
+- Audits et compte-rendus
+
+## Traductions
+
+- Français
+- Anglais
 
 ## Installation
 
-### From the ZIP file and GUI interface
+### Méthode 1 :
 
-- If you get the module in a zip file (like when downloading it from the market place [Dolistore](https://www.dolistore.com)), go into
-menu ```Home - Setup - Modules - Deploy external module``` and upload the zip file.
+- Depuis le menu "Déployer/Installer un module externe" de Dolibarr :
+- Glisser l'archive ZIP 'module_dolimeet-X.Y.Z' et cliquer sur "ENVOYER FICHIER"
+- Glisser l'archive ZIP 'module_saturne-X.Y.Z' et cliquer sur "ENVOYER FICHIER"
+- Activer le module dans la liste des Modules/Applications installés
 
-Note: If this screen tell you there is no custom directory, check your setup is correct:
+### Méthode 2 :
 
-- In your Dolibarr installation directory, edit the ```htdocs/conf/conf.php``` file and check that following lines are not commented:
-
-    ```php
-    //$dolibarr_main_url_root_alt ...
-    //$dolibarr_main_document_root_alt ...
-    ```
-
-- Uncomment them if necessary (delete the leading ```//```) and assign a sensible value according to your Dolibarr installation
-
-    For example :
-
-    - UNIX:
-        ```php
-        $dolibarr_main_url_root_alt = '/custom';
-        $dolibarr_main_document_root_alt = '/var/www/Dolibarr/htdocs/custom';
-        ```
-
-    - Windows:
-        ```php
-        $dolibarr_main_url_root_alt = '/custom';
-        $dolibarr_main_document_root_alt = 'C:/My Web Sites/Dolibarr/htdocs/custom';
-        ```
-
-### From a GIT repository
-
-- Clone the repository in ```$dolibarr_main_document_root_alt/dolimeet```
-
-```sh
-cd ....../custom
-git clone git@github.com:gitlogin/dolimeet.git dolimeet
+- Dans le dossier "dolibarr/htdocs/custom" copier la ligne suivante :
+``` 
+git clone https://github.com/Evarisk/dolimeet.git
+git clone https://github.com/Evarisk/saturne.git
 ```
-
-### <a name="final_steps"></a>Final steps
-
-From your browser:
-
-  - Log into Dolibarr as a super-administrator
-  - Go to "Setup" -> "Modules"
-  - You should now be able to find and enable the module
-
--->
-
-## Licenses
-
-### Main code
-
-GPLv3 or (at your option) any later version. See file COPYING for more information.
-
-### Documentation
-
-All texts and readmes are licensed under GFDL.

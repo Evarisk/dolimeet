@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EVARISK <dev@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,15 +40,14 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 	 *
 	 * @param DoliDB $db Database handler
 	 */
-	public function __construct($db)
+	public function __construct(DoliDB $db)
 	{
-		$this->db = $db;
+        parent::__construct($db);
 
-		$this->name = preg_replace('/^Interface/i', '', get_class($this));
-		$this->family = "demo";
-		$this->description = "DoliMeet triggers.";
-		$this->version = '1.0.2';
-		$this->picto = 'dolimeet@dolimeet';
+		$this->family      = 'demo';
+		$this->description = 'DoliMeet triggers.';
+		$this->version     = '1.1.0';
+		$this->picto       = 'dolimeet@dolimeet';
 	}
 
 	/**
@@ -56,9 +55,9 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 	 *
 	 * @return string Name of trigger file
 	 */
-	public function getName()
-	{
-		return $this->name;
+	public function getName(): string
+    {
+        return parent::getName();
 	}
 
 	/**
@@ -66,311 +65,216 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 	 *
 	 * @return string Description of trigger file
 	 */
-	public function getDesc()
-	{
-		return $this->description;
+	public function getDesc(): string
+    {
+        return parent::getDesc();
 	}
 
-	/**
-	 * Function called when a Dolibarrr business event is done.
-	 * All functions "runTrigger" are triggered if file
-	 * is inside directory core/triggers
-	 *
-	 * @param string 		$action 	Event action code
-	 * @param CommonObject 	$object 	Object
-	 * @param User 			$user 		Object user
-	 * @param Translate 	$langs 		Object langs
-	 * @param Conf 			$conf 		Object conf
-	 * @return int              		<0 if KO, 0 if no triggered ran, >0 if OK
-	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
+    /**
+     * Function called when a Dolibarr business event is done.
+     * All functions "runTrigger" are triggered if file
+     * is inside directory core/triggers
+     *
+     * @param  string       $action Event action code
+     * @param  CommonObject $object Object
+     * @param  User         $user   Object user
+     * @param  Translate    $langs  Object langs
+     * @param  Conf         $conf   Object conf
+     * @return int                  0 < if KO, 0 if no triggered ran, >0 if OK
+     * @throws Exception
+     */
+	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf): int
 	{
-		//echo '<pre>'; print_r( $conf ); echo '</pre>'; exit;
-		if (empty($conf->dolimeet->enabled)) return 0; // If module is not enabled, we do nothing
+		if (!isModEnabled('dolimeet')) {
+            return 0; // If module is not enabled, we do nothing
+        }
 
 		// Data and type of action are stored into $object and $action
-		switch ($action) {
+        dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . '. id=' . $object->id);
 
-			// Meeting
+        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        $now = dol_now();
+        $actioncomm = new ActionComm($this->db);
+
+        $actioncomm->elementtype = $object->element . '@dolimeet';
+        $actioncomm->type_code   = 'AC_OTH_AUTO';
+        $actioncomm->datep       = $now;
+        $actioncomm->fk_element  = $object->id;
+        $actioncomm->userownerid = $user->id;
+        $actioncomm->percentage  = -1;
+
+        switch ($action) {
 			case 'MEETING_CREATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'meeting@dolimeet';
-				$actioncomm->code        = 'AC_MEETING_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('MeetingCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'MEETING_MODIFY' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'meeting@dolimeet';
-				$actioncomm->code        = 'AC_MEETING_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('MeetingModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
+            case 'AUDIT_CREATE' :
+				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
+				$actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
 
-			case 'MEETING_DELETE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
+            case 'TRAININGSESSION_CREATE' :
+                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
-				$actioncomm->elementtype = 'meeting@dolimeet';
-				$actioncomm->code        = 'AC_MEETING_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('MeetingDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+                require_once __DIR__ . '/../../class/saturnesignature.class.php';
 
+                $contract  = new Contrat($this->db);
+                $signatory = new SaturneSignature($this->db);
+
+                $contract->fetch($object->fk_contrat);
+
+                $attendantInternalSessionTrainerArray = $contract->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
+                $attendantInternalTraineeArray        = $contract->liste_contact(-1, 'internal', 0, 'TRAINEE');
+                $attendantExternalSessionTrainerArray = $contract->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
+                $attendantExternalTraineeArray        = $contract->liste_contact(-1, 'external', 0, 'TRAINEE');
+
+                $attendantArray = array_merge(
+                    (is_array($attendantInternalSessionTrainerArray) ? $attendantInternalSessionTrainerArray : []),
+                    (is_array($attendantInternalTraineeArray) ? $attendantInternalTraineeArray : []),
+                    (is_array($attendantExternalSessionTrainerArray) ? $attendantExternalSessionTrainerArray : []),
+                    (is_array($attendantExternalTraineeArray) ? $attendantExternalTraineeArray : [])
+                );
+
+                foreach ($attendantArray as $attendant) {
+                    if ($attendant['code'] == 'TRAINEE') {
+                        $attendantRole = 'Trainee';
+                    } else {
+                        $attendantRole = 'SessionTrainer';
+                    }
+                    $signatory->setSignatory($object->id, $object->element, (($attendant['source'] == 'internal') ? 'user' : 'socpeople'), [$attendant['id']], $attendantRole, 1);
+                }
+
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
+                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
+
+            case 'MEETING_MODIFY' :
+            case 'TRAININGSESSION_MODIFY' :
+            case 'AUDIT_MODIFY' :
+				$actioncomm->code  = 'AC_' . strtoupper($object->element) . '_MODIFY';
+				$actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
 
-			// TrainingSession
-			case 'TRAININGSESSION_CREATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'trainingsession@dolimeet';
-				$actioncomm->code        = 'AC_TRAININGSESSION_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('TrainingSessionCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'TRAININGSESSION_MODIFY' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'trainingsession@dolimeet';
-				$actioncomm->code        = 'AC_TRAININGSESSION_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('TrainingSessionModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
+            case 'MEETING_DELETE' :
+            case 'TRAININGSESSION_DELETE' :
+            case 'AUDIT_DELETE' :
+				$actioncomm->code  = 'AC_ ' . strtoupper($object->element) . '_DELETE';
+				$actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)));
 				$actioncomm->create($user);
 				break;
 
-			case 'TRAININGSESSION_DELETE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
+            case 'MEETING_VALIDATE' :
+            case 'TRAININGSESSION_VALIDATE' :
+            case 'AUDIT_VALIDATE' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_VALIDATE';
+                $actioncomm->label = $langs->trans('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
 
-				$actioncomm->elementtype = 'trainingsession@dolimeet';
-				$actioncomm->code        = 'AC_TRAININGSESSION_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('TrainingSessionDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+            case 'MEETING_UNVALIDATE' :
+            case 'TRAININGSESSION_UNVALIDATE' :
+            case 'AUDIT_UNVALIDATE' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_UNVALIDATE';
+                $actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities(ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
 
-				$actioncomm->create($user);
-				break;
+            case 'MEETING_LOCKED' :
+            case 'TRAININGSESSION_LOCKED' :
+            case 'AUDIT_LOCKED' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_LOCKED';
+                $actioncomm->label = $langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
 
-			// Audit
-			case 'AUDIT_CREATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
+            case 'MEETING_ARCHIVED' :
+            case 'TRAININGSESSION_ARCHIVED' :
+            case 'AUDIT_ARCHIVED' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_ARCHIVED';
+                $actioncomm->label = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities(ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
 
-				$actioncomm->elementtype = 'audit@dolimeet';
-				$actioncomm->code        = 'AC_AUDIT_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AuditCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+            case 'MEETING_SENTBYMAIL' :
+            case 'TRAININGSESSION_SENTBYMAIL' :
+            case 'AUDIT_SENTBYMAIL' :
+                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_SENTBYMAIL';
+                $actioncomm->label = $langs->trans('ObjectSentByMailTrigger', $langs->transnoentities(ucfirst($object->element)));
+                $actioncomm->create($user);
+                break;
 
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'AUDIT_MODIFY' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'audit@dolimeet';
-				$actioncomm->code        = 'AC_AUDIT_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AuditModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'AUDIT_DELETE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'audit@dolimeet';
-				$actioncomm->code        = 'AC_AUDIT_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AuditDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-
-			case 'SESSION_ADDATTENDANT' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype       = $object->object_type . '@dolimeet';
-				$actioncomm->code              = 'AC_SESSION_ADDATTENDANT';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('AddAttendantTrigger', $object->firstname . ' ' . $object->lastname);
-				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				}
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'DOLIMEETSIGNATURE_SIGNED' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
+			case 'SATURNESIGNATURE_ADDATTENDANT' :
 				$actioncomm->elementtype = $object->object_type . '@dolimeet';
-				$actioncomm->code        = 'AC_DOLIMEETSIGNATURE_SIGNED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-
-				$actioncomm->label = $langs->transnoentities($object->role . 'Signed') . ' : ' . $object->firstname . ' ' . $object->lastname;
-
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_ADDATTENDANT';
+				$actioncomm->label       = $langs->transnoentities('AddAttendantTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                if ($object->element_type == 'socpeople') {
+                    $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
+                }
+                $actioncomm->fk_element = $object->fk_object;
+				$actioncomm->create($user);
+				break;
+			case 'SATURNESIGNATURE_SIGNED' :
+				$actioncomm->elementtype = $object->object_type . '@dolimeet';
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_SIGNED';
+				$actioncomm->label       = $langs->transnoentities('SignedTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                if ($object->element_type == 'socpeople') {
+                    $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
+                }
+                $actioncomm->fk_element = $object->fk_object;
+				$actioncomm->create($user);
+                break;
+            case 'SATURNESIGNATURE_SIGNED_PUBLIC' :
+                $actioncomm->elementtype = $object->object_type . '@dolimeet';
+                $actioncomm->code        = 'AC_SATURNESIGNATURE_SIGNED_PUBLIC';
+                $actioncomm->label       = $langs->transnoentities('SignedTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                if ($object->element_type == 'socpeople') {
+                    $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
+                }
+                $actioncomm->fk_element = $object->fk_object;
+                $actioncomm->userownerid = $object->element_id;
+                $actioncomm->create($user);
+                break;
+			case 'SATURNESIGNATURE_PENDING_SIGNATURE' :
+				$actioncomm->elementtype = $object->object_type . '@dolimeet';
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_PENDING_SIGNATURE';
+				$actioncomm->label       = $langs->transnoentities('PendingSignatureTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
 				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+					$actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
 				}
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-
-			case 'DOLIMEETSIGNATURE_PENDING_SIGNATURE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype       = $object->object_type . '@dolimeet';
-				$actioncomm->code              = 'AC_DOLIMEETSIGNATURE_PENDING_SIGNATURE';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DolimeetSignaturePendingSignatureTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
+            case 'SATURNESIGNATURE_ATTENDANCE_DELAY' :
+                $actioncomm->elementtype = $object->object_type . '@dolimeet';
+                $actioncomm->code        = 'AC_SATURNESIGNATURE_ATTENDANCE_DELAY';
+                $actioncomm->label       = $langs->transnoentities('AttendanceDelayTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                if ($object->element_type == 'socpeople') {
+                    $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
+                }
+                $actioncomm->fk_element = $object->fk_object;
+                $actioncomm->create($user);
+                break;
+			case 'SATURNESIGNATURE_ATTENDANCE_ABSENT' :
+				$actioncomm->elementtype = $object->object_type . '@dolimeet';
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_ATTENDANCE_ABSENT';
+				$actioncomm->label       = $langs->transnoentities('AttendanceAbsentTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
 				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+					$actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
 				}
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-
-			case 'DOLIMEETSIGNATURE_ABSENT' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype       = $object->object_type . '@dolimeet';
-				$actioncomm->code              = 'AC_DOLIMEETSIGNATURE_ABSENT';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DolimeetSignatureAbsentTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				}
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
+			case 'SATURNESIGNATURE_DELETED' :
+				$actioncomm->elementtype = $object->object_type . '@dolimeet';
+				$actioncomm->code        = 'AC_SATURNESIGNATURE_DELETED';
+				$actioncomm->label       = $langs->transnoentities('DeletedTrigger', $langs->trans($object->role) . ' ' . strtoupper($object->lastname) . ' ' . $object->firstname);
+                if ($object->element_type == 'socpeople') {
+                    $actioncomm->socpeopleassigned = [$object->element_id => $object->element_id];
+                }
+                $actioncomm->fk_element = $object->fk_object;
 				$actioncomm->create($user);
 				break;
-
-			case 'DOLIMEETSIGNATURE_DELETED' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype       = $object->object_type . '@dolimeet';
-				$actioncomm->code              = 'AC_DOLIMEETSIGNATURE_DELETED';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DolimeetSignatureDeletedTrigger') . ' : ' . $object->firstname . ' ' . $object->lastname;
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			default:
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				break;
-		}
-
-
+        }
 		return 0;
 	}
 }

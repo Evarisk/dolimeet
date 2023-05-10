@@ -21,229 +21,246 @@
  *       \brief      Public page to add signature
  */
 
-if ( ! defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
-if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
-if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
-if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
-if ( ! defined('NOLOGIN'))        define("NOLOGIN", 1);           // This means this output page does not require to be logged.
-if ( ! defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1);       // We accept to go on this page from external web site.
-if ( ! defined('NOIPCHECK'))		define('NOIPCHECK', '1');      // Do not check IP defined into conf $dolibarr_main_restrict_ip
-if ( ! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
+if (!defined('NOREQUIREUSER')) {
+    define('NOREQUIREUSER', '1');
+}
+if (!defined('NOTOKENRENEWAL')) {
+    define('NOTOKENRENEWAL', '1');
+}
+if (!defined('NOREQUIREMENU')) {
+    define('NOREQUIREMENU', 1);
+}
+if (!defined('NOREQUIREHTML')) {
+    define('NOREQUIREHTML', '1');
+}
+if (!defined('NOLOGIN')) { // This means this output page does not require to be logged.
+    define('NOLOGIN', '1');
+}
+if (!defined('NOCSRFCHECK')) { // We accept to go on this page from external website.
+    define('NOCSRFCHECK', '1');
+}
+if (!defined('NOIPCHECK')) { // Do not check IP defined into conf $dolibarr_main_restrict_ip
+    define('NOIPCHECK', '1');
+}
+if (!defined('NOBROWSERNOTIF')) {
+    define('NOBROWSERNOTIF', '1');
+}
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DoliMeet environment
+if (file_exists('../../dolimeet.main.inc.php')) {
+    require_once __DIR__ . '/../../dolimeet.main.inc.php';
+} else {
+    die('Include of dolimeet main fails');
+}
 
+// Get module parameters
+$objectType = GETPOST('object_type', 'alpha');
+
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 
-require_once __DIR__ . '/../../class/trainingsession.class.php';
-require_once __DIR__ . '/../../class/meeting.class.php';
-require_once __DIR__ . '/../../class/audit.class.php';
-require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+require_once __DIR__ . '/../../class/saturnesignature.class.php';
+require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
+require_once __DIR__ . '/../../lib/dolimeet_functions.lib.php';
+
+// Global variables definitions
+global $conf, $db, $hookmanager, $langs;
 
 // Load translation files required by the page
-$langs->loadLangs(array("dolimeet@dolimeet", "other", "errors"));
+saturne_load_langs();
 
 // Get parameters
 $track_id = GETPOST('track_id', 'alpha');
 $action   = GETPOST('action', 'aZ09');
 $source   = GETPOST('source', 'aZ09');
-$type     = GETPOST('type', 'aZ09');
-$url      = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
 
 // Initialize technical objects
-$user = new User($db);
+$classname       = ucfirst($objectType);
+$object          = new $classname($db);
+$sessiondocument = new SessionDocument($db, $objectType);
+$signatory       = new SaturneSignature($db);
+$user            = new User($db);
 
-switch ($type) {
-	case 'meeting':
-		$object         = new Meeting($db);
-		$signatory      = new MeetingSignature($db);
-		break;
-	case 'trainingsession':
-		$object         = new TrainingSession($db);
-		$signatory      = new TrainingSessionSignature($db);
-		break;
-	case 'audit':
-		$object         = new Audit($db);
-		$signatory      = new AuditSignature($db);
-		break;
-}
+// Initialize view objects
+$form = new Form($db);
 
-$signatory->fetch('', '', " AND signature_url =" . "'" . $track_id . "'");
-if (dol_strlen($signatory->signature)) {
-	$urltoredirect = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
-	header('Location: ' . $urltoredirect);
-}
+$hookmanager->initHooks([$objectType . 'publicsignature', 'saturnepublicsignature', 'saturnepublicinterface', 'saturneglobal', 'globalcard']); // Note that conf->hooks_modules contains array
+
+$signatory->fetch(0, '', ' AND signature_url =' . "'" . $track_id . "'");
 $object->fetch($signatory->fk_object);
 
-$upload_dir = $conf->dolimeet->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
 
 /*
  * Actions
  */
 
-$parameters = array();
+$parameters = [];
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-// Action to add record
-if ($action == 'addSignature') {
-	$signatoryID  = GETPOST('signatoryID');
-	$data = json_decode(file_get_contents('php://input'), true);
+if (empty($reshook)) {
+    // Action to add record
+    if ($action == 'add_signature') {
+        $data       = json_decode(file_get_contents('php://input'), true);
+        $signatoryID = GETPOST('signatoryID');
+        
+        $signatory->fetch($signatoryID);
 
-	$signatory->fetch($signatoryID);
-	$signatory->signature      = $data['signature'];
-	$signatory->signature_date = dol_now();
+        $signatory->signature      = $data['signature'];
+        $signatory->signature_date = dol_now('tzuser');
 
-	// Check Captcha code if is enabled
-	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
-		$sessionkey = 'dol_antispam_value';
-		$ok         = (array_key_exists($sessionkey, $_SESSION) === true && (strtolower($_SESSION[$sessionkey]) === strtolower($data['code'])));
+//        // Check Captcha code if is enabled
+//        if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
+//            $sessionkey = 'dol_antispam_value';
+//            $ok = (array_key_exists($sessionkey, $_SESSION) === true && (strtolower($_SESSION[$sessionkey]) === strtolower($data['code'])));
+//
+//            if (!$ok) {
+//                $error++;
+//                setEventMessage($langs->trans('ErrorBadValueForCode'), 'errors');
+//                $action = '';
+//            }
+//        }
 
-		if ( ! $ok) {
-			$error++;
-			setEventMessage($langs->trans('ErrorBadValueForCode'), 'errors');
-			$action = '';
-		}
-	}
+        $error = 0;
 
-	if ( ! $error) {
-		$result = $signatory->update($user, false);
-		if ($result > 0) {
-			$signatory->setSigned($user, false);
-			// Creation signature OK
-			exit;
-		} else {
-			// Creation signature KO
-			if ( ! empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
-			else setEventMessages($signatory->error, null, 'errors');
-		}
-	} else {
-		exit;
-	}
+        if (!$error) {
+            $result = $signatory->update($user, true);
+            if ($result > 0) {
+                // Creation signature OK
+                $signatory->setSigned($user, false, 'public');
+                exit;
+            } elseif (!empty($signatory->errors)) { // Creation signature KO
+                setEventMessages('', $signatory->errors, 'errors');
+            } else {
+                setEventMessages($signatory->error, [], 'errors');
+            }
+        } else {
+            exit;
+        }
+    }
+
+    // Action to build doc
+    if ($action == 'builddoc') {
+        $outputlangs = $langs;
+        $newlang = '';
+
+        if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) {
+            $newlang = GETPOST('lang_id', 'aZ09');
+        }
+        if (!empty($newlang)) {
+            $outputlangs = new Translate('', $conf);
+            $outputlangs->setDefaultLang($newlang);
+        }
+
+        // To be sure vars is defined
+        if (empty($hidedetails)){
+            $hidedetails = 0;
+        }
+        if (empty($hidedesc)) {
+            $hidedesc = 0;
+        }
+        if (empty($hideref)) {
+            $hideref = 0;
+        }
+        if (empty($moreparams)) {
+            $moreparams = null;
+        }
+
+        $constforval = 'DOLIMEET_' . strtoupper('attendancesheetdocument') . '_ADDON_ODT_PATH';
+        $template    = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$constforval);
+        $model       = 'attendancesheetdocument_odt:' . $template .'template_attendancesheetdocument.odt';
+
+        $moreparams['object']   = $object;
+        $moreparams['user']     = $user;
+        $moreparams['specimen'] = 1;
+        $moreparams['zone']     = 'public';
+
+        $result = $sessiondocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+
+        if ($result <= 0) {
+            setEventMessages($sessiondocument->error, $sessiondocument->errors, 'errors');
+            $action = '';
+        } elseif (empty($donotredirect)) {
+            copy($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref . '/specimen/' . $sessiondocument->last_main_doc, DOL_DOCUMENT_ROOT . '/custom/dolimeet/documents/temp/' . $object->element . '_specimen_' . $track_id . '.odt');
+            setEventMessages($langs->trans('FileGenerated') . ' - ' . $sessiondocument->last_main_doc, []);
+            $urltoredirect = $_SERVER['REQUEST_URI'];
+            $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+            $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+            header('Location: ' . $urltoredirect . '#builddoc');
+            exit;
+        }
+    }
+
+    if ($action == 'remove_file') {
+        $files = dol_dir_list(DOL_DOCUMENT_ROOT . '/custom/dolimeet/documents/temp/'); // get all file names
+
+        foreach ($files as $file) {
+            if (is_file($file['fullname'])) {
+                dol_delete_file($file['fullname']);
+            }
+        }
+    }
 }
 
-if ($action == 'builddoc') {
-	$outputlangs = $langs;
-	$newlang     = '';
-
-	if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-	if ( ! empty($newlang)) {
-		$outputlangs = new Translate("", $conf);
-		$outputlangs->setDefaultLang($newlang);
-	}
-
-	// To be sure vars is defined
-	if (empty($hidedetails)) $hidedetails = 0;
-	if (empty($hidedesc)) $hidedesc       = 0;
-	if (empty($hideref)) $hideref         = 0;
-	if (empty($moreparams)) $moreparams   = null;
-
-	$constforval = "DIGIRISKDOLIBARR_".strtoupper($type.'document')."_SPECIMEN_ADDON_ODT_PATH";
-	$template = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$constforval);
-	$model = $type.'document_specimen_odt:'.$template.'template_'.$type.'document_specimen.odt';
-
-	$moreparams['object'] = $object;
-	$moreparams['user']   = $user;
-
-	$result = $objectdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-	if ($result <= 0) {
-		setEventMessages($object->error, $object->errors, 'errors');
-
-		$action = '';
-	} elseif (empty($donotredirect)) {
-		$document_name = $objectdocument->last_main_doc;
-
-		copy($conf->dolimeet->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type.'document' . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/dolimeet/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
-
-		setEventMessages($langs->trans("FileGenerated") . ' - ' . $document_name, null);
-
-		$urltoredirect = $_SERVER['REQUEST_URI'];
-		$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-		$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-		header('Location: ' . $urltoredirect . '#builddoc');
-		exit;
-	}
-}
-
-if ($action == 'remove_file') {
-	$files = dol_dir_list(DOL_DOCUMENT_ROOT . '/custom/dolimeet/documents/temp/'); // get all file names
-
-	foreach ($files as $file) {
-		if (is_file($file['fullname'])) {
-			dol_delete_file($file['fullname']);
-		}
-	}
-}
 /*
  * View
  */
 
-$form = new Form($db);
-//
-//if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
-//	print $langs->trans('SignaturePublicInterfaceForbidden');
-//	exit;
-//}
+$title   = $langs->trans('Signature');
+$morejs  = ['/saturne/js/includes/signature-pad.min.js'];
+$morecss = ['/saturne/css/saturne.min.css'];
 
-$morejs  = array("/dolimeet/js/signature-pad.min.js", "/dolimeet/js/dolimeet.js.php");
-$morecss = array("/dolimeet/css/dolimeet.css");
+$conf->dol_hide_topmenu  = 1;
+$conf->dol_hide_leftmenu = 1;
 
-llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
+saturne_header(0,'', $title, '', '', 0, 0, $morejs, $morecss);
 
-$element = $signatory;
-?>
-<div class="digirisk-signature-container">
-	<input type="hidden" name="token" value="<?php echo newToken(); ?>">
-	<div class="wpeo-gridlayout grid-2">
-		<div class="informations">
-<!--			<input type="hidden" id="confCAPTCHA" value="--><?php //echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?><!--"/>-->
-			<div class="wpeo-gridlayout grid-2 file-generation">
-				<strong class="grid-align-middle"><?php echo $langs->trans("ThisIsInformationOnDocumentToSign"); ?></strong>
-				<?php $path = DOL_MAIN_URL_ROOT . '/custom/dolimeet/documents/temp/';	?>
-				<input type="hidden" class="specimen-name" value="<?php echo $type . '_specimen_' . $track_id . '.odt' ?>">
-				<input type="hidden" class="specimen-path" value="<?php echo $path ?>">
-				<input type="hidden" class="track-id" value="<?php echo $track_id ?>">
-				<span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-file-pdf"></i><?php echo '  ' . $langs->trans('ShowDocument'); ?></span>
-			</div>
-			<br>
-			<div class="wpeo-table table-flex table-2">
-				<div class="table-row">
-					<div class="table-cell"><?php echo $langs->trans("Name"); ?></div>
-					<div class="table-cell table-end"><?php echo $signatory->firstname . ' ' . $signatory->lastname; ?></div>
-				</div>
-				<div class="table-row">
-					<div class="table-cell"><?php echo $langs->trans("DocumentName"); ?></div>
-					<div class="table-cell table-end"><?php echo $object->ref . ' ' . $object->label; ?></div>
-				</div>
-			</div>
-		</div>
-		<div class="signature">
-			<div class="wpeo-gridlayout grid-2">
-				<strong class="grid-align-middle"><?php echo $langs->trans("Signature"); ?></strong>
-				<div class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
-					<span><i class="fas fa-pen-nib"></i> <?php echo $langs->trans('Sign'); ?></span>
-				</div>
-			</div>
-			<br>
-			<div class="signature-element">
-				<?php require "../../core/tpl/signature/dolimeet_signature_view.tpl.php"; ?>
-			</div>
-		</div>
-	</div>
+$element = $signatory; ?>
+
+<div class="signature-container">
+    <?php if (!empty($conf->global->SATURNE_ENABLE_PUBLIC_INTERFACE)) : ?>
+        <input type="hidden" name="token" value="<?php echo newToken(); ?>">
+        <div class="wpeo-gridlayout grid-2">
+            <div class="informations">
+    <!--			<input type="hidden" id="confCAPTCHA" value="--><?php //echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?><!--"/>-->
+                <div class="wpeo-gridlayout grid-2 file-generation">
+                    <strong class="grid-align-middle"><?php echo $langs->trans('Document'); ?></strong>
+                    <?php $path = DOL_MAIN_URL_ROOT . '/custom/dolimeet/documents/temp/'; ?>
+                    <input type="hidden" class="specimen-name" value="<?php echo $object->element . '_specimen_' . $track_id . '.odt' ?>">
+                    <input type="hidden" class="specimen-path" value="<?php echo $path ?>">
+                    <span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-print"></i></span>
+                </div>
+                <br>
+                <div class="wpeo-table table-flex table-2">
+                    <div class="table-row">
+                        <div class="table-cell"><?php echo $langs->trans('FullName'); ?></div>
+                        <div class="table-cell table-end"><?php echo strtoupper($signatory->lastname) . ' ' . $signatory->firstname; ?></div>
+                    </div>
+                    <div class="table-row">
+                        <div class="table-cell"><?php echo $langs->trans($langs->trans(ucfirst($object->element))); ?></div>
+                        <div class="table-cell table-end"><?php echo $object->ref . ' ' . $object->label; ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="signature">
+                <div class="wpeo-gridlayout grid-2">
+                    <strong class="grid-align-middle"><?php echo $langs->trans('Signature'); ?></strong>
+                    <?php if (!dol_strlen($element->signature)) : ?>
+                        <div class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
+                            <input type="hidden" class="modal-to-open" value="modal-signature<?php echo $element->id ?>">
+                            <input type="hidden" class="from-id" value="<?php echo $element->id ?>">
+                            <span><i class="fas fa-pen-nib"></i> <?php echo $langs->trans('Sign'); ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <br>
+                <div class="signature-element">
+                    <?php require __DIR__ . '/../../core/tpl/signature/signature_view.tpl.php'; ?>
+                </div>
+            </div>
+        </div>
 <!--	--><?php
 //	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 //		require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
@@ -259,9 +276,11 @@ $element = $signatory;
 //		print '</span>';
 //		print '</div>';
 //	}?>
+    <?php else :
+        print '<div class="center">' . $langs->trans('SignaturePublicInterfaceForbidden') . '</div>';
+    endif; ?>
 </div>
-<?php
 
+<?php
 llxFooter('', 'public');
 $db->close();
-

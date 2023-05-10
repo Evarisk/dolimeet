@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 Theo David <theodavid.perso@gmail.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    dolimeet/lib/dolimeet.lib.php
+ * \file    lib/dolimeet.lib.php
  * \ingroup dolimeet
  * \brief   Library files with common functions for DoliMeet
  */
@@ -26,40 +26,33 @@
  *
  * @return array
  */
-function dolimeetAdminPrepareHead()
+function dolimeet_admin_prepare_head(): array
 {
+    // Global variables definitions
 	global $langs, $conf;
 
-	$langs->load("dolimeet@dolimeet");
+    // Load translation files required by the page
+	saturne_load_langs();
 
+    // Initialize values
 	$h = 0;
-	$head = array();
+	$head = [];
 
-	$head[$h][0] = dol_buildpath("/dolimeet/admin/setup.php", 1);
-	$head[$h][1] = $langs->trans("Settings");
-	$head[$h][2] = 'settings';
-	$h++;
+    $head[$h][0] = dol_buildpath('/dolimeet/admin/dolimeetdocuments.php', 1);
+    $head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('YourDocuments');
+    $head[$h][2] = 'documents';
+    $h++;
 
-	/*
-	$head[$h][0] = dol_buildpath("/dolimeet/admin/myobject_extrafields.php", 1);
-	$head[$h][1] = $langs->trans("ExtraFields");
-	$head[$h][2] = 'myobject_extrafields';
-	$h++;
-	*/
+    $head[$h][0] = dol_buildpath('/dolimeet/admin/setup.php', 1);
+    $head[$h][1] = '<i class="fas fa-cog pictofixedwidth"></i>' . $langs->trans('ModuleSettings');
+    $head[$h][2] = 'settings';
+    $h++;
 
-	$head[$h][0] = dol_buildpath("/dolimeet/admin/about.php", 1);
-	$head[$h][1] = $langs->trans("About");
-	$head[$h][2] = 'about';
-	$h++;
+    $head[$h][0] = dol_buildpath('/dolimeet/admin/about.php', 1);
+    $head[$h][1] = '<i class="fab fa-readme pictofixedwidth"></i>' . $langs->trans('About');
+    $head[$h][2] = 'about';
+    $h++;
 
-	// Show more tabs from modules
-	// Entries must be declared in modules descriptor with line
-	//$this->tabs = array(
-	//	'entity:+tabname:Title:@dolimeet:/dolimeet/mypage.php?id=__ID__'
-	//); // to add new tab
-	//$this->tabs = array(
-	//	'entity:-tabname:Title:@dolimeet:/dolimeet/mypage.php?id=__ID__'
-	//); // to remove a tab
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'dolimeet@dolimeet');
 
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'dolimeet@dolimeet', 'remove');
