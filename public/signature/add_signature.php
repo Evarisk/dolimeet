@@ -49,6 +49,8 @@ if (!defined('NOBROWSERNOTIF')) {
 // Load DoliMeet environment
 if (file_exists('../../dolimeet.main.inc.php')) {
     require_once __DIR__ . '/../../dolimeet.main.inc.php';
+} elseif (file_exists('../../../dolimeet.main.inc.php')) {
+    require_once __DIR__ . '/../../../dolimeet.main.inc.php';
 } else {
     die('Include of dolimeet main fails');
 }
