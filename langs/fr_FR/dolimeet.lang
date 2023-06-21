@@ -99,6 +99,8 @@ TrainingSessionLocation               = Lieu de la formation
 TrainingsessionsCategoriesArea        = Espace des tags/catégories des sessions de formations
 DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un formateur et un stagiaire au contrat de formation.
 AttendantsFromContract                = Participants du contrat
+SessionTrainerResponsible             = Responsable du dispensateur de formation
+SessionTrainerResponsibleDesc         = Définit le responsable du dispensateur de formation
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur

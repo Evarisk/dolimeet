@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 require_once __DIR__ . '/../lib/dolimeet.lib.php';
 
 // Global variables definitions
-global $db, $langs, $user;
+global $conf, $db, $langs, $user;
 
 // Load translation files required by the page
 saturne_load_langs(['admin']);
@@ -49,6 +49,15 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $permissiontoread = $user->rights->dolimeet->adminpage->read;
 saturne_check_access($permissiontoread);
 
+/*
+ * Actions
+ */
+
+if ($action == 'update') {
+	$responsibleId = GETPOST('session_trainer_responsible_id');
+	dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', 1, 'int');
+	setEventMessages('SessionTrainerResponsibleIdSet', null);
+}
 /*
  * View
  */
@@ -199,6 +208,33 @@ print '<td class="center">';
 print ajax_constantonoff('DOLIMEET_AUDIT_MENU_ENABLED');
 print '</td>';
 print '</tr>';
+
+print load_fiche_titre($langs->trans('SessionTrainerResponsible'), '', '');
+
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="update">';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
+print '<td></td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('SessionTrainerResponsible');
+print '</td><td>';
+print $langs->transnoentities('SessionTrainerResponsibleDesc');
+print '</td>';
+
+print '<td class="center">';
+print $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1);
+print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+print '</td>';
+print '</tr>';
+print '</form>';
 
 $db->close();
 llxFooter();
