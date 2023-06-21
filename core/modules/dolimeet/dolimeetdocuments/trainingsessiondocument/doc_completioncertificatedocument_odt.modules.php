@@ -170,7 +170,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
      */
     public function write_file(SessionDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails = 0, int $hidedesc = 0, int $hideref = 0, array $moreparam): int
     {
-        global $action, $conf, $hookmanager, $langs, $mysoc;
+        global $action, $conf, $db, $hookmanager, $langs, $mysoc;
 
         $object = $moreparam['object'];
 
@@ -292,15 +292,12 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 
             require_once __DIR__ . '/../../../../../class/saturnesignature.class.php';
 
-            $signatory = new SaturneSignature($this->db);
-            $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
-            if (is_array($signatory) && !empty($signatory)) {
-                $signatory = array_shift($signatory);
-                $tmparray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
-                $tmparray['trainer_quality']  = $langs->trans($signatory->role);
+            $usertmp = new User($this->db);
+            $result = $usertmp->fetch($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE);
+            if ($result > 0) {
+                $tmparray['company_owner_fullname'] = $usertmp->firstname . ' ' . strtoupper($usertmp->lastname);
             } else {
-                $tmparray['trainer_fullname'] = '';
-                $tmparray['trainer_quality']  =  '';
+                $tmparray['company_owner_fullname'] = '';
             }
 
             if (!empty($object->fk_contrat)) {
@@ -345,22 +342,28 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                 $tmparray['attendant_company_name'] = '';
             }
 
+			$signatory = new SaturneSignature($db);
+			$result = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
+			if(is_array($result) && !empty($result)) {
+				$signatory = array_shift($result);
+			}
+
             if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
                 if ($moreparam['specimen'] == 0 || ($moreparam['specimen'] == 1 && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1)) {
                     $encodedImage = explode(',', $signatory->signature)[1];
                     $decodedImage = base64_decode($encodedImage);
                     file_put_contents($tempdir . 'signature.png', $decodedImage);
-                    $tmparray['trainer_signature'] = $tempdir . 'signature.png';
+                    $tmparray['company_owner_signature'] = $tempdir . 'signature.png';
                 }
             } else {
-                $tmparray['trainer_signature'] = '';
+                $tmparray['company_owner_signature'] = '';
             }
 
             $tmparray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
             foreach ($tmparray as $key => $value) {
                 try {
-                    if ($key == 'trainer_signature') { // Image
+                    if ($key == 'company_owner_signature') { // Image
                         if (file_exists($value)) {
                             $list = getimagesize($value);
                             $newWidth = 350;
