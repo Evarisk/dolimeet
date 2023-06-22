@@ -55,8 +55,11 @@ saturne_check_access($permissiontoread);
 
 if ($action == 'update') {
 	$responsibleId = GETPOST('session_trainer_responsible_id');
-	dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', 1, 'int');
-	setEventMessages('SessionTrainerResponsibleIdSet', null);
+	dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', $responsibleId, 'int');
+
+	$usertmp = new User($db);
+	$usertmp->fetch($responsibleId);
+	setEventMessages($langs->trans('SessionTrainerResponsibleIdSet', $user->getFullName($langs)), null);
 }
 /*
  * View

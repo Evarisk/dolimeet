@@ -101,6 +101,7 @@ DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un form
 AttendantsFromContract                = Participants du contrat
 SessionTrainerResponsible             = Responsable du dispensateur de formation
 SessionTrainerResponsibleDesc         = Définit le responsable du dispensateur de formation
+SessionTrainerResponsibleIdSet        = Responsable du dispensateur de formation défini : %s
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
