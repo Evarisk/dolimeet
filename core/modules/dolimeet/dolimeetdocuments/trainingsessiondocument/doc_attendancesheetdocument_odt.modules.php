@@ -308,12 +308,13 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
                 $contract = new Contrat($this->db);
                 $contract->fetch($object->fk_contrat);
                 $contract->fetch_optionals();
-                $tmparray['contract_ref_label'] = $contract->ref;
                 if (!empty($contract->array_options['options_label'])) {
-                    $tmparray['contract_ref_label'] .= ' - ' . $contract->array_options['options_label'];
-                }
+                    $tmparray['contract_label'] = $contract->array_options['options_label'];
+                } else {
+					$tmparray['contract_label'] = $contract->ref;
+				}
             } else {
-                $tmparray['contract_ref_label'] = '';
+                $tmparray['contract_label'] = '';
             }
 
             if (!empty($object->fk_project)) {

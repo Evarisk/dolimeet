@@ -301,23 +301,17 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             }
 
             if (!empty($object->fk_contrat)) {
-                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-                $contract = new Contrat($this->db);
-                $contract->fetch($object->fk_contrat);
-                $contract->fetch_optionals();
-                $trainingsessionDict = fetch_dolimeet_dictionnary('c_trainingsession_type');
-                if (is_array($trainingsessionDict) && !empty($trainingsessionDict) && !empty($contract->array_options['options_trainingsession_type'])) {
-                    $tmparray['action_nature'] = $langs->trans($trainingsessionDict[$contract->array_options['options_trainingsession_type']]->label);
-                } else {
-                    $tmparray['action_nature'] = '';
-                }
-                $tmparray['contract_ref_label'] = $contract->ref;
-                $tmparray['location'] = $contract->array_options['options_trainingsession_location'];
-                if (!empty($contract->array_options['options_label'])) {
-                    $tmparray['contract_ref_label'] .= ' - ' . $contract->array_options['options_label'];
-                }
+				require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+				$contract = new Contrat($this->db);
+				$contract->fetch($object->fk_contrat);
+				$contract->fetch_optionals();
+				if (!empty($contract->array_options['options_label'])) {
+					$tmparray['contract_label'] = $contract->array_options['options_label'];
+				} else {
+					$tmparray['contract_label'] = $contract->ref;
+				}
             } else {
-                $tmparray['contract_ref_label'] = '';
+                $tmparray['contract_label'] = '';
                 $tmparray['location'] = '';
                 $tmparray['action_nature'] = '';
             }
