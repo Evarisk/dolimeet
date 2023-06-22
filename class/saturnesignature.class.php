@@ -177,15 +177,15 @@ class SaturneSignature extends CommonObject
      */
     public string $signature_date;
 
-    /**
-     * @var string Signature location
-     */
-    public string $signature_location = '';
+	/**
+	 * @var string|null Signature location
+	 */
+	public ?string $signature_location = '';
 
-    /**
-     * @var string Signature Comment
-     */
-    public string $signature_comment = '';
+	/**
+	 * @var string|null Signature Comment
+	 */
+	public ?string $signature_comment = '';
 
     /**
      * @var int Element id
@@ -208,9 +208,9 @@ class SaturneSignature extends CommonObject
     public ?string $signature = '';
 
     /**
-     * @var string Stamp
+     * @var string|null Stamp
      */
-    public string $stamp = '';
+    public ?string $stamp = '';
 
     /**
      * @var string Signature url
@@ -218,9 +218,9 @@ class SaturneSignature extends CommonObject
     public string $signature_url;
 
     /**
-     * @var string Transaction url
+     * @var string|null Transaction url
      */
-    public string $transaction_url = '';
+	public ?string $transaction_url = '';
 
     /**
      * @var string Last email sent date
@@ -233,9 +233,9 @@ class SaturneSignature extends CommonObject
     public ?int $attendance;
 
     /**
-     * @var string Object type
+     * @var string|null Object type
      */
-    public string $object_type = '';
+	public ?string $object_type = '';
 
     /**
      * @var int Object id
