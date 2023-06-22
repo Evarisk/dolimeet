@@ -310,11 +310,17 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 				} else {
 					$tmparray['contract_label'] = $contract->ref;
 				}
-            } else {
+				$trainingsessionDict = fetch_dolimeet_dictionnary('c_trainingsession_type');
+				if (is_array($trainingsessionDict) && !empty($trainingsessionDict) && !empty($contract->array_options['options_trainingsession_type'])) {
+					$tmparray['action_nature'] = $langs->trans($trainingsessionDict[$contract->array_options['options_trainingsession_type']]->label);
+				} else {
+					$tmparray['action_nature'] = '';
+				}
+			} else {
                 $tmparray['contract_label'] = '';
-                $tmparray['location'] = '';
                 $tmparray['action_nature'] = '';
             }
+			$tmparray['location'] = $conf->global->DOLIMEET_DOCUMENT_LOCATION;
 
             $tmparray['mycompany_name'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
 
