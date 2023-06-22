@@ -173,9 +173,9 @@ class SaturneSignature extends CommonObject
     public string $society_name;
 
     /**
-     * @var string Signature date
+     * @var string|null Signature date
      */
-    public string $signature_date;
+	public ?string $signature_date = '';
 
 	/**
 	 * @var string|null Signature location
@@ -223,9 +223,9 @@ class SaturneSignature extends CommonObject
 	public ?string $transaction_url = '';
 
     /**
-     * @var string Last email sent date
+     * @var string|null Last email sent date
      */
-    public string $last_email_sent_date;
+    public ?string $last_email_sent_date  = '';
 
     /**
      * @var int|null Attendance
