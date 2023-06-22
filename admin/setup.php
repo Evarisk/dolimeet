@@ -54,12 +54,21 @@ saturne_check_access($permissiontoread);
  */
 
 if ($action == 'update') {
-	$responsibleId = GETPOST('session_trainer_responsible_id');
-	dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', $responsibleId, 'int');
+	$responsibleId    = GETPOST('session_trainer_responsible_id');
+	$documentLocation = GETPOST('document_location');
 
-	$usertmp = new User($db);
-	$usertmp->fetch($responsibleId);
-	setEventMessages($langs->trans('SessionTrainerResponsibleIdSet', $user->getFullName($langs)), null);
+	if ($responsibleId != $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE) {
+		dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', $responsibleId, 'int');
+		$usertmp = new User($db);
+		$usertmp->fetch($responsibleId);
+		setEventMessages($langs->trans('SessionTrainerResponsibleIdSet', $user->getFullName($langs)), null);
+	}
+
+	if ($documentLocation != $conf->global->DOLIMEET_DOCUMENT_LOCATION) {
+		dolibarr_set_const($db, 'DOLIMEET_DOCUMENT_LOCATION', $documentLocation);
+		setEventMessages($langs->trans('DocumentLocationSet', $user->getFullName($langs)), null);
+	}
+
 }
 /*
  * View
@@ -212,7 +221,7 @@ print ajax_constantonoff('DOLIMEET_AUDIT_MENU_ENABLED');
 print '</td>';
 print '</tr>';
 
-print load_fiche_titre($langs->trans('SessionTrainerResponsible'), '', '');
+print load_fiche_titre($langs->trans('TrainingSessions'), '', '');
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -234,6 +243,18 @@ print '</td>';
 
 print '<td class="center">';
 print $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1);
+print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('DocumentLocation');
+print '</td><td>';
+print $langs->transnoentities('DocumentLocationDesc');
+print '</td>';
+
+print '<td class="center">';
+print '<input name="document_location" value="'. $conf->global->DOLIMEET_DOCUMENT_LOCATION .'">';
 print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
 print '</td>';
 print '</tr>';

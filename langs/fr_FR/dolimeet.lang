@@ -79,8 +79,8 @@ Responsible = Responsable
 
 # Data - Donnée
 TrainingSession                       = Session de formation
-Trainingsession                       = Session de formation
 Trainingsessions                      = sessions de formation
+TrainingSessions                      = Sessions de formation
 TheTrainingsession                    = la session de formation
 TrainingsessionList                   = Liste des sessions de formation
 TrainingSessionList                   = Liste des sessions de formation
@@ -102,6 +102,10 @@ AttendantsFromContract                = Participants du contrat
 SessionTrainerResponsible             = Responsable du dispensateur de formation
 SessionTrainerResponsibleDesc         = Définit le responsable du dispensateur de formation
 SessionTrainerResponsibleIdSet        = Responsable du dispensateur de formation défini : %s
+DocumentLocation                      = Lieu affiché sur les documents
+DocumentLocationDesc                  = Enregistre le lieu qui sera affiché sur les documents (Fait à : xxxx)
+DocumentLocationSet                   = Lieu enregistré
+DocumentLocation
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
