@@ -220,13 +220,14 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             $societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
             if (!empty($moreparam['attendant'])) {
-                $attandent = strtoupper($moreparam['attendant']->lastname) . '_' . $moreparam['attendant']->firstname;
+                $attendantName = strtoupper($moreparam['attendant']->lastname) . '_' . $moreparam['attendant']->firstname;
             } else {
-                $attandent = '';
+                $attendantName = '';
             }
+			$attendantName = str_replace(' ', '', $attendantName);
 
             $date = dol_print_date(dol_now(),'dayxcard');
-            $newfiletmp = $date . '_' . $object->ref . '_' . $objectDocumentRef .'_' . $langs->transnoentities($newfiletmp) . '_' . $attandent . '_' . $societyname;
+            $newfiletmp = $date . '_' . $object->ref . '_' . $objectDocumentRef .'_' . $langs->transnoentities($newfiletmp) . '_' . $attendantName . '_' . $societyname;
             if ($moreparam['specimen'] == 1) {
                 $newfiletmp .= '_specimen';
             }
@@ -284,7 +285,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 
             //Define substitution array
             $substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
-            $array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+//            $array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
             $array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
             $tmparray = array_merge($substitutionarray, $array_soc);
