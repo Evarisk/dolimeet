@@ -79,6 +79,7 @@ Responsible = Responsable
 
 # Data - Donnée
 TrainingSession                       = Session de formation
+Trainingsession                       = Session de formation
 Trainingsessions                      = sessions de formation
 TrainingSessions                      = Sessions de formation
 TheTrainingsession                    = la session de formation
