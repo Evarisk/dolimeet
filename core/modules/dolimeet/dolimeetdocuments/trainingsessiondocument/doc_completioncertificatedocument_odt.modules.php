@@ -24,6 +24,7 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
 require_once __DIR__ . '/modules_trainingsessiondocument.php';
 require_once __DIR__ . '/mod_completioncertificatedocument_standard.php';
@@ -285,8 +286,8 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 
             //Define substitution array
             $substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
-//            $array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-            $array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
+            $array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
             $tmparray = array_merge($substitutionarray, $array_soc);
             complete_substitutions_array($tmparray, $outputlangs, $object);
@@ -296,9 +297,9 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             $usertmp = new User($this->db);
             $result = $usertmp->fetch($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE);
             if ($result > 0) {
-                $tmparray['company_owner_fullname'] = $usertmp->firstname . ' ' . strtoupper($usertmp->lastname);
+                $tmparray['mycompany_owner_fullname'] = $usertmp->firstname . ' ' . strtoupper($usertmp->lastname);
             } else {
-                $tmparray['company_owner_fullname'] = '';
+                $tmparray['mycompany_owner_fullname'] = '';
             }
 
             if (!empty($object->fk_contrat)) {
@@ -347,6 +348,11 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 			$result = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
 			if(is_array($result) && !empty($result)) {
 				$signatory = array_shift($result);
+				$user = new User($db);
+				$user->fetch($signatory->element_id);
+				$tmparray['mycompany_owner_job'] = $user->job;
+			} else {
+				$tmparray['mycompany_owner_job'] = '';
 			}
 
             if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
@@ -354,17 +360,17 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                     $encodedImage = explode(',', $signatory->signature)[1];
                     $decodedImage = base64_decode($encodedImage);
                     file_put_contents($tempdir . 'signature.png', $decodedImage);
-                    $tmparray['company_owner_signature'] = $tempdir . 'signature.png';
+                    $tmparray['mycompany_owner_signature'] = $tempdir . 'signature.png';
                 }
             } else {
-                $tmparray['company_owner_signature'] = '';
+                $tmparray['mycompany_owner_signature'] = '';
             }
 
             $tmparray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
             foreach ($tmparray as $key => $value) {
                 try {
-                    if ($key == 'company_owner_signature') { // Image
+                    if ($key == 'mycompany_owner_signature') { // Image
                         if (file_exists($value)) {
                             $list = getimagesize($value);
                             $newWidth = 350;
