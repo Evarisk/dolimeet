@@ -24,6 +24,7 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
 require_once __DIR__ . '/modules_trainingsessiondocument.php';
 require_once __DIR__ . '/mod_attendancesheetdocument_standard.php';

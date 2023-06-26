@@ -24,6 +24,7 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
 require_once __DIR__ . '/modules_trainingsessiondocument.php';
 require_once __DIR__ . '/mod_completioncertificatedocument_standard.php';
@@ -285,8 +286,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 
             //Define substitution array
             $substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
-//            $array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-            $array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
+            $array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
 
             $tmparray = array_merge($substitutionarray, $array_soc);
             complete_substitutions_array($tmparray, $outputlangs, $object);
