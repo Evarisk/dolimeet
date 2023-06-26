@@ -297,9 +297,9 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             $usertmp = new User($this->db);
             $result = $usertmp->fetch($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE);
             if ($result > 0) {
-                $tmparray['company_owner_fullname'] = $usertmp->firstname . ' ' . strtoupper($usertmp->lastname);
+                $tmparray['mycompany_owner_fullname'] = $usertmp->firstname . ' ' . strtoupper($usertmp->lastname);
             } else {
-                $tmparray['company_owner_fullname'] = '';
+                $tmparray['mycompany_owner_fullname'] = '';
             }
 
             if (!empty($object->fk_contrat)) {
@@ -350,9 +350,9 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 				$signatory = array_shift($result);
 				$user = new User($db);
 				$user->fetch($signatory->element_id);
-				$tmparray['company_owner_job'] = $user->job;
+				$tmparray['mycompany_owner_job'] = $user->job;
 			} else {
-				$tmparray['company_owner_job'] = '';
+				$tmparray['mycompany_owner_job'] = '';
 			}
 
             if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
@@ -360,17 +360,17 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
                     $encodedImage = explode(',', $signatory->signature)[1];
                     $decodedImage = base64_decode($encodedImage);
                     file_put_contents($tempdir . 'signature.png', $decodedImage);
-                    $tmparray['company_owner_signature'] = $tempdir . 'signature.png';
+                    $tmparray['mycompany_owner_signature'] = $tempdir . 'signature.png';
                 }
             } else {
-                $tmparray['company_owner_signature'] = '';
+                $tmparray['mycompany_owner_signature'] = '';
             }
 
             $tmparray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
             foreach ($tmparray as $key => $value) {
                 try {
-                    if ($key == 'company_owner_signature') { // Image
+                    if ($key == 'mycompany_owner_signature') { // Image
                         if (file_exists($value)) {
                             $list = getimagesize($value);
                             $newWidth = 350;

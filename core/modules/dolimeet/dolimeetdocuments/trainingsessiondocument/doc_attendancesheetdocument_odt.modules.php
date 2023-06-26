@@ -297,12 +297,7 @@ class doc_attendancesheetdocument_odt extends ModeleODTTrainingSessionDocument
             }
 
 			$tmparray['mycompany_name']     = $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$tmparray['address']            = $conf->global->MAIN_INFO_SOCIETE_ADDRESS;
 			$tmparray['declaration_number'] = $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER;
-			$tmparray['society_phone']      = $conf->global->MAIN_INFO_SOCIETE_TEL;
-			$tmparray['society_siret']      = $conf->global->MAIN_INFO_SIRET;
-			$tmparray['society_mail']       = $conf->global->MAIN_INFO_SOCIETE_MAIL;
-			$tmparray['society_website']    = $conf->global->MAIN_INFO_SOCIETE_WEB;
 
             if (!empty($object->fk_contrat)) {
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
