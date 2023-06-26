@@ -348,6 +348,11 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 			$result = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
 			if(is_array($result) && !empty($result)) {
 				$signatory = array_shift($result);
+				$user = new User($db);
+				$user->fetch($signatory->element_id);
+				$tmparray['company_owner_job'] = $user->job;
+			} else {
+				$tmparray['company_owner_job'] = '';
 			}
 
             if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
