@@ -287,6 +287,7 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
             //Define substitution array
             $substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
             $array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
             $tmparray = array_merge($substitutionarray, $array_soc);
             complete_substitutions_array($tmparray, $outputlangs, $object);
