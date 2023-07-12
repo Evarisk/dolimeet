@@ -105,7 +105,7 @@ if (empty($reshook)) {
     if ($action == 'add_signature') {
         $data       = json_decode(file_get_contents('php://input'), true);
         $signatoryID = GETPOST('signatoryID');
-        
+
         $signatory->fetch($signatoryID);
 
         $signatory->signature      = $data['signature'];
@@ -249,10 +249,9 @@ $element = $signatory; ?>
                     <strong class="grid-align-middle"><?php echo $langs->trans('Signature'); ?></strong>
                     <?php if (!dol_strlen($element->signature)) : ?>
                         <div class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
-                            <input type="hidden" class="modal-to-open" value="modal-signature<?php echo $element->id ?>">
-                            <input type="hidden" class="from-id" value="<?php echo $element->id ?>">
                             <span><i class="fas fa-pen-nib"></i> <?php echo $langs->trans('Sign'); ?></span>
-                        </div>
+							<input hidden class="modal-options" data-modal-to-open="modal-signature<?php echo $element->id ?>" data-from-id="<?php echo $element->id ?>" data-from-module="dolimeet">;
+						</div>
                     <?php endif; ?>
                 </div>
                 <br>
