@@ -94,7 +94,7 @@ class mod_completioncertificatedocument_standard
 
         $posindice = strlen($this->prefix) + 6;
         $sql = 'SELECT MAX(CAST(SUBSTRING(ref FROM ' . $posindice . ') AS SIGNED)) as max';
-        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'dolimeet_dolimeetdocuments';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'saturne_object_documents';
         $sql .= " WHERE ref LIKE '" . $db->escape($this->prefix) . "____-%'";
         if ($object->ismultientitymanaged == 1) {
             $sql .= ' AND entity = ' . $conf->entity;
@@ -130,7 +130,7 @@ class mod_completioncertificatedocument_standard
         // first we get the max value
         $posindice = strlen($this->prefix) + 6;
         $sql = 'SELECT MAX(CAST(SUBSTRING(ref FROM ' . $posindice . ') AS SIGNED)) as max';
-        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'dolimeet_dolimeetdocuments';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'saturne_object_documents';
         $sql .= " WHERE ref LIKE '" . $db->escape($this->prefix) . "____-%'";
         if ($object->ismultientitymanaged == 1) {
             $sql .= ' AND entity = ' . $conf->entity;

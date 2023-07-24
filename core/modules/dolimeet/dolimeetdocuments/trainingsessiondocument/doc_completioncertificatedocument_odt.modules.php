@@ -242,11 +242,11 @@ class doc_completioncertificatedocument_odt extends ModeleODTTrainingSessionDocu
 
             $objectDocument->last_main_doc = $filename;
 
-            $sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'dolimeet_dolimeetdocuments';
+            $sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'saturne_object_documents';
             $sql .= ' SET last_main_doc =' . (!empty($objectDocument->last_main_doc) ? "'" . $this->db->escape($objectDocument->last_main_doc) . "'" : 'null');
             $sql .= ' WHERE rowid = ' . $objectDocument->id;
 
-            dol_syslog('dolimeet_dolimeetdocuments::Insert last main doc', LOG_DEBUG);
+            dol_syslog('saturne_object_documents::Insert last main doc', LOG_DEBUG);
             $this->db->query($sql);
 
             dol_mkdir($conf->dolimeet->dir_temp);

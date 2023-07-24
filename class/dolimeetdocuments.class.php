@@ -23,10 +23,12 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
+// Laod saturne libraries
+require_once __DIR__ . '/../../saturne/class/saturnedocuments.class.php';
 /**
  * Class for DoliMeetDocuments
  */
-class DoliMeetDocuments extends CommonObject
+class DoliMeetDocuments extends SaturneDocuments
 {
 	/**
 	 * @var DoliDB Database handler.
@@ -51,7 +53,7 @@ class DoliMeetDocuments extends CommonObject
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'dolimeet_dolimeetdocuments';
+	public $table_element = 'saturne_object_documents';
 
 	/**
 	 * @var int Does this object support multicompany module ?
@@ -139,7 +141,7 @@ class DoliMeetDocuments extends CommonObject
     /**
      * @var string Json
      */
-	public string $json;
+	public ?string $json;
 
     /**
      * @var string Pdf model name
@@ -149,7 +151,7 @@ class DoliMeetDocuments extends CommonObject
     /**
      * @var string ODT model name
      */
-	public string $model_odt;
+	public ?string $model_odt;
 
     /**
      * @var string Last document name
