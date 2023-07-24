@@ -1,4 +1,4 @@
--- Copyright (C) 2023 EVARISK <technique@evarisk.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,9 +13,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see https://www.gnu.org/licenses/.
 
-create table llx_dolimeet_dolimeetdocuments_extrafields(
-    rowid      integer AUTO_INCREMENT PRIMARY KEY,
-    tms        timestamp,
-    import_key varchar(14),
-    fk_object  integer NOT NULL
+CREATE TABLE llx_dolimeet_session_extrafields(
+  rowid      integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  tms        timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  import_key varchar(14),
+  fk_object  integer NOT NULL
 ) ENGINE=innodb;
