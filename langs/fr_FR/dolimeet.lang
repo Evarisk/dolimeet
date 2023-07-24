@@ -106,7 +106,13 @@ SessionTrainerResponsibleIdSet        = Responsable du dispensateur de formation
 DocumentLocation                      = Lieu affiché sur les documents
 DocumentLocationDesc                  = Enregistre le lieu qui sera affiché sur les documents (Fait à : xxxx)
 DocumentLocationSet                   = Lieu enregistré
-DocumentLocation
+DocumentLocation                      = Lieu de signature des documents
+LinkDolimeet_trainsess                = Activer le lien avec les sessions de formation
+LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles de contrôle
+SatisfactionSurvey                    = Enquête de satisfaction
+SatisfactionSurveyDesc                = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction
+
+
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur

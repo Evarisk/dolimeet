@@ -127,7 +127,8 @@ class modDoliMeet extends DolibarrModules
                 'saturneglobal',
                 'sessioncard',
                 'saturnepublicsignature',
-                'contractcard'
+                'contractcard',
+				'get_sheet_linkable_objects'
             ],
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 1,

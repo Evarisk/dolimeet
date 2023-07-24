@@ -54,8 +54,9 @@ saturne_check_access($permissiontoread);
  */
 
 if ($action == 'update') {
-	$responsibleId    = GETPOST('session_trainer_responsible_id');
-	$documentLocation = GETPOST('document_location');
+	$responsibleId        = GETPOST('session_trainer_responsible_id');
+	$documentLocation     = GETPOST('document_location');
+	$satisfactionSurveyId = GETPOST('satisfaction_survey_model');
 
 	if ($responsibleId != $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE) {
 		dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', $responsibleId, 'int');
@@ -67,6 +68,11 @@ if ($action == 'update') {
 	if ($documentLocation != $conf->global->DOLIMEET_DOCUMENT_LOCATION) {
 		dolibarr_set_const($db, 'DOLIMEET_DOCUMENT_LOCATION', $documentLocation);
 		setEventMessages($langs->trans('DocumentLocationSet', $user->getFullName($langs)), null);
+	}
+
+	if ($satisfactionSurveyId != $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET) {
+		dolibarr_set_const($db, 'DOLIMEET_SATISFACTION_SURVEY_SHEET', $satisfactionSurveyId);
+		setEventMessages($langs->trans('SatisfactionSurveySet'), null);
 	}
 
 }
@@ -258,7 +264,26 @@ print '<input name="document_location" value="'. $conf->global->DOLIMEET_DOCUMEN
 print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
 print '</td>';
 print '</tr>';
+
+if (isModEnabled('digiquali')) {
+	require_once __DIR__ . '/../../digiquali/class/sheet.class.php';
+	$sheet = new Sheet($db);
+
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('SatisfactionSurvey');
+	print '</td><td>';
+	print $langs->transnoentities('SatisfactionSurveyDesc');
+	print '</td>';
+
+	print '<td class="center">';
+	print $sheet->selectSheetList($conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET, 'satisfaction_survey_model');
+	print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+	print '</td>';
+	print '</tr>';
+}
+
 print '</form>';
+
 
 $db->close();
 llxFooter();
