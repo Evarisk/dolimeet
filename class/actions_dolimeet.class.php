@@ -216,6 +216,33 @@ class ActionsDolimeet
         return 0; // or return 1 to replace standard code
 	}
 
+	/**
+	 * Execute action extendSheetLinkableObjectsList
+	 *
+	 * @param   array           $linkableObjectTypes     Array of linkable objects
+	 * @return  int                                      1
+	 */
+	public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int {
+		require_once __DIR__ . '/../class/trainingsession.class.php';
+		require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
+		$trainingSession = new Trainingsession($this->db);
+		$linkableObjectTypes['dolimeet_trainsess'] = [
+			'langs'      => 'TrainingSession',
+			'langfile'   => 'dolimeet@dolimeet',
+			'picto'      => $trainingSession->picto,
+			'className'  => 'TrainingSession',
+			'post_name'  => 'fk_trainingsession',
+			'link_name'  => 'dolimeet_trainsess',
+			'name_field' => 'ref',
+			'create_url' => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
+			'class_path' => 'custom/dolimeet/class/trainingsession.class.php',
+			'lib_path'   => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php',
+		];
+
+		$this->results = $linkableObjectTypes;
+		return 1;
+	}
+
     /**
      *  Overloading the saturneBannerTab function : replacing the parent's function with the one below
      *
