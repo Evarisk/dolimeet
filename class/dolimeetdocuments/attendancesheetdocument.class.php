@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,35 +16,36 @@
  */
 
 /**
- * \file        class/dolimeetdocuments/attendancesheetdocument.class.php
- * \ingroup     dolimeet
- * \brief       This file is a class file for AttendancesheetDocument
+ * \file    class/dolimeetdocuments/attendancesheetdocument.class.php
+ * \ingroup dolimeet
+ * \brief   This file is a class file for AttendancesheetDocument.
  */
 
-require_once __DIR__ . '/../dolimeetdocuments.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
 /**
- * Class for AttendancesheetDocument
+ * Class for AttendancesheetDocument.
  */
-class AttendancesheetDocument extends DoliMeetDocuments
+class AttendancesheetDocument extends SaturneDocuments
 {
-	/**
-	 * @var string Element type of object.
-	 */
-	public $element = 'attendancesheetdocument';
+    /**
+     * @var string Module name.
+     */
+    public string $module = 'dolimeet';
 
-	/**
-	 * @var string String with name of icon for attendancesheetdocument. Must be the part after the 'object_' into object_attendancesheetdocument.png
-	 */
-	public string $picto = 'attendancesheetdocument@dolimeet';
+    /**
+     * @var string Element type of object.
+     */
+    public $element = 'attendancesheetdocument';
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		parent::__construct($db);
-	}
+    /**
+     * Constructor.
+     *
+     * @param DoliDb $db Database handler.
+     */
+    public function __construct(DoliDB $db)
+    {
+        parent::__construct($db, $this->module, $this->element);
+    }
 }

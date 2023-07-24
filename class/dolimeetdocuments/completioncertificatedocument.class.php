@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,35 +16,36 @@
  */
 
 /**
- * \file        class/dolimeetdocuments/completioncertificatedocument.class.php
- * \ingroup     dolimeet
- * \brief       This file is a class file for CompletionCertificateDocument
+ * \file    class/dolimeetdocuments/completioncertificatedocument.class.php
+ * \ingroup dolimeet
+ * \brief   This file is a class file for CompletioncertificateDocument.
  */
 
-require_once __DIR__ . '/../dolimeetdocuments.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
 /**
- * Class for CompletionCertificateDocument
+ * Class for CompletioncertificateDocument.
  */
-class CompletionCertificateDocument extends DoliMeetDocuments
+class CompletioncertificateDocument extends SaturneDocuments
 {
-	/**
-	 * @var string Element type of object.
-	 */
-	public $element = 'completioncertificatedocument';
+    /**
+     * @var string Module name.
+     */
+    public string $module = 'dolimeet';
 
-	/**
-	 * @var string String with name of icon for completioncertificatedocument. Must be the part after the 'object_' into object_completioncertificatedocument.png
-	 */
-	public string $picto = 'completioncertificatedocument@dolimeet';
+    /**
+     * @var string Element type of object.
+     */
+    public $element = 'completioncertificatedocument';
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		parent::__construct($db);
-	}
+    /**
+     * Constructor.
+     *
+     * @param DoliDb $db Database handler.
+     */
+    public function __construct(DoliDB $db)
+    {
+        parent::__construct($db, $this->module, $this->element);
+    }
 }
