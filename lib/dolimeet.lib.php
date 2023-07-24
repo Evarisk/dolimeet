@@ -18,27 +18,27 @@
 /**
  * \file    lib/dolimeet.lib.php
  * \ingroup dolimeet
- * \brief   Library files with common functions for DoliMeet
+ * \brief   Library files with common functions for Admin conf.
  */
 
 /**
- * Prepare admin pages header
+ * Prepare admin pages header.
  *
- * @return array
+ * @return array $head Array of tabs.
  */
 function dolimeet_admin_prepare_head(): array
 {
-    // Global variables definitions
-	global $langs, $conf;
+    // Global variables definitions.
+    global $langs, $conf;
 
-    // Load translation files required by the page
-	saturne_load_langs();
+    // Load translation files required by the page.
+    saturne_load_langs();
 
-    // Initialize values
-	$h = 0;
-	$head = [];
+    // Initialize values.
+    $h    = 0;
+    $head = [];
 
-    $head[$h][0] = dol_buildpath('/dolimeet/admin/dolimeetdocuments.php', 1);
+    $head[$h][0] = dol_buildpath('/saturne/admin/documents.php?module_name=DoliMeet', 1);
     $head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('YourDocuments');
     $head[$h][2] = 'documents';
     $h++;
@@ -48,14 +48,14 @@ function dolimeet_admin_prepare_head(): array
     $head[$h][2] = 'settings';
     $h++;
 
-    $head[$h][0] = dol_buildpath('/dolimeet/admin/about.php', 1);
+    $head[$h][0] = dol_buildpath('/saturne/admin/about.php?module_name=DoliMeet', 1);
     $head[$h][1] = '<i class="fab fa-readme pictofixedwidth"></i>' . $langs->trans('About');
     $head[$h][2] = 'about';
     $h++;
 
-	complete_head_from_modules($conf, $langs, null, $head, $h, 'dolimeet@dolimeet');
+    complete_head_from_modules($conf, $langs, null, $head, $h, 'dolimeet@dolimeet');
 
-	complete_head_from_modules($conf, $langs, null, $head, $h, 'dolimeet@dolimeet', 'remove');
+    complete_head_from_modules($conf, $langs, null, $head, $h, 'dolimeet@dolimeet', 'remove');
 
-	return $head;
+    return $head;
 }

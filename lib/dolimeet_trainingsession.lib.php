@@ -18,19 +18,23 @@
 /**
  * \file    lib/dolimeet_trainingsession.lib.php
  * \ingroup dolimeet
- * \brief   Library files with common functions for TrainingSession
+ * \brief   Library files with common functions for TrainingSession.
  */
 
+// Load DoliMeet libraries.
 require_once __DIR__ . '/dolimeet_session.lib.php';
 
 /**
- * Prepare training session pages header
+ * Prepare training session pages header.
  *
- * @param  Trainingsession $object TrainingSession
- * @return array                   Array of tabs
+ * @param  Trainingsession $object TrainingSession.
+ * @return array           $head   Array of tabs.
  * @throws Exception
  */
 function trainingsession_prepare_head(Trainingsession $object): array
 {
-    return session_prepare_head($object);
+    $moreParams['documentType']       = 'AttendanceSheetDocument';
+    $moreParams['attendantTableMode'] = 'simple';
+
+    return session_prepare_head($object, [], $moreParams);
 }

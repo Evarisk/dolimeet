@@ -18,19 +18,23 @@
 /**
  * \file    lib/dolimeet_meeting.lib.php
  * \ingroup dolimeet
- * \brief   Library files with common functions for Meeting
+ * \brief   Library files with common functions for Meeting.
  */
 
+// Load DoliMeet libraries.
 require_once __DIR__ . '/dolimeet_session.lib.php';
 
 /**
- * Prepare meeting pages header
+ * Prepare meeting pages header.
  *
- * @param  Meeting    $object Meeting
- * @return array              Array of tabs
+ * @param  Meeting   $object Meeting.
+ * @return array     $head   Array of tabs.
  * @throws Exception
  */
 function meeting_prepare_head(Meeting $object): array
 {
-    return session_prepare_head($object);
+    $moreParams['documentType']       = 'MeetingDocument';
+    $moreParams['attendantTableMode'] = 'simple';
+
+    return session_prepare_head($object, [], $moreParams);
 }

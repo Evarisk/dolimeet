@@ -18,19 +18,23 @@
 /**
  * \file    lib/dolimeet_audit.lib.php
  * \ingroup dolimeet
- * \brief   Library files with common functions for Audit
+ * \brief   Library files with common functions for Audit.
  */
 
+// Load DoliMeet libraries.
 require_once __DIR__ . '/dolimeet_session.lib.php';
 
 /**
- * Prepare audit pages header
+ * Prepare audit pages header.
  *
- * @param  Audit      $object Audit
- * @return array              Array of tabs
+ * @param  Audit     $object Audit.
+ * @return array     $head   Array of tabs.
  * @throws Exception
  */
 function audit_prepare_head(Audit $object): array
 {
-    return session_prepare_head($object);
+    $moreParams['documentType']       = 'AuditDocument';
+    $moreParams['attendantTableMode'] = 'simple';
+
+    return session_prepare_head($object, [], $moreParams);
 }
