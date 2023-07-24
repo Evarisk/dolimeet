@@ -307,7 +307,7 @@ class modDoliMeet extends DolibarrModules
         ];
 
         // Boxes/Widgets.
-        // Add here list of php file(s) stored in dolisirh/core/boxes that contains a class to show a widget.
+        // Add here list of php file(s) stored in dolimeet/core/boxes that contains a class to show a widget.
         $this->boxes = [];
 
         // Cronjobs (List of cron jobs entries to add when module is enabled).
