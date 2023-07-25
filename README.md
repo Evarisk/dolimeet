@@ -1,27 +1,28 @@
-# DoliMeet sur [DOLIBARR ERP CRM](https://www.dolibarr.org)
+# DoliMeet sur [DOLIBARR ERP CRM](https://dolibarr.org)
 
 ## Informations
 
 - Numéro du module : 436304
-- Dernière mise à jour : 10/05/2023
-- Éditeur : [Evarisk](https://www.evarisk.com)
-- Thème : eldy
+- Dernière mise à jour : 24/07/2023
+- Éditeur : [Evarisk](https://evarisk.com)
+- Thème : Eldy Menu
 - Licence : GPLv3
 - Disponible sur : Windows - MacOS - Linux
 
 ## Version
 
-- Version :  1.1.0
-- Compatibilité : Dolibarr 15.0.0 - 16.0.4
-- Saturne framework : 1.0.0
+- Version :  1.2.0
+- Compatibilité : Dolibarr 16.0.0 - 17.0.2
+- Saturne framework : 1.1.1
 
 ## Liens
 
-- Support & Assistance : [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
-- Demo : [Demo DoliMeet](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
+- Support & Assistance : [Forum dolibarr.fr](https://dolibarr.fr) / Par mail à technique@evarisk.com
+- Demo : [Demo DoliMeet](https://demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki DoliMeet](https://wiki.dolibarr.org/index.php/Module_DoliMeet)
 - Projet GitHub : [Projet DoliMeet](https://github.com/Evarisk/dolimeet/projects?query=is%3Aopen)
-- D'autres modules développés par Evarisk disponibles sur [DoliStore.com](https://www.dolistore.com)
+- Saturne Framework : [Télécharger Saturne](https://dolistore.com/fr/modules/1906-Saturne.html)
+- D'autres modules développés par Evarisk disponibles sur [DoliStore.com](https://dolistore.com)
 
 ## Fonctionnalités
 
@@ -47,6 +48,7 @@
 
 - Dans le dossier "dolibarr/htdocs/custom" copier la ligne suivante :
 ``` 
-git clone https://github.com/Evarisk/dolimeet.git
-git clone https://github.com/Evarisk/saturne.git
+git clone -b main https://github.com/Evarisk/dolimeet.git dolimeet
+git clone -b main https://github.com/Evarisk/saturne.git saturne
 ```
+- Activer le module dans la liste des Modules/Applications installés
