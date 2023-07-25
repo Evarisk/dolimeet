@@ -17,13 +17,14 @@
  */
 
 /**
- * \file    core/modules/dolimeet/dolimeetdocuments/attendancesheetdocument/doc_attendancesheetdocument_odt.modules.php
+ * \file    core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_attendancesheetdocument_odt.modules.php
  * \ingroup dolimeet
  * \brief   File of class to build ODT attendancesheet document.
  */
 
 // Load Dolibarr libraries.
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
@@ -32,7 +33,7 @@ require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 // Load DoliMeet libraries.
-require_once __DIR__ . '/mod_attendancesheetdocument_standard.php';
+require_once __DIR__ . '/../attendancesheetdocument/mod_attendancesheetdocument_standard.php';
 
 /**
  * Class to build documents using ODF templates generator.
