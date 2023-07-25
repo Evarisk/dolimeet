@@ -24,3 +24,11 @@ INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `activ
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'internal', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+
+-- 1.2.0
+INSERT INTO `llx_c_meeting_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'Contributor', 'Contributor', '', 1, 1);
+INSERT INTO `llx_c_meeting_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Responsible', 'Responsible', '', 1, 10);
+INSERT INTO `llx_c_trainingsession_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'Trainee', 'Trainee', '', 1, 1);
+INSERT INTO `llx_c_trainingsession_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'SessionTrainer', 'SessionTrainer', '', 1, 10);
+INSERT INTO `llx_c_audit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'Auditee', 'Auditee', '', 1, 1);
+INSERT INTO `llx_c_audit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Auditor', 'Auditor', '', 1, 10);
