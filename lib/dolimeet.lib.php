@@ -38,6 +38,21 @@ function dolimeet_admin_prepare_head(): array
     $h    = 0;
     $head = [];
 
+    $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=meeting';
+    $head[$h][1] = '<i class="fas fa-comments pictofixedwidth"></i>' . $langs->trans('Meeting');
+    $head[$h][2] = 'meeting';
+    $h++;
+
+    $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=trainingsession';
+    $head[$h][1] = '<i class="fas fa-people-arrows pictofixedwidth"></i>' . $langs->trans('Trainingsession');
+    $head[$h][2] = 'trainingsession';
+    $h++;
+
+    $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=audit';
+    $head[$h][1] = '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('Audit');
+    $head[$h][2] = 'audit';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/saturne/admin/documents.php?module_name=DoliMeet', 1);
     $head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('YourDocuments');
     $head[$h][2] = 'documents';
