@@ -251,7 +251,7 @@ class modDoliMeet extends DolibarrModules
             // Label of tables.
             'tablib' => [
                 'TrainingSessionType',
-                'Meetting',
+                'Meeting',
                 'TrainingSession',
                 'Audit'
             ],
@@ -332,14 +332,14 @@ class modDoliMeet extends DolibarrModules
 
         /* SESSION PERMISSSIONS */
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('SessionsMin'));
+        $this->rights[$r][1] = $langs->trans('ReadObjects', $langs->trans('SessionsMin'));
         $this->rights[$r][4] = 'session';
         $this->rights[$r][5] = 'read';
         $r++;
 
         /* MEETING PERMISSSIONS */
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->transnoentities('ReadObject', $langs->transnoentities('Meetings'));
+        $this->rights[$r][1] = $langs->transnoentities('ReadObjects', $langs->transnoentities('Meetings'));
         $this->rights[$r][4] = 'meeting';
         $this->rights[$r][5] = 'read';
         $r++;
@@ -349,19 +349,19 @@ class modDoliMeet extends DolibarrModules
         $this->rights[$r][5] = 'meeting';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->transnoentities('Meetings'));
+        $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('Meetings'));
         $this->rights[$r][4] = 'meeting';
         $this->rights[$r][5] = 'write';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->transnoentities('DeleteObject', $langs->transnoentities('Meetings'));
+        $this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('Meetings'));
         $this->rights[$r][4] = 'meeting';
         $this->rights[$r][5] = 'delete';
         $r++;
 
         /* TRAINING SESSION PERMISSSIONS */
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('Trainingsessions'));
+        $this->rights[$r][1] = $langs->trans('ReadObjects', $langs->trans('Trainingsessions'));
         $this->rights[$r][4] = 'trainingsession';
         $this->rights[$r][5] = 'read';
         $r++;
@@ -371,19 +371,19 @@ class modDoliMeet extends DolibarrModules
         $this->rights[$r][5] = 'trainingsession';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Trainingsessions'));
+        $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->trans('Trainingsessions'));
         $this->rights[$r][4] = 'trainingsession';
         $this->rights[$r][5] = 'write';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->trans('DeleteObject', $langs->trans('Trainingsessions'));
+        $this->rights[$r][1] = $langs->trans('DeleteObjects', $langs->trans('Trainingsessions'));
         $this->rights[$r][4] = 'trainingsession';
         $this->rights[$r][5] = 'delete';
         $r++;
 
         /* AUDIT PERMISSSIONS */
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->trans('ReadObject', $langs->trans('Audits'));
+        $this->rights[$r][1] = $langs->trans('ReadObjects', $langs->trans('Audits'));
         $this->rights[$r][4] = 'audit';
         $this->rights[$r][5] = 'read';
         $r++;
@@ -393,12 +393,12 @@ class modDoliMeet extends DolibarrModules
         $this->rights[$r][5] = 'audit';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->transnoentities('CreateObject', $langs->trans('Audits'));
+        $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->trans('Audits'));
         $this->rights[$r][4] = 'audit';
         $this->rights[$r][5] = 'write';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-        $this->rights[$r][1] = $langs->transnoentities('DeleteObject', $langs->trans('Audits'));
+        $this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->trans('Audits'));
         $this->rights[$r][4] = 'audit';
         $this->rights[$r][5] = 'delete';
         $r++;
