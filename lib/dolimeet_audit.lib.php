@@ -33,6 +33,7 @@ require_once __DIR__ . '/../../saturne/lib/object.lib.php';
  */
 function audit_prepare_head(Audit $object): array
 {
+    $moreParams['parentType']         = 'session';
     $moreParams['documentType']       = 'AuditDocument';
     $moreParams['attendantTableMode'] = 'simple';
 

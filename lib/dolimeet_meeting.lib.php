@@ -33,6 +33,7 @@ require_once __DIR__ . '/../../saturne/lib/object.lib.php';
  */
 function meeting_prepare_head(Meeting $object): array
 {
+    $moreParams['parentType']         = 'session';
     $moreParams['documentType']       = 'MeetingDocument';
     $moreParams['attendantTableMode'] = 'simple';
 
