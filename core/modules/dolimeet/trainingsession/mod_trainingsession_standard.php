@@ -16,26 +16,26 @@
  */
 
 /**
- * \file    core/modules/dolimeet/session/mod_audit_standard.php
+ * \file    core/modules/dolimeet/trainingsession/mod_trainingsession_standard.php
  * \ingroup dolimeet
- * \brief   File of class to manage audit numbering rules standard.
+ * \brief   File of class to manage training session numbering rules standard
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class to manage customer audit numbering rules standard.
+ * Class to manage customer training session numbering rules standard
  */
-class mod_audit_standard extends ModeleNumRefSaturne
+class mod_trainingsession_standard extends ModeleNumRefSaturne
 {
     /**
-     * @var string Numbering module ref prefix.
+     * @var string Numbering module ref prefix
      */
-    public string $prefix = 'AU';
+    public string $prefix = 'SF';
 
     /**
-     * @var string Name.
+     * @var string Name
      */
-    public string $name = 'Audit';
+    public string $name = 'TrainingSession';
 }
