@@ -18,17 +18,17 @@
 /**
  * \file    lib/dolimeet_meeting.lib.php
  * \ingroup dolimeet
- * \brief   Library files with common functions for Meeting.
+ * \brief   Library files with common functions for Meeting
  */
 
-// Load DoliMeet libraries.
-require_once __DIR__ . '/dolimeet_session.lib.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../saturne/lib/object.lib.php';
 
 /**
- * Prepare meeting pages header.
+ * Prepare meeting pages header
  *
- * @param  Meeting   $object Meeting.
- * @return array     $head   Array of tabs.
+ * @param  Meeting   $object Meeting
+ * @return array     $head   Array of tabs
  * @throws Exception
  */
 function meeting_prepare_head(Meeting $object): array
@@ -36,5 +36,5 @@ function meeting_prepare_head(Meeting $object): array
     $moreParams['documentType']       = 'MeetingDocument';
     $moreParams['attendantTableMode'] = 'simple';
 
-    return session_prepare_head($object, [], $moreParams);
+    return saturne_object_prepare_head($object, [], $moreParams, true);
 }

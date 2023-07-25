@@ -18,23 +18,23 @@
 /**
  * \file    lib/dolimeet.lib.php
  * \ingroup dolimeet
- * \brief   Library files with common functions for Admin conf.
+ * \brief   Library files with common functions for Admin conf
  */
 
 /**
- * Prepare admin pages header.
+ * Prepare admin pages header
  *
- * @return array $head Array of tabs.
+ * @return array $head Array of tabs
  */
 function dolimeet_admin_prepare_head(): array
 {
-    // Global variables definitions.
+    // Global variables definitions
     global $langs, $conf;
 
-    // Load translation files required by the page.
+    // Load translation files required by the page
     saturne_load_langs();
 
-    // Initialize values.
+    // Initialize values
     $h    = 0;
     $head = [];
 
