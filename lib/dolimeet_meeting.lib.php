@@ -21,16 +21,20 @@
  * \brief   Library files with common functions for Meeting
  */
 
-require_once __DIR__ . '/dolimeet_session.lib.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../saturne/lib/object.lib.php';
 
 /**
  * Prepare meeting pages header
  *
- * @param  Meeting    $object Meeting
- * @return array              Array of tabs
+ * @param  Meeting   $object Meeting
+ * @return array     $head   Array of tabs
  * @throws Exception
  */
 function meeting_prepare_head(Meeting $object): array
 {
-    return session_prepare_head($object);
+    $moreParams['documentType']       = 'MeetingDocument';
+    $moreParams['attendantTableMode'] = 'simple';
+
+    return saturne_object_prepare_head($object, [], $moreParams, true);
 }
