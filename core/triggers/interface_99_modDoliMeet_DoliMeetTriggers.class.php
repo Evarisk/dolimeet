@@ -97,10 +97,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $now        = dol_now();
         $actioncomm = new ActionComm($this->db);
 
-        if (method_exists($object, 'fetch')) {
-            $object->fetch($object->id);
-        }
-
         $actioncomm->elementtype = $object->element . '@dolimeet';
         $actioncomm->type_code   = 'AC_OTH_AUTO';
         $actioncomm->datep       = $now;
