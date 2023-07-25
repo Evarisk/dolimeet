@@ -170,7 +170,3 @@ Auditor = Auditeur
 TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
-ShowSignatureSpecimen             = Voir les signatures sur les documents specimens
-ShowSignatureSpecimenDescription  = Permet la visualisation des signatures sur les documents specimens
-Config                            = Configuration
-SendMailSubject                   = [%s] Liens de signature pour %s %s
