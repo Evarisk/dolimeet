@@ -311,6 +311,26 @@ class ActionsDolimeet
     }
 
     /**
+     *  Overloading the saturneAttendantsBackToCard function : replacing the parent's function with the one below.
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function saturneAttendantsBackToCard(array $parameters, CommonObject $object): int
+    {
+        global $moduleNameLowerCase;
+
+        // Do something only for the current context.
+        if (in_array($parameters['currentcontext'], ['saturneglobal'])) {
+            $this->resprints = dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $object->id . '&object_type=' . $object->element, 1);
+            return 1;
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
      * Overloading the SaturneAdminDocumentData function : replacing the parent's function with the one below.
      *
      * @param  array $parameters Hook metadatas (context, etc...).
