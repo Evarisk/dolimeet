@@ -271,6 +271,25 @@ class Session extends SaturneObject
     }
 
     /**
+     *  Return a link to the object card (with optionaly the picto).
+     *
+     *  @param  int     $withpicto              Include picto in link (0 = No picto, 1 = Include picto into link, 2 = Only picto).
+     *  @param  string  $option                 On what the link point to ('nolink', ...).
+     *  @param  int     $notooltip              1 = Disable tooltip.
+     *  @param  string  $morecss                Add more css on link.
+     *  @param  int     $save_lastsearch_value -1 = Auto, 0 = No save of lastsearch_values when clicking, 1 = Save lastsearch_values whenclicking.
+     *  @return	string                          String with URL.
+     */
+    public function getNomUrl(int $withpicto = 0, string $option = '', int $notooltip = 0, string $morecss = '', int $save_lastsearch_value = -1): string
+    {
+        global $url;
+
+        $url = dol_buildpath('/' . $this->module . '/view/session/session_card.php', 1) . '?id=' . $this->id . '&object_type=' . $this->element;
+
+        return parent::getNomUrl($withpicto, $option, $notooltip, $morecss, $save_lastsearch_value);
+    }
+
+    /**
      * Set draft status.
      *
      * @param  User      $user      Object user that modify.
@@ -323,6 +342,21 @@ class Session extends SaturneObject
         }
 
         return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+    }
+
+    /**
+     * Sets object to supplied categories
+     *
+     * Deletes object from existing categories not supplied
+     * Adds it to non-existing supplied categories
+     * Existing categories are left untouched
+     *
+     * @param  int|int[] $categories Category or categories IDs
+     * @return int                   0 < if KO, >0 if OK
+     */
+    public function setCategories($categories): int
+    {
+        return parent::setCategoriesCommon($categories, 'session');
     }
 
     /**
