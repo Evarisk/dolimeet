@@ -63,7 +63,7 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 // Initialize technical objects.
 $className   = ucfirst($objectType);
 $object      = new $className($db);
-$document    = new SessionDocument($db, $object->element);
+$document    = new SessionDocument($db, $object->element . 'document');
 $signatory   = new SaturneSignature($db, 'dolimeet', $object->element);
 $extrafields = new ExtraFields($db);
 $contact     = new Contact($db);
