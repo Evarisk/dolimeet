@@ -33,6 +33,7 @@ require_once __DIR__ . '/../../saturne/lib/object.lib.php';
  */
 function trainingsession_prepare_head(Trainingsession $object): array
 {
+    $moreParams['parentType']         = 'session';
     $moreParams['documentType']       = 'AttendanceSheetDocument';
     $moreParams['attendantTableMode'] = 'simple';
 
