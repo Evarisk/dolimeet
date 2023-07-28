@@ -202,53 +202,51 @@ if (empty($resHook)) {
             $model = GETPOST('model', 'alpha');
         }
 
-        $moreparams['object'] = $object;
-        $moreparams['user']   = $user;
+        $moreparams['object']   = $object;
+        $moreparams['user']     = $user;
+        $moreparams['zone']     = 'private';
+        $moreparams['specimen'] = $object->status < $object::STATUS_LOCKED;
 
-        if ($object->status < $object::STATUS_LOCKED) {
-            $moreparams['specimen'] = 1;
-            $moreparams['zone']     = 'private';
-        } else {
-            $moreparams['specimen'] = 0;
-        }
-
-        if (preg_match('/completioncertificate/', (!empty($models) ? $models[1] : $model))) {
-            $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
-            if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
-                foreach ($signatoriesArray as $objectSignatory) {
-                    if ($objectSignatory->role == 'Trainee' && $objectSignatory->attendance != $objectSignatory::ATTENDANCE_ABSENT) {
-                        $moreparams['attendant'] = $objectSignatory;
-                        $result = $document->generateDocument((!empty($models) ? $models[1] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-                        if ($result <= 0) {
-                            setEventMessages($document->error, $object->errors, 'errors');
-                            $action = '';
+        if (!empty($models) || !empty(($model))) {
+            if (preg_match('/completioncertificate/', (!empty($models) ? $models[1] : $model))) {
+                $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
+                if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
+                    foreach ($signatoriesArray as $objectSignatory) {
+                        if ($objectSignatory->role == 'Trainee' && $objectSignatory->attendance != $objectSignatory::ATTENDANCE_ABSENT) {
+                            $moreparams['attendant'] = $objectSignatory;
+                            $result = $document->generateDocument((!empty($models) ? $models[1] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+                            if ($result <= 0) {
+                                setEventMessages($document->error, $object->errors, 'errors');
+                                $action = '';
+                            }
+                        }
+                    }
+                    if (empty($donotredirect)) {
+                        setEventMessages($langs->trans('FileGenerated') . ' - ' . $document->last_main_doc, []);
+                        $urltoredirect = $_SERVER['REQUEST_URI'];
+                        $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+                        $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+                        if (!GETPOST('forcebuilddoc')){
+                            header('Location: ' . $urltoredirect . '#builddoc');
+                            exit;
                         }
                     }
                 }
-                if (empty($donotredirect)) {
-                    setEventMessages($langs->trans('FileGenerated') . ' - ' . $document->last_main_doc, []);
-                    $urltoredirect = $_SERVER['REQUEST_URI'];
-                    $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-                    $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-                    if (!GETPOST('forcebuilddoc')){
-                        header('Location: ' . $urltoredirect . '#builddoc');
-                        exit;
-                    }
-                }
             }
-        }
-        $result = $document->generateDocument((!empty($models) ? $models[0] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-        if ($result <= 0) {
-            setEventMessages($document->error, $document->errors, 'errors');
-            $action = '';
-        } elseif (empty($donotredirect)) {
-            setEventMessages($langs->trans('FileGenerated') . ' - ' . $document->last_main_doc, []);
-            $urltoredirect = $_SERVER['REQUEST_URI'];
-            $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-            $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-            $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
-            header('Location: ' . $urltoredirect . '#builddoc');
-            exit;
+
+            $result = $document->generateDocument((!empty($models) ? $models[0] : $model), $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+            if ($result <= 0) {
+                setEventMessages($document->error, $document->errors, 'errors');
+                $action = '';
+            } elseif (empty($donotredirect)) {
+                setEventMessages($langs->trans('FileGenerated') . ' - ' . $document->last_main_doc, []);
+                $urltoredirect = $_SERVER['REQUEST_URI'];
+                $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+                $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+                $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
+                header('Location: ' . $urltoredirect . '#builddoc');
+                exit;
+            }
         }
     }
 
