@@ -76,19 +76,25 @@ class ActionsDolimeet
                     'id'        => 436304001,
                     'code'      => 'meeting',
                     'obj_class' => 'Meeting',
-                    'obj_table' => 'dolimeet_session',
+                    'obj_table' => 'dolimeet_session'
                 ],
                 'trainingsession' => [
                     'id'          => 436304002,
                     'code'        => 'trainingsession',
                     'obj_class'   => 'Trainingsession',
-                    'obj_table'   => 'dolimeet_session',
+                    'obj_table'   => 'dolimeet_session'
                 ],
                 'audit'         => [
                     'id'        => 436304003,
                     'code'      => 'audit',
                     'obj_class' => 'Audit',
-                    'obj_table' => 'dolimeet_session',
+                    'obj_table' => 'dolimeet_session'
+                ],
+                'session'       => [
+                    'id'        => 436304004,
+                    'code'      => 'session',
+                    'obj_class' => 'Session',
+                    'obj_table' => 'dolimeet_session'
                 ],
             ];
             $this->results = $tags;
@@ -106,7 +112,7 @@ class ActionsDolimeet
      */
     public function printCommonFooter(array $parameters): int
     {
-        global $conf, $db, $langs;
+        global $conf, $db, $form, $langs ,$user;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'projectOverview') {
@@ -190,7 +196,148 @@ class ActionsDolimeet
             <?php
         }
 
+        // Do something only for the current context
+        if (preg_match('/categoryindex/', $parameters['context'])) {
+            print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
+        } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
+            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+
+            $id   = GETPOST('id');
+            $type = GETPOST('type');
+
+            // Load variable for pagination
+            $limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
+            $sortfield = GETPOST('sortfield', 'aZ09comma');
+            $sortorder = GETPOST('sortorder', 'aZ09comma');
+            $page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+            if (empty($page) || $page == -1) {
+                $page = 0;
+            }     // If $page is not defined, or '' or -1 or if we click on clear filters or if we select empty mass action
+            $offset = $limit * $page;
+
+            require_once __DIR__ . '/' . $type . '.class.php';
+
+            $classname = ucfirst($type);
+            $object    = new $classname($this->db);
+
+            $sessions      = $object->fetchAll('', '', 0, 0, ['customsql' => 't.type = ' . "'" . $type . "'"]);
+            $sessionArrays = [];
+            if (is_array($sessions) && !empty($sessions)) {
+                foreach ($sessions as $session) {
+                    $sessionArrays[$session->id] = $session->ref;
+                }
+            }
+
+            $category = new Categorie($this->db);
+            $category->fetch($id);
+
+            $sessionCategories = $category->getObjectsInCateg('session', 0, $limit, $offset);
+            $out = '<br>';
+
+            $out .= '<form method="post" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=' . $type . '">';
+            $out .= '<input type="hidden" name="token" value="' . newToken() . '">';
+            $out .= '<input type="hidden" name="action" value="addintocategory">';
+
+            $out .= '<table class="noborder centpercent">';
+            $out .= '<tr class="liste_titre"><td>';
+            $out .= $langs->trans('AddObjectIntoCategory') . ' ';
+            $out .= $form::selectarray('element_id', $sessionArrays, '', 1);
+            $out .= '<input type="submit" class="button buttongen" value="' . $langs->trans('ClassifyInCategory') . '"></td>';
+            $out .= '</tr>';
+            $out .= '</table>';
+            $out .= '</form>';
+
+            $out .= '<br>';
+
+            $out .= load_fiche_titre($langs->transnoentities($classname), '', 'object_' . $object->picto);
+            $out .= '<table class="noborder centpercent">';
+            $out .= '<tr class="liste_titre"><td colspan="3">' . $langs->trans('Ref') . '</td></tr>';
+
+            if (is_array($sessionCategories) && !empty($sessionCategories)) {
+                // Form to add record into a category
+                if (count($sessionCategories) > 0) {
+                    $i = 0;
+                    foreach ($sessionCategories as $session) {
+                        $i++;
+                        if ($i > $limit) break;
+
+                        $out .= '<tr class="oddeven">';
+                        $out .= '<td class="nowrap">';
+                        $session->picto   = $object->picto;
+                        $session->element = $type;
+                        $out .= $session->getNomUrl(1);
+                        $out .= '</td>';
+                        // Link to delete from category
+                        $out .= '<td class="right">';
+                        if ($user->rights->categorie->creer) {
+                            $out .= '<a href="' . $_SERVER['PHP_SELF'] . '?action=delintocategory&id=' . $id . '&type=' . $type . '&element_id=' . $session->id . '&token=' . newToken() . '">';
+                            $out .= $langs->trans('DeleteFromCat');
+                            $out .= img_picto($langs->trans('DeleteFromCat'), 'unlink', '', false, 0, 0, '', 'paddingleft');
+                            $out .= '</a>';
+                        }
+                        $out .= '</td>';
+                        $out .= '</tr>';
+                    }
+                } else {
+                    $out .= '<tr class="oddeven"><td colspan="2" class="opacitymedium">' . $langs->trans('ThisCategoryHasNoItems') . '</td></tr>';
+                }
+            } else {
+                $out .= '<tr class="oddeven"><td colspan="2" class="opacitymedium">' . $langs->trans('ThisCategoryHasNoItems') . '</td></tr>';
+            }
+
+            $out .= '</table>'; ?>
+
+            <script>
+                jQuery('.fichecenter').last().after(<?php echo json_encode($out); ?>)
+            </script>
+            <?php
+        }
+
         return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     The object to process
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addMoreActionsButtons(array $parameters, $object): int
+    {
+        global $langs, $user;
+
+        if (preg_match('/categorycard/', $parameters['context'])) {
+            $id        = GETPOST('id');
+            $elementId = GETPOST('element_id');
+            $type      = GETPOST('type');
+            if ($id > 0 && $elementId > 0 && ($user->rights->dolimeet->$type->write)) {
+                require_once __DIR__ . '/' . $type . '.class.php';
+
+                $classname = ucfirst($type);
+                $session   = new $classname($this->db);
+
+                $session->fetch($elementId);
+
+                if (GETPOST('action') == 'addintocategory') {
+                    $result = $object->add_type($session, 'session');
+                    if ($result >= 0) {
+                        setEventMessages($langs->trans('WasAddedSuccessfully', $session->ref), []);
+                    } elseif ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                        setEventMessages($langs->trans('ObjectAlreadyLinkedToCategory'), [], 'warnings');
+                    } else {
+                        setEventMessages($object->error, $object->errors, 'errors');
+                    }
+                } elseif (GETPOST('action') == 'delintocategory') {
+                    $result = $object->del_type($session, 'session');
+                    if ($result < 0) {
+                        dol_print_error('', $object->error);
+                    }
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
     }
 
     /**
