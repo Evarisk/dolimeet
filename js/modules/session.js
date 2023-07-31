@@ -88,6 +88,7 @@ window.dolimeet.session.reloadField = function() {
     contentType: false,
     success: function(resp) {
       $('.field_fk_project').replaceWith($(resp).find('.field_fk_project'));
+      $('.field_fk_contrat').replaceWith($(resp).find('.field_fk_contrat'));
     },
     error: function() {}
   });
