@@ -16,18 +16,45 @@
  */
 
 /**
- * \file    dolimeetindex.php
+ * \file    class/dolimeetdashboard.class.php
  * \ingroup dolimeet
- * \brief   Home page of dolimeet top menu.
+ * \brief   Class file for manage DolimeetDashboard
  */
 
-// Load DoliMeet environment.
-if (file_exists('dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/dolimeet.main.inc.php';
-} elseif (file_exists('../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../dolimeet.main.inc.php';
-} else {
-    die('Include of dolimeet main fails');
-}
+/**
+ * Class for DolimeetDashboard
+ */
+class DolimeetDashboard
+{
+    /**
+     * @var DoliDB Database handler
+     */
+    public DoliDB $db;
 
-require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     * Load dashboard info
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        require_once __DIR__ . '/session.class.php';
+
+        $session = new Session($this->db);
+
+        $array['session'] = $session->loadDashboard();
+
+        return $array;
+    }
+}

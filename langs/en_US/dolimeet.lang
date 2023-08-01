@@ -90,7 +90,7 @@ TrainingSessionType                   = Type of training
 TrainingSessionLocation               = Location of the training
 TrainingsessionsCategoriesArea        = Trainingsession tags/categories area
 DontForgotAddSessionTrainerAndTrainee = Remember to add at least one trainer and one trainee to the training contract.
-AttendantsFromContract                = Contract participants
+AttendantsFromContract                = Contract attendants
 
 # Attendant role
 SessionTrainer                              = Trainer
@@ -141,10 +141,47 @@ Auditor = Auditor
 
 
 #
+# Widget/Dashboard - Widget/Tableau de bord
+#
+
+# Data - Donnée
+SessionInfos                         = Session information
+MoyenneDurationSessionInfos          = Information on average session duration
+NbMeetings                           = Number of meetings
+MoyenneDurationMeetings              = Average duration of meetings
+NbTrainingsessions                   = Number of training sessions
+MoyenneDurationTrainingsessions      = Average duration of training sessions
+NbAudits                             = Number of audits
+MoyenneDurationAudits                = Average duration of audits
+AttendantMeetingInfos                = Information on meeting attendants
+NbAttendantMeetings                  = Number of meeting attendants
+NbContributors                       = Number of contributors
+NbResponsibles                       = Number of responsibles
+AttendancePresentMeetingRate         = Meeting attendance rate
+AttendanceDelayMeetingRate           = Meeting lateness rate
+AttendanceAbsentMeetingRate          = Absence rate from meetings
+AttendantTrainingsessionInfos        = Information on training session attendants
+NbAttendantTrainingsessions          = Number of attendants in training sessions
+NbTrainees                           = Number of trainees
+NbSessionTrainers                    = Number of trainers
+AttendancePresentTrainingsessionRate = Attendance rate at training sessions
+AttendanceDelayTrainingsessionRate   = Late arrivals to training sessions
+AttendanceAbsentTrainingsessionRate  = Absence rate from training sessions
+AttendantAuditInfos                  = Information on audit attendants
+NbAttendantAudits                    = Number of audit attendants
+NbAuditees                           = Number of auditees
+NbAuditors                           = Number of auditors
+AttendancePresentAuditRate           = Audit attendance rate
+AttendanceDelayAuditRate             = Late audit rate
+AttendanceAbsentAuditRate            = Absence rate from audits
+
+
+
+#
 # Other
 #
 
 # Data
 TrainingOrganizationNumber        = Declaration number of the training organisation
 TrainingOrganizationNumberTooltip = Enter your registration number here if you are recognised as a training organisation
-SocietyAttendants                 = Third party external participants
+SocietyAttendants                 = Third party external attendants
