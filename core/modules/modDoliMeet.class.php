@@ -143,7 +143,8 @@ class modDoliMeet extends DolibarrModules
                 'meetinglist',
                 'trainingsessionlist',
                 'auditlist',
-                'contractlist'
+                'contractlist',
+                'propalcard'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,

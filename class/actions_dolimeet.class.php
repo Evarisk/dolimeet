@@ -597,27 +597,35 @@ class ActionsDolimeet
             }
         }
 
-        return 0; // or return 1 to replace standard code.
-    }
+        // Do something only for the current context
+        if ($parameters['currentcontext'] == 'propalcard') {
+            if ($action == 'create_formation') {
+                // Load Dolibarr libraries
+                require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
 
-    /**
-     *  Overloading the formObjectOptions function : replacing the parent's function with the one below
-     *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
-     */
-    public function formObjectOptions(array $parameters, $object, string $action): int
-    {
-        global $extrafields, $langs;
+                // Load DoliMeet libraries
+                require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 
-        if (strpos($parameters['context'], 'contractcard') !== false) {
-            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
-                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
-                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
+                $product    = new Product($this->db);
+                $propalLine = new PropaleLigne($this->db);
+                $project    = new Project($this->db);
+
+                $formationServices = get_formation_service();
+
+                foreach ($formationServices as $formationService) {
+                    $confName = $formationService['code'];
+                    $product->fetch($conf->global->$confName);
+                    $propalLine->fk_propal      = $object->id;
+                    $propalLine->fk_parent_line = 0;
+                    $propalLine->fk_product     = $product->id;
+                    $propalLine->product_label  = $product->label;
+                    $propalLine->product_desc   = $product->description;
+                    $propalLine->tva_tx         = 20;
+                    $propalLine->date_creation  = $object->db->idate(dol_now());
+                    $propalLine->qty            = 1;
+                    $propalLine->rang           = $formationService['position'];
+                    $propalLine->product_type   = 0;
+                    $propalLine->insert($user);
                 }
             }
         }
@@ -626,25 +634,18 @@ class ActionsDolimeet
     }
 
     /**
-     *  Overloading the printFieldListTitle function : replacing the parent's function with the one below
+     * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
      *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     The object to process
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
      */
-    public function printFieldPreListTitle(array $parameters, $object, string $action): int
+    public function addMoreActionsButtons(array $parameters, $object): int
     {
-        global $extrafields, $langs;
+        global $langs;
 
-        if (strpos($parameters['context'], 'contractlist') !== false) {
-            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
-                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
-                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
-                }
-            }
+        if ($parameters['currentcontext'] == 'propalcard') {
+            print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=create_formation"><i class="fas fa-edit"></i> ' . $langs->trans('Formation') . '</a>';
         }
 
         return 0; // or return 1 to replace standard code
