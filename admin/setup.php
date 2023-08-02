@@ -35,6 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 // Load DoliMeet libraries
 require_once __DIR__ . '/../lib/dolimeet.lib.php';
+require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 
 // Global variables definitions
 global $conf, $db, $langs, $user;
@@ -49,6 +50,8 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 // Initialize view objects
 $form = new Form($db);
+
+$formationServices = get_formation_service();
 
 // Security check - Protection if external user
 $permissionToRead = $user->rights->dolimeet->adminpage->read;
@@ -76,6 +79,19 @@ if ($action == 'set_satisfaction_survey') {
         $confName             = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
         if ($satisfactionSurveyID != $conf->global->$confName) {
             dolibarr_set_const($db, $confName, $satisfactionSurveyID, 'integer', 0, '', $conf->entity);
+        }
+    }
+
+    setEventMessage('SavedConfig');
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($action == 'update_formation_service') {
+    foreach ($formationServices as $formationService) {
+        $formationServiceID = GETPOST($formationService['name'], 'int');
+        if ($formationServiceID > 0) {
+            dolibarr_set_const($db, $formationService['code'], $formationServiceID, 'integer', 0, '', $conf->entity);
         }
     }
 
@@ -145,6 +161,32 @@ print '</td>';
 print '</tr>';
 
 print '</table>';
+
+// Formation
+print load_fiche_titre($langs->transnoentities('Formation'), '', '');
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="formation_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="update_formation_service">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->transnoentities('Name') . '</td>';
+print '<td>' . $langs->transnoentities('Service') . '</td>';
+print '</tr>';
+
+// FormationServices
+foreach ($formationServices as $formationService) {
+    print '<tr class="oddeven"><td><label for="' . $formationService['name'] . '">' . $langs->transnoentities($formationService['name']) . '</label></td><td>';
+    print img_picto('', 'service', 'class="pictofixedwidth"');
+    $formationServiceCode = $formationService['code'];
+    $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '', 0, 'maxwidth500 widthcentpercentminusxx', 1);
+    print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&statut=0&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
+    print '</td></tr>';
+}
+
+print '</table>';
+print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+print '</form>';
 
 print load_fiche_titre($langs->trans('TrainingSessions'), '', '');
 

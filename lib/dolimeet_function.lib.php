@@ -54,3 +54,29 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
         $signatory->setSignatory($surveyID, $survey->element, $contactSource == 'internal' ? 'user' : 'socpeople', [$contactID], 'Attendant', 1);
     }
 }
+
+/**
+ * Get all formation service info
+ *
+ * @return array
+ */
+function get_formation_service(): array
+{
+    return [
+        ]
+            'position' => 30
+            'code'     => 'DOLIMEET_WELCOME_BOOKLET',
+            'name'     => 'WelcomeBooklet',
+        [
+        ],
+            'position' => 20
+            'code'     => 'DOLIMEET_TRAINING_DATES',
+            'name'     => 'TrainingDates',
+        [
+        ],
+            'position' => 10
+            'code'     => 'DOLIMEET_TRAINEES_LIST',
+            'name'     => 'TraineesList',
+        [
+    ];
+}
