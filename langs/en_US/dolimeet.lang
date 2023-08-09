@@ -137,6 +137,7 @@ AuditsCategoriesArea = Audit tags/categories area
 
 # Attendant role
 Auditor = Auditor
+Auditee = Auditee
 
 
 
