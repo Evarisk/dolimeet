@@ -159,6 +159,44 @@ AuditsCategoriesArea = Espace des tags/catégories des audits
 
 # Attendant role - Rôle participant
 Auditor = Auditeur
+Auditee = Audité
+
+
+
+#
+# Widget/Dashboard - Widget/Tableau de bord
+#
+
+# Data - Donnée
+SessionInfos                         = Informations sur les sessions
+MoyenneDurationSessionInfos          = Informations sur les durées moyenne des sessions
+NbMeetings                           = Nombre de réunions
+MoyenneDurationMeetings              = Durée moyenne des réunions
+NbTrainingsessions                   = Nombre de sessions de formation
+MoyenneDurationTrainingsessions      = Durée moyenne des sessions de formation
+NbAudits                             = Nombre d'audits
+MoyenneDurationAudits                = Durée moyenne des audits
+AttendantMeetingInfos                = Informations sur les participants aux réunions
+NbAttendantMeetings                  = Nombre de participants aux réunions
+NbContributors                       = Nombre de contributeurs
+NbResponsibles                       = Nombre de responsables
+AttendancePresentMeetingRate         = Taux de présence aux réunions
+AttendanceDelayMeetingRate           = Taux de retard aux réunions
+AttendanceAbsentMeetingRate          = Taux d'absence aux réunions
+AttendantTrainingsessionInfos        = Informations sur les participants aux sessions de formation
+NbAttendantTrainingsessions          = Nombre de participants aux sessions de formation
+NbTrainees                           = Nombre de stagiaires
+NbSessionTrainers                    = Nombre de formateurs
+AttendancePresentTrainingsessionRate = Taux de présence aux sessions de formation
+AttendanceDelayTrainingsessionRate   = Taux de retard aux sessions de formation
+AttendanceAbsentTrainingsessionRate  = Taux d'absence aux sessions de formation
+AttendantAuditInfos                  = Informations sur les participants aux audits
+NbAttendantAudits                    = Nombre de participants aux audits
+NbAuditees                           = Nombre d'audités
+NbAuditors                           = Nombre d'auditeurs
+AttendancePresentAuditRate           = Taux de présence aux audits
+AttendanceDelayAuditRate             = Taux de retard aux audits
+AttendanceAbsentAuditRate            = Taux d'absence aux audits
 
 
 
