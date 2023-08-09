@@ -128,7 +128,8 @@ class modDoliMeet extends DolibarrModules
                 'saturnepublicsignature',
                 'contractcard',
                 'get_sheet_linkable_objects',
-                'dolimeetadmindocuments'
+                'dolimeetadmindocuments',
+                'trainingsessioncard'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,

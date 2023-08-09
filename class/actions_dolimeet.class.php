@@ -379,4 +379,50 @@ class ActionsDolimeet
 
         return 0; // or return 1 to replace standard code.
     }
+
+    /**
+     * Overloading the saturneBuildDoc function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
+    public function saturneBuildDoc(array $parameters, CommonObject $object, string $action): int
+    {
+        global $conf, $langs;
+
+        // Do something only for the current context
+        if ($parameters['currentcontext'] == 'trainingsessioncard') {
+            if (preg_match('/completioncertificate/', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']))) {
+                $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
+                $document  = new SessionDocument($this->db, $object->element . 'document');
+
+                $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
+                if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
+                    foreach ($signatoriesArray as $objectSignatory) {
+                        if ($objectSignatory->role == 'Trainee' && $objectSignatory->attendance != $objectSignatory::ATTENDANCE_ABSENT) {
+                            $parameters['moreparams']['attendant'] = $objectSignatory;
+                            $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                            if ($result <= 0) {
+                                setEventMessages($document->error, $document->errors, 'errors');
+                                $action = '';
+                            }
+                        }
+                    }
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=dolimeet&file=' . urlencode($object->element . 'document/' . $object->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $document->last_main_doc, []);
+                    $urlToRedirect = $_SERVER['REQUEST_URI'];
+                    $urlToRedirect = preg_replace('/#builddoc$/', '', $urlToRedirect);
+                    $urlToRedirect = preg_replace('/action=builddoc&?/', '', $urlToRedirect); // To avoid infinite loop
+                    if (!GETPOST('forcebuilddoc')){
+                        header('Location: ' . $urlToRedirect . '#builddoc');
+                        exit;
+                    }
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
 }
