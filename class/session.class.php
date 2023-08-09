@@ -282,11 +282,84 @@ class Session extends SaturneObject
      */
     public function getNomUrl(int $withpicto = 0, string $option = '', int $notooltip = 0, string $morecss = '', int $save_lastsearch_value = -1): string
     {
-        global $url;
+        global $conf, $langs, $url;
+
+        if (!empty($conf->dol_no_mouse_hover)) {
+            $notooltip = 1; // Force disable tooltips.
+        }
+
+        $result = '';
+
+        $label = img_picto('', $this->picto) . ' <u>' . $langs->trans(ucfirst($this->element)) . '</u>';
+        if (isset($this->status)) {
+            $label .= ' ' . $this->getLibStatut(5);
+        }
+        $label .= '<br>';
+        $label .= '<b>' . $langs->trans('Ref') . ' : </b> ' . $this->ref;
 
         $url = dol_buildpath('/' . $this->module . '/view/session/session_card.php', 1) . '?id=' . $this->id . '&object_type=' . $this->element;
 
-        return parent::getNomUrl($withpicto, $option, $notooltip, $morecss, $save_lastsearch_value);
+        if ($option != 'nolink') {
+            // Add param to save lastsearch_values or not.
+            $add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+            if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER['PHP_SELF'])) {
+                $add_save_lastsearch_values = 1;
+            }
+            if ($add_save_lastsearch_values) {
+                $url .= '&save_lastsearch_values=1';
+            }
+        }
+
+        $linkclose = '';
+        if (empty($notooltip)) {
+            if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+                $label = $langs->trans('Show' . ucfirst($this->element));
+                $linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
+            }
+            $linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
+            $linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
+        } else {
+            $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
+        }
+
+        if ($option == 'nolink') {
+            $linkstart = '<span';
+        } else {
+            $linkstart = '<a href="' . $url . '"';
+        }
+        if ($option == 'blank') {
+            $linkstart .= 'target=_blank';
+        }
+        $linkstart .= $linkclose . '>';
+        if ($option == 'nolink' || empty($url)) {
+            $linkend = '</span>';
+        } else {
+            $linkend = '</a>';
+        }
+
+        $result .= $linkstart;
+
+        if ($withpicto > 0) {
+            $result .= img_picto('', $this->picto) . ' ';
+        }
+
+        if ($withpicto != 2) {
+            $result .= $this->ref;
+        }
+
+        $result .= $linkend;
+
+        global $action, $hookmanager;
+        $hookmanager->initHooks([$this->element . 'dao']);
+        $parameters = ['id' => $this->id, 'getnomurl' => $result];
+        $reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks.
+        if ($reshook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
+
+        return $result;
     }
 
     /**
