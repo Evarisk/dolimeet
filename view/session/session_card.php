@@ -390,6 +390,7 @@ if (($id || $ref) && $action == 'edit') {
 
     if (GETPOST('fk_soc')) {
         $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+        $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
     }
 
     // Common attributes.
