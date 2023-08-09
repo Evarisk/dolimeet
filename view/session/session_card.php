@@ -143,7 +143,6 @@ if (empty($resHook)) {
     }
 
     // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen.
-    $conf->global->MAIN_DISABLE_PDF_AUTOUPDATE = 1;
 
     if ($action == 'add' && $permissiontoadd) {
         $durationHour = GETPOST('durationhour');
