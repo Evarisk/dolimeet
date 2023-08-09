@@ -477,15 +477,19 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     switch ($object->element) {
         case 'meeting' :
             $attendantsRole = ['Contributor', 'Responsible'];
+            $documentType   = 'MeetingDocument';
             break;
         case 'trainingsession' :
             $attendantsRole = ['Trainee', 'SessionTrainer'];
+            $documentType   = 'AttendanceSheetDocument';
             break;
         case 'audit' :
             $attendantsRole = ['Auditee', 'Auditor'];
+            $documentType   = 'AuditDocument';
             break;
         default :
             $attendantsRole = ['Attendant'];
+            $documentType   = '';
     }
 
     $mesg              = '';
@@ -587,7 +591,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             // Sign
             $displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
             if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-                print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element . '&document_type=AttendanceSheetDocument&attendant_table_mode=simple', 3) . '">' . $displayButton . '</a>';
+                print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element . '&document_type=' . $documentType . '&attendant_table_mode=simple', 3) . '">' . $displayButton . '</a>';
             } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }

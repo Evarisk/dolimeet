@@ -133,8 +133,8 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
         }
 
         $tmpArray['location']   = $conf->global->DOLIMEET_DOCUMENT_LOCATION;
-        $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour');
-        $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour');
+        $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
+        $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
         $tmpArray['duration']   = convertSecondToTime($object->duration);
 
         $tmpArray['attendant_fullname'] = strtoupper($moreParam['attendant']->lastname) . ' ' . ucfirst($moreParam['attendant']->firstname);
@@ -150,7 +150,11 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
             $tmpArray['attendant_company_name'] = '';
         }
 
-        $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
+        if (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) {
+            $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
+        } else {
+            $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
+        }
         if(is_array($signatory) && !empty($signatory)) {
             $signatory = array_shift($signatory);
             $userTmp->fetch($signatory->element_id);
