@@ -155,7 +155,7 @@ if (empty($resHook)) {
         }
     }
 
-    require_once DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+    require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
     // Actions save_project.
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/edit_project_action.tpl.php';
@@ -210,14 +210,15 @@ if ($action == 'create') {
     print '<table class="border centpercent tableforfieldcreate">';
 
     $now = dol_getdate(dol_now());
+    if (!GETPOSTISSET('date_start')) {
+        $_POST['date_startyear']  = $now['year'];
+        $_POST['date_startmonth'] = $now['mon'];
+        $_POST['date_startday']   = $now['mday'];
+        $_POST['date_starthour']  = $now['hours'];
+        $_POST['date_startmin']   = $now['minutes'];
+    }
 
-    $_POST['date_startyear']  = $now['year'];
-    $_POST['date_startmonth'] = $now['mon'];
-    $_POST['date_startday']   = $now['mday'];
-    $_POST['date_starthour']  = $now['hours'];
-    $_POST['date_startmin']   = $now['minutes'];
-
-    if ($object->element == 'meeting') {
+    if ($object->element == 'meeting' && !GETPOSTISSET('date_end')) {
         $_POST['date_endyear']  = $now['year'];
         $_POST['date_endmonth'] = $now['mon'];
         $_POST['date_endday']   = $now['mday'];
