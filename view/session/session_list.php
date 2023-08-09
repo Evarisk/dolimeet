@@ -564,7 +564,7 @@ if ($search_all) {
 $moreforfilter = '';
 
 // Filter on categories
-if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire) {
+if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire && $objectType != 'session') {
     $formcategory   = new FormCategory($db);
     $moreforfilter .= $formcategory->getFilterBox($objectType, $search_category_array);
 }
