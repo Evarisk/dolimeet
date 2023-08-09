@@ -195,7 +195,7 @@ if ($action == 'create') {
 
     print load_fiche_titre($langs->trans('New' . ucfirst($object->element)), '', 'object_' . $object->picto);
 
-    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . '">';
+    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . '">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="add">';
     if ($backtopage) {
@@ -228,6 +228,11 @@ if ($action == 'create') {
 
     $fromType = GETPOSTISSET('fromtype') ? GETPOST('fromtype', 'alpha') : ''; // element type.
     $fromID   = GETPOSTISSET('fromid') ? GETPOST('fromid', 'int') : 0;        //element id.
+
+    if (GETPOST('fk_soc')) {
+        $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+        $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+    }
 
     if (!empty($fromType)) {
         switch ($fromType) {
@@ -277,7 +282,7 @@ if ($action == 'create') {
 if (($id || $ref) && $action == 'edit') {
     print load_fiche_titre($langs->trans('Modify' . ucfirst($object->element)), '', 'object_' . $object->picto);
 
-    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . '">';
+    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . '">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="update">';
     print '<input type="hidden" name="id" value="' . $object->id . '">';
@@ -291,6 +296,11 @@ if (($id || $ref) && $action == 'edit') {
     print dol_get_fiche_head();
 
     print '<table class="border centpercent tableforfieldedit">';
+
+    if (GETPOST('fk_soc')) {
+        $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+        $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+    }
 
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
