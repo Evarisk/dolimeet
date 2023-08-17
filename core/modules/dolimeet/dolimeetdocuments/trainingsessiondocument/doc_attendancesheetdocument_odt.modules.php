@@ -115,8 +115,10 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
             } else {
                 $tmpArray['contract_label'] = $contract->ref;
             }
+            $tmpArray['contract_trainingsession_location'] = $contract->array_options['trainingsession_location'];
         } else {
-            $tmpArray['contract_label'] = '';
+            $tmpArray['contract_label']                    = '';
+            $tmpArray['contract_trainingsession_location'] = '';
         }
 
         if (!empty($object->fk_project)) {
