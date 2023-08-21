@@ -81,8 +81,19 @@ window.dolimeet.session.reloadField = function() {
 
   let field = formData.get('fk_soc');
 
+  let actionPost = ''
+
+  if (!document.URL.match('action=')) {
+    let action = formData.get('action')
+    if (action == 'add') {
+      actionPost = '&action=create'
+    } else if (action == 'update') {
+      actionPost = '&action=edit'
+    }
+  }
+
   $.ajax({
-    url: document.URL + querySeparator + "fk_soc=" + field + "&token=" + token,
+    url: document.URL + querySeparator + "fk_soc=" + field + "&token=" + token + actionPost,
     type: "POST",
     processData: false,
     contentType: false,

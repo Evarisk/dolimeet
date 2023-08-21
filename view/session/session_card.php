@@ -210,6 +210,11 @@ if ($action == 'create') {
     print '<table class="border centpercent tableforfieldcreate">';
 
     $now = dol_getdate(dol_now());
+
+    if ($_POST['fk_soc'] == -1) {
+        $_POST['fk_soc'] = 0;
+    }
+
     if (!GETPOSTISSET('date_start')) {
         $_POST['date_startyear']  = $now['year'];
         $_POST['date_startmonth'] = $now['mon'];
@@ -232,6 +237,7 @@ if ($action == 'create') {
     if (GETPOST('fk_soc')) {
         $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
         $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+
     }
 
     if (!empty($fromType)) {
@@ -254,6 +260,8 @@ if ($action == 'create') {
                 break;
         }
     }
+
+    $conf->tzuserinputkey = 'tzuser';
 
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
@@ -297,10 +305,16 @@ if (($id || $ref) && $action == 'edit') {
 
     print '<table class="border centpercent tableforfieldedit">';
 
+    if ($_POST['fk_soc'] == -1) {
+        $_POST['fk_soc'] = 0;
+    }
+
     if (GETPOST('fk_soc')) {
         $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
         $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
     }
+
+    $conf->tzuserinputkey = 'tzuser';
 
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
