@@ -60,7 +60,6 @@ saturne_check_access($permissionToRead);
 
 if ($action == 'update') {
     $responsibleId        = GETPOST('session_trainer_responsible_id');
-    $documentLocation     = GETPOST('document_location');
     $satisfactionSurveyId = GETPOST('satisfaction_survey_model');
 
     if ($responsibleId != $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE) {
@@ -68,11 +67,6 @@ if ($action == 'update') {
         $userTmp = new User($db);
         $userTmp->fetch($responsibleId);
         setEventMessages($langs->trans('SessionTrainerResponsibleIdSet', $user->getFullName($langs)), []);
-    }
-
-    if ($documentLocation != $conf->global->DOLIMEET_DOCUMENT_LOCATION) {
-        dolibarr_set_const($db, 'DOLIMEET_DOCUMENT_LOCATION', $documentLocation, 'chaine', 0, '', $conf->entity);
-        setEventMessages($langs->trans('DocumentLocationSet', $user->getFullName($langs)), []);
     }
 
     if ($satisfactionSurveyId != $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET) {
@@ -162,17 +156,6 @@ print '</td>';
 
 print '<td class="center">';
 print $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1);
-print '<td class="center"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '">';
-print '</td></tr>';
-
-print '<tr class="oddeven"><td>';
-print $langs->trans('DocumentLocation');
-print '</td><td>';
-print $langs->transnoentities('DocumentLocationDesc');
-print '</td>';
-
-print '<td class="center">';
-print '<input name="document_location" value="'. $conf->global->DOLIMEET_DOCUMENT_LOCATION .'">';
 print '<td class="center"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '">';
 print '</td></tr>';
 

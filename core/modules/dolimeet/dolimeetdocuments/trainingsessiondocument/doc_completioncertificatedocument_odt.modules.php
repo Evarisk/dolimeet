@@ -132,7 +132,6 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
             $tmpArray['action_nature'] = '';
         }
 
-        $tmpArray['location']   = $conf->global->DOLIMEET_DOCUMENT_LOCATION;
         $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
         $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
         $tmpArray['duration']   = convertSecondToTime($object->duration);
