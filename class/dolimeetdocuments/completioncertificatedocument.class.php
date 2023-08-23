@@ -32,7 +32,7 @@ class CompletioncertificateDocument extends SaturneDocuments
     /**
      * @var string Module name.
      */
-    public string $module = 'dolimeet';
+    public $module = 'dolimeet';
 
     /**
      * @var string Element type of object.
