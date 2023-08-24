@@ -123,13 +123,15 @@ class modDoliMeet extends DolibarrModules
                 'projectOverview',
                 'printOverviewDetail',
                 'admincompany',
-                'saturneglobal',
                 'sessioncard',
                 'saturnepublicsignature',
                 'contractcard',
                 'get_sheet_linkable_objects',
                 'dolimeetadmindocuments',
-                'trainingsessioncard'
+                'trainingsessioncard',
+                'meetingsignature',
+                'trainingsessionsignature',
+                'auditsignature'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
