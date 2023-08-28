@@ -469,7 +469,7 @@ class ActionsDolimeet
         global $moduleNameLowerCase;
 
         // Do something only for the current context.
-        if (in_array($parameters['currentcontext'], ['saturneglobal'])) {
+        if (preg_match('/meetingsignature|trainingsessionsignature|auditsignature/', $parameters['context'])) {
             $this->resprints = dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $object->id . '&object_type=' . $object->element, 1);
             return 1;
         }
