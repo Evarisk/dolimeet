@@ -29,7 +29,7 @@
 function dolimeet_admin_prepare_head(): array
 {
     // Global variables definitions
-    global $langs, $conf;
+    global $conf, $langs;
 
     // Load translation files required by the page
     saturne_load_langs();
@@ -39,32 +39,32 @@ function dolimeet_admin_prepare_head(): array
     $head = [];
 
     $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=meeting';
-    $head[$h][1] = '<i class="fas fa-comments pictofixedwidth"></i>' . $langs->trans('Meeting');
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-comments pictofixedwidth"></i>' . $langs->trans('Meeting') : '<i class="fas fa-comments"></i>';
     $head[$h][2] = 'meeting';
     $h++;
 
     $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=trainingsession';
-    $head[$h][1] = '<i class="fas fa-people-arrows pictofixedwidth"></i>' . $langs->trans('Trainingsession');
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-people-arrows pictofixedwidth"></i>' . $langs->trans('Trainingsession') : '<i class="fas fa-people-arrows"></i>';
     $head[$h][2] = 'trainingsession';
     $h++;
 
     $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=audit';
-    $head[$h][1] = '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('Audit');
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('Audit') : '<i class="fas fa-tasks"></i>';
     $head[$h][2] = 'audit';
     $h++;
 
     $head[$h][0] = dol_buildpath('/saturne/admin/documents.php?module_name=DoliMeet', 1);
-    $head[$h][1] = '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('YourDocuments');
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('YourDocuments') : '<i class="fas fa-file-alt"></i>';
     $head[$h][2] = 'documents';
     $h++;
 
     $head[$h][0] = dol_buildpath('/dolimeet/admin/setup.php', 1);
-    $head[$h][1] = '<i class="fas fa-cog pictofixedwidth"></i>' . $langs->trans('ModuleSettings');
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-cog pictofixedwidth"></i>' . $langs->trans('ModuleSettings') : '<i class="fas fa-cog"></i>';
     $head[$h][2] = 'settings';
     $h++;
 
     $head[$h][0] = dol_buildpath('/saturne/admin/about.php?module_name=DoliMeet', 1);
-    $head[$h][1] = '<i class="fab fa-readme pictofixedwidth"></i>' . $langs->trans('About');
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fab fa-readme pictofixedwidth"></i>' . $langs->trans('About') : '<i class="fab fa-readme"></i>';
     $head[$h][2] = 'about';
     $h++;
 
