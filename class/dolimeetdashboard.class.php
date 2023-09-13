@@ -16,36 +16,45 @@
  */
 
 /**
- * \file    class/dolimeetdocuments/completioncertificatedocument.class.php
+ * \file    class/dolimeetdashboard.class.php
  * \ingroup dolimeet
- * \brief   This file is a class file for CompletioncertificateDocument.
+ * \brief   Class file for manage DolimeetDashboard
  */
-
-// Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
 /**
- * Class for CompletioncertificateDocument.
+ * Class for DolimeetDashboard
  */
-class CompletioncertificateDocument extends SaturneDocuments
+class DolimeetDashboard
 {
     /**
-     * @var string Module name.
+     * @var DoliDB Database handler
      */
-    public $module = 'dolimeet';
+    public DoliDB $db;
 
     /**
-     * @var string Element type of object.
-     */
-    public $element = 'completioncertificatedocument';
-
-    /**
-     * Constructor.
+     * Constructor
      *
-     * @param DoliDb $db Database handler.
+     * @param DoliDB $db Database handler
      */
     public function __construct(DoliDB $db)
     {
-        parent::__construct($db, $this->module, $this->element);
+        $this->db = $db;
+    }
+
+    /**
+     * Load dashboard info
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        require_once __DIR__ . '/session.class.php';
+
+        $session = new Session($this->db);
+
+        $array['session'] = $session->loadDashboard();
+
+        return $array;
     }
 }

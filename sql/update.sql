@@ -1,4 +1,4 @@
--- Copyright (C) 2022-2023 EVARISK <technique@evarisk.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -20,3 +20,8 @@ ALTER TABLE `llx_dolimeet_session` CHANGE `tms` `tms` TIMESTAMP on update CURREN
 ALTER TABLE `llx_dolimeet_session` CHANGE `status` `status` INT(11) NOT NULL;
 ALTER TABLE `llx_dolimeet_session` CHANGE `import_key` `import_key` VARCHAR(14) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;
 ALTER TABLE `llx_saturne_object_signature` ADD `attendance` SMALLINT NULL AFTER `transaction_url`;
+
+-- 1.2.0
+ALTER TABLE `llx_c_trainingsession_type` CHANGE `active` `active` TINYINT(4) NULL DEFAULT '1';
+ALTER TABLE `llx_c_trainingsession_type` ADD `position` INT NULL DEFAULT '0' AFTER `active`;
+ALTER TABLE `llx_dolimeet_session` DROP `model_pdf`, DROP `last_main_doc`, DROP `document_url`;

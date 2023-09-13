@@ -17,29 +17,30 @@
  */
 
 /**
- *  \file       core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/modules_trainingsessiondocument.php
- *  \ingroup    dolimeet
- *  \brief      File that contains parent class for trainingsession document models
+ *  \file    core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/modules_trainingsessiondocument.php
+ *  \ingroup dolimeet
+ *  \brief   File that contains parent class for trainingsession document models.
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Parent class for documents models
+ * Parent class for trainingsession document models.
  */
-abstract class ModeleODTTrainingSessionDocument extends CommonDocGenerator
+abstract class ModeleODTTrainingSessionDocument extends SaturneDocumentModel
 {
     /**
-     * Return list of activated modules usable for document generation
+     * Return list of active generation modules.
      *
-     * @param  DoliDB     $db                Database handler
-     * @param  int        $maxfilenamelength Max length of value to show
-     * @return array|int                     0 if no module is activated, or array(key=>label). For modules that need directory scan, key is completed with ":filename".
+     * @param  DoliDB    $db                Database handler.
+     * @param  string    $type              Document type.
+     * @param  int       $maxfilenamelength Max length of value to show.
+     * @return array|int                    0 if no module is activated, or array(key=>label). For modules that need directory scan, key is completed with ":filename".
      * @throws Exception
      */
-	public static function liste_modeles(DoliDB $db, int $maxfilenamelength = 0)
-	{
-        require_once __DIR__ . '/../../../../../../saturne/lib/documents.lib.php';
-        return saturne_get_list_of_models($db, 'trainingsessiondocument', $maxfilenamelength);
-	}
+    public static function liste_modeles(DoliDB $db, string $type, int $maxfilenamelength = 0): array
+    {
+        return parent::liste_modeles($db, 'trainingsessiondocument', $maxfilenamelength);
+    }
 }

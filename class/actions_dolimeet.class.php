@@ -22,119 +22,125 @@
  */
 
 /**
- * Class ActionsDolimeet
+ * Class ActionsDolimeet.
  */
 class ActionsDolimeet
 {
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public DoliDB $db;
+    /**
+     * @var DoliDB Database handler.
+     */
+    public DoliDB $db;
 
-	/**
-	 * @var string Error code (or message)
-	 */
-	public string $error = '';
+    /**
+     * @var string Error code (or message).
+     */
+    public string $error = '';
 
-	/**
-	 * @var array Errors
-	 */
-	public array $errors = [];
+    /**
+     * @var array Errors.
+     */
+    public array $errors = [];
 
-	/**
-	 * @var array Hook results. Propagated to $hookmanager->resArray for later reuse
-	 */
-	public array $results = [];
+    /**
+     * @var array Hook results. Propagated to $hookmanager->resArray for later reuse.
+     */
+    public array $results = [];
 
-	/**
-	 * @var string String displayed by executeHook() immediately after return
-	 */
-	public string $resprints;
+    /**
+     * @var string String displayed by executeHook() immediately after return.
+     */
+    public string $resprints;
 
-	/**
-	 * Constructor
-	 *
-	 *  @param DoliDB $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-	}
-
-	/**
-	 * Overloading the constructCategory function : replacing the parent's function with the one below
-	 *
-	 * @param  array $parameters Hook metadatas (context, etc...)
-	 * @return int               0 < on error, 0 on success, 1 to replace standard code
-	 */
-	public function constructCategory(array $parameters): int
+    /**
+     * Constructor
+     *
+     *  @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
     {
-        // Do something only for the current context
-		if (in_array($parameters['currentcontext'], ['category', 'sessioncard'])) {
-			$tags = [
-				'meeting' => [
-					'id' => 436304001,
-					'code' => 'meeting',
-					'obj_class' => 'Meeting',
-					'obj_table' => 'dolimeet_session',
+        $this->db = $db;
+    }
+
+    /**
+     * Overloading the constructCategory function : replacing the parent's function with the one below.
+     *
+     * @param  array $parameters Hook metadatas (context, etc...).
+     * @return int               0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function constructCategory(array $parameters): int
+    {
+        // Do something only for the current context.
+        if (in_array($parameters['currentcontext'], ['category', 'sessioncard'])) {
+            $tags = [
+                'meeting'       => [
+                    'id'        => 436304001,
+                    'code'      => 'meeting',
+                    'obj_class' => 'Meeting',
+                    'obj_table' => 'dolimeet_session'
                 ],
-				'trainingsession' => [
-					'id' => 436304002,
-					'code' => 'trainingsession',
-					'obj_class' => 'Trainingsession',
-					'obj_table' => 'dolimeet_session',
+                'trainingsession' => [
+                    'id'          => 436304002,
+                    'code'        => 'trainingsession',
+                    'obj_class'   => 'Trainingsession',
+                    'obj_table'   => 'dolimeet_session'
                 ],
-				'audit' => [
-					'id' => 436304003,
-					'code' => 'audit',
-					'obj_class' => 'Audit',
-					'obj_table' => 'dolimeet_session',
+                'audit'         => [
+                    'id'        => 436304003,
+                    'code'      => 'audit',
+                    'obj_class' => 'Audit',
+                    'obj_table' => 'dolimeet_session'
+                ],
+                'session'       => [
+                    'id'        => 436304004,
+                    'code'      => 'session',
+                    'obj_class' => 'Session',
+                    'obj_table' => 'dolimeet_session'
                 ],
             ];
             $this->results = $tags;
         }
 
-        return 0; // or return 1 to replace standard code
-	}
+        return 0; // or return 1 to replace standard code.
+    }
 
     /**
-     * Overloading the printCommonFooter function : replacing the parent's function with the one below
+     * Overloading the printCommonFooter function : replacing the parent's function with the one below.
      *
-     * @param  array $parameters Hook metadatas (context, etc...)
-     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     * @param  array     $parameters Hook metadatas (context, etc...).
+     * @return int                   0 < on error, 0 on success, 1 to replace standard code.
      * @throws Exception
      */
-	public function printCommonFooter(array $parameters): int
+    public function printCommonFooter(array $parameters): int
     {
-		global $langs, $db, $conf;
+        global $conf, $db, $form, $langs ,$user;
 
-        // Do something only for the current context
-		if ($parameters['currentcontext'] == 'projectOverview') {
+        // Do something only for the current context.
+        if ($parameters['currentcontext'] == 'projectOverview') {
             require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
-			require_once __DIR__ . '/session.class.php';
+            require_once __DIR__ . '/session.class.php';
 
-            $pictopath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-            $picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
+            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
-			$session = new Session($db, 'session');
+            $session = new Session($db, 'session');
             $project = new Project($db);
 
             $project->fetch(GETPOST('id'), GETPOST('ref'));
-			$linkedSessions = $session->fetchAll('','',0,0, ['fk_project' => $project->id]);
+            $linkedSessions = $session->fetchAll('','',0,0, ['fk_project' => $project->id]);
 
             saturne_load_langs();
 
-			$outputline = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block">' . $picto . $langs->transnoentities('SessionListOnProject') . '</div></td></tr></table>';
-			$outputline .= '<table><div class="div-table-responsive-no-min"><table class="liste formdoc noborder centpercent"><tbody>';
-			$outputline .= '<tr class="liste_titre">';
-			$outputline .= '<td class="float">' . $langs->transnoentities('Type') . '</td>';
-			$outputline .= '<td class="float">' . $langs->transnoentities('Ref') . '</td>';
-			$outputline .= '<td class="float">' . $langs->transnoentities('Date') . '</td>';
-            $outputline .= '<td class="float">' . $langs->transnoentities('Status') . '</td>';
-			$outputline .= '</tr>';
+            $outputLine = '<table><tr class="titre"><td class="nobordernopadding valignmiddle col-title"><div class="titre inline-block">' . $picto . $langs->transnoentities('SessionListOnProject') . '</div></td></tr></table>';
+            $outputLine .= '<table><div class="div-table-responsive-no-min"><table class="liste formdoc noborder centpercent"><tbody>';
+            $outputLine .= '<tr class="liste_titre">';
+            $outputLine .= '<td class="float">' . $langs->transnoentities('Type') . '</td>';
+            $outputLine .= '<td class="float">' . $langs->transnoentities('Ref') . '</td>';
+            $outputLine .= '<td class="float">' . $langs->transnoentities('Date') . '</td>';
+            $outputLine .= '<td class="float">' . $langs->transnoentities('Status') . '</td>';
+            $outputLine .= '</tr>';
 
-			if (is_array($linkedSessions) && !empty($linkedSessions)) {
-				foreach($linkedSessions as $linkedSession) {
+            if (is_array($linkedSessions) && !empty($linkedSessions)) {
+                foreach($linkedSessions as $linkedSession) {
                     switch ($linkedSession->type) {
                         case 'trainingsession':
                             $linkedSession->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
@@ -150,95 +156,184 @@ class ActionsDolimeet
                             break;
                     }
 
-					$outputline .= '<tr><td>';
-					$outputline .= $langs->trans(ucfirst($linkedSession->type));
-					$outputline .= '</td><td>';
-					$outputline .= $linkedSession->getNomUrl(1);
-					$outputline .= '</td><td>';
-					$outputline .= dol_print_date($linkedSession->date_start, 'dayhour') . ' - ' . dol_print_date($linkedSession->date_end, 'dayhour');
-                    $outputline .= '</td><td>';
-                    $outputline .= $linkedSession->getLibStatut(5);
-					$outputline .= '</td></tr>';
-				}
-			} else {
-                $outputline .= '<tr><td colspan="4">';
-                $outputline .= '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
-                $outputline .= '</td></tr>';
+                    $outputLine .= '<tr><td>';
+                    $outputLine .= $langs->trans(ucfirst($linkedSession->type));
+                    $outputLine .= '</td><td>';
+                    $outputLine .= $linkedSession->getNomUrl(1);
+                    $outputLine .= '</td><td>';
+                    $outputLine .= dol_print_date($linkedSession->date_start, 'dayhour') . ' - ' . dol_print_date($linkedSession->date_end, 'dayhour');
+                    $outputLine .= '</td><td>';
+                    $outputLine .= $linkedSession->getLibStatut(5);
+                    $outputLine .= '</td></tr>';
+                }
+            } else {
+                $outputLine .= '<tr><td colspan="4">';
+                $outputLine .= '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
+                $outputLine .= '</td></tr>';
             }
-			$outputline .= '</tbody></table></div>';
-			?>
-			<script>
-				jQuery('.fiche').append(<?php echo json_encode($outputline); ?>)
-			</script>
-			<?php
-		}
+            $outputLine .= '</tbody></table></div>';
+            ?>
+            <script>
+                jQuery('.fiche').append(<?php echo json_encode($outputLine); ?>)
+            </script>
+            <?php
+        }
+
+        // Do something only for the current context.
+        if ($parameters['currentcontext'] == 'admincompany') {
+            $form      = new Form($db);
+            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+            $trainingOrganizationNumberInput = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
+            ?>
+            <script>
+                let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $picto . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
+                trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($trainingOrganizationNumberInput) ; ?> + '</td></tr>');
+
+                let element = $('table:nth-child(1) .oddeven:last-child');
+                element.after(trainingOrganizationNumberInput);
+            </script>
+            <?php
+        }
 
         // Do something only for the current context
-		if ($parameters['currentcontext'] == 'admincompany') {
-			$form      = new Form($db);
-			$pictopath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-            $picto = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-			$trainingOrganizationNumberInput = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
-			?>
-			<script>
-				let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $picto . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
-				trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($trainingOrganizationNumberInput) ; ?> + '</td></tr>');
+        if (preg_match('/categoryindex/', $parameters['context'])) {
+            print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
+        } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
+            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
 
-				let element = $('table:nth-child(1) .oddeven:last-child');
-				element.after(trainingOrganizationNumberInput);
-			</script>
-			<?php
-		}
+            $id   = GETPOST('id');
+            $type = GETPOST('type');
 
-        return 0; // or return 1 to replace standard code
-	}
+            // Load variable for pagination
+            $limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
+            $sortfield = GETPOST('sortfield', 'aZ09comma');
+            $sortorder = GETPOST('sortorder', 'aZ09comma');
+            $page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+            if (empty($page) || $page == -1) {
+                $page = 0;
+            }     // If $page is not defined, or '' or -1 or if we click on clear filters or if we select empty mass action
+            $offset = $limit * $page;
 
+            require_once __DIR__ . '/' . $type . '.class.php';
 
-	/**
-	 *  Overloading the doActions function : replacing the parent's function with the one below
-	 *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
-	 */
-	public function doActions(array $parameters, $object, string $action): int
-    {
-		global $conf, $db;
+            $classname = ucfirst($type);
+            $object    = new $classname($this->db);
 
-        // Do something only for the current context
-		if ($parameters['currentcontext'] == 'admincompany') {
-			if ($action == 'update') {
-				dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
-			}
-		}
+            $sessions      = $object->fetchAll('', '', 0, 0, ['customsql' => 't.type = ' . "'" . $type . "'"]);
+            $sessionArrays = [];
+            if (is_array($sessions) && !empty($sessions)) {
+                foreach ($sessions as $session) {
+                    $sessionArrays[$session->id] = $session->ref;
+                }
+            }
 
-        return 0; // or return 1 to replace standard code
-	}
+            $category = new Categorie($this->db);
+            $category->fetch($id);
+
+            $sessionCategories = $category->getObjectsInCateg('session', 0, $limit, $offset);
+            $out = '<br>';
+
+            $out .= '<form method="post" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=' . $type . '">';
+            $out .= '<input type="hidden" name="token" value="' . newToken() . '">';
+            $out .= '<input type="hidden" name="action" value="addintocategory">';
+
+            $out .= '<table class="noborder centpercent">';
+            $out .= '<tr class="liste_titre"><td>';
+            $out .= $langs->trans('AddObjectIntoCategory') . ' ';
+            $out .= $form::selectarray('element_id', $sessionArrays, '', 1);
+            $out .= '<input type="submit" class="button buttongen" value="' . $langs->trans('ClassifyInCategory') . '"></td>';
+            $out .= '</tr>';
+            $out .= '</table>';
+            $out .= '</form>';
+
+            $out .= '<br>';
+
+            $out .= load_fiche_titre($langs->transnoentities($classname), '', 'object_' . $object->picto);
+            $out .= '<table class="noborder centpercent">';
+            $out .= '<tr class="liste_titre"><td colspan="3">' . $langs->trans('Ref') . '</td></tr>';
+
+            if (is_array($sessionCategories) && !empty($sessionCategories)) {
+                // Form to add record into a category
+                if (count($sessionCategories) > 0) {
+                    $i = 0;
+                    foreach ($sessionCategories as $session) {
+                        $i++;
+                        if ($i > $limit) break;
+
+                        $out .= '<tr class="oddeven">';
+                        $out .= '<td class="nowrap">';
+                        $session->picto   = $object->picto;
+                        $session->element = $type;
+                        $out .= $session->getNomUrl(1);
+                        $out .= '</td>';
+                        // Link to delete from category
+                        $out .= '<td class="right">';
+                        if ($user->rights->categorie->creer) {
+                            $out .= '<a href="' . $_SERVER['PHP_SELF'] . '?action=delintocategory&id=' . $id . '&type=' . $type . '&element_id=' . $session->id . '&token=' . newToken() . '">';
+                            $out .= $langs->trans('DeleteFromCat');
+                            $out .= img_picto($langs->trans('DeleteFromCat'), 'unlink', '', false, 0, 0, '', 'paddingleft');
+                            $out .= '</a>';
+                        }
+                        $out .= '</td>';
+                        $out .= '</tr>';
+                    }
+                } else {
+                    $out .= '<tr class="oddeven"><td colspan="2" class="opacitymedium">' . $langs->trans('ThisCategoryHasNoItems') . '</td></tr>';
+                }
+            } else {
+                $out .= '<tr class="oddeven"><td colspan="2" class="opacitymedium">' . $langs->trans('ThisCategoryHasNoItems') . '</td></tr>';
+            }
+
+            $out .= '</table>'; ?>
+
+            <script>
+                jQuery('.fichecenter').last().after(<?php echo json_encode($out); ?>)
+            </script>
+            <?php
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
 
     /**
-     *  Overloading the saturneBannerTab function : replacing the parent's function with the one below
+     * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
      *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     The object to process
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
      */
-    public function saturneBannerTab(array $parameters, CommonObject $object): int
+    public function addMoreActionsButtons(array $parameters, $object): int
     {
-        global $db, $langs;
+        global $langs, $user;
 
-        // Do something only for the current context
-        if (in_array($parameters['currentcontext'], ['saturneglobal', 'sessioncard'])) {
-            if (isModEnabled('contrat') && property_exists($object, 'fk_contrat')) {
-                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-                $morehtmlref = $langs->trans('Contract') . ' : ';
-                if (!empty($object->fk_contrat)) {
-                    $contract = new Contrat($db);
-                    $contract->fetch($object->fk_contrat);
-                    $morehtmlref .= $contract->getNomUrl(1);
+        if (preg_match('/categorycard/', $parameters['context'])) {
+            $id        = GETPOST('id');
+            $elementId = GETPOST('element_id');
+            $type      = GETPOST('type');
+            if ($id > 0 && $elementId > 0 && ($user->rights->dolimeet->$type->write)) {
+                require_once __DIR__ . '/' . $type . '.class.php';
+
+                $classname = ucfirst($type);
+                $session   = new $classname($this->db);
+
+                $session->fetch($elementId);
+
+                if (GETPOST('action') == 'addintocategory') {
+                    $result = $object->add_type($session, 'session');
+                    if ($result >= 0) {
+                        setEventMessages($langs->trans('WasAddedSuccessfully', $session->ref), []);
+                    } elseif ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                        setEventMessages($langs->trans('ObjectAlreadyLinkedToCategory'), [], 'warnings');
+                    } else {
+                        setEventMessages($object->error, $object->errors, 'errors');
+                    }
+                } elseif (GETPOST('action') == 'delintocategory') {
+                    $result = $object->del_type($session, 'session');
+                    if ($result < 0) {
+                        dol_print_error('', $object->error);
+                    }
                 }
-                $morehtmlref .= '<br>';
-                $this->resprints = $morehtmlref;
             }
         }
 
@@ -246,17 +341,68 @@ class ActionsDolimeet
     }
 
     /**
-     *  Overloading the saturneBannerTab function : replacing the parent's function with the one below
+     *  Overloading the doActions function : replacing the parent's function with the one below.
      *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     * @param  array        $parameters Hook metadatas (context, etc...).
+     * @param  CommonObject $object     Current object.
+     * @param  string       $action     Current action.
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function doActions(array $parameters, $object, string $action): int
+    {
+        global $conf, $db;
+
+        // Do something only for the current context.
+        if ($parameters['currentcontext'] == 'admincompany') {
+            if ($action == 'update') {
+                dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
+            }
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below.
+     *
+     * @param  array $linkableObjectTypes  Array of linkable objects.
+     * @return int                         0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
+    {
+        require_once __DIR__ . '/../class/trainingsession.class.php';
+
+        $trainingSession = new Trainingsession($this->db);
+
+        $linkableObjectTypes['dolimeet_trainsess'] = [
+            'langs'      => 'Trainingsession',
+            'langfile'   => 'dolimeet@dolimeet',
+            'picto'      => $trainingSession->picto,
+            'className'  => 'Trainingsession',
+            'post_name'  => 'fk_trainingsession',
+            'link_name'  => 'dolimeet_trainsess',
+            'name_field' => 'ref',
+            'create_url' => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
+            'class_path' => 'custom/dolimeet/class/trainingsession.class.php',
+            'lib_path'   => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php',
+        ];
+        $this->results = $linkableObjectTypes;
+
+        return 1;
+    }
+
+    /**
+     *  Overloading the moreHtmlStatus function : replacing the parent's function with the one below.
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code.
      */
     public function moreHtmlStatus(array $parameters, CommonObject $object): int
     {
         global $langs;
 
-        // Do something only for the current context
+        // Do something only for the current context.
         if ($parameters['currentcontext'] == 'contractcard') {
             if (isModEnabled('contrat')) {
                 $error = 0;
@@ -279,6 +425,151 @@ class ActionsDolimeet
             }
         }
 
-        return 0; // or return 1 to replace standard code
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     *  Overloading the saturneBannerTab function : replacing the parent's function with the one below.
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function saturneBannerTab(array $parameters, CommonObject $object): int
+    {
+        global $db, $langs;
+
+        // Do something only for the current context.
+        if (in_array($parameters['currentcontext'], ['saturneglobal', 'sessioncard'])) {
+            if (isModEnabled('contrat') && property_exists($object, 'fk_contrat')) {
+                require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+                $moreHtmlRef = $langs->trans('Contract') . ' : ';
+                if (!empty($object->fk_contrat)) {
+                    $contract = new Contrat($db);
+                    $contract->fetch($object->fk_contrat);
+                    $moreHtmlRef .= $contract->getNomUrl(1);
+                }
+                $moreHtmlRef .= '<br>';
+                $this->resprints = $moreHtmlRef;
+            }
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     *  Overloading the saturneAttendantsBackToCard function : replacing the parent's function with the one below.
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function saturneAttendantsBackToCard(array $parameters, CommonObject $object): int
+    {
+        global $moduleNameLowerCase;
+
+        // Do something only for the current context.
+        if (preg_match('/meetingsignature|trainingsessionsignature|auditsignature/', $parameters['context'])) {
+            $this->resprints = dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $object->id . '&object_type=' . $object->element, 1);
+            return 1;
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the SaturneAdminDocumentData function : replacing the parent's function with the one below.
+     *
+     * @param  array $parameters Hook metadatas (context, etc...).
+     * @return int               0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function SaturneAdminDocumentData(array $parameters): int
+    {
+        // Do something only for the current context.
+        if ($parameters['currentcontext'] == 'dolimeetadmindocuments') {
+            $types = [
+                'AttendanceSheetDocument' => [
+                    'documentType' => 'attendancesheetdocument',
+                    'picto'        => 'fontawesome_fa-people-arrows_fas_#d35968'
+                ],
+                'CompletionCertificateDocument' => [
+                    'documentType' => 'completioncertificatedocument',
+                    'picto'        => 'fontawesome_fa-people-arrows_fas_#d35968'
+                ]
+            ];
+            $this->results = $types;
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the SaturneAdminObjectConst function : replacing the parent's function with the one below.
+     *
+     * @param  array $parameters Hook metadatas (context, etc...).
+     * @return int               0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function SaturneAdminObjectConst(array $parameters): int
+    {
+        // Do something only for the current context.
+        if ($parameters['currentcontext'] == 'dolimeetadmindocuments') {
+            $constArray['dolimeet'] = [
+                'attendancesheetdocument' => [
+                    'name'        => 'DisplayAttendanceAbsentInSignature',
+                    'description' => 'DisplayAttendanceAbsentInSignatureDescription',
+                    'code'        => 'DOLIMEET_ATTENDANCESHEETDOCUMENT_DISPLAY_ATTENDANCE_ABSENT_IN_SIGNATURE'
+                ]
+            ];
+            $this->results = $constArray;
+            return 1;
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the saturneBuildDoc function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
+    public function saturneBuildDoc(array $parameters, CommonObject $object, string $action): int
+    {
+        global $conf, $langs;
+
+        // Do something only for the current context
+        if ($parameters['currentcontext'] == 'trainingsessioncard') {
+            if (preg_match('/completioncertificate/', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']))) {
+                $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
+                $document  = new SessionDocument($this->db, $object->element . 'document');
+
+                $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
+                if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
+                    foreach ($signatoriesArray as $objectSignatory) {
+                        if ($objectSignatory->role == 'Trainee' && $objectSignatory->attendance != $objectSignatory::ATTENDANCE_ABSENT) {
+                            $parameters['moreparams']['attendant'] = $objectSignatory;
+                            $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                            if ($result <= 0) {
+                                setEventMessages($document->error, $document->errors, 'errors');
+                                $action = '';
+                            }
+                        }
+                    }
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=dolimeet&file=' . urlencode($object->element . 'document/' . $object->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $document->last_main_doc, []);
+                    $urlToRedirect = $_SERVER['REQUEST_URI'];
+                    $urlToRedirect = preg_replace('/#builddoc$/', '', $urlToRedirect);
+                    $urlToRedirect = preg_replace('/action=builddoc&?/', '', $urlToRedirect); // To avoid infinite loop
+                    if (!GETPOST('forcebuilddoc')){
+                        header('Location: ' . $urlToRedirect . '#builddoc');
+                        exit;
+                    }
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code.
     }
 }

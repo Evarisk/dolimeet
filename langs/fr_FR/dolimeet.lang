@@ -81,6 +81,7 @@ Responsible = Responsable
 TrainingSession                       = Session de formation
 Trainingsession                       = Session de formation
 Trainingsessions                      = sessions de formation
+TrainingSessions                      = Sessions de formation
 TheTrainingsession                    = la session de formation
 TrainingsessionList                   = Liste des sessions de formation
 TrainingSessionList                   = Liste des sessions de formation
@@ -99,6 +100,15 @@ TrainingSessionLocation               = Lieu de la formation
 TrainingsessionsCategoriesArea        = Espace des tags/catégories des sessions de formations
 DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un formateur et un stagiaire au contrat de formation.
 AttendantsFromContract                = Participants du contrat
+SessionTrainerResponsible             = Responsable du dispensateur de formation
+SessionTrainerResponsibleDesc         = Définit le responsable du dispensateur de formation
+SessionTrainerResponsibleIdSet        = Responsable du dispensateur de formation défini : %s
+LinkDolimeet_trainsess                = Activer le lien avec les sessions de formation
+LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles de contrôle
+SatisfactionSurvey                    = Enquête de satisfaction
+SatisfactionSurveyDesc                = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction
+
+
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
@@ -117,13 +127,13 @@ TypeContact_contrat_external_TRAINEE        = Stagiaire
 # Data - Donnée
 AttendanceSheetDocument                       = Feuille de présence
 AttendanceSheetDocuments                      = feuilles de présence
-attendancesheetdocument                       = feuille de présence
+attendancesheetdocument                       = feuille de presence
 attendancesheetdocument.odt                   = Feuille de présence
 DisplayAttendanceAbsentInSignature            = Affiche la présence absent dans le champ signature de la feuille de présence
 DisplayAttendanceAbsentInSignatureDescription = Affiche la présence absent si la personne est absente et qu'elle n'a pas signé
 CompletionCertificateDocument                 = Certificat de réalisation
 CompletionCertificateDocuments                = certificats de réalisation
-completioncertificatedocument                 = certificat de réalisation
+completioncertificatedocument                 = certificat de realisation
 completioncertificatedocument.odt             = Certificat de réalisation
 
 
@@ -145,6 +155,44 @@ AuditsCategoriesArea = Espace des tags/catégories des audits
 
 # Attendant role - Rôle participant
 Auditor = Auditeur
+Auditee = Audité
+
+
+
+#
+# Widget/Dashboard - Widget/Tableau de bord
+#
+
+# Data - Donnée
+SessionInfos                         = Informations sur les sessions
+MoyenneDurationSessionInfos          = Informations sur les durées moyenne des sessions
+NbMeetings                           = Nombre de réunions
+MoyenneDurationMeetings              = Durée moyenne des réunions
+NbTrainingsessions                   = Nombre de sessions de formation
+MoyenneDurationTrainingsessions      = Durée moyenne des sessions de formation
+NbAudits                             = Nombre d'audits
+MoyenneDurationAudits                = Durée moyenne des audits
+AttendantMeetingInfos                = Informations sur les participants aux réunions
+NbAttendantMeetings                  = Nombre de participants aux réunions
+NbContributors                       = Nombre de contributeurs
+NbResponsibles                       = Nombre de responsables
+AttendancePresentMeetingRate         = Taux de présence aux réunions
+AttendanceDelayMeetingRate           = Taux de retard aux réunions
+AttendanceAbsentMeetingRate          = Taux d'absence aux réunions
+AttendantTrainingsessionInfos        = Informations sur les participants aux sessions de formation
+NbAttendantTrainingsessions          = Nombre de participants aux sessions de formation
+NbTrainees                           = Nombre de stagiaires
+NbSessionTrainers                    = Nombre de formateurs
+AttendancePresentTrainingsessionRate = Taux de présence aux sessions de formation
+AttendanceDelayTrainingsessionRate   = Taux de retard aux sessions de formation
+AttendanceAbsentTrainingsessionRate  = Taux d'absence aux sessions de formation
+AttendantAuditInfos                  = Informations sur les participants aux audits
+NbAttendantAudits                    = Nombre de participants aux audits
+NbAuditees                           = Nombre d'audités
+NbAuditors                           = Nombre d'auditeurs
+AttendancePresentAuditRate           = Taux de présence aux audits
+AttendanceDelayAuditRate             = Taux de retard aux audits
+AttendanceAbsentAuditRate            = Taux d'absence aux audits
 
 
 
@@ -156,7 +204,3 @@ Auditor = Auditeur
 TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
-ShowSignatureSpecimen             = Voir les signatures sur les documents specimens
-ShowSignatureSpecimenDescription  = Permet la visualisation des signatures sur les documents specimens
-Config                            = Configuration
-SendMailSubject                   = [%s] Liens de signature pour %s %s

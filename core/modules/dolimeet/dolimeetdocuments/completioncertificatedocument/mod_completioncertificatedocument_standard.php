@@ -13,39 +13,30 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * or see https://www.gnu.org/
  */
 
 /**
- * \file    class/dolimeetdocuments/completioncertificatedocument.class.php
+ * \file    core/modules/dolimeet/dolimeetdocumets/completioncertificatedocument/mod_completioncertificatedocument_standard.php
  * \ingroup dolimeet
- * \brief   This file is a class file for CompletioncertificateDocument.
+ * \brief   File of class to manage completion certificate document numbering rules standard.
  */
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
+require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class for CompletioncertificateDocument.
+ * Class to manage completion certificate document numbering rules Standard.
  */
-class CompletioncertificateDocument extends SaturneDocuments
+class mod_completioncertificatedocument_standard extends ModeleNumRefSaturne
 {
     /**
-     * @var string Module name.
+     * @var string string Numbering module ref prefix.
      */
-    public $module = 'dolimeet';
+    public string $prefix = 'CCD';
 
     /**
-     * @var string Element type of object.
+     * @var string Name.
      */
-    public $element = 'completioncertificatedocument';
-
-    /**
-     * Constructor.
-     *
-     * @param DoliDb $db Database handler.
-     */
-    public function __construct(DoliDB $db)
-    {
-        parent::__construct($db, $this->module, $this->element);
-    }
+    public string $name = 'Kari';
 }

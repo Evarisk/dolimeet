@@ -16,31 +16,26 @@
  */
 
 /**
- * \file    class/meeting.class.php
+ * \file    core/modules/dolimeet/meeting/mod_meeting_standard.php
  * \ingroup dolimeet
- * \brief   This file is a CRUD class file for Meeting (Create/Read/Update/Delete).
+ * \brief   File of class to manage meeting numbering rules standard
  */
 
-// Load DoliMeet libraries.
-require_once __DIR__ . '/session.class.php';
+// Load Saturne libraries
+require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class for Meeting.
+ * Class to manage customer meeting numbering rules standard
  */
-class Meeting extends Session
+class mod_meeting_standard extends ModeleNumRefSaturne
 {
     /**
-     * @var string Element type of object.
+     * @var string Numbering module ref prefix
      */
-    public $element = 'meeting';
+    public string $prefix = 'RE';
 
     /**
-     * Constructor.
-     *
-     * @param DoliDb $db Database handler.
+     * @var string Name
      */
-    public function __construct(DoliDB $db)
-    {
-        parent::__construct($db,  $this->element);
-    }
+    public string $name = 'Meeting';
 }

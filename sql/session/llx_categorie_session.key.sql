@@ -13,12 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-CREATE TABLE llx_c_trainingsession_type(
-  rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-  entity      integer default 1,
-  ref         varchar(128),
-  label       varchar(255),
-  description text,
-  active      tinyint(4) DEFAULT 1,
-  position    integer DEFAULT 0
-) ENGINE=innodb;
+ALTER TABLE llx_categorie_session ADD PRIMARY KEY pk_categorie_session (fk_categorie, fk_session);
+ALTER TABLE llx_categorie_session ADD INDEX idx_categorie_session_fk_categorie (fk_categorie);
+ALTER TABLE llx_categorie_session ADD INDEX idx_categorie_session_fk_session (fk_session);
+ALTER TABLE llx_categorie_session ADD CONSTRAINT fk_categorie_session_categorie_rowid FOREIGN KEY (fk_categorie) REFERENCES llx_categorie (rowid);
+ALTER TABLE llx_categorie_session ADD CONSTRAINT fk_categorie_session_dolimeet_session_rowid FOREIGN KEY (fk_session) REFERENCES llx_dolimeet_session (rowid);

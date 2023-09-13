@@ -16,15 +16,16 @@
  */
 
 /**
- * \file        class/trainingsession.class.php
- * \ingroup     dolimeet
- * \brief       This file is a CRUD class file for Trainingsession (Create/Read/Update/Delete)
+ * \file    class/trainingsession.class.php
+ * \ingroup dolimeet
+ * \brief   This file is a CRUD class file for Trainingsession (Create/Read/Update/Delete).
  */
 
+// Load DoliMeet libraries.
 require_once __DIR__ . '/session.class.php';
 
 /**
- * Class for Trainingsession
+ * Class for Trainingsession.
  */
 class Trainingsession extends Session
 {
@@ -34,9 +35,9 @@ class Trainingsession extends Session
     public $element = 'trainingsession';
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param DoliDb $db Database handler
+     * @param DoliDb $db Database handler.
      */
     public function __construct(DoliDB $db)
     {

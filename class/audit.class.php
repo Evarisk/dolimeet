@@ -16,15 +16,16 @@
  */
 
 /**
- * \file        class/audit.class.php
- * \ingroup     dolimeet
- * \brief       This file is a CRUD class file for Audit (Create/Read/Update/Delete)
+ * \file    class/audit.class.php
+ * \ingroup dolimeet
+ * \brief   This file is a CRUD class file for Audit (Create/Read/Update/Delete).
  */
 
+// Load DoliMeet libraries.
 require_once __DIR__ . '/session.class.php';
 
 /**
- * Class for Audit
+ * Class for Audit.
  */
 class Audit extends Session
 {
@@ -34,9 +35,9 @@ class Audit extends Session
     public $element = 'audit';
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param DoliDb $db Database handler
+     * @param DoliDb $db Database handler.
      */
     public function __construct(DoliDB $db)
     {
