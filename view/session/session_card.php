@@ -107,7 +107,7 @@ saturne_check_access($permissionToRead, null, true);
  * Actions.
  */
 
-$parameters = [];
+$parameters = ['id' => $id];
 $resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks.
 if ($resHook < 0) {
     setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
@@ -157,8 +157,8 @@ if (empty($resHook)) {
 
     require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
-    // Actions save_project.
-    require_once __DIR__ . '/../../../saturne/core/tpl/actions/edit_project_action.tpl.php';
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 
     // Actions builddoc, forcebuilddoc, remove_file.
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
