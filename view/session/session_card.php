@@ -516,9 +516,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             // ReOpen.
             $displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
             if ($object->status == $object::STATUS_VALIDATED) {
-                print '<span class="butAction" id="actionButtonInProgress">' . $langs->trans('ReOpenDoli') . '</span>';
+                print '<span class="butAction" id="actionButtonInProgress">' . $displayButton . '</span>';
             } elseif ($object->status > $object::STATUS_VALIDATED) {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $langs->trans('ReOpenDoli') . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
 
             // Sign
