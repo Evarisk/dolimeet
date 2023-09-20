@@ -179,7 +179,7 @@ foreach ($formationServices as $formationService) {
     print '<tr class="oddeven"><td><label for="' . $formationService['name'] . '">' . $langs->transnoentities($formationService['name']) . '</label></td><td>';
     print img_picto('', 'service', 'class="pictofixedwidth"');
     $formationServiceCode = $formationService['code'];
-    $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '', 0, 'maxwidth500 widthcentpercentminusxx', 1);
+    $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'maxwidth500 widthcentpercentminusxx', 1);
     print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&statut=0&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
     print '</td></tr>';
 }

@@ -523,6 +523,16 @@ class ActionsDolimeet
             }
         }
 
+        if ($parameters['currentcontext'] == 'propalcard') {
+            print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=create_formation"><i class="fas fa-edit"></i> ' . $langs->trans('Formation') . '</a>';
+        }
+
+        if (in_array($parameters['currentcontext'], ['thirdpartycard', 'thirdpartycomm'])) {
+            if (isModEnabled('propal') && $user->hasRight('propal', 'creer') && $object->status == 1) {
+                print '<div class="inline-block divButAction"><a class="butAction" href="' . DOL_URL_ROOT . '/comm/propal/card.php?socid=' . $object->id . '&action=create">' . img_picto('', 'fontawesome_file-signature_fas_white', 'class="pictofixedwidth"') . $langs->trans('ProposalFormation') . '</a></div>';
+            }
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -628,24 +638,6 @@ class ActionsDolimeet
                     $propalLine->insert($user);
                 }
             }
-        }
-
-        return 0; // or return 1 to replace standard code
-    }
-
-    /**
-     * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
-     *
-     * @param  array  $parameters Hook metadata (context, etc...)
-     * @param  object $object     The object to process
-     * @return int                0 < on error, 0 on success, 1 to replace standard code
-     */
-    public function addMoreActionsButtons(array $parameters, $object): int
-    {
-        global $langs;
-
-        if ($parameters['currentcontext'] == 'propalcard') {
-            print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=create_formation"><i class="fas fa-edit"></i> ' . $langs->trans('Formation') . '</a>';
         }
 
         return 0; // or return 1 to replace standard code
