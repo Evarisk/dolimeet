@@ -82,32 +82,6 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
         return parent::info($langs);
     }
 
-    /**
-     * Fill all odt tags for segments lines.
-     *
-     * @param  Odf       $odfHandler  Object builder odf library.
-     * @param  Translate $outputLangs Lang object to use for output.
-     * @param  array     $moreParam   More param (Object/user/etc).
-     *
-     * @return int                    1 if OK, <=0 if KO.
-     * @throws Exception
-     */
-    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
-    {
-        // Replace tags of lines.
-        try {
-            $this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
-            $moreParam['excludeAttendantsRole'] = ['Trainee'];
-            $moreParam['segmentName']           = 'trainers';
-            $moreParam['attendantLabel']        = 'trainer';
-            $this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
-        } catch (OdfException $e) {
-            $this->error = $e->getMessage();
-            dol_syslog($this->error, LOG_WARNING);
-            return -1;
-        }
-        return 0;
-    }
 
     /**
      * Function to build a document on disk.
@@ -163,9 +137,9 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
 
         $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
-        $moreParam['excludeAttendantsRole'] = ['SessionTrainer'];
+        $moreParam['excludeAttendantsRole'] = [];
         $moreParam['tmparray']              = $tmpArray;
-
+        $moreParam['multipleAttendantsRole'] = 1;
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
     }
 }
