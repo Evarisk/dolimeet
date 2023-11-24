@@ -671,7 +671,7 @@ class Session extends SaturneObject
         $signatory = new SaturneSignature($this->db);
 
         $array       = [];
-        $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => 't.module_name = "dolimeet"']);
+        $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => 't.module_name = "dolimeet" AND status > 0']);
         if (is_array($signatories) && !empty($signatories)) {
             foreach ($signatories as $signatory) {
                 switch ($signatory->object_type) {
@@ -768,19 +768,19 @@ class Session extends SaturneObject
                 }
             }
             if ($array['meeting']['content'] > 0) {
-                $array['meeting']['attendanceRate']['present']['content'] = ($array['meeting']['attendance']['present']['content'] / $array['meeting']['content']) * 100 . ' %';
-                $array['meeting']['attendanceRate']['delay']['content']   = ($array['meeting']['attendance']['delay']['content'] / $array['meeting']['content']) * 100 . ' %';
-                $array['meeting']['attendanceRate']['absent']['content']  = ($array['meeting']['attendance']['absent']['content'] / $array['meeting']['content']) * 100 . ' %';
+                $array['meeting']['attendanceRate']['present']['content'] = price2num(($array['meeting']['attendance']['present']['content'] / $array['meeting']['content']) * 100, 'MT') . ' %';
+                $array['meeting']['attendanceRate']['delay']['content']   = price2num(($array['meeting']['attendance']['delay']['content'] / $array['meeting']['content']) * 100, 'MT') . ' %';
+                $array['meeting']['attendanceRate']['absent']['content']  = price2num(($array['meeting']['attendance']['absent']['content'] / $array['meeting']['content']) * 100, 'MT') . ' %';
             }
             if ($array['trainingsession']['content'] > 0) {
-                $array['trainingsession']['attendanceRate']['present']['content'] = ($array['trainingsession']['attendance']['present']['content'] / $array['trainingsession']['content']) * 100 . ' %';
-                $array['trainingsession']['attendanceRate']['delay']['content']   = ($array['trainingsession']['attendance']['delay']['content'] / $array['trainingsession']['content']) * 100 . ' %';
-                $array['trainingsession']['attendanceRate']['absent']['content']  = ($array['trainingsession']['attendance']['absent']['content'] / $array['trainingsession']['content']) * 100 . ' %';
+                $array['trainingsession']['attendanceRate']['present']['content'] = price2num(($array['trainingsession']['attendance']['present']['content'] / $array['trainingsession']['content']) * 100, 'MT') . ' %';
+                $array['trainingsession']['attendanceRate']['delay']['content']   = price2num(($array['trainingsession']['attendance']['delay']['content'] / $array['trainingsession']['content']) * 100, 'MT') . ' %';
+                $array['trainingsession']['attendanceRate']['absent']['content']  = price2num(($array['trainingsession']['attendance']['absent']['content'] / $array['trainingsession']['content']) * 100, 'MT') . ' %';
             }
             if ($array['audit']['content'] > 0) {
-                $array['audit']['attendanceRate']['present']['content'] = ($array['audit']['attendance']['present']['content'] / $array['audit']['content']) * 100 . ' %';
-                $array['audit']['attendanceRate']['delay']['content']   = ($array['audit']['attendance']['delay']['content'] / $array['audit']['content']) * 100 . ' %';
-                $array['audit']['attendanceRate']['absent']['content']  = ($array['audit']['attendance']['absent']['content'] / $array['audit']['content']) * 100 . ' %';
+                $array['audit']['attendanceRate']['present']['content'] = price2num(($array['audit']['attendance']['present']['content'] / $array['audit']['content']) * 100, 'MT') . ' %';
+                $array['audit']['attendanceRate']['delay']['content']   = price2num(($array['audit']['attendance']['delay']['content'] / $array['audit']['content']) * 100, 'MT') . ' %';
+                $array['audit']['attendanceRate']['absent']['content']  = price2num(($array['audit']['attendance']['absent']['content'] / $array['audit']['content']) * 100, 'MT') . ' %';
             }
         }
 
