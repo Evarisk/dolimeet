@@ -596,12 +596,17 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             print '<a href="#builddoc"></a>'; // ancre.
 
             // Documents.
-            $objRef    = dol_sanitizeFileName($object->ref);
-            $dirFiles  = $object->element . 'document/' . $objRef;
-            $fileDir   = $upload_dir . '/' . $dirFiles;
+            $objRef            = dol_sanitizeFileName($object->ref);
+            $documentTypeArray = ['trainingsession', 'attendancesheet', 'completioncertificate'];
+            foreach ($documentTypeArray as $documentTypeSingle) {
+                $dirFiles        = $documentTypeSingle . 'document/' . $objRef;
+                $fileDir         = $upload_dir . '/' . $dirFiles;
+                $dirFilesArray[] = $dirFiles;
+                $fileDirArray[]  = $fileDir;
+            }
             $urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
         }
 
         print '</div><div class="fichehalfright">';
