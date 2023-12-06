@@ -137,8 +137,7 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
 
         $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
-        $moreParam['tmparray']               = $tmpArray;
-        $moreParam['multipleAttendantsRole'] = 1;
+        $moreParam['tmparray'] = $tmpArray;
 
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
     }
