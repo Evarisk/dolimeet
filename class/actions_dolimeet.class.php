@@ -199,6 +199,10 @@ class ActionsDolimeet
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
             print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
+        } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
+            require_once __DIR__ . '/../class/trainingsession.class.php';
+            require_once __DIR__ . '/../class/meeting.class.php';
+            require_once __DIR__ . '/../class/audit.class.php';
         }
 
         return 0; // or return 1 to replace standard code.
