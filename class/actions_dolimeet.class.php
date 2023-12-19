@@ -478,12 +478,12 @@ class ActionsDolimeet
     }
 
     /**
-     * Overloading the SaturneAdminDocumentData function : replacing the parent's function with the one below.
+     * Overloading the saturneAdminDocumentData function : replacing the parent's function with the one below.
      *
      * @param  array $parameters Hook metadatas (context, etc...).
      * @return int               0 < on error, 0 on success, 1 to replace standard code.
      */
-    public function SaturneAdminDocumentData(array $parameters): int
+    public function saturneAdminDocumentData(array $parameters): int
     {
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'dolimeetadmindocuments') {
@@ -504,12 +504,12 @@ class ActionsDolimeet
     }
 
     /**
-     * Overloading the SaturneAdminObjectConst function : replacing the parent's function with the one below.
+     * Overloading the saturneAdminObjectConst function : replacing the parent's function with the one below.
      *
      * @param  array $parameters Hook metadatas (context, etc...).
      * @return int               0 < on error, 0 on success, 1 to replace standard code.
      */
-    public function SaturneAdminObjectConst(array $parameters): int
+    public function saturneAdminObjectConst(array $parameters): int
     {
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'dolimeetadmindocuments') {
