@@ -621,6 +621,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         print '</div></div>';
     }
 
+    // Select mail models is same action as presend
+    if (GETPOST('modelselected', 'alpha')) {
+        $action = 'presend';
+    }
     // Presend form.
     if ($action == 'presend') {
         $langs->load('mails');
@@ -634,6 +638,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $nbTrainee = 0;
         }
         $fileList = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC);
+        $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/completioncertificatedocument' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC));
         if (!empty($fileList) && is_array($fileList)) {
             $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
             foreach ($fileList as $file) {
