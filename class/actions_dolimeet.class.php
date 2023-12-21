@@ -199,57 +199,9 @@ class ActionsDolimeet
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
             print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
-        } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
-            require_once __DIR__ . '/../class/trainingsession.class.php';
-            require_once __DIR__ . '/../class/meeting.class.php';
-            require_once __DIR__ . '/../class/audit.class.php';
         }
 
         return 0; // or return 1 to replace standard code.
-    }
-
-    /**
-     * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
-     *
-     * @param  array  $parameters Hook metadata (context, etc...)
-     * @param  object $object     The object to process
-     * @return int                0 < on error, 0 on success, 1 to replace standard code
-     */
-    public function addMoreActionsButtons(array $parameters, $object): int
-    {
-        global $langs, $user;
-
-        if (preg_match('/categorycard/', $parameters['context'])) {
-            $id        = GETPOST('id');
-            $elementId = GETPOST('element_id');
-            $type      = GETPOST('type');
-            if ($id > 0 && $elementId > 0 && ($user->rights->dolimeet->$type->write)) {
-                require_once __DIR__ . '/' . $type . '.class.php';
-
-                $classname = ucfirst($type);
-                $session   = new $classname($this->db);
-
-                $session->fetch($elementId);
-
-                if (GETPOST('action') == 'addintocategory') {
-                    $result = $object->add_type($session, 'session');
-                    if ($result >= 0) {
-                        setEventMessages($langs->trans('WasAddedSuccessfully', $session->ref), []);
-                    } elseif ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-                        setEventMessages($langs->trans('ObjectAlreadyLinkedToCategory'), [], 'warnings');
-                    } else {
-                        setEventMessages($object->error, $object->errors, 'errors');
-                    }
-                } elseif (GETPOST('action') == 'delintocategory') {
-                    $result = $object->del_type($session, 'session');
-                    if ($result < 0) {
-                        dol_print_error('', $object->error);
-                    }
-                }
-            }
-        }
-
-        return 0; // or return 1 to replace standard code
     }
 
     /**
@@ -269,6 +221,11 @@ class ActionsDolimeet
             if ($action == 'update') {
                 dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
             }
+        }
+        if (preg_match('/categorycard/', $parameters['context'])) {
+            require_once __DIR__ . '/../class/trainingsession.class.php';
+            require_once __DIR__ . '/../class/meeting.class.php';
+            require_once __DIR__ . '/../class/audit.class.php';
         }
 
         return 0; // or return 1 to replace standard code.
