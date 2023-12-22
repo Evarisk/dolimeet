@@ -487,6 +487,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
     print dol_get_fiche_end();
 
+    $documentTypeArray = ['trainingsession', 'attendancesheet', 'completioncertificate'];
     // Buttons for actions.
     if ($action != 'presend') {
         print '<div class="tabsAction">';
@@ -546,8 +547,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                 } else {
                     $nbTrainee = 0;
                 }
-                $fileList = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC);
-                if (!empty($fileList) && is_array($fileList)) {
+                $fileList = [];
+                foreach ($documentTypeArray as $documentTypeName) {
+                    $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $ref, 'files', 0, '(\.pdf)', '', 'date', SORT_DESC));
+                }
+                if (!empty($fileList)) {
                     $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
                     foreach ($fileList as $file) {
                         if (!strstr($file['name'], 'specimen')) {
@@ -597,7 +601,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
             // Documents.
             $objRef            = dol_sanitizeFileName($object->ref);
-            $documentTypeArray = ['trainingsession', 'attendancesheet', 'completioncertificate'];
+
             foreach ($documentTypeArray as $documentTypeSingle) {
                 $dirFiles        = $documentTypeSingle . 'document/' . $objRef;
                 $fileDir         = $upload_dir . '/' . $dirFiles;
@@ -621,6 +625,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         print '</div></div>';
     }
 
+    // Select mail models is same action as presend
+    if (GETPOST('modelselected', 'alpha')) {
+        $action = 'presend';
+    }
     // Presend form.
     if ($action == 'presend') {
         $langs->load('mails');
@@ -633,7 +641,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         } else {
             $nbTrainee = 0;
         }
-        $fileList = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC);
+        $fileList = [];
+        foreach ($documentTypeArray as $documentTypeName) {
+            $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $ref, 'files', 0, '(\.pdf)', '', 'date', SORT_DESC));
+        }
         if (!empty($fileList) && is_array($fileList)) {
             $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
             foreach ($fileList as $file) {
