@@ -637,7 +637,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         } else {
             $nbTrainee = 0;
         }
-        $fileList = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC);
+        $fileList = dol_dir_list($upload_dir . '/attendancesheetdocument' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC);
         $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/completioncertificatedocument' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC));
         if (!empty($fileList) && is_array($fileList)) {
             $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
