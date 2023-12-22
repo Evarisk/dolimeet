@@ -549,7 +549,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                 }
                 $fileList = [];
                 foreach ($documentTypeArray as $documentTypeName) {
-                    $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $ref, 'files', 0, '(\.pdf)', '', 'date', SORT_DESC));
+                    $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC));
                 }
                 if (!empty($fileList)) {
                     $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
