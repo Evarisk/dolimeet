@@ -509,7 +509,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $displayButton = $onPhone ? '<i class="fas fa-check fa-2x"></i>' : '<i class="fas fa-check"></i>' . ' ' . $langs->trans('Validate');
             if ($object->status == $object::STATUS_DRAFT && $nbAttendants > 0) {
                 print '<span class="butAction" id="actionButtonPendingSignature">' . $displayButton . '</span>';
-            } elseif ($object->status < $object::STATUS_DRAFT) {
+            } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg) . '">' . $displayButton . '</span>';
             }
 
@@ -517,7 +517,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
             if ($object->status == $object::STATUS_VALIDATED) {
                 print '<span class="butAction" id="actionButtonInProgress">' . $displayButton . '</span>';
-            } elseif ($object->status > $object::STATUS_VALIDATED) {
+            } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
 
