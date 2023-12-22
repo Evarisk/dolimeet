@@ -472,7 +472,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         $contract->fetchObjectLinked('digiquali_control');
 
         print '<tr><td class="valignmiddle">' . $langs->trans('SatisfactionSurvey') . '</td><td>';
-        print '<a onclick="preventDefault()" target="_blank" href="../../../digiquali/view/control/control_card?action=create&fromtype=contrat&fromid=' . $object->fk_contrat . '&fk_sheet=' . $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET . '"><button class="butAction">' . $langs->trans('Create') . '</button></a>';
+        print '<a onclick="preventDefault()" target="_blank" href="../../../digiquali/view/control/control_card.php?action=create&fromtype=contrat&fromid=' . $object->fk_contrat . '&fk_sheet=' . $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET . '"><button class="butAction">' . $langs->trans('Create') . '</button></a>';
         print '</td></tr>';
     }
 
