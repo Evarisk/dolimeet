@@ -186,3 +186,5 @@ AttendanceAbsentAuditRate            = Absence rate from audits
 TrainingOrganizationNumber        = Declaration number of the training organisation
 TrainingOrganizationNumberTooltip = Enter your registration number here if you are recognised as a training organisation
 SocietyAttendants                 = Third party external attendants
+DateAndTime                       = Date and time
+SignAttendanceSheetOnline         = Sign the attendance sheet online
