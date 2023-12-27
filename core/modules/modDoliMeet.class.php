@@ -131,7 +131,13 @@ class modDoliMeet extends DolibarrModules
                 'trainingsessioncard',
                 'meetingsignature',
                 'trainingsessionsignature',
-                'auditsignature'
+                'auditsignature',
+                'meetingnote',
+                'trainingsessionnote',
+                'auditnote',
+                'meetingdocument',
+                'trainingsessiondocument',
+                'auditdocument'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
