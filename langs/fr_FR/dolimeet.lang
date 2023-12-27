@@ -205,3 +205,5 @@ TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de f
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
 SetContrat                        = Définir contrat
+DateAndTime                       = Date et horaire
+SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
