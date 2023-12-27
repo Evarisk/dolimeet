@@ -82,6 +82,7 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
         return parent::info($langs);
     }
 
+
     /**
      * Function to build a document on disk.
      *
@@ -134,31 +135,10 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
         $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
         $tmpArray['duration']   = convertSecondToTime($object->duration);
 
-        $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
-        if (is_array($signatory) && !empty($signatory)) {
-            $signatory = array_shift($signatory);
-            $tmpArray['trainer_fullname'] = strtoupper($signatory->lastname) . ' ' . $signatory->firstname;
-            if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
-                if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1)) {
-                    $tempDir      = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp/';
-                    $encodedImage = explode(',', $signatory->signature)[1];
-                    $decodedImage = base64_decode($encodedImage);
-                    file_put_contents($tempDir . 'signature.png', $decodedImage);
-                    $tmpArray['trainer_signature'] = $tempDir . 'signature.png';
-                } else {
-                    $tmpArray['trainer_signature'] = '';
-                }
-            } else {
-                $tmpArray['trainer_signature'] = '';
-            }
-        } else {
-            $tmpArray['trainer_fullname']  = '';
-            $tmpArray['trainer_signature'] = '';
-        }
-
         $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
 
-        $moreParam['tmparray'] = $tmpArray;
+        $moreParam['tmparray']                  = $tmpArray;
+        $moreParam['multipleAttendantsSegment'] = ['sessiontrainer', 'trainee'];
 
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
     }

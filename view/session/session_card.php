@@ -472,7 +472,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         $contract->fetchObjectLinked('digiquali_control');
 
         print '<tr><td class="valignmiddle">' . $langs->trans('SatisfactionSurvey') . '</td><td>';
-        print '<a onclick="preventDefault()" target="_blank" href="../../../digiquali/view/control/control_card?action=create&fromtype=contrat&fromid=' . $object->fk_contrat . '&fk_sheet=' . $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET . '"><button class="butAction">' . $langs->trans('Create') . '</button></a>';
+        print '<a onclick="preventDefault()" target="_blank" href="../../../digiquali/view/control/control_card.php?action=create&fromtype=contrat&fromid=' . $object->fk_contrat . '&fk_sheet=' . $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET . '"><button class="butAction">' . $langs->trans('Create') . '</button></a>';
         print '</td></tr>';
     }
 
@@ -487,6 +487,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
     print dol_get_fiche_end();
 
+    $documentTypeArray = ['trainingsession', 'attendancesheet', 'completioncertificate'];
     // Buttons for actions.
     if ($action != 'presend') {
         print '<div class="tabsAction">';
@@ -509,7 +510,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $displayButton = $onPhone ? '<i class="fas fa-check fa-2x"></i>' : '<i class="fas fa-check"></i>' . ' ' . $langs->trans('Validate');
             if ($object->status == $object::STATUS_DRAFT && $nbAttendants > 0) {
                 print '<span class="butAction" id="actionButtonPendingSignature">' . $displayButton . '</span>';
-            } elseif ($object->status < $object::STATUS_DRAFT) {
+            } else if ($object->status <= $object::STATUS_DRAFT && $nbAttendants <= 0) {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg) . '">' . $displayButton . '</span>';
             }
 
@@ -517,7 +518,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
             if ($object->status == $object::STATUS_VALIDATED) {
                 print '<span class="butAction" id="actionButtonInProgress">' . $displayButton . '</span>';
-            } elseif ($object->status > $object::STATUS_VALIDATED) {
+            } else if ($object->status > $object::STATUS_VALIDATED) {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
 
@@ -546,8 +547,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                 } else {
                     $nbTrainee = 0;
                 }
-                $fileList = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC);
-                if (!empty($fileList) && is_array($fileList)) {
+                $fileList = [];
+                foreach ($documentTypeArray as $documentTypeName) {
+                    $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC));
+                }
+                if (!empty($fileList)) {
                     $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
                     foreach ($fileList as $file) {
                         if (!strstr($file['name'], 'specimen')) {
@@ -596,12 +600,17 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             print '<a href="#builddoc"></a>'; // ancre.
 
             // Documents.
-            $objRef    = dol_sanitizeFileName($object->ref);
-            $dirFiles  = $object->element . 'document/' . $objRef;
-            $fileDir   = $upload_dir . '/' . $dirFiles;
+            $objRef            = dol_sanitizeFileName($object->ref);
+
+            foreach ($documentTypeArray as $documentTypeSingle) {
+                $dirFiles        = $documentTypeSingle . 'document/' . $objRef;
+                $fileDir         = $upload_dir . '/' . $dirFiles;
+                $dirFilesArray[] = $dirFiles;
+                $fileDirArray[]  = $fileDir;
+            }
             $urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
         }
 
         print '</div><div class="fichehalfright">';
@@ -616,6 +625,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         print '</div></div>';
     }
 
+    // Select mail models is same action as presend
+    if (GETPOST('modelselected', 'alpha')) {
+        $action = 'presend';
+    }
     // Presend form.
     if ($action == 'presend') {
         $langs->load('mails');
@@ -628,7 +641,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         } else {
             $nbTrainee = 0;
         }
-        $fileList = dol_dir_list($upload_dir . '/' . $object->element . 'document' . '/' . $ref, 'files', 0, '', '', 'date', SORT_DESC);
+        $fileList = [];
+        foreach ($documentTypeArray as $documentTypeName) {
+            $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $ref, 'files', 0, '(\.pdf)', '', 'date', SORT_DESC));
+        }
         if (!empty($fileList) && is_array($fileList)) {
             $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
             foreach ($fileList as $file) {
