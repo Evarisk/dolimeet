@@ -431,32 +431,32 @@ class ActionsDolimeet
     }
 
     /**
-     *  Overloading the saturneBannerTab function : replacing the parent's function with the one below.
+     *  Overloading the saturneBannerTab function : replacing the parent's function with the one below
      *
-     * @param  array        $parameters Hook metadatas (context, etc...).
-     * @param  CommonObject $object     Current object.
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
      */
     public function saturneBannerTab(array $parameters, CommonObject $object): int
     {
         global $db, $langs;
 
-        // Do something only for the current context.
-        if (in_array($parameters['currentcontext'], ['saturneglobal', 'sessioncard'])) {
+        // Do something only for the current context
+        if (preg_match('/sessioncard|saturneglobal/', $parameters['context'])) {
             if (isModEnabled('contrat') && property_exists($object, 'fk_contrat')) {
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-                $moreHtmlRef = $langs->trans('Contract') . ' : ';
-                if (!empty($object->fk_contrat)) {
-                    $contract = new Contrat($db);
-                    $contract->fetch($object->fk_contrat);
-                    $moreHtmlRef .= $contract->getNomUrl(1);
-                }
-                $moreHtmlRef .= '<br>';
-                $this->resprints = $moreHtmlRef;
+
+                $objectsMetadataContract = saturne_get_objects_metadata('contract');
+
+                $moreParams['bannerElement'] = $objectsMetadataContract['link_name'];
+                $moreParams['possibleKeys']  = ['fk_contrat'];
+                $moreParams['className']     = $objectsMetadataContract['class_name'];
+                $moreParams['title']         = $objectsMetadataContract['langs'];
+                $moreParams['picto']         = $objectsMetadataContract['picto'];
+                $this->results = ['', $moreParams];
             }
         }
-
-        return 0; // or return 1 to replace standard code.
+        return 0; // or return 1 to replace standard code
     }
 
     /**
