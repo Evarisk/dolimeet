@@ -209,3 +209,4 @@ SocietyAttendants                 = Third party external attendants
 SetContrat                        = Define contract
 DateAndTime                       = Date and time
 SignAttendanceSheetOnline         = Sign the attendance sheet online
+SetSatisfactionSurvey             = Create a satisfaction survey

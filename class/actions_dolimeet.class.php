@@ -197,7 +197,7 @@ class ActionsDolimeet
         }
 
         // Do something only for the current context
-        if (preg_match('/contacttpl:contactdao/', $parameters['context']) && preg_match('/contractcontactcard/', $parameters['context']) && isModEnabled('digiquali')) {
+        if (preg_match('/contacttpl:contactdao/', $parameters['context']) && preg_match('/contractcard/', $parameters['context']) && isModEnabled('digiquali')) {
             global $object;
 
             // Load Saturne libraries
@@ -423,7 +423,7 @@ class ActionsDolimeet
             }
         }
 
-        if (preg_match('/contractcontactcard/', $parameters['context']) && isModEnabled('digiquali')) {
+        if (preg_match('/contractcard/', $parameters['context']) && isModEnabled('digiquali')) {
             if ($action == 'set_satisfaction_survey') {
                 require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 

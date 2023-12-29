@@ -25,7 +25,7 @@
  * Set satisfaction survey
  *
  * @param  CommonObject $object        Object
- * @param  string       $contactCode   Contact code contact from c_type_contact
+ * @param  string       $contactCode   Contact code from c_type_contact
  * @param  int          $contactID     Contact ID : user or socpeople
  * @param  string       $contactSource Contact source : internal or external
  * @throws Exception
