@@ -506,6 +506,58 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the completeTabsHead function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadatas (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function completeTabsHead(array $parameters): int
+    {
+        global $conf, $db;
+
+        if (preg_match('/main/', $parameters['context'])) {
+            $nbSessions = 0;
+            require_once __DIR__ . '/session.class.php';
+            $session = new Session($db);
+            switch ($parameters['object']->element) {
+                case 'societe' :
+                    $objectElement = 'soc';
+                    break;
+                case 'contract' :
+                    $objectElement = 'contrat';
+                    break;
+                default :
+                    $objectElement = $parameters['object']->element;
+                    break;
+            }
+            $filter  = 't.status >= 0 AND t.fk_' . $objectElement . ' = ' . $parameters['object']->id;
+            $filter .= GETPOST('object_type') ? " AND t.type = '" . GETPOST('object_type') . "'" : '';
+            $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
+            if (is_array($sessions) && !empty($sessions)) {
+                $nbSessions = count($sessions);
+            }
+            if ($nbSessions > 0) {
+                if (is_array($parameters['head']) && !empty($parameters['head'])) {
+                    foreach ($parameters['head'] as $headKey => $tabsHead) {
+                        if (is_array($tabsHead) && !empty($tabsHead)) {
+                            if (isset($tabsHead[2]) && $tabsHead[2] === 'sessionList') {
+                                $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+                                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+                                $parameters['head'][$headKey][1]  = $conf->browser->layout == 'classic' ? $picto . 'DoliMeet' : $picto;
+                                $parameters['head'][$headKey][1] .= '<span class="badge marginleftonlyshort">' . $nbSessions . '</span>';
+                            }
+                        }
+                    }
+                }
+            }
+
+            $this->results = $parameters;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      *  Overloading the saturneBannerTab function : replacing the parent's function with the one below
      *
      * @param  array        $parameters Hook metadatas (context, etc...)
