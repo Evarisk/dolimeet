@@ -23,6 +23,25 @@ DoliMeetDescription     = Suivi des réunions, sessions de formation, audit
 DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 #
+# Config page - Page d'administration
+#
+
+# Setup - Réglages
+SatisfactionSurvey                          = Enquête de satisfaction
+ClientSatisfactionSurvey                    = Enquête de satisfaction client
+ClientSatisfactionSurveyDescription         = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction client
+TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
+TraineeSatisfactionSurveyDescription        = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction stagiaire
+SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
+SessiontrainerSatisfactionSurveyDescription = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction formateur
+SponsorSatisfactionSurvey                   = Enquête de satisfaction commanditaire
+SponsorSatisfactionSurveyDescription        = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction commanditaire
+OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
+OpcoSatisfactionSurveyDescription           = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction OPCO
+
+
+
+#
 # DoliMeet
 #
 
@@ -105,8 +124,6 @@ SessionTrainerResponsibleDesc         = Définit le responsable du dispensateur 
 SessionTrainerResponsibleIdSet        = Responsable du dispensateur de formation défini : %s
 LinkDolimeet_trainsess                = Activer le lien avec les sessions de formation
 LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles de contrôle
-SatisfactionSurvey                    = Enquête de satisfaction
-SatisfactionSurveyDesc                = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction
 
 
 
@@ -207,3 +224,4 @@ SocietyAttendants                 = Tiers des participants externe
 SetContrat                        = Définir contrat
 DateAndTime                       = Date et horaire
 SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
+SetSatisfactionSurvey             = Créer enquête de satisfaction

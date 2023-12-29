@@ -58,21 +58,30 @@ saturne_check_access($permissionToRead);
  * Actions
  */
 
-if ($action == 'update') {
-    $responsibleId        = GETPOST('session_trainer_responsible_id');
-    $satisfactionSurveyId = GETPOST('satisfaction_survey_model');
-
+if ($action == 'set_session_trainer_responsible') {
+    $responsibleId = GETPOST('session_trainer_responsible_id');
     if ($responsibleId != $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE) {
         dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', $responsibleId, 'integer', 0, '', $conf->entity);
-        $userTmp = new User($db);
-        $userTmp->fetch($responsibleId);
-        setEventMessages($langs->trans('SessionTrainerResponsibleIdSet', $user->getFullName($langs)), []);
     }
 
-    if ($satisfactionSurveyId != $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET) {
-        dolibarr_set_const($db, 'DOLIMEET_SATISFACTION_SURVEY_SHEET', $satisfactionSurveyId, 'integer', 0, '', $conf->entity);
-        setEventMessages($langs->trans('SatisfactionSurveySet'), []);
+    setEventMessage('SavedConfig');
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($action == 'set_satisfaction_survey') {
+    $satisfactionSurveys = ['client', 'trainee', 'sessiontrainer', 'sponsor', 'opco'];
+    foreach ($satisfactionSurveys as $satisfactionSurvey) {
+        $satisfactionSurveyID = GETPOST($satisfactionSurvey . '_satisfaction_survey_model');
+        $confName             = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
+        if ($satisfactionSurveyID != $conf->global->$confName) {
+            dolibarr_set_const($db, $confName, $satisfactionSurveyID, 'integer', 0, '', $conf->entity);
+        }
     }
+
+    setEventMessage('SavedConfig');
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
 }
 
 /*
@@ -85,8 +94,9 @@ $help_url = 'FR:Module_DoliMeet';
 saturne_header(0,'', $title, $help_url);
 
 // Subheader
-$linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans('BackToModuleList') . '</a>';
-print load_fiche_titre($title, $linkback, 'dolimeet_color@dolimeet');
+$linkBack = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans('BackToModuleList') . '</a>';
+
+print load_fiche_titre($title, $linkBack, 'title_setup');
 
 // Configuration header
 $head = dolimeet_admin_prepare_head();
@@ -134,18 +144,19 @@ print ajax_constantonoff('DOLIMEET_AUDIT_MENU_ENABLED');
 print '</td>';
 print '</tr>';
 
+print '</table>';
+
 print load_fiche_titre($langs->trans('TrainingSessions'), '', '');
 
-print '<form method="POST" action="'. $_SERVER['PHP_SELF'] .'">';
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="update">';
+print '<input type="hidden" name="action" value="set_session_trainer_responsible">';
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->trans('Name') . '</td>';
 print '<td>' . $langs->trans('Description') . '</td>';
-print '<td class="center">' . $langs->trans('Status') . '</td>';
-print '<td class="center">' . $langs->trans('Action') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
@@ -154,29 +165,50 @@ print '</td><td>';
 print $langs->transnoentities('SessionTrainerResponsibleDesc');
 print '</td>';
 
-print '<td class="center">';
-print $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1);
-print '<td class="center"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '">';
+print '<td class="minwidth400 maxwidth500">';
+print img_picto($langs->trans('User'), 'user', 'class="pictofixedwidth"') . $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1, null, 0, '', '', '0', 0, 0, '', 0, '','minwidth400 maxwidth500');
 print '</td></tr>';
+
+print '</table>';
+print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+print '</form>';
 
 if (isModEnabled('digiquali')) {
     require_once __DIR__ . '/../../digiquali/class/sheet.class.php';
 
     $sheet = new Sheet($db);
 
-    print '<tr class="oddeven"><td>';
-    print $langs->trans('SatisfactionSurvey');
-    print '</td><td>';
-    print $langs->transnoentities('SatisfactionSurveyDesc');
-    print '</td>';
+    print load_fiche_titre($langs->trans('SatisfactionSurvey'), '', '');
 
-    print '<td class="center">';
-    print $sheet->selectSheetList($conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET, 'satisfaction_survey_model');
-    print '<td class="center"><input type="submit" class="button" name="save" value="'. $langs->trans('Save') . '">';
-    print '</td></tr>';
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="set_satisfaction_survey">';
+
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Name') . '</td>';
+    print '<td>' . $langs->trans('Description') . '</td>';
+    print '<td>' . $langs->trans('Value') . '</td>';
+    print '</tr>';
+
+    $satisfactionSurveys = ['client', 'trainee', 'sessiontrainer', 'sponsor', 'opco'];
+    foreach ($satisfactionSurveys as $satisfactionSurvey) {
+        print '<tr class="oddeven"><td>';
+        print $langs->trans(ucfirst($satisfactionSurvey) . 'SatisfactionSurvey');
+        print '</td><td>';
+        print $langs->transnoentities(ucfirst($satisfactionSurvey) . 'SatisfactionSurveyDescription');
+        print '</td>';
+
+        print '<td class="minwidth400 maxwidth500">';
+        $confName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
+        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList($conf->global->$confName, $satisfactionSurvey . '_satisfaction_survey_model', '', '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
+        print '</td></tr>';
+    }
+
+    print '</table>';
+    print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+    print '</form>';
 }
-
-print '</form>';
 
 $db->close();
 llxFooter();

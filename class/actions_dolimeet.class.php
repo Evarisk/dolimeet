@@ -197,6 +197,68 @@ class ActionsDolimeet
         }
 
         // Do something only for the current context
+        if (preg_match('/contacttpl:contactdao/', $parameters['context']) && preg_match('/contractcard/', $parameters['context']) && isModEnabled('digiquali')) {
+            global $object;
+
+            // Load Saturne libraries
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            // Load DigiQuali libraries
+            require_once __DIR__ . '/../../digiquali/class/control.class.php';
+
+            $control   = new Control($this->db);
+            $signatory = new SaturneSignature($db, 'digiquali', $control->element);
+
+            $contacts = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
+
+            $object->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
+
+            if (isset($object->linkedObjectsIds['digiquali_control']) && !empty($object->linkedObjectsIds['digiquali_control'])) {
+                $outputLine = [];
+                $controlIDs = $object->linkedObjectsIds['digiquali_control'];
+
+                foreach ($controlIDs as $controlID) {
+                    foreach ($contacts as $contact) {
+                        $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
+                        if ($contact['code'] == 'TRAINEE' || $contact['code'] == 'SESSIONTRAINER') {
+                            if ($signatory->checkSignatoryHasObject($controlID, $control->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople')) {
+                                $control->fetch($controlID);
+                                $outputLine[$contact['rowid']] .= $control->getNomUrl(1);
+                            } else {
+                                $outputLine[$contact['rowid']] .= img_picto($langs->trans('Control'), $control->picto, 'class="pictofixedwidth"');
+                                $outputLine[$contact['rowid']] .= '<a class="reposition editfielda" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_satisfaction_survey&contact_code=' . $contact['code'] . '&contact_id=' . $contact['id'] . '&contact_source=' . $contact['source'] . '&token=' . newToken() . '">';
+                                $outputLine[$contact['rowid']] .= img_picto($langs->trans('SetSatisfactionSurvey'), 'fontawesome_fa-plus-circle_fas_#444') . '</a>';
+                            }
+                        }
+                        $outputLine[$contact['rowid']] .= '</td>';
+                    }
+                }
+            }
+
+            $outputLineHeader = '<th class="wrapcolumntitle liste_titre" title="' . $langs->transnoentities('SatisfactionSurvey') . '">' . $langs->transnoentities('SatisfactionSurvey') . '</th>';
+
+            $jsonData = json_encode($outputLine);
+            ?>
+            <script>
+                // Target the second-to-last th element
+                var targetTh = $('table.tagtable th:nth-last-child(2)');
+                targetTh.before(<?php echo json_encode($outputLineHeader); ?>)
+
+                function fillTable(data) {
+                    $('.oddeven').each(function() {
+                        var id       = $(this).data('rowid');
+                        var targetTd = $(this).find('td:nth-last-child(2)');
+                        targetTd.before(data[id]);
+                    });
+                }
+
+                var tableData = <?php echo $jsonData; ?>;
+                fillTable(tableData);
+            </script>
+            <?php
+        }
+
+        // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
             print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
         } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
@@ -358,6 +420,19 @@ class ActionsDolimeet
         if ($parameters['currentcontext'] == 'admincompany') {
             if ($action == 'update') {
                 dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
+            }
+        }
+
+        if (preg_match('/contractcard/', $parameters['context']) && isModEnabled('digiquali')) {
+            if ($action == 'set_satisfaction_survey') {
+                require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+
+                $object->fetch(GETPOST('id'));
+
+                set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
+
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
+                exit;
             }
         }
 
