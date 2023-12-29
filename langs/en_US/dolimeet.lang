@@ -23,6 +23,26 @@ DoliMeetDescription     = Follow-up of meetings, training sessions, audits
 DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 
 
+
+#
+# Config page
+#
+
+# Setup
+SatisfactionSurvey                          = Satisfaction survey
+ClientSatisfactionSurvey                    = Client satisfaction survey
+ClientSatisfactionSurveyDescription         = Defines the control model used by default for customer satisfaction surveys
+TraineeSatisfactionSurvey                   = Trainee satisfaction survey
+TraineeSatisfactionSurveyDescription        = Defines the control model used by default for trainee satisfaction surveys
+SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
+SessiontrainerSatisfactionSurveyDescription = Defines the control model used by default for session trainer satisfaction surveys
+SponsorSatisfactionSurvey                   = Sponsor satisfaction survey
+SponsorSatisfactionSurveyDescription        = Defines the control model used by default for sponsor satisfaction surveys
+OpcoSatisfactionSurvey                      = OPCO satisfaction survey
+OpcoSatisfactionSurveyDescription           = Defines the control model used by default for OPCO satisfaction surveys
+
+
+
 #
 # Session
 #
