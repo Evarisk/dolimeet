@@ -217,6 +217,24 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 $actioncomm->label = $langs->trans('ObjectSentByMailTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
                 $actioncomm->create($user);
                 break;
+
+            case 'CONTRAT_ADD_CONTACT' :
+                if (isModEnabled('digiquali')) {
+                    require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+
+                    if (GETPOST('userid')) {
+                        $contactID     = GETPOST('userid');
+                        $contactSource = 'internal';
+                    } else {
+                        $contactID     = GETPOST('contactid');
+                        $contactSource = 'external';
+                    }
+                    $contactTypeID = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
+                    $contactCode   = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
+
+                    set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
+                }
+                break;
         }
         return 0;
     }
