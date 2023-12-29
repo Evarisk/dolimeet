@@ -414,7 +414,10 @@ class Session extends SaturneObject
         if ($status == self::STATUS_VALIDATED) {
             $statusType = 'status3';
         }
-        if ($status == self::STATUS_LOCKED || $status == self::STATUS_ARCHIVED) {
+        if ($status == self::STATUS_LOCKED) {
+            $statusType = 'status4';
+        }
+        if ($status == self::STATUS_ARCHIVED) {
             $statusType = 'status8';
         }
 
