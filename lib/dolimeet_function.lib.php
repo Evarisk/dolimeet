@@ -34,26 +34,24 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
 {
     global $conf, $db, $user;
 
-    if ($contactCode == 'TRAINEE' || $contactCode == 'SESSIONTRAINER') {
-        // Load DigiQuali libraries
-        require_once __DIR__ . '/../../digiquali/class/control.class.php';
-        require_once __DIR__ . '/../../digiquali/lib/digiquali_sheet.lib.php';
+    // Load DigiQuali libraries
+    require_once __DIR__ . '/../../digiquali/class/control.class.php';
+    require_once __DIR__ . '/../../digiquali/lib/digiquali_sheet.lib.php';
 
-        $control = new Control($db);
+    $control = new Control($db);
 
-        $confName                    = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
-        $control->fk_sheet           = $conf->global->$confName;
-        $control->fk_user_controller = $user->id;
-        $_POST['fk_contract']        = $object->id;
+    $confName                    = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
+    $control->fk_sheet           = $conf->global->$confName;
+    $control->fk_user_controller = $user->id;
+    $_POST['fk_contract']        = $object->id;
 
-        $controlID = $control->create($user);
+    $controlID = $control->create($user);
 
-        if ($controlID > 0) {
-            // Load Saturne libraries
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+    if ($controlID > 0) {
+        // Load Saturne libraries
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
-            $signatory = new SaturneSignature($db, 'digiquali', $control->element);
-            $signatory->setSignatory($controlID, $control->element, $contactSource == 'internal' ? 'user' : 'socpeople', [$contactID], 'Attendant', 1);
-        }
+        $signatory = new SaturneSignature($db, 'digiquali', $control->element);
+        $signatory->setSignatory($controlID, $control->element, $contactSource == 'internal' ? 'user' : 'socpeople', [$contactID], 'Attendant', 1);
     }
 }

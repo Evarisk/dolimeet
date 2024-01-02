@@ -70,7 +70,7 @@ if ($action == 'set_session_trainer_responsible') {
 }
 
 if ($action == 'set_satisfaction_survey') {
-    $satisfactionSurveys = ['client', 'trainee', 'sessiontrainer', 'sponsor', 'opco'];
+    $satisfactionSurveys = ['customer', 'billing', 'trainee', 'sessiontrainer', 'opco'];
     foreach ($satisfactionSurveys as $satisfactionSurvey) {
         $satisfactionSurveyID = GETPOST($satisfactionSurvey . '_satisfaction_survey_model');
         $confName             = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
@@ -191,7 +191,7 @@ if (isModEnabled('digiquali')) {
     print '<td>' . $langs->trans('Value') . '</td>';
     print '</tr>';
 
-    $satisfactionSurveys = ['client', 'trainee', 'sessiontrainer', 'sponsor', 'opco'];
+    $satisfactionSurveys = ['customer', 'billing', 'trainee', 'sessiontrainer', 'opco'];
     foreach ($satisfactionSurveys as $satisfactionSurvey) {
         print '<tr class="oddeven"><td>';
         print $langs->trans(ucfirst($satisfactionSurvey) . 'SatisfactionSurvey');

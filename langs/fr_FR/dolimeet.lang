@@ -28,14 +28,14 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
-ClientSatisfactionSurvey                    = Enquête de satisfaction client
-ClientSatisfactionSurveyDescription         = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction client
+CustomerSatisfactionSurvey                  = Enquête de satisfaction client
+CustomerSatisfactionSurveyDescription       = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction client
+BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire
+BillingSatisfactionSurveyDescription        = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction commanditaire
 TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
 TraineeSatisfactionSurveyDescription        = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction stagiaire
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
 SessiontrainerSatisfactionSurveyDescription = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction formateur
-SponsorSatisfactionSurvey                   = Enquête de satisfaction commanditaire
-SponsorSatisfactionSurveyDescription        = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction commanditaire
 OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
 OpcoSatisfactionSurveyDescription           = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction OPCO
 
