@@ -480,7 +480,7 @@ class ActionsDolimeet
         global $langs;
 
         // Do something only for the current context.
-        if ($parameters['currentcontext'] == 'contractcard') {
+        if (strpos($parameters['context'], 'contractcard') !== false) {
             if (isModEnabled('contrat')) {
                 $error = 0;
                 $attendantInternalSessionTrainerArray = $object->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
@@ -670,7 +670,7 @@ class ActionsDolimeet
         global $conf, $langs;
 
         // Do something only for the current context
-        if ($parameters['currentcontext'] == 'trainingsessioncard') {
+        if (strpos($parameters['context'], 'trainingsessioncard') !== false) {
             if (preg_match('/completioncertificate/', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']))) {
                 $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
                 $document  = new SessionDocument($this->db, $object->element . 'document');
