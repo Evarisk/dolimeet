@@ -26,13 +26,13 @@
  * functions xxx_completesubstitutionarray are called by make_substitutions() if file
  * is inside directory htdocs/core/substitutions
  *
- * @param  array       $substitutionarray Array with substitution key => val
- * @param  Translate   $langs             Output langs
- * @param  Object|null $object            Object to use to get values
- * @return void                           The entry parameter $substitutionarray is modified
+ * @param  array              $substitutionarray Array with substitution key => val
+ * @param  Translate          $langs             Output langs
+ * @param  Object|string|null $object            Object to use to get values
+ * @return void                                  The entry parameter $substitutionarray is modified
  * @throws Exception
  */
-function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate $langs, ?object $object)
+function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate $langs, $object)
 {
     global $conf, $db;
 
