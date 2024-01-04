@@ -276,21 +276,6 @@ class ActionsDolimeet
             }
         }
 
-        if (strpos($parameters['context'], 'contractcard') !== false && isModEnabled('digiquali')) {
-            if (GETPOST('action') == 'set_satisfaction_survey') {
-                global $object;
-
-                require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
-
-                $object->fetch(GETPOST('id'));
-
-                set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
-
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
-                exit;
-            }
-        }
-
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
             print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
@@ -453,6 +438,21 @@ class ActionsDolimeet
         if ($parameters['currentcontext'] == 'admincompany') {
             if ($action == 'update') {
                 dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
+            }
+        }
+
+        if (strpos($parameters['context'], 'contractcard') !== false && isModEnabled('digiquali')) {
+            if (GETPOST('action') == 'set_satisfaction_survey') {
+                global $object;
+
+                require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+
+                $object->fetch(GETPOST('id'));
+
+                set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
+
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
+                exit;
             }
         }
 
