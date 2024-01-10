@@ -299,6 +299,7 @@ class Session extends SaturneObject
         $label .= '<b>' . $langs->trans('Ref') . ' : </b> ' . $this->ref;
 
         $url = dol_buildpath('/' . $this->module . '/view/session/session_card.php', 1) . '?id=' . $this->id . '&object_type=' . $this->element;
+        $url .= !empty(GETPOST('fromtype')) ? '&fromtype=' . GETPOST('fromtype') : '';
 
         if ($option != 'nolink') {
             // Add param to save lastsearch_values or not.

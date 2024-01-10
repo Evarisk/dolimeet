@@ -49,9 +49,6 @@ require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
-// Load translation files required by the page
-saturne_load_langs();
-
 // Get parameters
 $id         = GETPOST('id', 'int');
 $ref        = GETPOST('ref', 'alpha');
@@ -70,6 +67,11 @@ $mode        = GETPOST('mode', 'aZ');
 $fromType    = GETPOST('fromtype', 'alpha');   // element type
 $fromID      = GETPOST('fromid', 'int');       //element id
 $type        = GETPOST('type');
+
+// Load translation files required by the page
+$objectMetadata = saturne_get_objects_metadata($fromType);
+$langFile       = !empty($objectMetadata['langfile']) ? [$objectMetadata['langfile']] : [];
+saturne_load_langs($langFile);
 
 // Get pagination parameters
 $limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -545,7 +547,7 @@ if ($objectType == 'session' || !empty($fromType) && $fromID > 0) {
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewList'), '', 'fa fa-bars imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=common' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ((empty($mode) || $mode == 'common') ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewKanban'), '', 'fa fa-th-list imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=kanban' . preg_replace('/(&|\?)*mode=[^&]+/', '', $param), '', ($mode == 'kanban' ? 2 : 1), ['morecss'=>'reposition']);
 $newcardbutton .= dolGetButtonTitleSeparator();
-$newcardbutton .= dolGetButtonTitle($langs->trans('New'), ($objectType != 'session' ? '' : $langs->trans('SelectSessionType')), 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $fromurl . '&object_type=' . $objectType, '', ($objectType != 'session' ? $permissiontoadd : -2));
+$newcardbutton .= dolGetButtonTitle($langs->trans('New'), ($objectType != 'session' ? '' : $langs->trans('SelectSessionType')), 'fa fa-plus-circle', dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $fromurl . '&object_type=' . $objectType . (!empty(GETPOST('fromtype')) ? '&fromtype=' . GETPOST('fromtype') : ''), '', ($objectType != 'session' ? $permissiontoadd : -2));
 
 print_barre_liste($title, $page, $_SERVER['PHP_SELF'], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_' . $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 

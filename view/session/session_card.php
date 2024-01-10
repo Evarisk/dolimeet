@@ -117,6 +117,7 @@ if (empty($resHook)) {
     $error = 0;
 
     $backurlforlist = dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?object_type=' . $object->element;
+    $backurlforlist .= !empty(GETPOST('fromtype')) ? '&fromtype=' . GETPOST('fromtype') : '';
 
     if (empty($backtopage) || ($cancel && empty($id))) {
         if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
@@ -195,7 +196,7 @@ if ($action == 'create') {
 
     print load_fiche_titre($langs->trans('New' . ucfirst($object->element)), '', 'object_' . $object->picto);
 
-    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . '">';
+    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . (!empty(GETPOST('fromtype')) ? '&fromtype=' . GETPOST('fromtype') : '') .'">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="add">';
     if ($backtopage) {
@@ -351,7 +352,7 @@ if (($id || $ref) && $action == 'edit') {
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
     $res = $object->fetch_optionals();
 
-    $linkback = '<a href="' . dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?restore_lastsearch_values=1&object_type=' . $object->element . '">' . $langs->trans('BackToList') . '</a>';
+    $linkback = '<a href="' . dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?restore_lastsearch_values=1&object_type=' . $object->element . (!empty(GETPOST('fromtype')) ? '&fromtype=' . GETPOST('fromtype') : '') . '">' . $langs->trans('BackToList') . '</a>';
     saturne_get_fiche_head($object, 'card', $title);
     saturne_banner_tab($object, 'ref', $linkback);
 
