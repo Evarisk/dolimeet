@@ -702,6 +702,270 @@ class ActionsDolimeet
                 }
             }
         }
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     *  Overloading the showFilesList function : replacing the parent's function with the one below.
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function showFilesList(array $parameters, $object): int
+    {
+        global $conf, $db, $langs;
+
+        if (preg_match('/contractcard/', $parameters['context']) && preg_match('/document/', $_SERVER['PHP_SELF'])) {
+            global $dolibarr_main_url_root, $form, $formfile, $maxheightmini;
+
+            if (!is_object($form)) {
+                include_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
+                $form = new Form($db);
+            }
+            if (!is_object($formfile)) {
+                include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+                $formfile = new FormFile($db);
+            }
+
+            $sortfield    = GETPOSTISSET('sortfield') ? GETPOST('sortfield') : '';
+            $sortorder    = GETPOSTISSET('sortoder') ? GETPOST('sortoder') : '';
+            $permonobject = empty($conf->global->MAIN_UPLOAD_DOC) ? 0 : 1;
+
+            //change the ref
+            $upload_dir        = $conf->dolimeet->multidir_output[$object->entity ?? 1];
+            $documentTypeArray = ['trainingsession', 'attendancesheet', 'completioncertificate'];
+
+            require_once __DIR__ . '/session.class.php';
+            $session = new Session($db);
+            $sessions = $session->fetchAll('', '', 0, 0, ['']);
+
+            // May be needed to add .pdf in filter later
+            foreach ($documentTypeArray as $documentTypeName) {
+                foreach ($sessions as $session) {
+                    $filearray = dol_dir_list($upload_dir . '/' . $documentTypeName . 'document/' . $session->ref, 'files', 0, '', '', 'date', SORT_DESC);
+                    $parameters['filearray'] = array_merge($parameters['filearray'], $filearray);
+                }
+            }
+
+            if (!str_contains($parameters['param'], '&id=') && isset($object->id)) {
+                $parameters['param'] .= '&id='.$object->id;
+            }
+            $relativepathwihtoutslashend = preg_replace('/\/$/', '', $parameters['relativepath']);
+            if ($relativepathwihtoutslashend) {
+                $parameters['param'] .= '&file='.urlencode($relativepathwihtoutslashend);
+            }
+
+            // Show list of existing files
+            if ((empty($parameters['useinecm']) || $parameters['useinecm'] == 6) && $parameters['title'] != 'none') {
+                print load_fiche_titre($parameters['title'] ?: $langs->trans("AttachedFiles"), '', 'file-upload', 0, '', 'table-list-of-attached-files');
+            }
+            if (empty($url)) {
+                $url = $_SERVER["PHP_SELF"];
+            }
+
+            print '<!-- html.formfile::list_of_documents -->'."\n";
+            print '<div class="div-table-responsive-no-min">';
+            print '<table id="tablelines" class="centpercent liste noborder nobottom">'."\n";
+
+            // Get list of files stored into database for same relative directory
+            if ($parameters['relativedir']) {
+                if ($sortfield && $sortorder) {	// If $sortfield is for example 'position_name', we will sort on the property 'position_name' (that is concat of position+name)
+                    $parameters['filearray'] = dol_sort_array($parameters['filearray'], $sortfield, $sortorder);
+                }
+            }
+
+            print '<tr class="liste_titre nodrag nodrop">';
+            //print $url.' sortfield='.$sortfield.' sortorder='.$sortorder;
+            print_liste_field_titre('Documents2', $url, "name", "", $parameters['param'], '', $sortfield, $sortorder, 'left ');
+            print_liste_field_titre('Size', $url, "size", "", $parameters['param'], '', $sortfield, $sortorder, 'right ');
+            print_liste_field_titre('Date', $url, "date", "", $parameters['param'], '', $sortfield, $sortorder, 'center ');
+            if (empty($parameters['useinecm']) || $parameters['useinecm'] == 4 || $parameters['useinecm'] == 5 || $parameters['useinecm'] == 6) {
+                print_liste_field_titre('', $url, "", "", $parameters['param'], '', $sortfield, $sortorder, 'center '); // Preview
+            }
+            // Shared or not - Hash of file
+            print_liste_field_titre('');
+            // Action button
+            print_liste_field_titre('');
+            if (empty($disablemove) && count($parameters['filearray']) > 1) {
+                print_liste_field_titre('');
+            }
+            print "</tr>\n";
+
+            $nboffiles = count($parameters['filearray']);
+            if ($nboffiles > 0) {
+                include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+            }
+
+            $i = 0;
+            $nboflines = 0;
+            $lastrowid = 0;
+            foreach ($parameters['filearray'] as $key => $file) {      // filearray must be only files here
+                if ($file['name'] != '.' && $file['name'] != '..' && !preg_match('/\.meta$/i', $file['name'])) {
+                    if (array_key_exists('rowid', $parameters['filearray'][$key]) && $parameters['filearray'][$key]['rowid'] > 0) {
+                        $lastrowid = $parameters['filearray'][$key]['rowid'];
+                    }
+                    $filepath = $parameters['relativepath'].$file['name'];
+                    $nboflines++;
+                    print '<!-- Line list_of_documents '.$key.' relativepath = '.$parameters['relativepath'].' -->'."\n";
+                    // Do we have entry into database ?
+                    print '<!-- In database: position='.(array_key_exists('position', $parameters['filearray'][$key]) ? $parameters['filearray'][$key]['position'] : 0).' -->'."\n";
+                    print '<tr class="oddeven" id="row-'.((array_key_exists('rowid', $parameters['filearray'][$key]) && $parameters['filearray'][$key]['rowid'] > 0) ? $parameters['filearray'][$key]['rowid'] : 'AFTER'.$lastrowid.'POS'.($i + 1)).'">';
+
+                    // File name
+                    print '<td class="minwith200 tdoverflowmax500">';
+
+                    // Show file name with link to download
+                    //print "XX".$file['name'];	//$file['name'] must be utf8
+                    print '<a class="paddingright valignmiddle" href="'.DOL_URL_ROOT.'/document.php?modulepart='.$parameters['modulepart'];
+                    if ($parameters['forcedownload']) {
+                        print '&attachment=1';
+                    }
+                    if (!empty($object->entity)) {
+                        print '&entity='.$object->entity;
+                    }
+                    print '&file='.urlencode($filepath).'">';
+                    print img_mime($file['name'], $file['name'].' ('.dol_print_size($file['size'], 0, 0).')', 'inline-block valignmiddle paddingright');
+                    $filenametoshow = preg_replace('/\.noexe$/', '', $file['name']);
+                    print dol_escape_htmltag(dol_trunc($filenametoshow, 200));
+                    print '</a>';
+
+                    // Preview link
+                    print $formfile->showPreview($file, $parameters['modulepart'], $filepath, 0, '&entity='.(!empty($object->entity) ? $object->entity : $conf->entity));
+                    print "</td>\n";
+
+                    // Size
+                    $sizetoshow = dol_print_size($file['size'], 1, 1);
+                    $sizetoshowbytes = dol_print_size($file['size'], 0, 1);
+                    print '<td class="right nowraponall">';
+                    if ($sizetoshow == $sizetoshowbytes) {
+                        print $sizetoshow;
+                    } else {
+                        print $form->textwithpicto($sizetoshow, $sizetoshowbytes, -1);
+                    }
+                    print '</td>';
+
+                    // Date
+                    print '<td class="center nowraponall">'.dol_print_date($file['date'], "dayhour", "tzuser").'</td>';
+
+                    // Preview
+                    if (empty($parameters['useinecm']) || $parameters['useinecm'] == 4 || $parameters['useinecm'] == 5 || $parameters['useinecm'] == 6) {
+                        $fileinfo = pathinfo($file['name']);
+                        print '<td class="center">';
+                        if (image_format_supported($file['name']) >= 0) {
+                            if ($parameters['useinecm'] == 5 || $parameters['useinecm'] == 6) {
+                                $smallfile = getImageFileNameForSize($file['name'], ''); // There is no thumb for ECM module and Media filemanager, so we use true image. TODO Change this it is slow on image dir.
+                            } else {
+                                $smallfile = getImageFileNameForSize($file['name'], '_small'); // For new thumbs using same ext (in lower case however) than original
+                            }
+                            if (!dol_is_file($file['path'].'/'.$smallfile)) {
+                                $smallfile = getImageFileNameForSize($file['name'], '_small', '.png'); // For backward compatibility of old thumbs that were created with filename in lower case and with .png extension
+                            }
+                            //print $file['path'].'/'.$smallfile.'<br>';
+
+                            $urlforhref = getAdvancedPreviewUrl($parameters['modulepart'], $parameters['relativepath'].$fileinfo['filename'].'.'.strtolower($fileinfo['extension']), 1, '&entity='.(!empty($object->entity) ? $object->entity : $conf->entity));
+                            if (empty($urlforhref)) {
+                                $urlforhref = DOL_URL_ROOT.'/viewimage.php?modulepart='.$parameters['modulepart'].'&entity='.(!empty($object->entity) ? $object->entity : $conf->entity).'&file='.urlencode($parameters['relativepath'].$fileinfo['filename'].'.'.strtolower($fileinfo['extension']));
+                                print '<a href="'.$urlforhref.'" class="aphoto" target="_blank" rel="noopener noreferrer">';
+                            } else {
+                                print '<a href="'.$urlforhref['url'].'" class="'.$urlforhref['css'].'" target="'.$urlforhref['target'].'" mime="'.$urlforhref['mime'].'">';
+                            }
+                            print '<img class="photo maxwidth200 shadow valignmiddle" height="'.(($parameters['useinecm'] == 4 || $parameters['useinecm'] == 5 || $parameters['useinecm'] == 6) ? '20' : $maxheightmini).'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$parameters['modulepart'].'&entity='.(!empty($object->entity) ? $object->entity : $conf->entity).'&file='.urlencode($parameters['relativepath'].$smallfile).'" title="">';
+                            print '</a>';
+                        } else {
+                            print '&nbsp;';
+                        }
+                        print '</td>';
+                    }
+
+                    // Shared or not - Hash of file
+                    print '<td class="center">';
+                    if ($parameters['relativedir'] && $parameters['filearray'][$key]['rowid'] > 0) {	// only if we are in a mode where a scan of dir were done and we have id of file in ECM table
+                        if ($file['share']) {
+                            // Define $urlwithroot
+                            $urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($dolibarr_main_url_root));
+                            $urlwithroot       = $urlwithouturlroot.DOL_URL_ROOT; // This is to use external domain name found into config file
+                            $paramlink         = '';
+                            if (!empty($file['share'])) {
+                                $paramlink .= ($paramlink ? '&' : '').'hashp='.$file['share']; // Hash for public share
+                            }
+
+                            $fulllink = $urlwithroot.'/document.php'.($paramlink ? '?'.$paramlink : '');
+
+                            print '<a href="'.$fulllink.'" target="_blank" rel="noopener">'.img_picto($langs->trans("FileSharedViaALink"), 'globe').'</a> ';
+                            print '<input type="text" class="quatrevingtpercent minwidth200imp nopadding small" id="downloadlink'.$parameters['filearray'][$key]['rowid'].'" name="downloadexternallink" title="'.dol_escape_htmltag($langs->trans("FileSharedViaALink")).'" value="'.dol_escape_htmltag($fulllink).'">';
+                        }
+                    }
+                    print '</td>';
+
+                    // Delete or view link
+                    // ($param must start with &)
+                    print '<td class="valignmiddle right actionbuttons nowraponall"><!-- action on files -->';
+                    if ($parameters['useinecm'] == 1 || $parameters['useinecm'] == 5) {	// ECM manual tree only
+                        // $section is inside $param
+                        $newparam = preg_replace('/&file=.*$/', '', $parameters['param']); // We don't need param file=
+                        $backtopage = DOL_URL_ROOT.'/ecm/index.php?&section_dir='.urlencode($parameters['relativepath']).$newparam;
+                        print '<a class="editfielda editfilelink" href="'.DOL_URL_ROOT.'/ecm/file_card.php?urlfile='.urlencode($file['name']).$parameters['param'].'&backtopage='.urlencode($backtopage).'" rel="'.urlencode($file['name']).'">'.img_edit('default', 0, 'class="paddingrightonly"').'</a>';
+                    }
+
+                    // Output link to delete file
+                    if ($permonobject) {
+                        $useajax = 1;
+                        if (!empty($conf->dol_use_jmobile)) {
+                            $useajax = 0;
+                        }
+                        if (empty($conf->use_javascript_ajax)) {
+                            $useajax = 0;
+                        }
+                        if (!empty($conf->global->MAIN_ECM_DISABLE_JS)) {
+                            $useajax = 0;
+                        }
+                        print '<a href="'.((($parameters['useinecm'] && $parameters['useinecm'] != 6) && $useajax) ? '#' : ($url.'?action=deletefile&token='.newToken().'&urlfile='.urlencode($filepath).$parameters['param'])).'" class="reposition deletefilelink" rel="'.$filepath.'">'.img_delete().'</a>';
+                    }
+                    print "</td>";
+
+                    if (empty($disablemove) && count($parameters['filearray']) > 1) {
+                        if ($nboffiles > 1 && $conf->browser->layout != 'phone') {
+                            print '<td class="linecolmove tdlineupdown center">';
+                            if ($i > 0) {
+                                print '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=up&rowid='.$object->id.'">'.img_up('default', 0, 'imgupforline').'</a>';
+                            }
+                            if ($i < ($nboffiles - 1)) {
+                                print '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=down&rowid='.$object->id.'">'.img_down('default', 0, 'imgdownforline').'</a>';
+                            }
+                            print '</td>';
+                        } else {
+                            print '<td'.(($conf->browser->layout != 'phone') ? ' class="linecolmove tdlineupdown center"' : ' class="linecolmove center"').'>';
+                            print '</td>';
+                        }
+                    }
+                    print "</tr>\n";
+
+                    $i++;
+                }
+            }
+
+            if ($nboffiles == 0) {
+                $colspan = '6';
+                if (empty($disablemove) && count($parameters['filearray']) > 1) {
+                    $colspan++; // 6 columns or 7
+                }
+                print '<tr class="oddeven"><td colspan="'.$colspan.'">';
+                if (empty($parameters['textifempty'])) {
+                    print '<span class="opacitymedium">'.$langs->trans("NoFileFound").'</span>';
+                } else {
+                    print '<span class="opacitymedium">'.$parameters['textifempty'].'</span>';
+                }
+                print '</td></tr>';
+            }
+
+            print "</table>";
+            print '</div>';
+
+            print ajax_autoselect('downloadlink');
+
+            return $nboffiles ?? 1;
+        }
 
         return 0; // or return 1 to replace standard code.
     }
