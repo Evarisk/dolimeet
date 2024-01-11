@@ -49,6 +49,9 @@ require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
+// Load translation files required by the page
+saturne_load_langs(['contracts']);
+
 // Get parameters
 $id         = GETPOST('id', 'int');
 $ref        = GETPOST('ref', 'alpha');
