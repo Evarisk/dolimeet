@@ -205,10 +205,10 @@ class ActionsDolimeet
                 require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
                 // Load DigiQuali libraries
-                require_once __DIR__ . '/../../digiquali/class/control.class.php';
+                require_once __DIR__ . '/../../digiquali/class/survey.class.php';
 
-                $control   = new Control($this->db);
-                $signatory = new SaturneSignature($db, 'digiquali', $control->element);
+                $survey   = new Survey($this->db);
+                $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
                 $contactsCodeWanted = ['CUSTOMER', 'BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
@@ -220,21 +220,21 @@ class ActionsDolimeet
                     foreach ($contacts as $contact) {
                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
                         if (in_array($contact['code'], $contactsCodeWanted)) {
-                            if (isset($object->linkedObjectsIds['digiquali_control']) && !empty($object->linkedObjectsIds['digiquali_control'])) {
-                                $controlIDs = $object->linkedObjectsIds['digiquali_control'];
-                                arsort($controlIDs);
-                                foreach ($controlIDs as $controlID) {
+                            if (isset($object->linkedObjectsIds['digiquali_survey']) && !empty($object->linkedObjectsIds['digiquali_survey'])) {
+                                $surveyIDs = $object->linkedObjectsIds['digiquali_survey'];
+                                arsort($surveyIDs);
+                                foreach ($surveyIDs as $surveyID) {
                                     $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
                                     $filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
-                                    if ($signatory->checkSignatoryHasObject($controlID, $control->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
-                                        $control->fetch($controlID);
+                                    if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
+                                        $survey->fetch($surveyID);
                                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                        $outputLine[$contact['rowid']] .= $control->getNomUrl(1);
+                                        $outputLine[$contact['rowid']] .= $survey->getNomUrl(1);
                                         $outputLine[$contact['rowid']] .= '</td>';
                                         break;
                                     } else {
                                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                        $outputLine[$contact['rowid']] .= img_picto($langs->trans('Control'), $control->picto, 'class="pictofixedwidth"');
+                                        $outputLine[$contact['rowid']] .= img_picto($langs->trans('Survey'), $survey->picto, 'class="pictofixedwidth"');
                                         $outputLine[$contact['rowid']] .= '<a class="reposition editfielda" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_satisfaction_survey&contact_code=' . $contact['code'] . '&contact_id=' . $contact['id'] . '&contact_source=' . $contact['source'] . '&token=' . newToken() . '">';
                                         $outputLine[$contact['rowid']] .= img_picto($langs->trans('SetSatisfactionSurvey'), 'fontawesome_fa-plus-circle_fas_#444') . '</a>';
                                         $outputLine[$contact['rowid']] .= '</td>';
@@ -242,7 +242,7 @@ class ActionsDolimeet
                                 }
                             } else {
                                 $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                $outputLine[$contact['rowid']] .= img_picto($langs->trans('Control'), $control->picto, 'class="pictofixedwidth"');
+                                $outputLine[$contact['rowid']] .= img_picto($langs->trans('Survey'), $survey->picto, 'class="pictofixedwidth"');
                                 $outputLine[$contact['rowid']] .= '<a class="reposition editfielda" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_satisfaction_survey&contact_code=' . $contact['code'] . '&contact_id=' . $contact['id'] . '&contact_source=' . $contact['source'] . '&token=' . newToken() . '">';
                                 $outputLine[$contact['rowid']] .= img_picto($langs->trans('SetSatisfactionSurvey'), 'fontawesome_fa-plus-circle_fas_#444') . '</a>';
                                 $outputLine[$contact['rowid']] .= '</td>';
