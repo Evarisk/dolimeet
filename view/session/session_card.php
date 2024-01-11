@@ -117,7 +117,6 @@ if (empty($resHook)) {
     $error = 0;
 
     $backurlforlist = dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?object_type=' . $object->element;
-    $backurlforlist .= !empty(GETPOST('fromtype')) ? '&fromtype=' . GETPOST('fromtype') : '';
 
     if (empty($backtopage) || ($cancel && empty($id))) {
         if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
@@ -196,14 +195,14 @@ if ($action == 'create') {
 
     print load_fiche_titre($langs->trans('New' . ucfirst($object->element)), '', 'object_' . $object->picto);
 
-    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . (!empty(GETPOST('fromtype')) ? '&fromtype=' . GETPOST('fromtype') : '') .'">';
+    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element .'">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="add">';
     if ($backtopage) {
         print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
     }
-    if ($backtopageforcancel) {
-        print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+    if (!empty(GETPOST('fromtype'))) {
+        print '<input type="hidden" name="backtopageforcancel" value="' . $backurlforlist . '&fromtype=' . GETPOST('fromtype') . '&fromid=' . GETPOST('fromid') . '">';
     }
 
     print dol_get_fiche_head();

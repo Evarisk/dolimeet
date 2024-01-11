@@ -462,7 +462,7 @@ saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 if (!empty($fromType) && !$error) {
     saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($objectType));
-    // Shownav must be 0 because navigation between fromObject can't be done while saturne_banner_tab not fix
+    //TODO Shownav must be 0 because navigation between fromObject can't be done while saturne_banner_tab not fix
     saturne_banner_tab($objectLinked, 'ref', $moreHtml, 0);
 }
 
