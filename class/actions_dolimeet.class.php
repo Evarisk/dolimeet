@@ -357,6 +357,37 @@ class ActionsDolimeet
             }
         }
 
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            if (GETPOST('action') == 'view' || empty(GETPOST('action'))) {
+                global $object;
+
+                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
+                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+                require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
+
+                saturne_load_langs();
+
+                print '<link rel="stylesheet" type="text/css" href="../custom/saturne/css/saturne.min.css">';
+
+                $moduleNameLowerCase = 'dolimeet';
+
+                $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
+                $objRef     = dol_sanitizeFileName($object->ref);
+                $dirFiles   = 'completioncertificatedocument/' . $objRef;
+                $fileDir    = $upload_dir . '/' . $dirFiles;
+                $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
+
+                $html = saturne_show_documents('dolimeet:CompletioncertificateDocument', $dirFiles, $fileDir, $urlSource, $user->rights->contrat->creer, $user->rights->contrat->supprimer, '', 1, 0, 0, 0, 0, '', 0, $langs->defaultlang, '', $object, 0, 'remove_file', (($object->statut > Contrat::STATUS_DRAFT) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities(ucfirst($object->element)))));
+                ?>
+
+                <script src="../custom/saturne/js/saturne.min.js"></script>
+                <script>
+                    jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html) ; ?>)
+                </script>
+                <?php
+            }
+        }
+
         return 0; // or return 1 to replace standard code.
     }
 
@@ -414,17 +445,17 @@ class ActionsDolimeet
      */
     public function doActions(array $parameters, $object, string $action): int
     {
-        global $conf, $db;
+        global $conf, $langs, $user;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'admincompany') {
             if ($action == 'update') {
-                dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
+                dolibarr_set_const($this->db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
             }
         }
 
-        if (preg_match('/contractcard/', $parameters['context']) && isModEnabled('digiquali')) {
-            if ($action == 'set_satisfaction_survey') {
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            if ($action == 'set_satisfaction_survey' && isModEnabled('digiquali')) {
                 require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 
                 $object->fetch(GETPOST('id'));
@@ -432,6 +463,35 @@ class ActionsDolimeet
                 set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
 
                 header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
+                exit;
+            }
+
+            if ($action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument_odt')) {
+                require_once __DIR__ . '/dolimeetdocuments/completioncertificatedocument.class.php';
+
+                $document = new CompletioncertificateDocument($this->db);
+                $document->element = 'trainingsessiondocument';
+
+                $moduleNameLowerCase = 'dolimeet';
+                $permissiontoadd     = $user->rights->dolimeet->trainingsession->write;
+
+                require_once __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                $action = '';
+            }
+
+            if ($action == 'pdfGeneration') {
+                $moduleName          = 'DoliMeet';
+                $moduleNameLowerCase = strtolower($moduleName);
+                $upload_dir          = $conf->dolimeet->multidir_output[$conf->entity ?? 1];
+
+                // Action to generate pdf from odt file
+                require_once __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+
+                $urlToRedirect = $_SERVER['REQUEST_URI'];
+                $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
+                $urlToRedirect = preg_replace('/action=pdfGeneration&?/', '', $urlToRedirect); // To avoid infinite loop
+
+                header('Location: ' . $urlToRedirect);
                 exit;
             }
         }

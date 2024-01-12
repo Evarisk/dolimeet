@@ -573,9 +573,11 @@ class modDoliMeet extends DolibarrModules
 
         delDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument');
         delDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument');
+        delDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument');
 
         addDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
 
         // Create extrafields during init.
         require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
