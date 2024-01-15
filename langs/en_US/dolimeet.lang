@@ -31,15 +31,15 @@ DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 # Setup
 SatisfactionSurvey                          = Satisfaction survey
 CustomerSatisfactionSurvey                  = Customer satisfaction survey
-CustomerSatisfactionSurveyDescription       = Defines the control model used by default for customer satisfaction surveys
+CustomerSatisfactionSurveyDescription       = Defines the model used by default for customer satisfaction surveys
 BillingSatisfactionSurvey                   = Billing satisfaction survey
-BillingSatisfactionSurveyDescription        = Defines the control model used by default for billing satisfaction surveys
+BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
 TraineeSatisfactionSurvey                   = Trainee satisfaction survey
-TraineeSatisfactionSurveyDescription        = Defines the control model used by default for trainee satisfaction surveys
+TraineeSatisfactionSurveyDescription        = Defines the model used by default for trainee satisfaction surveys
 SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
-SessiontrainerSatisfactionSurveyDescription = Defines the control model used by default for session trainer satisfaction surveys
+SessiontrainerSatisfactionSurveyDescription = Defines the model used by default for session trainer satisfaction surveys
 OpcoSatisfactionSurvey                      = OPCO satisfaction survey
-OpcoSatisfactionSurveyDescription           = Defines the control model used by default for OPCO satisfaction surveys
+OpcoSatisfactionSurveyDescription           = Defines the model used by default for OPCO satisfaction surveys
 
 
 
@@ -211,3 +211,4 @@ SetContrat                        = Define contract
 DateAndTime                       = Date and time
 SignAttendanceSheetOnline         = Sign the attendance sheet online
 SetSatisfactionSurvey             = Create a satisfaction survey
+NeedToSetSatisfactionSurvey       = Satisfaction survey configuration %s required
