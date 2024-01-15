@@ -50,7 +50,7 @@ require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-saturne_load_langs();
+saturne_load_langs(['contracts']);
 
 // Get parameters
 $id         = GETPOST('id', 'int');
@@ -136,24 +136,28 @@ if (isModEnabled('categorie')) {
 //$searchExternalAttendants = GETPOST('search_external_attendants', 'int');
 $searchSocietyAttendants  = GETPOST('search_society_attendants', 'int');
 
-$error = 0;
+$error    = 0;
+$moreHtml = '';
 if (!empty($fromType)) {
     switch ($fromType) {
         case 'thirdparty' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
             $objectLinked     = new Societe($db);
             $search['fk_soc'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/societe/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'project' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
             $objectLinked         = new Project($db);
             $search['fk_project'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/projet/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'socpeople' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/contact.lib.php';
             $objectLinked                         = new Contact($db);
             $search['fk_contact']                 = $fromID;
             $search['search_external_attendants'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/contact/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'contrat' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/contract.lib.php';
@@ -165,11 +169,13 @@ if (!empty($fromType)) {
                 $sortfield = 't.date_start';
                 $sortorder = 'ASC';
             }
+            $moreHtml = '<a href="' . dol_buildpath('/contrat/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'user' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
             $objectLinked                         = new User($db);
             $search['search_internal_attendants'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         default :
             $error++;
@@ -454,7 +460,8 @@ saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 if (!empty($fromType) && !$error) {
     saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($objectType));
-    saturne_banner_tab($objectLinked);
+    //TODO Shownav must be 0 because navigation between fromObject can't be done while saturne_banner_tab not fix
+    saturne_banner_tab($objectLinked, 'ref', $moreHtml, 0);
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : [];
