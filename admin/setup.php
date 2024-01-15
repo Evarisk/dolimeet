@@ -173,7 +173,7 @@ print '</table>';
 print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
 print '</form>';
 
-if (isModEnabled('digiquali')) {
+if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
     require_once __DIR__ . '/../../digiquali/class/sheet.class.php';
 
     $sheet = new Sheet($db);

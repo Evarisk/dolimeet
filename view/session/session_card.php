@@ -468,14 +468,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         print '</td></tr>';
     }
 
-    if ($objectType == 'trainingsession' && isModEnabled('digiquali') && $object->fk_contrat > 0) {
-        $contract->fetchObjectLinked('digiquali_control');
-
-        print '<tr><td class="valignmiddle">' . $langs->trans('SatisfactionSurvey') . '</td><td>';
-        print '<a onclick="preventDefault()" target="_blank" href="../../../digiquali/view/control/control_card.php?action=create&fromtype=contrat&fromid=' . $object->fk_contrat . '&fk_sheet=' . $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET . '"><button class="butAction">' . $langs->trans('Create') . '</button></a>';
-        print '</td></tr>';
-    }
-
     // Other attributes. Fields from hook formObjectOptions and Extrafields.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 

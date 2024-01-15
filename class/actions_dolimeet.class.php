@@ -197,7 +197,7 @@ class ActionsDolimeet
         }
 
         // Do something only for the current context
-        if (preg_match('/contacttpl/', $parameters['context']) && preg_match('/contractcard/', $parameters['context']) && isModEnabled('digiquali')) {
+        if (preg_match('/contacttpl/', $parameters['context']) && preg_match('/contractcard/', $parameters['context']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             global $object;
 
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
@@ -452,7 +452,7 @@ class ActionsDolimeet
             }
         }
 
-        if (strpos($parameters['context'], 'contractcard') !== false && isModEnabled('digiquali')) {
+        if (strpos($parameters['context'], 'contractcard') !== false && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             if (GETPOST('action') == 'set_satisfaction_survey') {
                 global $object;
 
