@@ -203,9 +203,12 @@ class ActionsDolimeet
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                 // Load Saturne libraries
                 require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
 
                 // Load DigiQuali libraries
                 require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+
+                saturne_load_langs();
 
                 $survey   = new Survey($this->db);
                 $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
@@ -228,8 +231,9 @@ class ActionsDolimeet
                                     $filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
                                     if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
                                         $survey->fetch($surveyID);
+                                        $signatory->fetch($signatory->id);
                                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                        $outputLine[$contact['rowid']] .= $survey->getNomUrl(1);
+                                        $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' - ' .  $signatory->getLibStatut(3);
                                         $outputLine[$contact['rowid']] .= '</td>';
                                         break;
                                     } else {

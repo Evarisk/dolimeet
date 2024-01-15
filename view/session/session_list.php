@@ -922,12 +922,12 @@ while ($i < $imaxinloop) {
                                         $userTmp = $user;
                                         $userTmp->fetch($objectSignatory->element_id);
                                         print $userTmp->getNomUrl(1, '', 0, 0, 24, 1) . ' - ' . $objectSignatory->getLibStatut(3);
-                                        print ' - <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . '"></i>';
+                                        print ' - <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . ';"></i>';
                                         print '<br>';
                                     } elseif ($objectSignatory->element_type == 'socpeople' && $objectSignatory->role == $resource['label']) {
                                         $contact->fetch($objectSignatory->element_id);
                                         print $contact->getNomUrl(1) . ' - ' . $objectSignatory->getLibStatut(3);
-                                        print ' - <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . '"></i>';
+                                        print ' - <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . ';"></i>';
                                         print '<br>';
                                     }
                                 }
