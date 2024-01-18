@@ -100,181 +100,88 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
     {
         global $conf, $langs;
 
-        require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-        require_once __DIR__ . '/../../../../../class/session.class.php';
+        $object = $moreParam['object'];
 
-        $object     = $moreParam['object'];
-        $userTmp    = new User($this->db);
-        $thirdparty = new Societe($this->db);
-        $signatory  = new SaturneSignature($this->db, 'dolimeet', $object->element);
+        $userTmp   = new User($this->db);
+        $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
-        if (get_class($object) == 'Contrat') {
-            $object->fetch_optionals();
-            if (!empty($object->array_options['options_label'])) {
-                $tmpArray['contract_label'] = $object->array_options['options_label'];
+        if (!empty($moreParam['attendant'])) {
+            $moreParam['documentName'] = strtoupper($moreParam['attendant']->lastname) . '_' . ucfirst($moreParam['attendant']->firstname) . '_';
+        } else {
+            $moreParam['documentName'] = '';
+        }
+
+        if (!empty($object->fk_contrat)) {
+            require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+            $contract = new Contrat($this->db);
+            $contract->fetch($object->fk_contrat);
+            $contract->fetch_optionals();
+            if (!empty($contract->array_options['options_label'])) {
+                $tmpArray['contract_label'] = $contract->array_options['options_label'];
             } else {
-                $tmpArray['contract_label'] = $object->ref;
+                $tmpArray['contract_label'] = $contract->ref;
             }
             $trainingSessionDict = saturne_fetch_dictionary('c_trainingsession_type');
-            if (is_array($trainingSessionDict) && !empty($trainingSessionDict) && !empty($object->array_options['options_trainingsession_type'])) {
-                $tmpArray['action_nature'] = $langs->trans($trainingSessionDict[$object->array_options['options_trainingsession_type']]->label);
+            if (is_array($trainingSessionDict) && !empty($trainingSessionDict) && !empty($contract->array_options['options_trainingsession_type'])) {
+                $tmpArray['action_nature'] = $langs->trans($trainingSessionDict[$contract->array_options['options_trainingsession_type']]->label);
             } else {
                 $tmpArray['action_nature'] = '';
             }
-
-            $tmpArray['date_start'] = dol_print_date($object->array_options['options_trainingsession_start'], 'dayhour', 'tzuser');
-            $tmpArray['date_end']   = dol_print_date($object->array_options['options_trainingsession_end'], 'dayhour', 'tzuser');
-
-            $duration = 0;
-            $session  = new Session($this->db);
-            $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ') AND (t.status = 2']);
-            if (is_array($sessions) && !empty($sessions)) {
-                foreach ($sessions as $session) {
-                    $duration += $session->duration;
-                }
-                $dateEnd = $sessions[count($sessions)]->date_end;
-                if ($dateEnd != $object->array_options['options_trainingsession_end']) {
-                    setEventMessages($langs->trans('WarningDateEndNotEqual'), [], 'warnings');
-                }
-            }
-            $tmpArray['duration'] = convertSecondToTime($duration);
-
-            $contactList = [];
-            foreach (['external', 'internal'] as $source) {
-                $contactList = array_merge($contactList, $object->liste_contact(-1, $source, 0, 'TRAINEE'));
-                $responsible = $object->liste_contact(-1, $source, 0, 'SESSIONTRAINER');
-            }
-            if (is_array($contactList) && !empty($contactList)) {
-                foreach ($contactList as $contact) {
-                    $moreParam['documentName'] = strtoupper($contact['lastname']) . '_' . ucfirst($contact['firstname']) . '_';
-
-                    $tmpArray['attendant_fullname'] = strtoupper($contact['lastname']) . ' ' . ucfirst($contact['firstname']);
-                    if ($contact['source'] == 'internal') {
-                        $tmpArray['attendant_company_name'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
-                    } elseif ($contact['source'] == 'external') {
-                        $thirdparty->fetch($contact['socid']);
-                        $tmpArray['attendant_company_name'] = $thirdparty->name;
-                    } else {
-                        $tmpArray['attendant_company_name'] = '';
-                    }
-
-                    if (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) {
-                        $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
-                    } else {
-                        $signatory = $signatory->fetchSignatory('SessionTrainer', $responsible[0]['id'], 'trainingsession');
-                    }
-                    if (is_array($signatory) && !empty($signatory)) {
-                        $signatory = array_shift($signatory);
-                        $userTmp->fetch($signatory->element_id);
-                        $tmpArray['mycompany_owner_fullname'] = strtoupper($userTmp->lastname) .  ' ' . ucfirst($userTmp->firstname);
-                        $tmpArray['mycompany_owner_job']      = $userTmp->job;
-                        if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
-                            if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1)) {
-                                $tempDir      = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp/';
-                                $encodedImage = explode(',', $signatory->signature)[1];
-                                $decodedImage = base64_decode($encodedImage);
-                                file_put_contents($tempDir . 'signature.png', $decodedImage);
-                                $tmpArray['mycompany_owner_signature'] = $tempDir . 'signature.png';
-                            } else {
-                                $tmpArray['mycompany_owner_signature'] = '';
-                            }
-                        } else {
-                            $tmpArray['mycompany_owner_signature'] = '';
-                        }
-                    } else {
-                        $tmpArray['mycompany_owner_fullname']  = '';
-                        $tmpArray['mycompany_owner_job']       = '';
-                        $tmpArray['mycompany_owner_signature'] = '';
-                    }
-
-                    $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
-
-                    $moreParam['tmparray'] = $tmpArray;
-
-                    $result = parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
-                }
-            } else {
-                $object->errors = [$langs->trans('NoContactDefined')];
-                $result         = -1;
-            }
-            return $result;
         } else {
-            if (!empty($moreParam['attendant'])) {
-                $moreParam['documentName'] = strtoupper($moreParam['attendant']->lastname) . '_' . ucfirst($moreParam['attendant']->firstname) . '_';
-            } else {
-                $moreParam['documentName'] = '';
-            }
+            $tmpArray['contract_label'] = '';
+            $tmpArray['action_nature'] = '';
+        }
 
-            if (!empty($object->fk_contrat)) {
-                $contract = new Contrat($this->db);
-                $contract->fetch($object->fk_contrat);
-                $contract->fetch_optionals();
-                if (!empty($contract->array_options['options_label'])) {
-                    $tmpArray['contract_label'] = $contract->array_options['options_label'];
-                } else {
-                    $tmpArray['contract_label'] = $contract->ref;
-                }
-                $trainingSessionDict = saturne_fetch_dictionary('c_trainingsession_type');
-                if (is_array($trainingSessionDict) && !empty($trainingSessionDict) && !empty($contract->array_options['options_trainingsession_type'])) {
-                    $tmpArray['action_nature'] = $langs->trans($trainingSessionDict[$contract->array_options['options_trainingsession_type']]->label);
-                } else {
-                    $tmpArray['action_nature'] = '';
-                }
-            } else {
-                $tmpArray['contract_label'] = '';
-                $tmpArray['action_nature'] = '';
-            }
+        $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
+        $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
+        $tmpArray['duration']   = convertSecondToTime($object->duration);
 
-            $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
-            $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
-            $tmpArray['duration']   = convertSecondToTime($object->duration);
+        $tmpArray['attendant_fullname'] = strtoupper($moreParam['attendant']->lastname) . ' ' . ucfirst($moreParam['attendant']->firstname);
+        if ($moreParam['attendant']->element_type == 'user') {
+            $tmpArray['attendant_company_name'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
+        } elseif ($moreParam['attendant']->element_type == 'socpeople') {
+            $contact    = new Contact($this->db);
+            $thirdparty = new Societe($this->db);
+            $contact->fetch($moreParam['attendant']->element_id);
+            $thirdparty->fetch($contact->fk_soc);
+            $tmpArray['attendant_company_name'] = $thirdparty->name;
+        } else {
+            $tmpArray['attendant_company_name'] = '';
+        }
 
-            $tmpArray['attendant_fullname'] = strtoupper($moreParam['attendant']->lastname) . ' ' . ucfirst($moreParam['attendant']->firstname);
-            if ($moreParam['attendant']->element_type == 'user') {
-                $tmpArray['attendant_company_name'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
-            } elseif ($moreParam['attendant']->element_type == 'socpeople') {
-                $contact    = new Contact($this->db);
-                $contact->fetch($moreParam['attendant']->element_id);
-                $thirdparty->fetch($contact->fk_soc);
-                $tmpArray['attendant_company_name'] = $thirdparty->name;
-            } else {
-                $tmpArray['attendant_company_name'] = '';
-            }
-
-            if (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) {
-                $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
-            } else {
-                $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
-            }
-            if (is_array($signatory) && !empty($signatory)) {
-                $signatory = array_shift($signatory);
-                $userTmp->fetch($signatory->element_id);
-                $tmpArray['mycompany_owner_fullname'] = strtoupper($userTmp->lastname) .  ' ' . ucfirst($userTmp->firstname);
-                $tmpArray['mycompany_owner_job']      = $userTmp->job;
-                if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
-                    if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1)) {
-                        $tempDir      = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp/';
-                        $encodedImage = explode(',', $signatory->signature)[1];
-                        $decodedImage = base64_decode($encodedImage);
-                        file_put_contents($tempDir . 'signature.png', $decodedImage);
-                        $tmpArray['mycompany_owner_signature'] = $tempDir . 'signature.png';
-                    } else {
-                        $tmpArray['mycompany_owner_signature'] = '';
-                    }
+        if (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) {
+            $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
+        } else {
+            $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
+        }
+        if(is_array($signatory) && !empty($signatory)) {
+            $signatory = array_shift($signatory);
+            $userTmp->fetch($signatory->element_id);
+            $tmpArray['mycompany_owner_fullname'] = strtoupper($userTmp->lastname) .  ' ' . ucfirst($userTmp->firstname);
+            $tmpArray['mycompany_owner_job']      = $userTmp->job;
+            if (dol_strlen($signatory->signature) > 0 && $signatory->signature != $langs->transnoentities('FileGenerated')) {
+                if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DOLIMEET_SHOW_SIGNATURE_SPECIMEN == 1)) {
+                    $tempDir      = $conf->dolimeet->multidir_output[$object->entity ?? 1] . '/temp/';
+                    $encodedImage = explode(',', $signatory->signature)[1];
+                    $decodedImage = base64_decode($encodedImage);
+                    file_put_contents($tempDir . 'signature.png', $decodedImage);
+                    $tmpArray['mycompany_owner_signature'] = $tempDir . 'signature.png';
                 } else {
                     $tmpArray['mycompany_owner_signature'] = '';
                 }
             } else {
-                $tmpArray['mycompany_owner_fullname']  = '';
-                $tmpArray['mycompany_owner_job']       = '';
                 $tmpArray['mycompany_owner_signature'] = '';
             }
-
-            $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
-
-            $moreParam['tmparray'] = $tmpArray;
-
-            return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+        } else {
+            $tmpArray['mycompany_owner_fullname']  = '';
+            $tmpArray['mycompany_owner_job']       = '';
+            $tmpArray['mycompany_owner_signature'] = '';
         }
+
+        $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
+
+        $moreParam['tmparray'] = $tmpArray;
+
+        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
     }
 }

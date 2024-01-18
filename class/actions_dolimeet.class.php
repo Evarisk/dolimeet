@@ -761,6 +761,66 @@ class ActionsDolimeet
                     }
                 }
             }
+        } else if (strpos($parameters['context'], 'contractcard') !== false) {
+            if (strpos($parameters['model'], 'completioncertificate') !== false) {
+                require_once __DIR__ . '/session.class.php';
+
+                $session   = new Session($this->db);
+                $document  = new CompletioncertificateDocument($this->db);
+                $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
+
+                $duration = 0;
+                $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ') AND (t.status != -1']);
+                if (is_array($sessions) && !empty($sessions)) {
+                    foreach ($sessions as $session) {
+                        $duration += $session->duration;
+                    }
+                    $dateEnd = $sessions[count($sessions)]->date_end;
+                    if ($dateEnd != $object->array_options['options_trainingsession_end']) {
+                        setEventMessages($langs->trans('WarningDateEndNotEqual'), [], 'warnings');
+                    }
+                }
+                $parameters['moreparams']['object']             = $object;
+                $parameters['moreparams']['object']->date_start = $object->array_options['options_trainingsession_start'];
+                $parameters['moreparams']['object']->date_end   = $object->array_options['options_trainingsession_end'];
+                $parameters['moreparams']['object']->duration   = $duration;
+                $parameters['moreparams']['object']->fk_contrat = $object->id;
+                $contactList = [];
+                $responsible = 0;
+                foreach (['external', 'internal'] as $source) {
+                    $contactList = array_merge($contactList, $object->liste_contact(-1, $source, 0, 'TRAINEE'));
+                    $responsible = ($object->liste_contact(-1, $source, 0, 'SESSIONTRAINER') ?: $responsible);
+                }
+                $parameters['moreparams']['object']->id      = $responsible[0]['id'];
+                $parameters['moreparams']['object']->element = 'trainingsession';
+                if (is_array($contactList) && !empty($contactList)) {
+                    foreach ($contactList as $contact) {
+                        $parameters['moreparams']['attendant'] = $signatory;
+                        $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
+                        $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
+                        $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
+                        $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                        $document->element = 'trainingsessiondocument';
+                        $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                        if ($result <= 0) {
+                            setEventMessages($document->error, $document->errors, 'errors');
+                            $action = '';
+                        }
+                    }
+                    $documentType = explode('_odt', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']));
+                    if ($document->element != $documentType[0]) {
+                        $document->element = $documentType[0];
+                    }
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=dolimeet&file=' . urlencode($document->element . '/' . $object->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $document->last_main_doc, []);
+                    $urlToRedirect = $_SERVER['REQUEST_URI'];
+                    $urlToRedirect = preg_replace('/#builddoc$/', '', $urlToRedirect);
+                    $urlToRedirect = preg_replace('/action=builddoc&?/', '', $urlToRedirect); // To avoid infinite loop
+                    if (!GETPOST('forcebuilddoc')){
+                        header('Location: ' . $urlToRedirect . '#builddoc');
+                        exit;
+                    }
+                }
+            }
         }
 
         return 0; // or return 1 to replace standard code.
