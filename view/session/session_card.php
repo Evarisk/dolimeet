@@ -440,9 +440,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $nbAttendantByRole[$attendantRole] = 0;
         }
         if ($nbAttendantByRole[$attendantRole] == 0) {
-            $mesg .= $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element))) . '<br>';
+            $mesg .= '<br>' . $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element)));
         }
     }
+    $mesg .= (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0 ? '' : '<br>' . $langs->trans('DefineSessionTrainerResponsible'));
 
     if (!in_array(0, $nbAttendantByRole)) {
         $nbAttendants = 1;
@@ -503,7 +504,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             if ($object->status == $object::STATUS_DRAFT && $nbAttendants > 0) {
                 print '<span class="butAction" id="actionButtonPendingSignature">' . $displayButton . '</span>';
             } else if ($object->status <= $object::STATUS_DRAFT && $nbAttendants <= 0) {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg) . '">' . $displayButton . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg) . '">' . $displayButton . '</span>';
             }
 
             // ReOpen.
@@ -602,7 +603,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             }
             $urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0 && ($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE > 0 || $objectType != 'trainingsession')), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg);
         }
 
         print '</div><div class="fichehalfright">';
