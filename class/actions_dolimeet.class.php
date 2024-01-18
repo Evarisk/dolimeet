@@ -358,8 +358,9 @@ class ActionsDolimeet
         }
 
         if (strpos($parameters['context'], 'contractcard') !== false) {
-            if (GETPOST('action') == 'view' || empty(GETPOST('action'))) {
-                global $object;
+            global $object;
+
+            if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && (GETPOST('action') == 'view' || empty(GETPOST('action')))) {
 
                 require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
                 require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
@@ -368,8 +369,6 @@ class ActionsDolimeet
                 saturne_load_langs();
 
                 print '<link rel="stylesheet" type="text/css" href="../custom/saturne/css/saturne.min.css">';
-
-                $moduleNameLowerCase = 'dolimeet';
 
                 $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
                 $objRef     = dol_sanitizeFileName($object->ref);
@@ -762,7 +761,7 @@ class ActionsDolimeet
                 }
             }
         } else if (strpos($parameters['context'], 'contractcard') !== false) {
-            if (strpos($parameters['model'], 'completioncertificate') !== false) {
+            if (strpos((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), 'completioncertificate') !== false) {
                 require_once __DIR__ . '/session.class.php';
 
                 $session   = new Session($this->db);
@@ -770,43 +769,45 @@ class ActionsDolimeet
                 $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
                 $duration = 0;
-                $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ') AND (t.status != -1']);
+                $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
                 if (is_array($sessions) && !empty($sessions)) {
                     foreach ($sessions as $session) {
                         $duration += $session->duration;
                     }
-                    $dateEnd = $sessions[count($sessions)]->date_end;
+                    $lastSession = end($sessions);
+                    $dateEnd     = $lastSession->date_end;
                     if ($dateEnd != $object->array_options['options_trainingsession_end']) {
-                        setEventMessages($langs->trans('WarningDateEndNotEqual'), [], 'warnings');
+                        setEventMessages($langs->trans('TrainingSessionEndErrorMatchingDate', $lastSession->ref), [], 'warnings');
                     }
                 }
+
+                $contactList = [];
+                foreach (['internal', 'external'] as $source) {
+                    $contactList = array_merge($contactList, $object->liste_contact(-1, $source, 0, 'TRAINEE'));
+                }
+
                 $parameters['moreparams']['object']             = $object;
+                $parameters['moreparams']['object']->element    = 'trainingsession';
                 $parameters['moreparams']['object']->date_start = $object->array_options['options_trainingsession_start'];
                 $parameters['moreparams']['object']->date_end   = $object->array_options['options_trainingsession_end'];
                 $parameters['moreparams']['object']->duration   = $duration;
                 $parameters['moreparams']['object']->fk_contrat = $object->id;
-                $contactList = [];
-                $responsible = 0;
-                foreach (['external', 'internal'] as $source) {
-                    $contactList = array_merge($contactList, $object->liste_contact(-1, $source, 0, 'TRAINEE'));
-                    $responsible = ($object->liste_contact(-1, $source, 0, 'SESSIONTRAINER') ?: $responsible);
-                }
-                $parameters['moreparams']['object']->id      = $responsible[0]['id'];
-                $parameters['moreparams']['object']->element = 'trainingsession';
-                if (is_array($contactList) && !empty($contactList)) {
+
+                if (!empty($contactList)) {
                     foreach ($contactList as $contact) {
-                        $parameters['moreparams']['attendant'] = $signatory;
+                        $parameters['moreparams']['attendant']               = $signatory;
                         $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
                         $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
                         $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
                         $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+
                         $document->element = 'trainingsessiondocument';
                         $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
                         if ($result <= 0) {
                             setEventMessages($document->error, $document->errors, 'errors');
-                            $action = '';
                         }
                     }
+
                     $documentType = explode('_odt', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']));
                     if ($document->element != $documentType[0]) {
                         $document->element = $documentType[0];
