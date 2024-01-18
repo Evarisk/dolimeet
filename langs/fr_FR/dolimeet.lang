@@ -28,16 +28,16 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
-ClientSatisfactionSurvey                    = Enquête de satisfaction client
-ClientSatisfactionSurveyDescription         = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction client
+CustomerSatisfactionSurvey                  = Enquête de satisfaction client
+CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
+BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire
+BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire
 TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
-TraineeSatisfactionSurveyDescription        = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction stagiaire
+TraineeSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction stagiaire
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
-SessiontrainerSatisfactionSurveyDescription = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction formateur
-SponsorSatisfactionSurvey                   = Enquête de satisfaction commanditaire
-SponsorSatisfactionSurveyDescription        = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction commanditaire
+SessiontrainerSatisfactionSurveyDescription = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction formateur
 OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
-OpcoSatisfactionSurveyDescription           = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction OPCO
+OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction OPCO
 
 
 
@@ -228,3 +228,4 @@ SetContrat                        = Définir contrat
 DateAndTime                       = Date et horaire
 SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
 SetSatisfactionSurvey             = Créer enquête de satisfaction
+NeedToSetSatisfactionSurvey       = Configuration de l'enquête de satisfaction %s requise

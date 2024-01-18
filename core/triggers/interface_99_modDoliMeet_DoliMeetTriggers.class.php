@@ -219,7 +219,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 break;
 
             case 'CONTRAT_ADD_CONTACT' :
-                if (isModEnabled('digiquali')) {
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && isModEnabled('digiquali') && getDolGlobalString('DIGIQUALI_VERSION') >= '1.11.0') {
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
                     if (GETPOST('userid')) {
@@ -229,10 +229,13 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         $contactID     = GETPOST('contactid');
                         $contactSource = 'external';
                     }
-                    $contactTypeID = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
-                    $contactCode   = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
+                    $contactTypeID      = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
+                    $contactCode        = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
+                    $contactsCodeWanted = ['CUSTOMER', 'BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
 
-                    set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
+                    if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
+                        set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
+                    }
                 }
                 break;
         }
