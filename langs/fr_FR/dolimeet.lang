@@ -229,3 +229,4 @@ DateAndTime                       = Date et horaire
 SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
 SetSatisfactionSurvey             = Créer enquête de satisfaction
 NeedToSetSatisfactionSurvey       = Configuration de l'enquête de satisfaction %s requise
+DefineSessionTrainerResponsible   = Vous devez définir le responsable du dispensateur de formation dans la configuration de DoliMeet.

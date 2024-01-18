@@ -216,3 +216,4 @@ DateAndTime                       = Date and time
 SignAttendanceSheetOnline         = Sign the attendance sheet online
 SetSatisfactionSurvey             = Create a satisfaction survey
 NeedToSetSatisfactionSurvey       = Satisfaction survey configuration %s required
+DefineSessionTrainerResponsible   = You must define the session training responsible in the DoliMeet configuration.

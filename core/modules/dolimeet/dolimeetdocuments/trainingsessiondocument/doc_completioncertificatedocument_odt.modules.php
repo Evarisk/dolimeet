@@ -152,7 +152,8 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
         if (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) {
             $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
         } else {
-            $signatory = $signatory->fetchSignatory('SessionTrainer', $object->id, $object->element);
+            setEventMessages($langs->trans('DefineSessionTrainerResponsible'), [], 'errors');
+            return -1;
         }
         if(is_array($signatory) && !empty($signatory)) {
             $signatory = array_shift($signatory);
