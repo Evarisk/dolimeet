@@ -80,6 +80,9 @@ window.dolimeet.session.reloadField = function() {
   let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
 
   let field = formData.get('fk_soc');
+  if (field == -1) {
+    field = 0;
+  }
 
   let actionPost = ''
 

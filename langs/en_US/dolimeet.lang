@@ -112,6 +112,10 @@ TrainingSessionLocation               = Location of the training
 TrainingsessionsCategoriesArea        = Trainingsession tags/categories area
 DontForgotAddSessionTrainerAndTrainee = Remember to add at least one trainer and one trainee to the training contract.
 AttendantsFromContract                = Contract attendants
+TrainingSessionStartErrorMatchingDate = <strong> Error: consistency of course start dates. </strong><br> The start date of the contract is not equal to the start date of the first training session %s.
+TrainingSessionEndErrorMatchingDate   = <strong> Error: consistency of course end dates. </strong><br> The end date of the training contract is not equal to the end date of the last training session %s.
+
+
 
 # Attendant role
 SessionTrainer                              = Trainer

@@ -386,6 +386,66 @@ class ActionsDolimeet
             }
         }
 
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            global $object;
+
+            if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
+                // Load Saturne libraries
+                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
+                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+                require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
+
+                // Load DoliMeet libraries
+                require_once __DIR__ . '/session.class.php';
+
+                saturne_load_langs();
+
+                // Handle consistency of contract trainingsession dates
+                $session = new Session($this->db);
+
+                $filter = ' AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_start ASC';
+                $session->fetch('', '', $filter);
+
+                $out = img_picto('', 'check', 'class="marginleftonly"');
+                if ($session->date_start != $object->array_options['options_trainingsession_start']) {
+                    $out = $form->textwithpicto('', $langs->trans('TrainingSessionStartErrorMatchingDate', $session->ref), 1, 'warning');
+                } ?>
+                <script>
+                    jQuery('.contrat_extras_trainingsession_start').append(<?php echo json_encode($out); ?>);
+                </script>
+                <?php
+
+                $filter = ' AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_end DESC';
+                $session->fetch('', '', $filter);
+
+                $out = img_picto('', 'check', 'class="marginleftonly"');
+                if ($session->date_end != $object->array_options['options_trainingsession_end']) {
+                    $out = $form->textwithpicto('', $langs->trans('TrainingSessionEndErrorMatchingDate', $session->ref), 1, 'warning');
+                } ?>
+                <script>
+                    jQuery('.contrat_extras_trainingsession_end').append(<?php echo json_encode($out); ?>);
+                </script>
+                <?php
+
+                // Handle saturne_show_documents for completion certificate document generation
+                print '<link rel="stylesheet" type="text/css" href="../custom/saturne/css/saturne.min.css">';
+
+                $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
+                $objRef     = dol_sanitizeFileName($object->ref);
+                $dirFiles   = 'completioncertificatedocument/' . $objRef;
+                $fileDir    = $upload_dir . '/' . $dirFiles;
+                $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
+
+                $html = saturne_show_documents('dolimeet:CompletioncertificateDocument', $dirFiles, $fileDir, $urlSource, $user->rights->contrat->creer, $user->rights->contrat->supprimer, '', 1, 0, 0, 0, 0, '', 0, $langs->defaultlang, '', $object, 0, 'remove_file', (($object->statut > Contrat::STATUS_DRAFT) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities(ucfirst($object->element))))); ?>
+
+                <script src="../custom/saturne/js/saturne.min.js"></script>
+                <script>
+                    jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html); ?>);
+                </script>
+                <?php
+            }
+        }
+
         return 0; // or return 1 to replace standard code.
     }
 
@@ -443,26 +503,51 @@ class ActionsDolimeet
      */
     public function doActions(array $parameters, $object, string $action): int
     {
-        global $conf, $db;
+        global $conf, $langs, $user;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'admincompany') {
             if ($action == 'update') {
-                dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
+                dolibarr_set_const($this->db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
             }
         }
 
-        if (strpos($parameters['context'], 'contractcard') !== false && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
-            if (GETPOST('action') == 'set_satisfaction_survey') {
-                global $object;
-
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            if ($action == 'set_satisfaction_survey' && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
                 require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
-
-                $object->fetch(GETPOST('id'));
 
                 set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
 
                 header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
+                exit;
+            }
+
+            if ($action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument_odt')) {
+                require_once __DIR__ . '/dolimeetdocuments/completioncertificatedocument.class.php';
+
+                $document = new CompletioncertificateDocument($this->db);
+                $document->element = 'trainingsessiondocument';
+
+                $moduleNameLowerCase = 'dolimeet';
+                $permissiontoadd     = $user->rights->dolimeet->trainingsession->write;
+
+                require_once __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                $action = '';
+            }
+
+            if ($action == 'pdfGeneration') {
+                $moduleName          = 'DoliMeet';
+                $moduleNameLowerCase = strtolower($moduleName);
+                $upload_dir          = $conf->dolimeet->multidir_output[$conf->entity ?? 1];
+
+                // Action to generate pdf from odt file
+                require_once __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+
+                $urlToRedirect = $_SERVER['REQUEST_URI'];
+                $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
+                $urlToRedirect = preg_replace('/action=pdfGeneration&?/', '', $urlToRedirect); // To avoid infinite loop
+
+                header('Location: ' . $urlToRedirect);
                 exit;
             }
         }
@@ -718,6 +803,68 @@ class ActionsDolimeet
                             }
                         }
                     }
+                    $documentType = explode('_odt', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']));
+                    if ($document->element != $documentType[0]) {
+                        $document->element = $documentType[0];
+                    }
+                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=dolimeet&file=' . urlencode($document->element . '/' . $object->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $document->last_main_doc, []);
+                    $urlToRedirect = $_SERVER['REQUEST_URI'];
+                    $urlToRedirect = preg_replace('/#builddoc$/', '', $urlToRedirect);
+                    $urlToRedirect = preg_replace('/action=builddoc&?/', '', $urlToRedirect); // To avoid infinite loop
+                    if (!GETPOST('forcebuilddoc')){
+                        header('Location: ' . $urlToRedirect . '#builddoc');
+                        exit;
+                    }
+                }
+            }
+        } else if (strpos($parameters['context'], 'contractcard') !== false) {
+            if (strpos((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), 'completioncertificate') !== false) {
+                require_once __DIR__ . '/session.class.php';
+
+                $session   = new Session($this->db);
+                $document  = new CompletioncertificateDocument($this->db);
+                $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
+
+                $duration = 0;
+                $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
+                if (is_array($sessions) && !empty($sessions)) {
+                    foreach ($sessions as $session) {
+                        $duration += $session->duration;
+                    }
+                    $lastSession = end($sessions);
+                    $dateEnd     = $lastSession->date_end;
+                    if ($dateEnd != $object->array_options['options_trainingsession_end']) {
+                        setEventMessages($langs->trans('TrainingSessionEndErrorMatchingDate', $lastSession->ref), [], 'warnings');
+                    }
+                }
+
+                $contactList = [];
+                foreach (['internal', 'external'] as $source) {
+                    $contactList = array_merge($contactList, $object->liste_contact(-1, $source, 0, 'TRAINEE'));
+                }
+
+                $parameters['moreparams']['object']             = $object;
+                $parameters['moreparams']['object']->element    = 'trainingsession';
+                $parameters['moreparams']['object']->date_start = $object->array_options['options_trainingsession_start'];
+                $parameters['moreparams']['object']->date_end   = $object->array_options['options_trainingsession_end'];
+                $parameters['moreparams']['object']->duration   = $duration;
+                $parameters['moreparams']['object']->fk_contrat = $object->id;
+
+                if (!empty($contactList)) {
+                    foreach ($contactList as $contact) {
+                        $parameters['moreparams']['attendant']               = $signatory;
+                        $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
+                        $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
+                        $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
+                        $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+
+                        $document->element = 'trainingsessiondocument';
+                        $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                        if ($result <= 0) {
+                            setEventMessages($document->error, $document->errors, 'errors');
+                        }
+                    }
+
                     $documentType = explode('_odt', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']));
                     if ($document->element != $documentType[0]) {
                         $document->element = $documentType[0];
