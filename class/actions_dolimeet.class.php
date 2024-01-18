@@ -516,6 +516,8 @@ class ActionsDolimeet
             if ($action == 'set_satisfaction_survey' && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
                 require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 
+                $object->fetch(GETPOST('id'));
+
                 set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
 
                 header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
