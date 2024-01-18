@@ -603,7 +603,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             }
             $urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0 && ($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE > 0 || $objectType != 'trainingsession')), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg);
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0 && (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0 || $object->element != 'trainingsession')), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg);
         }
 
         print '</div><div class="fichehalfright">';
