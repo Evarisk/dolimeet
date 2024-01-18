@@ -357,6 +357,66 @@ class ActionsDolimeet
             }
         }
 
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            global $object;
+
+            if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
+                // Load Saturne libraries
+                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
+                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+                require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
+
+                // Load DoliMeet libraries
+                require_once __DIR__ . '/session.class.php';
+
+                saturne_load_langs();
+
+                // Handle consistency of contract trainingsession dates
+                $session = new Session($this->db);
+
+                $filter = ' AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_start ASC';
+                $session->fetch('', '', $filter);
+
+                $out = img_picto('', 'check', 'class="marginleftonly"');
+                if ($session->date_start != $object->array_options['options_trainingsession_start']) {
+                    $out = $form->textwithpicto('', $langs->trans('TrainingSessionStartErrorMatchingDate', $session->ref), 1, 'warning');
+                } ?>
+                <script>
+                    jQuery('.contrat_extras_trainingsession_start').append(<?php echo json_encode($out); ?>);
+                </script>
+                <?php
+
+                $filter = ' AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_end DESC';
+                $session->fetch('', '', $filter);
+
+                $out = img_picto('', 'check', 'class="marginleftonly"');
+                if ($session->date_end != $object->array_options['options_trainingsession_end']) {
+                    $out = $form->textwithpicto('', $langs->trans('TrainingSessionEndErrorMatchingDate', $session->ref), 1, 'warning');
+                } ?>
+                <script>
+                    jQuery('.contrat_extras_trainingsession_end').append(<?php echo json_encode($out); ?>);
+                </script>
+                <?php
+
+                // Handle saturne_show_documents for completion certificate document generation
+                print '<link rel="stylesheet" type="text/css" href="../custom/saturne/css/saturne.min.css">';
+
+                $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
+                $objRef     = dol_sanitizeFileName($object->ref);
+                $dirFiles   = 'completioncertificatedocument/' . $objRef;
+                $fileDir    = $upload_dir . '/' . $dirFiles;
+                $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
+
+                $html = saturne_show_documents('dolimeet:CompletioncertificateDocument', $dirFiles, $fileDir, $urlSource, $user->rights->contrat->creer, $user->rights->contrat->supprimer, '', 1, 0, 0, 0, 0, '', 0, $langs->defaultlang, '', $object, 0, 'remove_file', (($object->statut > Contrat::STATUS_DRAFT) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities(ucfirst($object->element))))); ?>
+
+                <script src="../custom/saturne/js/saturne.min.js"></script>
+                <script>
+                    jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html); ?>);
+                </script>
+                <?php
+            }
+        }
+
         return 0; // or return 1 to replace standard code.
     }
 
