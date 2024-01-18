@@ -134,7 +134,7 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
 
         $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
         $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
-        $tmpArray['duration']   = convertSecondToTime($object->duration);
+        $tmpArray['duration']   = convertSecondToTime($object->duration, 'allhourmin');
 
         $tmpArray['attendant_fullname'] = strtoupper($moreParam['attendant']->lastname) . ' ' . ucfirst($moreParam['attendant']->firstname);
         if ($moreParam['attendant']->element_type == 'user') {
