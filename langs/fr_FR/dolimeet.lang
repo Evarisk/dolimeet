@@ -23,6 +23,25 @@ DoliMeetDescription     = Suivi des réunions, sessions de formation, audit
 DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 #
+# Config page - Page d'administration
+#
+
+# Setup - Réglages
+SatisfactionSurvey                          = Enquête de satisfaction
+CustomerSatisfactionSurvey                  = Enquête de satisfaction client
+CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
+BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire
+BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire
+TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
+TraineeSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction stagiaire
+SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
+SessiontrainerSatisfactionSurveyDescription = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction formateur
+OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
+OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction OPCO
+
+
+
+#
 # DoliMeet
 #
 
@@ -83,6 +102,7 @@ Trainingsession                       = Session de formation
 Trainingsessions                      = sessions de formation
 TrainingSessions                      = Sessions de formation
 TheTrainingsession                    = la session de formation
+OfTrainingsession                     = de la session de formation
 TrainingsessionList                   = Liste des sessions de formation
 TrainingSessionList                   = Liste des sessions de formation
 TrainingSessionCreate                 = Créer une session de formation
@@ -105,8 +125,9 @@ SessionTrainerResponsibleDesc         = Définit le responsable du dispensateur 
 SessionTrainerResponsibleIdSet        = Responsable du dispensateur de formation défini : %s
 LinkDolimeet_trainsess                = Activer le lien avec les sessions de formation
 LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles de contrôle
-SatisfactionSurvey                    = Enquête de satisfaction
-SatisfactionSurveyDesc                = Définit le modèle de contrôle utilisé par défaut pour les enquêtes de satisfaction
+TrainingSessionStartErrorMatchingDate = <strong> Erreur : cohérence des dates de début de la formation. </strong><br> La date de début de la formation du contrat n'est pas égale à la date début de la première session de formation %s.
+TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates de fin de la formation. </strong><br> La date de fin de la formation du contrat n'est pas égale à la date fin de la dernière session de formation %s.
+TrainingSessionDurations              = Durée des sessions de formation
 
 
 
@@ -204,3 +225,9 @@ AttendanceAbsentAuditRate            = Taux d'absence aux audits
 TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
+SetContrat                        = Définir contrat
+DateAndTime                       = Date et horaire
+SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
+SetSatisfactionSurvey             = Créer enquête de satisfaction
+NeedToSetSatisfactionSurvey       = Configuration de l'enquête de satisfaction %s requise
+DefineSessionTrainerResponsible   = Vous devez définir le responsable du dispensateur de formation dans la configuration de DoliMeet.

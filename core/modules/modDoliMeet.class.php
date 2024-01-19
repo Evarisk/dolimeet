@@ -78,7 +78,7 @@ class modDoliMeet extends DolibarrModules
         $this->editor_url  = 'https://evarisk.com';
 
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'.
-        $this->version = '1.2.1';
+        $this->version = '1.3.0';
 
         // Url to the file with your last numberversion of this module.
         //$this->url_last_version = 'http://www.example.com/versionmodule.txt';
@@ -99,7 +99,7 @@ class modDoliMeet extends DolibarrModules
             // Set this to 1 if module has its own login method file (core/login).
             'login' => 0,
             // Set this to 1 if module has its own substitution function file (core/substitutions).
-            'substitutions' => 0,
+            'substitutions' => 1,
             // Set this to 1 if module has its own menus handler directory (core/menus).
             'menus' => 0,
             // Set this to 1 if module overwrite template dir (core/tpl).
@@ -131,7 +131,18 @@ class modDoliMeet extends DolibarrModules
                 'trainingsessioncard',
                 'meetingsignature',
                 'trainingsessionsignature',
-                'auditsignature'
+                'auditsignature',
+                'meetingnote',
+                'trainingsessionnote',
+                'auditnote',
+                'meetingdocument',
+                'trainingsessiondocument',
+                'auditdocument',
+                'globalcard',
+                'sessionlist',
+                'meetinglist',
+                'trainingsessionlist',
+                'auditlist'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
@@ -562,9 +573,11 @@ class modDoliMeet extends DolibarrModules
 
         delDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument');
         delDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument');
+        delDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument');
 
         addDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
 
         // Create extrafields during init.
         require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';

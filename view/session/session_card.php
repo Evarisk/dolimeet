@@ -195,14 +195,14 @@ if ($action == 'create') {
 
     print load_fiche_titre($langs->trans('New' . ucfirst($object->element)), '', 'object_' . $object->picto);
 
-    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element . '">';
+    print '<form method="POST" id="session_form" action="' . $_SERVER['PHP_SELF'] . '?object_type=' . $object->element .'">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="add">';
     if ($backtopage) {
         print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
     }
-    if ($backtopageforcancel) {
-        print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+    if (!empty(GETPOST('fromtype'))) {
+        print '<input type="hidden" name="backtopageforcancel" value="' . $backurlforlist . '&fromtype=' . GETPOST('fromtype') . '&fromid=' . GETPOST('fromid') . '">';
     }
 
     print dol_get_fiche_head();
@@ -331,7 +331,7 @@ if (($id || $ref) && $action == 'edit') {
                 $arraySelected[] = $cat->id;
             }
         }
-        print img_picto('', 'category') . $form::multiselectarray('categories', $cateArbo, $arraySelected, '', 0, 'quatrevingtpercent widthcentpercentminusx');
+        print img_picto('', 'category') . $form::multiselectarray('categories', $cateArbo, (GETPOSTISSET('categories') ? GETPOST('categories', 'array') : $arraySelected), '', 0, 'quatrevingtpercent widthcentpercentminusx');
         print '</td></tr>';
     }
 
@@ -440,9 +440,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $nbAttendantByRole[$attendantRole] = 0;
         }
         if ($nbAttendantByRole[$attendantRole] == 0) {
-            $mesg .= $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element))) . '<br>';
+            $mesg .= '<br>' . $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element)));
         }
     }
+    $mesg .= (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0 ? '' : '<br>' . $langs->trans('DefineSessionTrainerResponsible'));
 
     if (!in_array(0, $nbAttendantByRole)) {
         $nbAttendants = 1;
@@ -465,14 +466,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     if ($conf->categorie->enabled) {
         print '<tr><td class="valignmiddle">' . $langs->trans('Categories') . '</td><td>';
         print $form->showCategories($object->id, 'session', 1);
-        print '</td></tr>';
-    }
-
-    if ($objectType == 'trainingsession' && isModEnabled('digiquali') && $object->fk_contrat > 0) {
-        $contract->fetchObjectLinked('digiquali_control');
-
-        print '<tr><td class="valignmiddle">' . $langs->trans('SatisfactionSurvey') . '</td><td>';
-        print '<a onclick="preventDefault()" target="_blank" href="../../../digiquali/view/control/control_card.php?action=create&fromtype=contrat&fromid=' . $object->fk_contrat . '&fk_sheet=' . $conf->global->DOLIMEET_SATISFACTION_SURVEY_SHEET . '"><button class="butAction">' . $langs->trans('Create') . '</button></a>';
         print '</td></tr>';
     }
 
@@ -511,7 +504,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             if ($object->status == $object::STATUS_DRAFT && $nbAttendants > 0) {
                 print '<span class="butAction" id="actionButtonPendingSignature">' . $displayButton . '</span>';
             } else if ($object->status <= $object::STATUS_DRAFT && $nbAttendants <= 0) {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg) . '">' . $displayButton . '</span>';
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg) . '">' . $displayButton . '</span>';
             }
 
             // ReOpen.
@@ -610,7 +603,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             }
             $urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . '<br>' . $mesg);
+            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0 && (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0 || $object->element != 'trainingsession')), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg);
         }
 
         print '</div><div class="fichehalfright">';

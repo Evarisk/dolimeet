@@ -47,7 +47,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $this->name        = preg_replace('/^Interface/i', '', get_class($this));
         $this->family      = 'demo';
         $this->description = 'DoliMeet triggers.';
-        $this->version     = '1.2.1';
+        $this->version     = '1.3.0';
         $this->picto       = 'dolimeet@dolimeet';
     }
 
@@ -216,6 +216,27 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_SENTBYMAIL';
                 $actioncomm->label = $langs->trans('ObjectSentByMailTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
                 $actioncomm->create($user);
+                break;
+
+            case 'CONTRAT_ADD_CONTACT' :
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && isModEnabled('digiquali') && getDolGlobalString('DIGIQUALI_VERSION') >= '1.11.0') {
+                    require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+
+                    if (GETPOST('userid')) {
+                        $contactID     = GETPOST('userid');
+                        $contactSource = 'internal';
+                    } else {
+                        $contactID     = GETPOST('contactid');
+                        $contactSource = 'external';
+                    }
+                    $contactTypeID      = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
+                    $contactCode        = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
+                    $contactsCodeWanted = ['CUSTOMER', 'BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+
+                    if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
+                        set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
+                    }
+                }
                 break;
         }
         return 0;

@@ -50,7 +50,7 @@ require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-saturne_load_langs();
+saturne_load_langs(['contracts']);
 
 // Get parameters
 $id         = GETPOST('id', 'int');
@@ -132,28 +132,32 @@ if (isModEnabled('categorie')) {
     $search_category_array = GETPOST('search_category_' . $objectType . '_list', 'array');
 }
 
-$searchInternalAttendants = GETPOST('search_internal_attendants', 'int');
-$searchExternalAttendants = GETPOST('search_external_attendants', 'int');
+//$searchInternalAttendants = GETPOST('search_internal_attendants', 'int');
+//$searchExternalAttendants = GETPOST('search_external_attendants', 'int');
 $searchSocietyAttendants  = GETPOST('search_society_attendants', 'int');
 
-$error = 0;
+$error    = 0;
+$moreHtml = '';
 if (!empty($fromType)) {
     switch ($fromType) {
         case 'thirdparty' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
             $objectLinked     = new Societe($db);
             $search['fk_soc'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/societe/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'project' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
             $objectLinked         = new Project($db);
             $search['fk_project'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/projet/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'socpeople' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/contact.lib.php';
             $objectLinked                         = new Contact($db);
             $search['fk_contact']                 = $fromID;
             $search['search_external_attendants'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/contact/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'contrat' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/contract.lib.php';
@@ -161,11 +165,17 @@ if (!empty($fromType)) {
             $objectLinked          = new Contrat($db);
             $objectLinked->element = 'contract';
             $search['fk_contrat']  = $fromID;
+            if ($objectType == 'trainingsession') {
+                $sortfield = 't.date_start';
+                $sortorder = 'ASC';
+            }
+            $moreHtml = '<a href="' . dol_buildpath('/contrat/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'user' :
             require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
             $objectLinked                         = new User($db);
             $search['search_internal_attendants'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         default :
             $error++;
@@ -248,8 +258,8 @@ if (empty($resHook)) {
         $toselect                 = [];
         $search_array_options     = [];
         $search_category_array    = [];
-        $searchInternalAttendants = -1;
-        $searchExternalAttendants = -1;
+        //$searchInternalAttendants = -1;
+        //$searchExternalAttendants = -1;
         $searchSocietyAttendants  = -1;
     }
     if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
@@ -304,12 +314,12 @@ if (dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !i
     }
 }
 
-if ($searchInternalAttendants > 0) {
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_internal_attendants on (search_internal_attendants.element_id = ' . $searchInternalAttendants . ' AND search_internal_attendants.element_type="user" AND search_internal_attendants.status > 0)';
-}
-if ($searchExternalAttendants > 0) {
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_external_attendants on (search_external_attendants.element_id = ' . $searchExternalAttendants . ' AND search_external_attendants.element_type="socpeople" AND search_external_attendants.status > 0)';
-}
+//if ($searchInternalAttendants > 0) {
+//    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_internal_attendants on (search_internal_attendants.element_id = ' . $searchInternalAttendants . ' AND search_internal_attendants.element_type="user" AND search_internal_attendants.status > 0)';
+//}
+//if ($searchExternalAttendants > 0) {
+//    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_external_attendants on (search_external_attendants.element_id = ' . $searchExternalAttendants . ' AND search_external_attendants.element_type="socpeople" AND search_external_attendants.status > 0)';
+//}
 if ($searchSocietyAttendants > 0) {
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople as cf on (cf.fk_soc = ' . $searchSocietyAttendants . ')';
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_society_attendants on (search_society_attendants.element_id = cf.rowid AND search_society_attendants.element_type="socpeople" AND search_society_attendants.status > 0)';
@@ -332,6 +342,7 @@ if ($object->ismultientitymanaged == 1) {
 } else {
     $sql .= ' WHERE 1 = 1';
 }
+$sql .= ' AND t.status >= 0';
 
 if (is_array($signatoryObjectsArray) && dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
     $sql .= ' AND t.rowid = e.fk_target ';
@@ -339,12 +350,12 @@ if (is_array($signatoryObjectsArray) && dol_strlen($fromType) > 0 && !in_array($
     $sql .= ' AND t.rowid = e.fk_object ';
 }
 
-if ($searchInternalAttendants > 0) {
-    $sql .= ' AND t.rowid = search_internal_attendants.fk_object ';
-}
-if ($searchExternalAttendants > 0) {
-    $sql .= ' AND t.rowid = search_external_attendants.fk_object ';
-}
+//if ($searchInternalAttendants > 0) {
+//    $sql .= ' AND t.rowid = search_internal_attendants.fk_object ';
+//}
+//if ($searchExternalAttendants > 0) {
+//    $sql .= ' AND t.rowid = search_external_attendants.fk_object ';
+//}
 if ($searchSocietyAttendants > 0) {
     $sql .= ' AND t.rowid = search_society_attendants.fk_object ';
 }
@@ -449,7 +460,8 @@ saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 if (!empty($fromType) && !$error) {
     saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($objectType));
-    saturne_banner_tab($objectLinked);
+    //TODO Shownav must be 0 because navigation between fromObject can't be done while saturne_banner_tab not fix
+    saturne_banner_tab($objectLinked, 'ref', $moreHtml, 0);
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : [];
@@ -585,16 +597,30 @@ if (!empty($moreforfilter)) {
 
 $varpage = empty($contextpage) ? $_SERVER['PHP_SELF'] : $contextpage;
 
-$arrayfields['InternalAttendants'] = ['label' => 'InternalAttendants', 'checked' => 1];
-$arrayfields['ExternalAttendants'] = ['label' => 'ExternalAttendants', 'checked' => 1];
-$arrayfields['SocietyAttendants']  = ['label' => 'SocietyAttendants', 'checked' => 1];
+if ($objectType != 'session') {
+    $signatoriesInDictionary = saturne_fetch_dictionary('c_' . $objectType . '_attendants_role');
+    if (is_array($signatoriesInDictionary) && !empty($signatoriesInDictionary)) {
+        foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+            $arrayfields[$signatoryInDictionary->ref] = ['label' => $signatoryInDictionary->ref, 'checked' => 1, 'css' => 'minwidth300 maxwidth500 widthcentpercentminusxx'];
+        }
+    }
+}
+
+$arrayfields['SocietyAttendants'] = ['label' => 'SocietyAttendants', 'checked' => 1, 'css' => 'minwidth300 maxwidth500 widthcentpercentminusxx'];
 
 $selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage, getDolGlobalString('MAIN_CHECKBOX_LEFT_COLUMN')); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
-$object->fields['Custom']['InternalAttendants'] = $arrayfields['InternalAttendants'];
-$object->fields['Custom']['ExternalAttendants'] = $arrayfields['ExternalAttendants'];
-$object->fields['Custom']['SocietyAttendants']  = $arrayfields['SocietyAttendants'];
+if ($objectType != 'session') {
+    $signatoriesInDictionary = saturne_fetch_dictionary('c_' . $objectType . '_attendants_role');
+    if (is_array($signatoriesInDictionary) && !empty($signatoriesInDictionary)) {
+        foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+            $object->fields['Custom'][$signatoryInDictionary->ref] = $arrayfields[$signatoryInDictionary->ref];
+        }
+    }
+}
+
+$object->fields['Custom']['SocietyAttendants'] = $arrayfields['SocietyAttendants'];
 
 print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you don't need reserved height for your table
 print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? ' listwithfilterbefore' : '') . '">';
@@ -645,18 +671,21 @@ foreach ($object->fields as $key => $val) {
     } elseif ($key == 'Custom') {
         foreach ($val as $resource) {
             if ($resource['checked']) {
-                if ($resource['label'] == 'InternalAttendants') {
-                    print '<td>';
-                    print $form->select_dolusers($fromType == 'user' ? $fromID : $searchInternalAttendants, 'search_internal_attendants', 1);
-                    print '</td>';
-                } elseif ($resource['label'] == 'ExternalAttendants') {
-                    print '<td>';
-                    print $form->selectcontacts(0, $fromType == 'socpeople' ? $fromID : $searchExternalAttendants, 'search_external_attendants', 1);
-                    print '</td>';
-                } elseif ($resource['label'] == 'SocietyAttendants') {
-                    print '<td>';
+//                if ($resource['label'] == 'InternalAttendants') {
+//                    print '<td>';
+//                    print $form->select_dolusers($fromType == 'user' ? $fromID : $searchInternalAttendants, 'search_internal_attendants', 1);
+//                    print '</td>';
+//                } elseif ($resource['label'] == 'ExternalAttendants') {
+//                    print '<td>';
+//                    print $form->selectcontacts(0, $fromType == 'socpeople' ? $fromID : $searchExternalAttendants, 'search_external_attendants', 1);
+//                    print '</td>';
+//                }
+                if ($resource['label'] == 'SocietyAttendants') {
+                    print '<td class="liste_titre ' . $resource['css'] . '">';
                     print $form->select_company($searchSocietyAttendants, 'search_society_attendants', '', 1);
                     print '</td>';
+                } else {
+                    print '<td class="liste_titre ' . $resource['css'] . '"></td>';
                 }
             }
         }
@@ -705,9 +734,9 @@ foreach ($object->fields as $key => $val) {
     } elseif ($key == 'Custom') {
         foreach ($val as $resource) {
             if ($resource['checked']) {
-                print '<td>';
+                print '<th class="wrapcolumntitle ' . $resource['css'] . ' liste_titre">';
                 print $langs->trans($resource['label']);
-                print '</td>';
+                print '</th>';
                 $totalarray['nbfield']++;
             }
         }
@@ -750,26 +779,20 @@ while ($i < $imaxinloop) {
 
     // Store properties in $object
     $object->setVarsFromFetchObj($obj);
-
     switch ($object->type) {
         case 'meeting':
             $object->picto  = 'fontawesome_fa-comments_fas_#d35968';
-            $attendantsRole = ['Responsible', 'Contributor'];
             break;
         case 'trainingsession':
             $object->picto  = 'fontawesome_fa-people-arrows_fas_#d35968';
-            $attendantsRole = ['SessionTrainer', 'Trainee'];
             break;
         case 'audit':
             $object->picto  = 'fontawesome_fa-tasks_fas_#d35968';
-            $attendantsRole = ['Auditor', 'Auditee'];
             break;
         default :
             $object->picto  = 'dolimeet_color@dolimeet';
-            $attendantsRole = ['Attendant'];
             break;
     }
-
     if ($mode == 'kanban') {
         if ($i == 0) {
             print '<tr><td colspan="' . $savnbfield . '">';
@@ -827,7 +850,7 @@ while ($i < $imaxinloop) {
                 }
                 print '>';
                 if ($key == 'status') {
-                    print $object->getLibStatut(5);
+                    print $object->getLibStatut(!empty($fromType) ? 3 : 5);
                 } elseif ($key == 'rowid') {
                     print $object->showOutputField($val, $key, $object->id);
                 } elseif ($key == 'ref') {
@@ -857,41 +880,8 @@ while ($i < $imaxinloop) {
             } elseif ($key == 'Custom') {
                 foreach ($val as $resource) {
                     if ($resource['checked']) {
-                        if ($resource['label'] == 'InternalAttendants') {
-                            print '<td>';
-                            if (is_array($signatories) && !empty($signatories) && $signatories > 0) {
-                                foreach ($attendantsRole as $attendantRole) {
-                                    print '<b>' . $langs->trans($attendantRole) . '</b><br><br>';
-                                    foreach ($signatories as $objectSignatory) {
-                                        if ($objectSignatory->element_type == 'user' && $objectSignatory->role == $attendantRole) {
-                                            $userTmp = $user;
-                                            $userTmp->fetch($objectSignatory->element_id);
-                                            print $userTmp->getNomUrl(1, '', 0, 0, 24, 1);
-                                            print '<br>';
-                                        }
-                                    }
-                                    print '<br>';
-                                }
-                            }
-                            print '</td>';
-                        } elseif ($resource['label'] == 'ExternalAttendants') {
-                            print '<td>';
-                            if (is_array($signatories) && !empty($signatories)) {
-                                foreach ($attendantsRole as $attendantRole) {
-                                    print '<b>' . $langs->trans($attendantRole) . '</b><br><br>';
-                                    foreach ($signatories as $objectSignatory) {
-                                        if ($objectSignatory->element_type == 'socpeople' && $objectSignatory->role == $attendantRole) {
-                                            $contact->fetch($objectSignatory->element_id);
-                                            print $contact->getNomUrl(1);
-                                            print '<br>';
-                                        }
-                                    }
-                                    print '<br>';
-                                }
-                            }
-                            print '</td>';
-                        } elseif ($resource['label'] == 'SocietyAttendants') {
-                            print '<td>';
+                        if ($resource['label'] == 'SocietyAttendants') {
+                            print '<td class="' . $resource['css'] . '">';
                             if (is_array($signatories) && !empty($signatories)) {
                                 $alreadyAddedThirdParties = [];
                                 foreach ($signatories as $objectSignatory) {
@@ -917,13 +907,46 @@ while ($i < $imaxinloop) {
                                 }
                             }
                             print '</td>';
+                        } else {
+                            print '<td class="' . $resource['css'] . '">';
+                            if (is_array($signatories) && !empty($signatories) && $signatories > 0) {
+                                foreach ($signatories as $objectSignatory) {
+                                    switch ($objectSignatory->attendance) {
+                                        case 1:
+                                            $cssButton = '#0d8aff';
+                                            $userIcon  = 'fa-user-clock';
+                                            break;
+                                        case 2:
+                                            $cssButton = '#e05353';
+                                            $userIcon  = 'fa-user-slash';
+                                            break;
+                                        default:
+                                            $cssButton = '#47e58e';
+                                            $userIcon  = 'fa-user';
+                                            break;
+                                    }
+                                    if ($objectSignatory->element_type == 'user' && $objectSignatory->role == $resource['label']) {
+                                        $userTmp = $user;
+                                        $userTmp->fetch($objectSignatory->element_id);
+                                        print $userTmp->getNomUrl(1, '', 0, 0, 24, 1) . ' - ' . $objectSignatory->getLibStatut(3);
+                                        print ' - <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . ';"></i>';
+                                        print '<br>';
+                                    } elseif ($objectSignatory->element_type == 'socpeople' && $objectSignatory->role == $resource['label']) {
+                                        $contact->fetch($objectSignatory->element_id);
+                                        print $contact->getNomUrl(1) . ' - ' . $objectSignatory->getLibStatut(3);
+                                        print ' - <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . ';"></i>';
+                                        print '<br>';
+                                    }
+                                }
+                            }
+                            print '</td>';
                         }
                     }
                 }
             }
         }
         // Extra fields
-        require_once DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_print_fields.tpl.php';
+        require DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_print_fields.tpl.php';
         // Fields from hook
         $parameters = ['arrayfields' => $arrayfields, 'object' => $object, 'obj' => $obj, 'i' => $i, 'totalarray' => &$totalarray];
         $resHook    = $hookmanager->executeHooks('printFieldListValue', $parameters, $object); // Note that $action and $object may have been modified by hook

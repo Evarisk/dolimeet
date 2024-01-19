@@ -23,6 +23,26 @@ DoliMeetDescription     = Follow-up of meetings, training sessions, audits
 DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 
 
+
+#
+# Config page
+#
+
+# Setup
+SatisfactionSurvey                          = Satisfaction survey
+CustomerSatisfactionSurvey                  = Customer satisfaction survey
+CustomerSatisfactionSurveyDescription       = Defines the model used by default for customer satisfaction surveys
+BillingSatisfactionSurvey                   = Billing satisfaction survey
+BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
+TraineeSatisfactionSurvey                   = Trainee satisfaction survey
+TraineeSatisfactionSurveyDescription        = Defines the model used by default for trainee satisfaction surveys
+SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
+SessiontrainerSatisfactionSurveyDescription = Defines the model used by default for session trainer satisfaction surveys
+OpcoSatisfactionSurvey                      = OPCO satisfaction survey
+OpcoSatisfactionSurveyDescription           = Defines the model used by default for OPCO satisfaction surveys
+
+
+
 #
 # Session
 #
@@ -74,6 +94,7 @@ TrainingSession                       = Training session
 Trainingsession                       = Training session
 Trainingsessions                      = training sessions
 TheTrainingsession                    = the training session
+OfTrainingsession                     = of training session
 TrainingsessionList                   = List of training sessions
 TrainingSessionList                   = List of training sessions
 TrainingSessionCreate                 = Create a training session
@@ -91,6 +112,10 @@ TrainingSessionLocation               = Location of the training
 TrainingsessionsCategoriesArea        = Trainingsession tags/categories area
 DontForgotAddSessionTrainerAndTrainee = Remember to add at least one trainer and one trainee to the training contract.
 AttendantsFromContract                = Contract attendants
+TrainingSessionStartErrorMatchingDate = <strong> Error: consistency of course start dates. </strong><br> The start date of the contract is not equal to the start date of the first training session %s.
+TrainingSessionEndErrorMatchingDate   = <strong> Error: consistency of course end dates. </strong><br> The end date of the training contract is not equal to the end date of the last training session %s.
+TrainingSessionDurations              = Duration of training sessions
+
 
 # Attendant role
 SessionTrainer                              = Trainer
@@ -186,3 +211,9 @@ AttendanceAbsentAuditRate            = Absence rate from audits
 TrainingOrganizationNumber        = Declaration number of the training organisation
 TrainingOrganizationNumberTooltip = Enter your registration number here if you are recognised as a training organisation
 SocietyAttendants                 = Third party external attendants
+SetContrat                        = Define contract
+DateAndTime                       = Date and time
+SignAttendanceSheetOnline         = Sign the attendance sheet online
+SetSatisfactionSurvey             = Create a satisfaction survey
+NeedToSetSatisfactionSurvey       = Satisfaction survey configuration %s required
+DefineSessionTrainerResponsible   = You must define the session training responsible in the DoliMeet configuration.
