@@ -428,21 +428,23 @@ class ActionsDolimeet
                 <?php
 
                 // Handle saturne_show_documents for completion certificate document generation
-                print '<link rel="stylesheet" type="text/css" href="../custom/saturne/css/saturne.min.css">';
+                if ($session->id > 0) {
+                    print '<link rel="stylesheet" type="text/css" href="../custom/saturne/css/saturne.min.css">';
 
-                $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
-                $objRef     = dol_sanitizeFileName($object->ref);
-                $dirFiles   = 'completioncertificatedocument/' . $objRef;
-                $fileDir    = $upload_dir . '/' . $dirFiles;
-                $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
+                    $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
+                    $objRef     = dol_sanitizeFileName($object->ref);
+                    $dirFiles   = 'completioncertificatedocument/' . $objRef;
+                    $fileDir    = $upload_dir . '/' . $dirFiles;
+                    $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-                $html = saturne_show_documents('dolimeet:CompletioncertificateDocument', $dirFiles, $fileDir, $urlSource, $user->rights->contrat->creer, $user->rights->contrat->supprimer, '', 1, 0, 0, 0, 0, '', 0, $langs->defaultlang, '', $object, 0, 'remove_file', (($object->statut > Contrat::STATUS_DRAFT && getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) ? 1 : 0), $langs->trans('DefineSessionTrainerResponsible') . '<br>' . $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities(ucfirst($object->element))))); ?>
+                    $html = saturne_show_documents('dolimeet:CompletioncertificateDocument', $dirFiles, $fileDir, $urlSource, $user->rights->contrat->creer, $user->rights->contrat->supprimer, '', 1, 0, 0, 0, 0, '', 0, $langs->defaultlang, '', $object, 0, 'remove_file', (($object->statut > Contrat::STATUS_DRAFT && getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) ? 1 : 0), $langs->trans('DefineSessionTrainerResponsible') . '<br>' . $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities(ucfirst($object->element))))); ?>
 
-                <script src="../custom/saturne/js/saturne.min.js"></script>
-                <script>
-                    jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html); ?>);
-                </script>
-                <?php
+                    <script src="../custom/saturne/js/saturne.min.js"></script>
+                    <script>
+                        jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html); ?>);
+                    </script>
+                    <?php
+                }
             }
         }
 
