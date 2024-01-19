@@ -127,6 +127,7 @@ LinkDolimeet_trainsess                = Activer le lien avec les sessions de for
 LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles de contrôle
 TrainingSessionStartErrorMatchingDate = <strong> Erreur : cohérence des dates de début de la formation. </strong><br> La date de début de la formation du contrat n'est pas égale à la date début de la première session de formation %s.
 TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates de fin de la formation. </strong><br> La date de fin de la formation du contrat n'est pas égale à la date fin de la dernière session de formation %s.
+TrainingSessionDurations              = Durée des sessions de formation
 
 
 
