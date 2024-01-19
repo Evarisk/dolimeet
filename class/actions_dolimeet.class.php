@@ -403,7 +403,7 @@ class ActionsDolimeet
                 // Handle consistency of contract trainingsession dates
                 $session = new Session($this->db);
 
-                $filter = ' AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_start ASC';
+                $filter = ' AND t.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_start ASC';
                 $session->fetch('', '', $filter);
 
                 $out = img_picto('', 'check', 'class="marginleftonly"');
@@ -415,7 +415,7 @@ class ActionsDolimeet
                 </script>
                 <?php
 
-                $filter = ' AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_end DESC';
+                $filter = ' AND t.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_end DESC';
                 $session->fetch('', '', $filter);
 
                 $out = img_picto('', 'check', 'class="marginleftonly"');
@@ -424,6 +424,22 @@ class ActionsDolimeet
                 } ?>
                 <script>
                     jQuery('.contrat_extras_trainingsession_end').append(<?php echo json_encode($out); ?>);
+                </script>
+                <?php
+
+                // Handle session durations
+                $sessionDurations = 0;
+                $filter           = 't.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id;
+                $sessions         = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
+                if (is_array($sessions) && !empty($sessions)) {
+                    foreach ($sessions as $session) {
+                        $sessionDurations += $session->duration;
+                    }
+                    $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $langs->transnoentities('TrainingSessionDurations') . '</td>';
+                    $out .= '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00') . '</td></tr>';
+                } ?>
+                <script>
+                    jQuery('.contrat_extras_trainingsession_location').closest('.trextrafields_collapse_' + <?php echo $object->id; ?>).after(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
 
