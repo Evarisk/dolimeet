@@ -586,17 +586,17 @@ class modDoliMeet extends DolibarrModules
         $extraFields->update('label', $langs->transnoentities('Label'), 'varchar', '', 'contrat', 0, 0, 1040, '', '', '', 1);
         $extraFields->addExtraField('label', $langs->transnoentities('Label'), 'varchar', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
 
-        $extraFields->update('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', '', 'contrat', 0, 0, 1800, '', '', '', 1);
-        $extraFields->addExtraField('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', '', 'contrat', 0, 0, 1800, '', '', '', 1, 'TrainingSessionStartHelp');
+        $extraFields->addExtraField('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionStartHelp');
 
-        $extraFields->update('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', '', 'contrat', 0, 0, 1810, '', '', '', 1);
-        $extraFields->addExtraField('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', '', 'contrat', 0, 0, 1810, '', '', '', 1, 'TrainingSessionEndHelp');
+        $extraFields->addExtraField('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 'TrainingSessionEndHelp');
 
-        $extraFields->update('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
-        $extraFields->addExtraField('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
+        $extraFields->update('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp');
+        $extraFields->addExtraField('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp');
 
-        $extraFields->update('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1);
-        $extraFields->addExtraField('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1, 'TrainingSessionLocationHelp');
+        $extraFields->addExtraField('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionLocationHelp');
 
         return $this->_init($sql, $options);
     }
