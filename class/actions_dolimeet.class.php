@@ -400,6 +400,9 @@ class ActionsDolimeet
 
                 saturne_load_langs();
 
+                $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+
                 // Handle consistency of contract trainingsession dates
                 $session = new Session($this->db);
 
@@ -411,6 +414,7 @@ class ActionsDolimeet
                     $out = $form->textwithpicto('', $langs->trans('TrainingSessionStartErrorMatchingDate', $session->ref), 1, 'warning');
                 } ?>
                 <script>
+                    jQuery('.contrat_extras_trainingsession_start').prepend(<?php echo json_encode($picto); ?>);
                     jQuery('.contrat_extras_trainingsession_start').append(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
@@ -423,6 +427,7 @@ class ActionsDolimeet
                     $out = $form->textwithpicto('', $langs->trans('TrainingSessionEndErrorMatchingDate', $session->ref), 1, 'warning');
                 } ?>
                 <script>
+                    jQuery('.contrat_extras_trainingsession_end').prepend(<?php echo json_encode($picto); ?>);
                     jQuery('.contrat_extras_trainingsession_end').append(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
@@ -436,10 +441,20 @@ class ActionsDolimeet
                         $sessionDurations += $session->duration;
                     }
                     $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $langs->transnoentities('TrainingSessionDurations') . '</td>';
-                    $out .= '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00') . '</td></tr>';
-                } ?>
+                    $out .= '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00') . '</td></tr>';
+                    ?>
+                    <script>
+                        jQuery('.contrat_extras_trainingsession_location').closest('.trextrafields_collapse_' + <?php echo $object->id; ?>).after(<?php echo json_encode($out); ?>);
+                    </script>
+                    <?php
+                }
+
+                // Handle picto before extrafields
+                ?>
                 <script>
-                    jQuery('.contrat_extras_trainingsession_location').closest('.trextrafields_collapse_' + <?php echo $object->id; ?>).after(<?php echo json_encode($out); ?>);
+                    jQuery('.contrat_extras_label').prepend(<?php echo json_encode($picto); ?>);
+                    jQuery('.contrat_extras_trainingsession_type').prepend(<?php echo json_encode($picto); ?>);
+                    jQuery('.contrat_extras_trainingsession_location').prepend(<?php echo json_encode($picto); ?>);
                 </script>
                 <?php
 
