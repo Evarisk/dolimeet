@@ -845,10 +845,16 @@ class ActionsDolimeet
                 $document  = new CompletioncertificateDocument($this->db);
                 $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
-                $duration = 0;
-                $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
+                $duration      = 0;
+                $signedTrainee = [];
+                $sessions      = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
                 if (is_array($sessions) && !empty($sessions)) {
                     foreach ($sessions as $session) {
+                        $signatories = $signatory->fetchSignatories($session->id, 'trainingsession', 'role = "Trainee" AND status = 5');
+                        foreach ($signatories as $signatory) {
+                            $signedTrainee[] = $signatory->element_id;
+                        }
+                        $signedTrainee = array_unique($signedTrainee);
                         $duration += $session->duration;
                     }
                     $lastSession = end($sessions);
@@ -872,16 +878,18 @@ class ActionsDolimeet
 
                 if (!empty($contactList)) {
                     foreach ($contactList as $contact) {
-                        $parameters['moreparams']['attendant']               = $signatory;
-                        $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
-                        $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
-                        $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
-                        $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                        if (in_array($contact['id'], $signedTrainee)) {
+                            $parameters['moreparams']['attendant']               = $signatory;
+                            $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
+                            $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
+                            $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
+                            $parameters['moreparams']['attendant']->element_id   = $contact['id'];
 
-                        $document->element = 'trainingsessiondocument';
-                        $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
-                        if ($result <= 0) {
-                            setEventMessages($document->error, $document->errors, 'errors');
+                            $document->element = 'trainingsessiondocument';
+                            $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                            if ($result <= 0) {
+                                setEventMessages($document->error, $document->errors, 'errors');
+                            }
                         }
                     }
 
