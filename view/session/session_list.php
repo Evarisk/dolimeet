@@ -182,7 +182,7 @@ if (!empty($fromType)) {
             $objectLinked = null;
     }
     if (!$error) {
-        $objectLinked->fetch($fromID);
+        !empty($ref) ? $objectLinked->fetch(0, $ref) : $objectLinked->fetch($fromID);
     }
     $linkedObjectsArray    = ['thirdparty', 'project', 'contrat'];
     $signatoryObjectsArray = ['user', 'socpeople'];
@@ -227,9 +227,8 @@ saturne_check_access($permissionToRead, null, true);
 // For the custom navigation, get the next/prev id from the ref
 // If the fromID doesn't correspond to the id from the ref then we reload page with good ID
 if (!empty($objectLinked) && is_object($objectLinked)) {
-    $objectLinked->fetch(0, $ref);
     if ($objectLinked->id != $fromID) {
-        header('Location: ' . dol_buildpath('/custom/dolimeet/view/session/session_list.php', 1) . '?fromtype='. $fromType .'&fromid=' . $objectLinked->id . '&object_type=trainingsession');
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?fromtype='. $fromType .'&fromid=' . $objectLinked->id . '&object_type=trainingsession');
     }
 }
 
