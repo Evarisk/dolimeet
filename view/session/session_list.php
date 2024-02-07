@@ -224,6 +224,15 @@ $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete;
 saturne_check_access($permissionToRead, null, true);
 
+// For the custom navigation, get the next/prev id from the ref
+// If the fromID doesn't correspond to the id from the ref then we reload page with good ID
+if (!empty($objectLinked) && is_object($objectLinked)) {
+    $objectLinked->fetch(0, $ref);
+    if ($objectLinked->id != $fromID) {
+        header('Location: ' . dol_buildpath('/custom/dolimeet/view/session/session_list.php', 1) . '?fromtype='. $fromType .'&fromid=' . $objectLinked->id . '&object_type=trainingsession');
+    }
+}
+
 /*
  * Actions
  */
@@ -460,8 +469,9 @@ saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 if (!empty($fromType) && !$error) {
     saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($objectType));
-    //TODO Shownav must be 0 because navigation between fromObject can't be done while saturne_banner_tab not fix
-    saturne_banner_tab($objectLinked, 'ref', $moreHtml, 0);
+
+    $moreParams['bannerTab'] = '&fromtype='. $fromType .'&fromid=' . $objectLinked->id . '&object_type=trainingsession';
+    saturne_banner_tab($objectLinked, 'ref', $moreHtml, 1, 'ref', 'ref', '', false, $moreParams);
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : [];
