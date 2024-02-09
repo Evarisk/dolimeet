@@ -845,17 +845,18 @@ class ActionsDolimeet
                 $document  = new CompletioncertificateDocument($this->db);
                 $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
-                $duration      = 0;
                 $signedTrainee = [];
                 $sessions      = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
                 if (is_array($sessions) && !empty($sessions)) {
                     foreach ($sessions as $session) {
-                        $signatories = $signatory->fetchSignatories($session->id, 'trainingsession', 'role = "Trainee" AND status = 5');
+                        $signatories = $signatory->fetchSignatories($session->id, 'trainingsession', 'role = "Trainee" AND status = ' . SaturneSignature::STATUS_SIGNED . ' AND attendance IS NULL');
                         foreach ($signatories as $signatory) {
-                            $signedTrainee[] = $signatory->element_id;
+                            if ($signatory->element_type == 'user') {
+                                $signedTrainee['internal'][$signatory->element_id] += $session->duration;
+                            } else {
+                                $signedTrainee['external'][$signatory->element_id] += $session->duration;
+                            }
                         }
-                        $signedTrainee = array_unique($signedTrainee);
-                        $duration += $session->duration;
                     }
                     $lastSession = end($sessions);
                     $dateEnd     = $lastSession->date_end;
@@ -866,29 +867,31 @@ class ActionsDolimeet
 
                 $contactList = [];
                 foreach (['internal', 'external'] as $source) {
-                    $contactList = array_merge($contactList, $object->liste_contact(-1, $source, 0, 'TRAINEE'));
+                    $contactList[$source] = $object->liste_contact(-1, $source, 0, 'TRAINEE');
                 }
 
                 $parameters['moreparams']['object']             = $object;
                 $parameters['moreparams']['object']->element    = 'trainingsession';
                 $parameters['moreparams']['object']->date_start = $object->array_options['options_trainingsession_start'];
                 $parameters['moreparams']['object']->date_end   = $object->array_options['options_trainingsession_end'];
-                $parameters['moreparams']['object']->duration   = $duration;
                 $parameters['moreparams']['object']->fk_contrat = $object->id;
 
-                if (!empty($contactList)) {
-                    foreach ($contactList as $contact) {
-                        if (in_array($contact['id'], $signedTrainee)) {
-                            $parameters['moreparams']['attendant']               = $signatory;
-                            $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
-                            $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
-                            $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
-                            $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                if (!empty($contactList) && !empty($signedTrainee)) {
+                    foreach ($contactList as $contactType) {
+                        foreach($contactType as $contact) {
+                            if (array_key_exists($contact['id'], $signedTrainee[$contact['source']])) {
+                                $parameters['moreparams']['attendant']               = $signatory;
+                                $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
+                                $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
+                                $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
+                                $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                                $parameters['moreparams']['object']->duration        = $signedTrainee[$contact['source']][$contact['id']];
 
-                            $document->element = 'trainingsessiondocument';
-                            $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
-                            if ($result <= 0) {
-                                setEventMessages($document->error, $document->errors, 'errors');
+                                $document->element = 'trainingsessiondocument';
+                                $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                                if ($result <= 0) {
+                                    setEventMessages($document->error, $document->errors, 'errors');
+                                }
                             }
                         }
                     }
