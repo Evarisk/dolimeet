@@ -119,7 +119,9 @@ TrainingSessionStartHelp              = Start date of the first training session
 TrainingSessionEndHelp                = End date of the last training session of the contract
 TrainingSessionTypeHelp               = Type of training session linked to the contract
 TrainingSessionLocationHelp           = Place where the training session linked to the contract took place
-
+TrainingSessionDurationHelp           = Total duration of the sessions HH:MM (ex: 60:30) <br> The duration shown on the certificate corresponds to the total number of hours of sessions attended by a trainee.
+CalculatedTotalSessionDuration        = Total calculated duration time:
+TrainingSessionDurationErrorMatching  = <strong> Error: consistency of training session duration. </strong><br> The total duration of the sessions indicated in the contract is different from the calculated duration of all the sessions linked to the contract.
 
 # Attendant role
 SessionTrainer                              = Trainer

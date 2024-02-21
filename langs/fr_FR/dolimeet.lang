@@ -132,6 +132,9 @@ TrainingSessionStartHelp              = Date de début de la première session d
 TrainingSessionEndHelp                = Date de fin de la dernière session de formation du contrat
 TrainingSessionTypeHelp               = Type de formation liée au contrat
 TrainingSessionLocationHelp           = Lieu où s'est réalisé la formation liée au contrat
+TrainingSessionDurationHelp           = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
+CalculatedTotalSessionDuration        = Durée totale calculée :
+TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
 
 
 

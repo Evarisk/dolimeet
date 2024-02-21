@@ -598,6 +598,9 @@ class modDoliMeet extends DolibarrModules
         $extraFields->update('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1, 'TrainingSessionLocationHelp');
         $extraFields->addExtraField('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionLocationHelp');
 
+        $extraFields->update('trainingsession_durations', $langs->transnoentities('TrainingSessionDurations'), 'int', '', 'contrat', 0, 0, 1860, '', '', '', 1, 'TrainingSessionDurationHelp');
+        $extraFields->addExtraField('trainingsession_durations', $langs->transnoentities('TrainingSessionDurations'), 'int', 1860, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionDurationHelp');
+
         return $this->_init($sql, $options);
     }
 

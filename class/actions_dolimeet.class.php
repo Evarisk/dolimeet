@@ -440,11 +440,25 @@ class ActionsDolimeet
                     foreach ($sessions as $session) {
                         $sessionDurations += $session->duration;
                     }
-                    $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $langs->transnoentities('TrainingSessionDurations') . '</td>';
-                    $out .= '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00') . '</td></tr>';
-                    ?>
+                    if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'trainingsession_durations') {
+                        $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto;
+                        $out .= '<form enctype="multipart/form-data" action="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '" method="post" name="formextra">';
+                        $out .= '<input type="hidden" name="action" value="update_extras">';
+                        $out .= '<input type="hidden" name="attribute" value="trainingsession_durations">';
+                        $out .= '<input type="hidden" name="token" value="'.newToken().'">';
+                        $out .= '<input type="hidden" name="confirm" value="yes">';
+                        $out .= $form->select_duration('duration', $object->array_options['options_trainingsession_durations'], 0, 'text', 0, 1);
+                        $out .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans('Modify')).'">' . '</td></tr>';
+                    } else {
+                        $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto . ($object->array_options['options_trainingsession_durations'] > 0 ? convertSecondToTime($object->array_options['options_trainingsession_durations'], 'allhourmin') : '00:00') . ' - ';
+                        $out .= $langs->trans('CalculatedTotalSessionDuration') . ' ' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00');
+                        if ($sessionDurations != $object->array_options['options_trainingsession_durations']) {
+                            $out .= $form->textwithpicto('', $langs->trans('TrainingSessionDurationErrorMatching', $session->ref), 1, 'warning');
+                        }
+                        $out .= '</td></tr>';
+                    } ?>
                     <script>
-                        jQuery('.contrat_extras_trainingsession_location').closest('.trextrafields_collapse_' + <?php echo $object->id; ?>).after(<?php echo json_encode($out); ?>);
+                        jQuery('.valuefield.contrat_extras_trainingsession_durations').replaceWith(<?php echo json_encode($out); ?>);
                     </script>
                     <?php
                 }
@@ -536,7 +550,7 @@ class ActionsDolimeet
      */
     public function doActions(array $parameters, $object, string $action): int
     {
-        global $conf, $langs, $user;
+        global $conf, $user;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'admincompany') {
@@ -584,6 +598,16 @@ class ActionsDolimeet
 
                 header('Location: ' . $urlToRedirect);
                 exit;
+            }
+
+            if ($action == 'update_extras' && GETPOST('attribute') == 'trainingsession_durations') {
+                $hours    = GETPOST('durationhour', 'int');
+                $minutes  = GETPOST('durationmin', 'int');
+                $duration = convertTime2Seconds($hours, $minutes);
+
+                $object->array_options['options_trainingsession_durations'] = $duration;
+                $object->updateExtrafield('trainingsession_durations');
+                return 1;
             }
         }
 
