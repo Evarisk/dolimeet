@@ -182,7 +182,7 @@ if (!empty($fromType)) {
             $objectLinked = null;
     }
     if (!$error) {
-        !empty($ref) ? $objectLinked->fetch(0, $ref) : $objectLinked->fetch($fromID);
+        $objectLinked->fetch($fromID);
     }
     $linkedObjectsArray    = ['thirdparty', 'project', 'contrat'];
     $signatoryObjectsArray = ['user', 'socpeople'];
@@ -223,14 +223,6 @@ $permissionToRead   = $user->rights->dolimeet->$objectType->read || $user->right
 $permissiontoadd    = $user->rights->dolimeet->$objectType->write;
 $permissiontodelete = $user->rights->dolimeet->$objectType->delete;
 saturne_check_access($permissionToRead, null, true);
-
-// For the custom navigation, get the next/prev id from the ref
-// If the fromID doesn't correspond to the id from the ref then we reload page with good ID
-if (!empty($objectLinked) && is_object($objectLinked)) {
-    if ($objectLinked->id != $fromID) {
-        header('Location: ' . $_SERVER['PHP_SELF'] . '?fromtype='. $fromType .'&fromid=' . $objectLinked->id . '&object_type=trainingsession');
-    }
-}
 
 /*
  * Actions
@@ -469,8 +461,8 @@ saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 if (!empty($fromType) && !$error) {
     saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($objectType));
 
-    $moreParams['bannerTab'] = '&fromtype='. $fromType .'&fromid=' . $objectLinked->id . '&object_type=trainingsession';
-    saturne_banner_tab($objectLinked, 'ref', $moreHtml, 1, 'ref', 'ref', '', false, $moreParams);
+    $moreParams['bannerTab'] = '&fromtype='. $fromType . '&object_type=trainingsession';
+    saturne_banner_tab($objectLinked, 'fromid', $moreHtml, 1, 'rowid', 'ref', '', false, $moreParams);
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : [];
