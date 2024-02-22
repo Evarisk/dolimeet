@@ -845,16 +845,38 @@ class ActionsDolimeet
                 $document  = new CompletioncertificateDocument($this->db);
                 $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
+                $contactList   = [];
                 $signedTrainee = [];
                 $sessions      = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
+                // We retrieve internal & external user linked to the contract
+                foreach (['internal', 'external'] as $source) {
+                    $contactList[$source] = $object->liste_contact(-1, $source, 0, 'TRAINEE');
+                    // We need our array keys to start with 1 for further logic
+                    array_unshift($contactList[$source],'');
+                    unset($contactList[$source][0]);
+                }
+                // Because of the structure of $contactList we need a second array where we will remove someone if he is present for ONE session
+                $absentTrainee = $contactList;
+
                 if (is_array($sessions) && !empty($sessions)) {
                     foreach ($sessions as $session) {
-                        $signatories = $signatory->fetchSignatories($session->id, 'trainingsession', 'role = "Trainee" AND status = ' . SaturneSignature::STATUS_SIGNED . ' AND attendance IS NULL');
+                        $signatories = $signatory->fetchSignatories($session->id, 'trainingsession', 'role = "Trainee"');
                         foreach ($signatories as $signatory) {
-                            if ($signatory->element_type == 'user') {
-                                $signedTrainee['internal'][$signatory->element_id] += $session->duration;
-                            } else {
-                                $signedTrainee['external'][$signatory->element_id] += $session->duration;
+                            $type     = ($signatory->element_type == 'user' ? 'internal' : 'external');
+                            $absentId = array_column($absentTrainee[$type], 'id');
+
+                            // We search for the key in $contactList corresponding to the current $signatory->element_id
+                            array_unshift($absentId,'');
+                            unset($absentId[0]);
+                            // array_search return false (0) if it doesn't find, that's why we need our $absentTrainee array to start by 1
+                            $key = array_search($signatory->element_id, $absentId);
+
+                            if ($signatory->attendance != SaturneSignature::ATTENDANCE_ABSENT) {
+                                // If the $signatory is present then we will remove it from the $absentTrainee array
+                                if ($key > 0) {
+                                    unset($absentTrainee[$type][$key]);
+                                }
+                                $signedTrainee[$type][$signatory->element_id] += $session->duration;
                             }
                         }
                     }
@@ -865,9 +887,12 @@ class ActionsDolimeet
                     }
                 }
 
-                $contactList = [];
-                foreach (['internal', 'external'] as $source) {
-                    $contactList[$source] = $object->liste_contact(-1, $source, 0, 'TRAINEE');
+                if (!empty($absentTrainee)) {
+                    foreach ($absentTrainee as $absentType) {
+                        foreach($absentType as $contact) {
+                            setEventMessages($langs->trans('NoCertificateBecauseAbsent', $contact['lastname'], $contact['firstname']), [], 'warnings');
+                        }
+                    }
                 }
 
                 $parameters['moreparams']['object']             = $object;
@@ -879,7 +904,7 @@ class ActionsDolimeet
                 if (!empty($contactList) && !empty($signedTrainee)) {
                     foreach ($contactList as $contactType) {
                         foreach($contactType as $contact) {
-                            if (array_key_exists($contact['id'], $signedTrainee[$contact['source']])) {
+                            if (is_array($signedTrainee[$contact['source']]) && array_key_exists($contact['id'], $signedTrainee[$contact['source']])) {
                                 $parameters['moreparams']['attendant']               = $signatory;
                                 $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
                                 $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
