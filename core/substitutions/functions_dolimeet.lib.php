@@ -62,7 +62,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
                             foreach ($signatories as $signatory) {
                                 $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__'] .= '<ul><li>' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname . ' - <strong>' . $signatory->getLibStatut(5) . (($signatory->status == SaturneSignature::STATUS_REGISTERED) ? ' - ' . $langs->transnoentities('PendingSignature') : '') . '</strong>';
                                 if ($signatoryRole != 'SessionTrainer') {
-                                    $signatureUrl = dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=dolimeet&object_type=' . $session->type . '&document_type=AttendanceSheetDocument&modal_to_open=modal-signature' . $signatory->id, 3);
+                                    $signatureUrl = dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=dolimeet&object_type=' . $session->type . '&document_type=AttendanceSheetDocument', 3);
                                     $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__'] .= ' - <a href=' . $signatureUrl . ' target="_blank">' . $langs->transnoentities('SignAttendanceSheetOnline') . '</a>';
                                 }
                                 $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__'] .= '</li></ul>';
