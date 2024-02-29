@@ -584,20 +584,23 @@ class ActionsDolimeet
     public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
     {
         require_once __DIR__ . '/../class/trainingsession.class.php';
+        require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
 
         $trainingSession = new Trainingsession($this->db);
 
         $linkableObjectTypes['dolimeet_trainsess'] = [
-            'langs'      => 'Trainingsession',
-            'langfile'   => 'dolimeet@dolimeet',
-            'picto'      => $trainingSession->picto,
-            'className'  => 'Trainingsession',
-            'post_name'  => 'fk_trainingsession',
-            'link_name'  => 'dolimeet_trainsess',
-            'name_field' => 'ref',
-            'create_url' => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
-            'class_path' => 'custom/dolimeet/class/trainingsession.class.php',
-            'lib_path'   => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php',
+            'langs'          => 'Trainingsession',
+            'langfile'       => 'dolimeet@dolimeet',
+            'picto'          => $trainingSession->picto,
+            'className'      => 'Trainingsession',
+            'name_field'     => 'ref',
+            'post_name'      => 'fk_trainingsession',
+            'link_name'      => 'dolimeet_trainsess',
+            'tab_type'       => 'trainingsession',
+            'hook_name_list' => 'trainingsessionlist',
+            'hook_name_card' => 'trainingsessioncard',
+            'create_url'     => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
+            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php'
         ];
         $this->results = $linkableObjectTypes;
 
