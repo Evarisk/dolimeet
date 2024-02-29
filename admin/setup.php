@@ -201,7 +201,7 @@ if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_V
 
         print '<td class="minwidth400 maxwidth500">';
         $confName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
-        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList($conf->global->$confName, $satisfactionSurvey . '_satisfaction_survey_model', '', '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
+        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList($conf->global->$confName, $satisfactionSurvey . '_satisfaction_survey_model', 's.type = "survey" AND s.status = ' . Sheet::STATUS_LOCKED, '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
         print '</td></tr>';
     }
 
