@@ -587,21 +587,21 @@ class modDoliMeet extends DolibarrModules
 
             $saturneMail = new SaturneMail($this->db, 'contrat');
 
-            $i = 10;
+            $position = 100;
             $satisfactionSurveys = ['customer', 'billing', 'trainee', 'sessiontrainer', 'opco'];
             foreach ($satisfactionSurveys as $satisfactionSurvey) {
                 $saturneMail->entity        = 0;
                 $saturneMail->type_template = 'contract';
                 $saturneMail->datec         = $this->db->idate(dol_now());
                 $saturneMail->label         = $langs->transnoentities('SatisfactionSurveyLabel', $langs->transnoentities(ucfirst($satisfactionSurvey)));
-                $saturneMail->position      = $i;
+                $saturneMail->position      = $position;
                 $saturneMail->enabled       = "isModEnabled('contrat')";
                 $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyTopic', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
                 $saturneMail->joinfiles     = 1;
                 $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyContent', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
 
                 $emailTemplateSatisfactionSurvey[$satisfactionSurvey] = $saturneMail->create($user);
-                $i += 10;
+                $position += 10;
             }
 
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', json_encode($emailTemplateSatisfactionSurvey), 'chaine', 0, '', $conf->entity);

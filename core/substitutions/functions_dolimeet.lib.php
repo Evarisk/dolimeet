@@ -96,34 +96,32 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
             }
 
             $object->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
-            if (is_array($sessions) && !empty($sessions)) {
-                foreach ($sessions as $session) {
-                    $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<strong>' . $session->ref . ' - ' . $session->label . '</strong>';
-                    $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<ul><li>' . $langs->transnoentities('DateAndTime') . ' : ' . dol_strtolower($langs->transnoentities('From')) . ' ' . dol_print_date($session->date_start, 'day', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('At')) . ' ' . dol_print_date($session->date_start, 'hour', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('To')) . ' ' . dol_print_date($session->date_end, 'day', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('At')) . ' ' . dol_print_date($session->date_end, 'hour', 'tzuserrel') . ' (' . dol_strtolower($langs->transnoentities('Duration')) . ' : ' . (($session->duration > 0) ? convertSecondToTime($session->duration, 'allhourmin') : '00:00') . ')' . '</li>';
-                    if (!empty($contacts)) {
-                        foreach ($contacts as $contact) {
-                            if (isset($object->linkedObjectsIds['digiquali_survey']) && !empty($object->linkedObjectsIds['digiquali_survey'])) {
-                                $surveyIDs = $object->linkedObjectsIds['digiquali_survey'];
-                                arsort($surveyIDs);
-                                foreach ($surveyIDs as $surveyID) {
-                                    $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
-                                    $filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
-                                    if (getDolGlobalInt($confName) > 0) {
-                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
-                                            $survey->fetch($surveyID);
-                                            $signatory->fetch($signatory->id);
-                                            $publicAnswerUrl = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&entity=' . $conf->entity, 3);
-                                            $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<ul><li>' . dol_strtoupper($signatory->lastname) . ' ' . ucfirst($signatory->firstname);
-                                            $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= ' - <a href=' . $publicAnswerUrl . ' target="_blank">' . $langs->transnoentities('FillSatisfactionSurvey', dol_strtolower($langs->transnoentities(ucfirst(dol_strtolower($contact['code']))))) . '</a>';
-                                            $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '</li></ul>';
-                                            break;
+            if (!empty($contacts)) {
+                foreach ($contacts as $contact) {
+                    if (isset($object->linkedObjectsIds['digiquali_survey']) && !empty($object->linkedObjectsIds['digiquali_survey'])) {
+                        $surveyIDs = $object->linkedObjectsIds['digiquali_survey'];
+                        arsort($surveyIDs);
+                        foreach ($surveyIDs as $surveyID) {
+                            $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
+                            $filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
+                            if (getDolGlobalInt($confName) > 0) {
+                                if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
+                                    $survey->fetch($surveyID);
+                                    $signatory->fetch($signatory->id);
+                                    $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<br><strong>' . dol_strtoupper($signatory->lastname) . ' ' . ucfirst($signatory->firstname) . '</strong>';
+                                    if (is_array($sessions) && !empty($sessions)) {
+                                        foreach ($sessions as $session) {
+                                            $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<ul><li>' . $session->ref . ' - ' . $session->label . '</li>';
+                                            $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<li>' . $langs->transnoentities('DateAndTime') . ' : ' . dol_strtolower($langs->transnoentities('From')) . ' ' . dol_print_date($session->date_start, 'day', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('At')) . ' ' . dol_print_date($session->date_start, 'hour', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('To')) . ' ' . dol_print_date($session->date_end, 'day', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('At')) . ' ' . dol_print_date($session->date_end, 'hour', 'tzuserrel') . ' (' . dol_strtolower($langs->transnoentities('Duration')) . ' : ' . (($session->duration > 0) ? convertSecondToTime($session->duration, 'allhourmin') : '00:00') . ')' . '</li></ul>';
                                         }
+                                        $publicAnswerUrl = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&entity=' . $conf->entity, 3);
+                                        $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<a href=' . $publicAnswerUrl . ' target="_blank">' . $langs->transnoentities('FillSatisfactionSurvey', dol_strtolower($langs->transnoentities(ucfirst(dol_strtolower($contact['code']))))) . '</a><br>';
                                     }
+                                    break;
                                 }
                             }
                         }
                     }
-                    $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '</ul>';
                 }
             }
         }
