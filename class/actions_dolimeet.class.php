@@ -389,6 +389,20 @@ class ActionsDolimeet
         if (strpos($parameters['context'], 'contractcard') !== false) {
             global $object;
 
+            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+
+            ?>
+            <script>
+                jQuery('.contrat_extras_trainingsession_start').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_end').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_label').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_type').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_location').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_durations').prepend(<?php echo json_encode($picto); ?>);
+            </script>
+            <?php
+
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                 // Load Saturne libraries
                 require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
@@ -399,9 +413,6 @@ class ActionsDolimeet
                 require_once __DIR__ . '/session.class.php';
 
                 saturne_load_langs();
-
-                $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
-                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
                 // Handle consistency of contract trainingsession dates
                 $session = new Session($this->db);
@@ -414,7 +425,6 @@ class ActionsDolimeet
                     $out = $form->textwithpicto('', $langs->trans('TrainingSessionStartErrorMatchingDate', $session->ref), 1, 'warning');
                 } ?>
                 <script>
-                    jQuery('.contrat_extras_trainingsession_start').prepend(<?php echo json_encode($picto); ?>);
                     jQuery('.contrat_extras_trainingsession_start').append(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
@@ -427,7 +437,6 @@ class ActionsDolimeet
                     $out = $form->textwithpicto('', $langs->trans('TrainingSessionEndErrorMatchingDate', $session->ref), 1, 'warning');
                 } ?>
                 <script>
-                    jQuery('.contrat_extras_trainingsession_end').prepend(<?php echo json_encode($picto); ?>);
                     jQuery('.contrat_extras_trainingsession_end').append(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
@@ -437,38 +446,29 @@ class ActionsDolimeet
                 $filter           = 't.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id;
                 $sessions         = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
                 if (is_array($sessions) && !empty($sessions)) {
-                    foreach ($sessions as $session) {
-                        $sessionDurations += $session->duration;
+                    foreach ($sessions as $sessionSingle) {
+                        $sessionDurations += $sessionSingle->duration;
                     }
-                    if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'trainingsession_durations') {
-                        $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto;
-                        $out .= '<form enctype="multipart/form-data" action="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '" method="post" name="formextra">';
-                        $out .= '<input type="hidden" name="action" value="update_extras">';
-                        $out .= '<input type="hidden" name="attribute" value="trainingsession_durations">';
-                        $out .= '<input type="hidden" name="token" value="'.newToken().'">';
-                        $out .= '<input type="hidden" name="confirm" value="yes">';
-                        $out .= $form->select_duration('duration', $object->array_options['options_trainingsession_durations'], 0, 'text', 0, 1);
-                        $out .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans('Modify')).'">' . '</td></tr>';
-                    } else {
-                        $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto . ($object->array_options['options_trainingsession_durations'] > 0 ? convertSecondToTime($object->array_options['options_trainingsession_durations'], 'allhourmin') : '00:00') . ' - ';
-                        $out .= $langs->trans('CalculatedTotalSessionDuration') . ' ' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00');
-                        if ($sessionDurations != $object->array_options['options_trainingsession_durations']) {
-                            $out .= $form->textwithpicto('', $langs->trans('TrainingSessionDurationErrorMatching', $session->ref), 1, 'warning');
-                        }
-                        $out .= '</td></tr>';
-                    } ?>
-                    <script>
-                        jQuery('.valuefield.contrat_extras_trainingsession_durations').replaceWith(<?php echo json_encode($out); ?>);
-                    </script>
-                    <?php
                 }
-
-                // Handle picto before extrafields
-                ?>
+                if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'trainingsession_durations') {
+                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto;
+                    $out .= '<form enctype="multipart/form-data" action="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '" method="post" name="formextra">';
+                    $out .= '<input type="hidden" name="action" value="update_extras">';
+                    $out .= '<input type="hidden" name="attribute" value="trainingsession_durations">';
+                    $out .= '<input type="hidden" name="token" value="'.newToken().'">';
+                    $out .= '<input type="hidden" name="confirm" value="yes">';
+                    $out .= $form->select_duration('duration', $object->array_options['options_trainingsession_durations'], 0, 'text', 0, 1);
+                    $out .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans('Modify')).'">' . '</td></tr>';
+                } else {
+                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto . ($object->array_options['options_trainingsession_durations'] > 0 ? convertSecondToTime($object->array_options['options_trainingsession_durations'], 'allhourmin') : '00:00') . ' - ';
+                    $out .= $langs->trans('CalculatedTotalSessionDuration') . ' ' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00');
+                    if ($sessionDurations != $object->array_options['options_trainingsession_durations']) {
+                        $out .= $form->textwithpicto('', $langs->trans('TrainingSessionDurationErrorMatching', $session->ref), 1, 'warning');
+                    }
+                    $out .= '</td></tr>';
+                } ?>
                 <script>
-                    jQuery('.contrat_extras_label').prepend(<?php echo json_encode($picto); ?>);
-                    jQuery('.contrat_extras_trainingsession_type').prepend(<?php echo json_encode($picto); ?>);
-                    jQuery('.contrat_extras_trainingsession_location').prepend(<?php echo json_encode($picto); ?>);
+                    jQuery('.valuefield.contrat_extras_trainingsession_durations').replaceWith(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
 
