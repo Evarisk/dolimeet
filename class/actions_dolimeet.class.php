@@ -386,7 +386,7 @@ class ActionsDolimeet
             }
         }
 
-        if (strpos($parameters['context'], 'contractcard') !== false) {
+        if (strpos($parameters['context'], 'contractcard') !== false && GETPOST('action') != 'create') {
             global $object;
 
             $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
