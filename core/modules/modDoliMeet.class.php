@@ -592,6 +592,7 @@ class modDoliMeet extends DolibarrModules
             foreach ($satisfactionSurveys as $satisfactionSurvey) {
                 $saturneMail->entity        = 0;
                 $saturneMail->type_template = 'contract';
+                $saturneMail->lang          = 'fr_FR';
                 $saturneMail->datec         = $this->db->idate(dol_now());
                 $saturneMail->label         = $langs->transnoentities('SatisfactionSurveyLabel', $langs->transnoentities(ucfirst($satisfactionSurvey)));
                 $saturneMail->position      = $position;
