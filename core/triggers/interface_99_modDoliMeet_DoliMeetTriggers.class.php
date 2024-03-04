@@ -219,7 +219,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 break;
 
             case 'CONTRAT_ADD_CONTACT' :
-                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && isModEnabled('digiquali') && getDolGlobalString('DIGIQUALI_VERSION') >= '1.11.0') {
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
                     if (GETPOST('userid')) {
