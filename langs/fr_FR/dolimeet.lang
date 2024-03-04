@@ -215,6 +215,15 @@ AttendancePresentAuditRate           = Taux de présence aux audits
 AttendanceDelayAuditRate             = Taux de retard aux audits
 AttendanceAbsentAuditRate            = Taux d'absence aux audits
 
+#
+# Email - Email
+#
+
+# Data - Donnée
+SatisfactionSurveyLabel   = Questionnaire_Satisfaction_%s
+SatisfactionSurveyTopic   = [__[MAIN_INFO_SOCIETE_NOM]__] Remise des liens de questionnaire de satisfaction %s pour la convention de formation __REF__
+SatisfactionSurveyContent = Bonjour,<br/><br/>Nous vous envoyons ce mail afin de vous mettre au courant des questionnaires de satisfaction %s liées avec votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br/>Ci-dessous, vous trouverez un aperçu des questionnaires, incluant les détails pertinents :<br/><br/>__DOLIMEET_CONTRACT_SURVEY_INFOS__<br/><br/>Nous vous prions de bien vouloir transmettre ces liens aux parties concernées.<br/>Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br/><br/>__USER_FULLNAME__<br/>__USER_EMAIL__<br/>__MYCOMPANY_NAME__<br/>__MYCOMPANY_FULLADDRESS__<br/>__MYCOMPANY_EMAIL__
+
 
 
 #
@@ -231,3 +240,7 @@ SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
 SetSatisfactionSurvey             = Créer enquête de satisfaction
 NeedToSetSatisfactionSurvey       = Configuration de l'enquête de satisfaction %s requise
 DefineSessionTrainerResponsible   = Vous devez définir le responsable du dispensateur de formation dans la configuration de DoliMeet.
+FillSatisfactionSurvey            = Remplir l'enquête de satisfaction %s
+Sessiontrainer                    = Formateur
+Billing                           = Commanditaire
+Customer                          = Client
