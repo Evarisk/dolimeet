@@ -394,12 +394,12 @@ class ActionsDolimeet
 
             ?>
             <script>
-                jQuery('.contrat_extras_trainingsession_start').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_end').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_label').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_type').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_location').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_durations').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_start').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_end').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_label').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_type').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_location').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
+                jQuery('.contrat_extras_trainingsession_durations').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
             </script>
             <?php
 
