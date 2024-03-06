@@ -460,8 +460,9 @@ saturne_header(0, '', $title, $help_url, '', 0, 0, [], [], '', 'bodyforlist');
 
 if (!empty($fromType) && !$error) {
     saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($objectType));
-    //TODO Shownav must be 0 because navigation between fromObject can't be done while saturne_banner_tab not fix
-    saturne_banner_tab($objectLinked, 'ref', $moreHtml, 0);
+
+    $moreParams['bannerTab'] = '&fromtype='. $fromType . '&object_type=trainingsession';
+    saturne_banner_tab($objectLinked, 'fromid', $moreHtml, 1, 'rowid', 'ref', '', false, $moreParams);
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : [];
