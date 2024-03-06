@@ -386,22 +386,8 @@ class ActionsDolimeet
             }
         }
 
-        if (strpos($parameters['context'], 'contractcard') !== false && GETPOST('action') != 'create') {
+        if (strpos($parameters['context'], 'contractcard') !== false) {
             global $object;
-
-            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-
-            ?>
-            <script>
-                jQuery('.contrat_extras_trainingsession_start').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_end').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_label').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_type').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_location').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
-                jQuery('.contrat_extras_trainingsession_durations').closest('.trextrafields_collapse_1').find('.titlefield').find('td').prepend(<?php echo json_encode($picto); ?>);
-            </script>
-            <?php
 
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                 // Load Saturne libraries
@@ -451,7 +437,7 @@ class ActionsDolimeet
                     }
                 }
                 if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'trainingsession_durations') {
-                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto;
+                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">';
                     $out .= '<form enctype="multipart/form-data" action="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '" method="post" name="formextra">';
                     $out .= '<input type="hidden" name="action" value="update_extras">';
                     $out .= '<input type="hidden" name="attribute" value="trainingsession_durations">';
@@ -460,7 +446,7 @@ class ActionsDolimeet
                     $out .= $form->select_duration('duration', $object->array_options['options_trainingsession_durations'], 0, 'text', 0, 1);
                     $out .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans('Modify')).'">' . '</td></tr>';
                 } else {
-                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . $picto . ($object->array_options['options_trainingsession_durations'] > 0 ? convertSecondToTime($object->array_options['options_trainingsession_durations'], 'allhourmin') : '00:00') . ' - ';
+                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . ($object->array_options['options_trainingsession_durations'] > 0 ? convertSecondToTime($object->array_options['options_trainingsession_durations'], 'allhourmin') : '00:00') . ' - ';
                     $out .= $langs->trans('CalculatedTotalSessionDuration') . ' ' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00');
                     if ($sessionDurations != $object->array_options['options_trainingsession_durations']) {
                         $out .= $form->textwithpicto('', $langs->trans('TrainingSessionDurationErrorMatching', $session->ref), 1, 'warning');
@@ -612,6 +598,56 @@ class ActionsDolimeet
         }
 
         return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     *  Overloading the formObjectOptions function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function formObjectOptions(array $parameters, $object, string $action): int
+    {
+        global $extrafields, $langs;
+
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
+                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
+                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     *  Overloading the printFieldListTitle function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldPreListTitle(array $parameters, $object, string $action): int
+    {
+        global $extrafields, $langs;
+
+        if (strpos($parameters['context'], 'contractlist') !== false) {
+            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
+                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
+                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
     }
 
     /**

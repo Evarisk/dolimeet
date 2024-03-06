@@ -142,7 +142,8 @@ class modDoliMeet extends DolibarrModules
                 'sessionlist',
                 'meetinglist',
                 'trainingsessionlist',
-                'auditlist'
+                'auditlist',
+                'contractlist'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
@@ -583,23 +584,23 @@ class modDoliMeet extends DolibarrModules
         require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
         $extraFields = new ExtraFields($this->db);
 
-        $extraFields->update('label', $langs->transnoentities('Label'), 'varchar', '', 'contrat', 0, 0, 1040, '', '', '', 1);
-        $extraFields->addExtraField('label', $langs->transnoentities('Label'), 'varchar', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('label', 'Label', 'varchar', 255, 'contrat', 0, 0, $this->numero . 1, '', '', '', 1, '', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('label', 'Label', 'varchar', $this->numero . 1, 255, 'contrat', 0, 0, '', '', '', '', 1, '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', '', 'contrat', 0, 0, 1800, '', '', '', 1, 'TrainingSessionStartHelp');
-        $extraFields->addExtraField('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionStartHelp');
+        $extraFields->update('trainingsession_type', 'TrainingSessionType', 'sellist', '', 'contrat', 0, 0, $this->numero . 10, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('trainingsession_type', 'TrainingSessionType', 'sellist', $this->numero . 10, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', '', 'contrat', 0, 0, 1810, '', '', '', 1, 'TrainingSessionEndHelp');
-        $extraFields->addExtraField('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 'TrainingSessionEndHelp');
+        $extraFields->update('trainingsession_location', 'TrainingSessionLocation', 'varchar', 255, 'contrat', 0, 0, $this->numero . 20, '', '', '', 1, 'TrainingSessionLocationHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('trainingsession_location', 'TrainingSessionLocation', 'varchar', $this->numero . 20, 255, 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionLocationHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp');
-        $extraFields->addExtraField('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp');
+        $extraFields->update('trainingsession_start', 'TrainingSessionStart', 'datetime', '', 'contrat', 0, 0, $this->numero . 30, '', '', '', 1, 'TrainingSessionStartHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('trainingsession_start', 'TrainingSessionStart', 'datetime', $this->numero . 30, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionStartHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1, 'TrainingSessionLocationHelp');
-        $extraFields->addExtraField('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionLocationHelp');
+        $extraFields->update('trainingsession_end', 'TrainingSessionEnd', 'datetime', '', 'contrat', 0, 0, $this->numero . 40, '', '', '', 1, 'TrainingSessionEndHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+        $extraFields->addExtraField('trainingsession_end', 'TrainingSessionEnd', 'datetime', $this->numero . 40, '', 'contrat', 0, 0, '', '', '', '', 'TrainingSessionEndHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
 
-        $extraFields->update('trainingsession_durations', $langs->transnoentities('TrainingSessionDurations'), 'int', '', 'contrat', 0, 0, 1860, '', '', '', 1, 'TrainingSessionDurationHelp');
-        $extraFields->addExtraField('trainingsession_durations', $langs->transnoentities('TrainingSessionDurations'), 'int', 1860, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionDurationHelp');
+        $extraFields->update('trainingsession_durations', 'TrainingSessionDurations', 'int', '', 'contrat', 0, 0, $this->numero . 50, '', '', '', 1, 'TrainingSessionDurationHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+        $extraFields->addExtraField('trainingsession_durations', 'TrainingSessionDurations', 'int', $this->numero . 50, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionDurationHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
 
         return $this->_init($sql, $options);
     }
