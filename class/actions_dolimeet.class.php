@@ -247,7 +247,7 @@ class ActionsDolimeet
                                     } else {
                                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
                                         $outputLine[$contact['rowid']] .= '<a href="' . dol_buildpath('/custom/dolimeet/admin/setup.php', 1) . '">';
-                                        $outputLine[$contact['rowid']] .= $form->textwithpicto($langs->trans('ClickHere'), $langs->trans('NeedToSetSatisfactionSurvey', $contact['code']), 1, 'warning') . '</a>';
+                                        $outputLine[$contact['rowid']] .= $form->textwithpicto($langs->trans('ClickHere'), $langs->trans('NeedToSetSatisfactionSurvey', dol_strtolower($langs->trans(ucfirst(dol_strtolower($contact['code']))))), 1, 'warning') . '</a>';
                                         $outputLine[$contact['rowid']] .= '</td>';
                                     }
                                 }
