@@ -115,6 +115,14 @@ AttendantsFromContract                = Contract attendants
 TrainingSessionStartErrorMatchingDate = <strong> Error: consistency of course start dates. </strong><br> The start date of the contract is not equal to the start date of the first training session %s.
 TrainingSessionEndErrorMatchingDate   = <strong> Error: consistency of course end dates. </strong><br> The end date of the training contract is not equal to the end date of the last training session %s.
 TrainingSessionDurations              = Duration of training sessions
+TrainingSessionStartHelp              = Start date of the first training session of the contract
+TrainingSessionEndHelp                = End date of the last training session of the contract
+TrainingSessionTypeHelp               = Type of training session linked to the contract
+TrainingSessionLocationHelp           = Place where the training session linked to the contract took place
+TrainingSessionDurationHelp           = Total duration of the sessions HH:MM (ex: 60:30) <br> The duration shown on the certificate corresponds to the total number of hours of sessions attended by a trainee.
+CalculatedTotalSessionDuration        = Total calculated duration time:
+TrainingSessionDurationErrorMatching  = <strong> Error: consistency of training session duration. </strong><br> The total duration of the sessions indicated in the contract is different from the calculated duration of all the sessions linked to the contract.
+NoCertificateBecauseAbsent            = No certificate was generated for <b> %s %s </b> because it was absent from all sessions.
 
 
 # Attendant role

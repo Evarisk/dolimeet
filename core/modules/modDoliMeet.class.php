@@ -78,7 +78,7 @@ class modDoliMeet extends DolibarrModules
         $this->editor_url  = 'https://evarisk.com';
 
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'.
-        $this->version = '1.3.0';
+        $this->version = '1.4.0';
 
         // Url to the file with your last numberversion of this module.
         //$this->url_last_version = 'http://www.example.com/versionmodule.txt';
@@ -142,7 +142,8 @@ class modDoliMeet extends DolibarrModules
                 'sessionlist',
                 'meetinglist',
                 'trainingsessionlist',
-                'auditlist'
+                'auditlist',
+                'contractlist'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
@@ -221,6 +222,8 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_VERSION','chaine', $this->version, '', 0, 'current'],
             $i++ => ['DOLIMEET_DB_VERSION', 'chaine', $this->version, '', 0, 'current'],
             $i++ => ['DOLIMEET_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SET', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', 'integer', 0, '', 0, 'current'],
 
             // CONST GENERAL CONST.
             $i++ => ['CONTACT_SHOW_EMAIL_PHONE_TOWN_SELECTLIST', 'integer', 1, '', 0, 'current'],
@@ -549,7 +552,7 @@ class modDoliMeet extends DolibarrModules
      */
     public function init($options = ''): int
     {
-        global $conf, $langs;
+        global $conf, $langs, $user;
 
         // Permissions.
         $this->remove($options);
@@ -579,24 +582,55 @@ class modDoliMeet extends DolibarrModules
         addDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
 
+        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+            // Load Saturne libraries
+            require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
+            $saturneMail = new SaturneMail($this->db, 'contrat');
+
+            $position = 100;
+            $satisfactionSurveys = ['customer', 'billing', 'trainee', 'sessiontrainer', 'opco'];
+            foreach ($satisfactionSurveys as $satisfactionSurvey) {
+                $saturneMail->entity        = 0;
+                $saturneMail->type_template = 'contract';
+                $saturneMail->lang          = 'fr_FR';
+                $saturneMail->datec         = $this->db->idate(dol_now());
+                $saturneMail->label         = $langs->transnoentities('SatisfactionSurveyLabel', $langs->transnoentities(ucfirst($satisfactionSurvey)));
+                $saturneMail->position      = $position;
+                $saturneMail->enabled       = "isModEnabled('contrat')";
+                $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyTopic', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
+                $saturneMail->joinfiles     = 1;
+                $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyContent', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
+
+                $emailTemplateSatisfactionSurvey[$satisfactionSurvey] = $saturneMail->create($user);
+                $position += 10;
+            }
+
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', json_encode($emailTemplateSatisfactionSurvey), 'chaine', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 1, 'integer', 0, '', $conf->entity);
+        }
+
         // Create extrafields during init.
         require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
         $extraFields = new ExtraFields($this->db);
 
-        $extraFields->update('label', $langs->transnoentities('Label'), 'varchar', '', 'contrat', 0, 0, 1040, '', '', '', 1);
-        $extraFields->addExtraField('label', $langs->transnoentities('Label'), 'varchar', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('label', 'Label', 'varchar', 255, 'contrat', 0, 0, $this->numero . 1, '', '', '', 1, '', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('label', 'Label', 'varchar', $this->numero . 1, 255, 'contrat', 0, 0, '', '', '', '', 1, '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', '', 'contrat', 0, 0, 1800, '', '', '', 1);
-        $extraFields->addExtraField('trainingsession_start', $langs->transnoentities('TrainingSessionStart'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('trainingsession_type', 'TrainingSessionType', 'sellist', '', 'contrat', 0, 0, $this->numero . 10, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('trainingsession_type', 'TrainingSessionType', 'sellist', $this->numero . 10, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', '', 'contrat', 0, 0, 1810, '', '', '', 1);
-        $extraFields->addExtraField('trainingsession_end', $langs->transnoentities('TrainingSessionEnd'), 'datetime', 1040, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('trainingsession_location', 'TrainingSessionLocation', 'varchar', 255, 'contrat', 0, 0, $this->numero . 20, '', '', '', 1, 'TrainingSessionLocationHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('trainingsession_location', 'TrainingSessionLocation', 'varchar', $this->numero . 20, 255, 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionLocationHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', '', 'contrat', 0, 0, 1830, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
-        $extraFields->addExtraField('trainingsession_type', $langs->transnoentities('TrainingSessionType'), 'sellist', 1830, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1);
+        $extraFields->update('trainingsession_start', 'TrainingSessionStart', 'datetime', '', 'contrat', 0, 0, $this->numero . 30, '', '', '', 1, 'TrainingSessionStartHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        $extraFields->addExtraField('trainingsession_start', 'TrainingSessionStart', 'datetime', $this->numero . 30, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionStartHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
 
-        $extraFields->update('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', '', 'contrat', 0, 0, 1850, '', '', '', 1);
-        $extraFields->addExtraField('trainingsession_location', $langs->transnoentities('TrainingSessionLocation'), 'varchar', 1850, '', 'contrat', 0, 0, '', '', '', '', 1);
+        $extraFields->update('trainingsession_end', 'TrainingSessionEnd', 'datetime', '', 'contrat', 0, 0, $this->numero . 40, '', '', '', 1, 'TrainingSessionEndHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+        $extraFields->addExtraField('trainingsession_end', 'TrainingSessionEnd', 'datetime', $this->numero . 40, '', 'contrat', 0, 0, '', '', '', '', 'TrainingSessionEndHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+
+        $extraFields->update('trainingsession_durations', 'TrainingSessionDurations', 'int', '', 'contrat', 0, 0, $this->numero . 50, '', '', '', 1, 'TrainingSessionDurationHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+        $extraFields->addExtraField('trainingsession_durations', 'TrainingSessionDurations', 'int', $this->numero . 50, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionDurationHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
 
         return $this->_init($sql, $options);
     }

@@ -247,7 +247,7 @@ class ActionsDolimeet
                                     } else {
                                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
                                         $outputLine[$contact['rowid']] .= '<a href="' . dol_buildpath('/custom/dolimeet/admin/setup.php', 1) . '">';
-                                        $outputLine[$contact['rowid']] .= $form->textwithpicto($langs->trans('ClickHere'), $langs->trans('NeedToSetSatisfactionSurvey', $contact['code']), 1, 'warning') . '</a>';
+                                        $outputLine[$contact['rowid']] .= $form->textwithpicto($langs->trans('ClickHere'), $langs->trans('NeedToSetSatisfactionSurvey', dol_strtolower($langs->trans(ucfirst(dol_strtolower($contact['code']))))), 1, 'warning') . '</a>';
                                         $outputLine[$contact['rowid']] .= '</td>';
                                     }
                                 }
@@ -432,14 +432,29 @@ class ActionsDolimeet
                 $filter           = 't.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id;
                 $sessions         = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
                 if (is_array($sessions) && !empty($sessions)) {
-                    foreach ($sessions as $session) {
-                        $sessionDurations += $session->duration;
+                    foreach ($sessions as $sessionSingle) {
+                        $sessionDurations += $sessionSingle->duration;
                     }
-                    $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $langs->transnoentities('TrainingSessionDurations') . '</td>';
-                    $out .= '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00') . '</td></tr>';
+                }
+                if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'trainingsession_durations') {
+                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">';
+                    $out .= '<form enctype="multipart/form-data" action="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '" method="post" name="formextra">';
+                    $out .= '<input type="hidden" name="action" value="update_extras">';
+                    $out .= '<input type="hidden" name="attribute" value="trainingsession_durations">';
+                    $out .= '<input type="hidden" name="token" value="'.newToken().'">';
+                    $out .= '<input type="hidden" name="confirm" value="yes">';
+                    $out .= $form->select_duration('duration', $object->array_options['options_trainingsession_durations'], 0, 'text', 0, 1);
+                    $out .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans('Modify')).'">' . '</td></tr>';
+                } else {
+                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . ($object->array_options['options_trainingsession_durations'] > 0 ? convertSecondToTime($object->array_options['options_trainingsession_durations'], 'allhourmin') : '00:00') . ' - ';
+                    $out .= $langs->trans('CalculatedTotalSessionDuration') . ' ' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00');
+                    if ($sessionDurations != $object->array_options['options_trainingsession_durations']) {
+                        $out .= $form->textwithpicto('', $langs->trans('TrainingSessionDurationErrorMatching', $session->ref), 1, 'warning');
+                    }
+                    $out .= '</td></tr>';
                 } ?>
                 <script>
-                    jQuery('.contrat_extras_trainingsession_location').closest('.trextrafields_collapse_' + <?php echo $object->id; ?>).after(<?php echo json_encode($out); ?>);
+                    jQuery('.valuefield.contrat_extras_trainingsession_durations').replaceWith(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
 
@@ -521,7 +536,7 @@ class ActionsDolimeet
      */
     public function doActions(array $parameters, $object, string $action): int
     {
-        global $conf, $langs, $user;
+        global $conf, $user;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'admincompany') {
@@ -570,9 +585,69 @@ class ActionsDolimeet
                 header('Location: ' . $urlToRedirect);
                 exit;
             }
+
+            if ($action == 'update_extras' && GETPOST('attribute') == 'trainingsession_durations') {
+                $hours    = GETPOST('durationhour', 'int');
+                $minutes  = GETPOST('durationmin', 'int');
+                $duration = convertTime2Seconds($hours, $minutes);
+
+                $object->array_options['options_trainingsession_durations'] = $duration;
+                $object->updateExtrafield('trainingsession_durations');
+                return 1;
+            }
         }
 
         return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     *  Overloading the formObjectOptions function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function formObjectOptions(array $parameters, $object, string $action): int
+    {
+        global $extrafields, $langs;
+
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
+                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
+                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     *  Overloading the printFieldListTitle function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldPreListTitle(array $parameters, $object, string $action): int
+    {
+        global $extrafields, $langs;
+
+        if (strpos($parameters['context'], 'contractlist') !== false) {
+            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
+                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
+                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
     }
 
     /**
@@ -584,20 +659,23 @@ class ActionsDolimeet
     public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
     {
         require_once __DIR__ . '/../class/trainingsession.class.php';
+        require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
 
         $trainingSession = new Trainingsession($this->db);
 
         $linkableObjectTypes['dolimeet_trainsess'] = [
-            'langs'      => 'Trainingsession',
-            'langfile'   => 'dolimeet@dolimeet',
-            'picto'      => $trainingSession->picto,
-            'className'  => 'Trainingsession',
-            'post_name'  => 'fk_trainingsession',
-            'link_name'  => 'dolimeet_trainsess',
-            'name_field' => 'ref',
-            'create_url' => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
-            'class_path' => 'custom/dolimeet/class/trainingsession.class.php',
-            'lib_path'   => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php',
+            'langs'          => 'Trainingsession',
+            'langfile'       => 'dolimeet@dolimeet',
+            'picto'          => $trainingSession->picto,
+            'className'      => 'Trainingsession',
+            'name_field'     => 'ref',
+            'post_name'      => 'fk_trainingsession',
+            'link_name'      => 'dolimeet_trainsess',
+            'tab_type'       => 'trainingsession',
+            'hook_name_list' => 'trainingsessionlist',
+            'hook_name_card' => 'trainingsessioncard',
+            'create_url'     => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
+            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php'
         ];
         $this->results = $linkableObjectTypes;
 
@@ -845,11 +923,40 @@ class ActionsDolimeet
                 $document  = new CompletioncertificateDocument($this->db);
                 $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
-                $duration = 0;
-                $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
+                $contactList   = [];
+                $signedTrainee = [];
+                $sessions      = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
+                // We retrieve internal & external user linked to the contract
+                foreach (['internal', 'external'] as $source) {
+                    $contactList[$source] = $object->liste_contact(-1, $source, 0, 'TRAINEE');
+                    // We need our array keys to start with 1 for further logic
+                    array_unshift($contactList[$source],'');
+                    unset($contactList[$source][0]);
+                }
+                // Because of the structure of $contactList we need a second array where we will remove someone if he is present for ONE session
+                $absentTrainee = $contactList;
+
                 if (is_array($sessions) && !empty($sessions)) {
                     foreach ($sessions as $session) {
-                        $duration += $session->duration;
+                        $signatories = $signatory->fetchSignatories($session->id, 'trainingsession', 'role = "Trainee"');
+                        foreach ($signatories as $signatory) {
+                            $type     = ($signatory->element_type == 'user' ? 'internal' : 'external');
+                            $absentId = array_column($absentTrainee[$type], 'id');
+
+                            // We search for the key in $contactList corresponding to the current $signatory->element_id
+                            array_unshift($absentId,'');
+                            unset($absentId[0]);
+                            // array_search return false (0) if it doesn't find, that's why we need our $absentTrainee array to start by 1
+                            $key = array_search($signatory->element_id, $absentId);
+
+                            if ($signatory->attendance != SaturneSignature::ATTENDANCE_ABSENT) {
+                                // If the $signatory is present then we will remove it from the $absentTrainee array
+                                if ($key > 0) {
+                                    unset($absentTrainee[$type][$key]);
+                                }
+                                $signedTrainee[$type][$signatory->element_id] += $session->duration;
+                            }
+                        }
                     }
                     $lastSession = end($sessions);
                     $dateEnd     = $lastSession->date_end;
@@ -858,30 +965,37 @@ class ActionsDolimeet
                     }
                 }
 
-                $contactList = [];
-                foreach (['internal', 'external'] as $source) {
-                    $contactList = array_merge($contactList, $object->liste_contact(-1, $source, 0, 'TRAINEE'));
+                if (!empty($absentTrainee)) {
+                    foreach ($absentTrainee as $absentType) {
+                        foreach($absentType as $contact) {
+                            setEventMessages($langs->trans('NoCertificateBecauseAbsent', $contact['lastname'], $contact['firstname']), [], 'warnings');
+                        }
+                    }
                 }
 
                 $parameters['moreparams']['object']             = $object;
                 $parameters['moreparams']['object']->element    = 'trainingsession';
                 $parameters['moreparams']['object']->date_start = $object->array_options['options_trainingsession_start'];
                 $parameters['moreparams']['object']->date_end   = $object->array_options['options_trainingsession_end'];
-                $parameters['moreparams']['object']->duration   = $duration;
                 $parameters['moreparams']['object']->fk_contrat = $object->id;
 
-                if (!empty($contactList)) {
-                    foreach ($contactList as $contact) {
-                        $parameters['moreparams']['attendant']               = $signatory;
-                        $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
-                        $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
-                        $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
-                        $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                if (!empty($contactList) && !empty($signedTrainee)) {
+                    foreach ($contactList as $contactType) {
+                        foreach($contactType as $contact) {
+                            if (is_array($signedTrainee[$contact['source']]) && array_key_exists($contact['id'], $signedTrainee[$contact['source']])) {
+                                $parameters['moreparams']['attendant']               = $signatory;
+                                $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
+                                $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
+                                $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
+                                $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                                $parameters['moreparams']['object']->duration        = $signedTrainee[$contact['source']][$contact['id']];
 
-                        $document->element = 'trainingsessiondocument';
-                        $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
-                        if ($result <= 0) {
-                            setEventMessages($document->error, $document->errors, 'errors');
+                                $document->element = 'trainingsessiondocument';
+                                $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                                if ($result <= 0) {
+                                    setEventMessages($document->error, $document->errors, 'errors');
+                                }
+                            }
                         }
                     }
 
