@@ -991,7 +991,7 @@ class ActionsDolimeet
                                 $parameters['moreparams']['object']->duration        = $signedTrainee[$contact['source']][$contact['id']];
 
                                 $document->element = 'trainingsessiondocument';
-                                $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                                $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $langs, $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
                                 if ($result <= 0) {
                                     setEventMessages($document->error, $document->errors, 'errors');
                                 }
