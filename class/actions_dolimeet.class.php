@@ -536,7 +536,7 @@ class ActionsDolimeet
      */
     public function doActions(array $parameters, $object, string $action): int
     {
-        global $conf, $user;
+        global $conf, $langs, $user;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'admincompany') {
