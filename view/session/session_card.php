@@ -459,6 +459,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     unset($object->fields['fk_soc']);     // Hide field already shown in banner.
     unset($object->fields['fk_contrat']); // Hide field already shown in banner.
 
+    $content = $object->fields['content'];
+    unset($object->fields['content']);
+
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
@@ -477,6 +480,21 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     print '</div>';
 
     print '<div class="clearboth"></div>';
+
+    print '<table class="centpercent notopnoleftnoright table-fiche-title">';
+    print '<tbody>';
+    print '<tr class="titre">';
+    print '<td class="nobordernopadding valignmiddle col-title">';
+    print '<div class="titre inline-block">' . $langs->trans($content['label']) . '</div>';
+    print '</td>';
+    print '</tr>';
+    print '<tr>';
+    print '<td>';
+    print '<div class="longmessagecut">' . $object->content . '</div>';
+    print '</td>';
+    print '</tr>';
+    print '</tbody>';
+    print '</table>';
 
     print dol_get_fiche_end();
 
