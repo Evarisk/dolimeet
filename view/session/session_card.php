@@ -465,6 +465,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
+    $object->fields['content'] = $content;
+
     // Categories
     if ($conf->categorie->enabled) {
         print '<tr><td class="valignmiddle">' . $langs->trans('Categories') . '</td><td>';
