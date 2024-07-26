@@ -350,6 +350,23 @@ if (($id || $ref) && $action == 'edit') {
 // Part to show record.
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
     $res = $object->fetch_optionals();
+$filterTech='';
+print '
+				<script type="text/javascript">
+					$(document).ready(function () {
+                        origLnk = $("a[href*=\'/comm/action/card.php?action=create\']");
+                		origLnk.prop("href","' . dol_buildpath('/dolimeet/comm/action/peruser_eventcreation.php', 2) . '?create_from_element_id=' . $object->id. '&create_from_element_type=' . $object->element . $filterTech . '");
+                        multilnk = $("<a>");
+                        multilnk.addClass("btnTitle btnTitlePlus");
+                        multilnk.prop("title","'.$langs->transnoentities('DlpdCreateMultiEvt').'");
+                        multilnk.prop("href","' . dol_buildpath('/dolimeet/comm/action/peruser_eventcreation.php', 2) . '?create_from_element_id=' . $object->id. '&create_from_element_type=' . $object->element . $filterTech . '&multievt=1&clean_session_multievt=1");
+                        multilnk.append($("<span>").addClass("fa fa-user-plus valignmiddle btnTitle-icon"));
+                        origLnk.before(multilnk);
+
+                        //multilnk.addClass("fa fa-calendar-plus");
+					});
+				</script>';
+
 
     $linkback = '<a href="' . dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?restore_lastsearch_values=1&object_type=' . $object->element . '">' . $langs->trans('BackToList') . '</a>';
     saturne_get_fiche_head($object, 'card', $title);
