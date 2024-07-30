@@ -347,6 +347,17 @@ if (($id || $ref) && $action == 'edit') {
     print '</form>';
 }
 
+if ($action == 'set_content' && $user->hasRight("dolimeet", "trainingsession", "write")) {
+    if (!GETPOST('cancel')) {
+        $object->content = GETPOST('content', 'restricthtml');
+        $result = $object->setValueFrom('content', $object->content);
+
+        if ($result < 0) {
+            setEventMessages($object->error, $object->errors, 'errors');
+        }
+    }
+}
+
 // Part to show record.
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
     $res = $object->fetch_optionals();
@@ -458,14 +469,50 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     unset($object->fields['fk_project']); // Hide field already shown in banner.
     unset($object->fields['fk_soc']);     // Hide field already shown in banner.
     unset($object->fields['fk_contrat']); // Hide field already shown in banner.
-
-    $content = $object->fields['content'];
-    unset($object->fields['content']);
-
+    
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-    $object->fields['content'] = $content;
+    if ($user->hasRight("dolimeet", "trainingsession", "write") && $action == 'edit_content') {
+        print '<form action="'.$_SERVER['PHP_SELF'].'" method="post">';
+        print '<input type="hidden" name="token" value="' . newToken() . '">';
+        print '<input type="hidden" name="id" value="' . $object->id . '">';
+        print '<input type="hidden" name="object_type" value="' . $objectType . '">';
+        print '<input type="hidden" name="action" value="set_content">';
+    }
+
+    print '<tr class="liste_titre trforfield"><td class="nowrap titlefield">';
+    print $langs->trans("Content");
+    print '</td><td>';
+    if ($user->hasRight("dolimeet", "trainingsession", "write")) {
+        print '<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=edit_content&token=' . newToken() . '&id=' . $object->id . '&object_type=' . $objectType . '">' . img_edit($langs->trans('Modify')) . '</a>';
+    }
+    print '</td></tr>';
+
+    print '<tr>';
+    print '<td colspan="2">';
+    if ($user->hasRight("dolimeet", "trainingsession", "write") && $action == 'edit_content') {
+        $content = GETPOSTISSET('content') ? GETPOST('content', 'restricthtml') : $object->content;
+        include_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+        $doleditor = new DolEditor('content', $content, '', 250, 'dolibarr_notes', 'In', false, true, isModEnabled('fckeditor'), ROWS_5, '90%');
+        $doleditor->Create();
+    } else {
+        print '<div class="longmessagecut">';
+        print dolPrintHTML($object->content);
+        print '</div>';
+    }
+    if ($user->hasRight("dolimeet", "trainingsession", "write") && $action == 'edit_content') {
+        print '<div class="center">';
+        print '<input type="submit" class="button button-edit" value="' . $langs->trans('Modify') . '">';
+        print '<input type="submit" class="button button-cancel" name="cancel" value="' . $langs->trans("Cancel") . '">';
+        print '</div>';
+    }
+    print '</td>';
+    print '</tr>';
+
+    if ($user->hasRight("dolimeet", "trainingsession", "write") && $action == 'edit_content') {
+        print '</form>';
+    }
 
     // Categories
     if ($conf->categorie->enabled) {
@@ -482,21 +529,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     print '</div>';
 
     print '<div class="clearboth"></div>';
-
-    print '<table class="centpercent notopnoleftnoright table-fiche-title">';
-    print '<tbody>';
-    print '<tr class="titre">';
-    print '<td class="nobordernopadding valignmiddle col-title">';
-    print '<div class="titre inline-block">' . $langs->trans($content['label']) . '</div>';
-    print '</td>';
-    print '</tr>';
-    print '<tr>';
-    print '<td>';
-    print '<div class="longmessagecut">' . $object->content . '</div>';
-    print '</td>';
-    print '</tr>';
-    print '</tbody>';
-    print '</table>';
 
     print dol_get_fiche_end();
 
