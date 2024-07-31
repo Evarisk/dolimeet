@@ -70,7 +70,7 @@ class ActionsDolimeet
     public function constructCategory(array $parameters): int
     {
         // Do something only for the current context.
-        if (in_array($parameters['currentcontext'], ['category', 'sessioncard'])) {
+        if (preg_match('/category|sessioncard/', $parameters['context'])) {
             $tags = [
                 'meeting'       => [
                     'id'        => 436304001,
