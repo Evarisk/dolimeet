@@ -458,7 +458,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     unset($object->fields['fk_project']); // Hide field already shown in banner.
     unset($object->fields['fk_soc']);     // Hide field already shown in banner.
     unset($object->fields['fk_contrat']); // Hide field already shown in banner.
-    
+
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
