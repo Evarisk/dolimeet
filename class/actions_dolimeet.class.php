@@ -884,38 +884,7 @@ class ActionsDolimeet
         global $conf, $langs;
 
         // Do something only for the current context
-        if (strpos($parameters['context'], 'trainingsessioncard') !== false) {
-            if (preg_match('/completioncertificate/', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']))) {
-                $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
-                $document  = new SessionDocument($this->db, $object->element . 'document');
-
-                $signatoriesArray = $signatory->fetchSignatories($object->id, $object->type);
-                if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
-                    foreach ($signatoriesArray as $objectSignatory) {
-                        if ($objectSignatory->role == 'Trainee' && $objectSignatory->attendance != $objectSignatory::ATTENDANCE_ABSENT) {
-                            $parameters['moreparams']['attendant'] = $objectSignatory;
-                            $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
-                            if ($result <= 0) {
-                                setEventMessages($document->error, $document->errors, 'errors');
-                                $action = '';
-                            }
-                        }
-                    }
-                    $documentType = explode('_odt', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']));
-                    if ($document->element != $documentType[0]) {
-                        $document->element = $documentType[0];
-                    }
-                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=dolimeet&file=' . urlencode($document->element . '/' . $object->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $document->last_main_doc, []);
-                    $urlToRedirect = $_SERVER['REQUEST_URI'];
-                    $urlToRedirect = preg_replace('/#builddoc$/', '', $urlToRedirect);
-                    $urlToRedirect = preg_replace('/action=builddoc&?/', '', $urlToRedirect); // To avoid infinite loop
-                    if (!GETPOST('forcebuilddoc')){
-                        header('Location: ' . $urlToRedirect . '#builddoc');
-                        exit;
-                    }
-                }
-            }
-        } else if (strpos($parameters['context'], 'contractcard') !== false) {
+        if (strpos($parameters['context'], 'contractcard') !== false) {
             if (strpos((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), 'completioncertificate') !== false) {
                 require_once __DIR__ . '/session.class.php';
 
