@@ -545,17 +545,15 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                     $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC));
                 }
                 if (!empty($fileList)) {
-                    $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
+                    $fileType = ['attendancesheetdocument' => 0];
                     foreach ($fileList as $file) {
                         if (!strstr($file['name'], 'specimen')) {
                             if (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('attendancesheetdocument'))) && $fileType['attendancesheetdocument'] == 0) {
                                 $fileType['attendancesheetdocument'] = 1;
-                            } elseif (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('completioncertificatedocument'))) && $fileType['completioncertificatedocument'] < $nbTrainee) {
-                                $fileType['completioncertificatedocument']++;
                             }
                         }
                     }
-                    if ($fileType['attendancesheetdocument'] == 1 && $fileType['completioncertificatedocument'] == $nbTrainee) {
+                    if ($fileType['attendancesheetdocument'] == 1) {
                         $forceBuildDoc = 0;
                     } else {
                         $forceBuildDoc = 1;
@@ -639,15 +637,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $ref, 'files', 0, '(\.pdf)', '', 'date', SORT_DESC));
         }
         if (!empty($fileList) && is_array($fileList)) {
-            $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
+            $fileType = ['attendancesheetdocument' => 0];
             foreach ($fileList as $file) {
                 if (!strstr($file['name'], 'specimen')) {
                     if (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('attendancesheetdocument'))) && $fileType['attendancesheetdocument'] == 0) {
                         $files[] = $file['fullname'];
                         $fileType['attendancesheetdocument'] = 1;
-                    } elseif (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('completioncertificatedocument'))) && $fileType['completioncertificatedocument'] < $nbTrainee) {
-                        $files[] = $file['fullname'];
-                        $fileType['completioncertificatedocument']++;
                     }
                 }
             }

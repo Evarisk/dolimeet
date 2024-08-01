@@ -834,10 +834,6 @@ class ActionsDolimeet
                 'AttendanceSheetDocument' => [
                     'documentType' => 'attendancesheetdocument',
                     'picto'        => 'fontawesome_fa-people-arrows_fas_#d35968'
-                ],
-                'CompletionCertificateDocument' => [
-                    'documentType' => 'completioncertificatedocument',
-                    'picto'        => 'fontawesome_fa-people-arrows_fas_#d35968'
                 ]
             ];
             $this->results = $types;
