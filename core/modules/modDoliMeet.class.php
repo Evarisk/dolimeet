@@ -632,6 +632,9 @@ class modDoliMeet extends DolibarrModules
         $extraFields->update('trainingsession_durations', 'TrainingSessionDurations', 'int', '', 'contrat', 0, 0, $this->numero . 50, '', '', '', 1, 'TrainingSessionDurationHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
         $extraFields->addExtraField('trainingsession_durations', 'TrainingSessionDurations', 'int', $this->numero . 50, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionDurationHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
 
+        $extraFields->update('trainingsession_opco_financing', 'TrainingSessionOpcoFinancing', 'boolean', '', 'contrat', 0, 0, $this->numero . 60, '', '', '', 1, 'TrainingSessionOpcoFinancingHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+        $extraFields->addExtraField('trainingsession_opco_financing', 'TrainingSessionOpcoFinancing', 'boolean', $this->numero . 60, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionOpcoFinancingHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+
         return $this->_init($sql, $options);
     }
 

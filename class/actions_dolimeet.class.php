@@ -104,6 +104,26 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the addHtmlHeader function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addHtmlHeader(array $parameters): int
+    {
+        if (strpos($parameters['context'], 'contractcard') !== false) {
+            $resourcesRequired = ['css' => '/custom/saturne/css/saturne.min.css'];
+
+            $out  = '<!-- Includes CSS added by module saturne -->';
+            $out .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath($resourcesRequired['css'], 1) . '">';
+
+            $this->resprints = $out;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the printCommonFooter function : replacing the parent's function with the one below.
      *
      * @param  array     $parameters Hook metadatas (context, etc...).
@@ -210,7 +230,7 @@ class ActionsDolimeet
 
                 saturne_load_langs();
 
-                $survey   = new Survey($this->db);
+                $survey    = new Survey($this->db);
                 $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
@@ -693,26 +713,48 @@ class ActionsDolimeet
     {
         global $langs;
 
-        // Do something only for the current context.
         if (strpos($parameters['context'], 'contractcard') !== false) {
-            if (isModEnabled('contrat')) {
-                $error = 0;
-                $attendantInternalSessionTrainerArray = $object->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
-                $attendantInternalTraineeArray        = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
-                $attendantExternalSessionTrainerArray = $object->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
-                $attendantExternalTraineeArray        = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
+            if (!empty($object->array_options['options_trainingsession_type'])) {
+                $contacts             = [];
+                $contactRoleBySources = [
+                    'internal' => [
+                        'warning' => ['trainee', 'sessiontrainer']
+                    ],
+                    'external' => [
+                        'info'    => ['billing', 'customer'],
+                        'warning' => ['trainee', 'sessiontrainer', 'opco']
+                    ]
+                ];
+                foreach ($contactRoleBySources as $contactSource => $contactNoticeTypes) {
+                    foreach ($contactNoticeTypes as $contactNoticeType => $contactRoles) {
+                        foreach ($contactRoles as $contactRole) {
+                            if (empty($object->liste_contact(-1, $contactSource, 0, dol_strtoupper($contactRole)))) {
+                                $contacts[$contactNoticeType][$contactRole]++;
+                                if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
+                                    $contacts['info']['opco']++;
+                                    unset($contacts['warning']['opco']);
+                                }
+                            }
+                        }
+                    }
+                }
 
-                if ((is_array($attendantInternalSessionTrainerArray) && empty($attendantInternalSessionTrainerArray)) && (is_array($attendantExternalSessionTrainerArray) && empty($attendantExternalSessionTrainerArray))) {
-                    $error++;
-                }
-                if ((is_array($attendantInternalTraineeArray) && empty($attendantInternalTraineeArray)) && (is_array($attendantExternalTraineeArray) && empty($attendantExternalTraineeArray))) {
-                    $error++;
+                $moreHtmlStatus = '';
+                foreach ($contacts as $contactNoticeType => $contactRoles) {
+                    $moreHtmlStatus .= '<div class="wpeo-notice notice-' . $contactNoticeType . '">';
+                    $moreHtmlStatus .= '<div class="notice-content">';
+                    $moreHtmlStatus .= '<div class="notice-title">';
+                    foreach ($contactRoles as $contactRole => $role) {
+                        if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
+                            $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                            continue;
+                        }
+                        $moreHtmlStatus .= $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                    }
+                    $moreHtmlStatus .= '</div></div></div>';
                 }
 
-                if (!empty($object->array_options['options_trainingsession_type']) && $error > 0) {
-                    $moreHtmlStatus = '<br><br><div><i class="fas fa-3x fa-exclamation-triangle pictowarning"></i> ' . $langs->trans('DontForgotAddSessionTrainerAndTrainee') . '</div>';
-                    $this->resprints = $moreHtmlStatus;
-                }
+                $this->resprints = $moreHtmlStatus;
             }
         }
 
