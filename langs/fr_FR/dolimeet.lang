@@ -46,7 +46,7 @@ OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par d
 #
 
 # Data - Donnée
-EnableDoliMeet = Veuillez activer le module DoliMeet pour accéder à cette page
+EnableDolimeet = Veuillez activer le module DoliMeet pour accéder à cette page
 
 
 

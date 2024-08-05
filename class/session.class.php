@@ -554,18 +554,20 @@ class Session extends SaturneObject
      */
     public function loadDashboard(): array
     {
+        global $langs;
+
         $getSessionInfos   = self::getSessionInfos();
         $getAttendantInfos = self::getAttendantInfos();
 
         $array['widgets'] = [
             0 => [
-                'label'      => [$getSessionInfos['meeting']['label'] ?? '', $getSessionInfos['trainingsession']['label'] ?? '', $getSessionInfos['audit']['label'] ?? ''],
-                'content'    => [$getSessionInfos['meeting']['content'] ?? 0, $getSessionInfos['trainingsession']['content'] ?? 0, $getSessionInfos['audit']['content'] ?? 0],
-                'picto'      => $getSessionInfos['picto'],
-                'widgetName' => $getSessionInfos['widgetName']
+                'label'         => [$langs->transnoentities('NbMeetings'), $langs->transnoentities('NbTrainingsessions'), $langs->transnoentities('NbAudits')],
+                'content'       => [$getSessionInfos['meeting']['content'] ?? 0, $getSessionInfos['trainingsession']['content'] ?? 0, $getSessionInfos['audit']['content'] ?? 0],
+                'picto'         => $getSessionInfos['picto'],
+                'widgetName'    => $getSessionInfos['widgetName']
             ],
             1 => [
-                'label'      => [$getSessionInfos['meeting']['moyenneDuration']['label'] ?? '', $getSessionInfos['trainingsession']['moyenneDuration']['label'] ?? '', $getSessionInfos['audit']['moyenneDuration']['label'] ?? ''],
+                'label'      => [$langs->transnoentities('MoyenneDurationMeetings'), $langs->transnoentities('MoyenneDurationTrainingsessions'), $langs->transnoentities('MoyenneDurationAudits')],
                 'content'    => [$getSessionInfos['meeting']['moyenneDuration']['content'] ?? 0, $getSessionInfos['trainingsession']['moyenneDuration']['content'] ?? 0, $getSessionInfos['audit']['moyenneDuration']['content'] ?? 0],
                 'picto'      => $getSessionInfos['picto'],
                 'widgetName' => $getSessionInfos['widgetName2']
@@ -622,27 +624,21 @@ class Session extends SaturneObject
             foreach ($sessions as $session) {
                 switch ($session->type) {
                     case 'meeting' :
-                        $array['meeting']['label'] = $langs->transnoentities('NbMeetings');
                         $array['meeting']['content']++;
                         if (!empty($session->date_start) && !empty($session->date_end)) {
-                            $array['meeting']['moyenneDuration']['label'] = $langs->transnoentities('MoyenneDurationMeetings');
-                            $array['meeting']['duration']['content']     += $session->date_end - $session->date_start;
+                            $array['meeting']['duration']['content'] += $session->date_end - $session->date_start;
                         }
                         break;
                     case 'trainingsession' :
-                        $array['trainingsession']['label'] = $langs->transnoentities('NbTrainingsessions');
                         $array['trainingsession']['content']++;
                         if (!empty($session->duration)) {
-                            $array['trainingsession']['moyenneDuration']['label'] = $langs->transnoentities('MoyenneDurationTrainingsessions');
-                            $array['trainingsession']['duration']['content']     += $session->duration;
+                            $array['trainingsession']['duration']['content'] += $session->duration;
                         }
                         break;
                     case 'audit' :
-                        $array['audit']['label'] = $langs->transnoentities('NbAudits');
                         $array['audit']['content']++;
                         if (!empty($session->date_start) && !empty($session->date_end)) {
-                            $array['audit']['moyenneDuration']['label'] = $langs->transnoentities('MoyenneDurationAudits');
-                            $array['audit']['duration']['content']     += $session->date_end - $session->date_start;
+                            $array['audit']['duration']['content'] += $session->date_end - $session->date_start;
                         }
                         break;
                 }
