@@ -607,8 +607,7 @@ class ActionsDolimeet
             }
         }
 
-        // Do something only for the current context
-        if ($parameters['currentcontext'] == 'propalcard') {
+        if (strpos($parameters['context'], 'propalcard') !== false) {
             if ($action == 'create_formation') {
                 // Load Dolibarr libraries
                 require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
@@ -636,6 +635,31 @@ class ActionsDolimeet
                     $propalLine->rang           = $formationService['position'];
                     $propalLine->product_type   = 0;
                     $propalLine->insert($user);
+                }
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     *  Overloading the printFieldListTitle function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldPreListTitle(array $parameters, $object, string $action): int
+    {
+        global $extrafields, $langs;
+
+        if (strpos($parameters['context'], 'contractlist') !== false) {
+            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
+                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
+                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
                 }
             }
         }
