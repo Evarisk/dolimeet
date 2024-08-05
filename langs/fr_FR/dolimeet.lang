@@ -38,6 +38,9 @@ SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
 SessiontrainerSatisfactionSurveyDescription = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction formateur
 OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
 OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction OPCO
+TrainingContract                            = Convention de formation
+WelcomeBooklet                              = Livret d'acceuil
+RulesOfProcedure                            = Réglement intérieur
 
 
 

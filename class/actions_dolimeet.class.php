@@ -103,6 +103,48 @@ class ActionsDolimeet
         return 0; // or return 1 to replace standard code.
     }
 
+
+    /**
+     * Overloading the printCommonFooter function : replacing the parent's function with the one below.
+     *
+     * @param  array     $parameters Hook metadatas (context, etc...).
+     * @return int                   0 < on error, 0 on success, 1 to replace standard code.
+     * @throws Exception
+     */
+    public function formObjectOptions(array $parameters): int
+    {
+        if (strpos($parameters['context'], 'propalcard') !== false) {
+            global $extrafields;
+
+            $extrafields->attributes['propal']['hidden']['trainingsession_location']  = 1;
+            $extrafields->attributes['propal']['hidden']['trainingsession_start']     = 1;
+            $extrafields->attributes['propal']['hidden']['trainingsession_end']       = 1;
+            $extrafields->attributes['propal']['hidden']['trainingsession_durations'] = 1;
+
+            ?>
+            <script>
+                $(document).on('change', '#options_trainingsession_type', function() {
+                    var type = $(this).val();
+                    console.log(type);
+                    if (type > 0) {
+                        $('#options_trainingsession_location').closest('tr').show();
+                        $('#options_trainingsession_start').closest('tr').show();
+                        $('#options_trainingsession_end').closest('tr').show();
+                        $('#options_trainingsession_durations').closest('tr').show();
+                    } else {
+                        $('#options_trainingsession_location').closest('tr').hide();
+                        $('#options_trainingsession_start').closest('tr').hide();
+                        $('#options_trainingsession_end').closest('tr').hide();
+                        $('#options_trainingsession_durations').closest('tr').hide();
+                    }
+                });
+            </script>
+            <?php
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
     /**
      * Overloading the printCommonFooter function : replacing the parent's function with the one below.
      *

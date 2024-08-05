@@ -63,20 +63,23 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
 function get_formation_service(): array
 {
     return [
-        ]
-            'position' => 30
-            'code'     => 'DOLIMEET_WELCOME_BOOKLET',
+        [
+            'position' => 10,
+            'code'     => 'DOLIMEET_SERVICE_TRAINING_CONTRACT',
+            'ref'      => 'F0',
+            'name'     => 'TrainingContract',
+        ],
+        [
+            'position' => 30,
+            'code'     => 'DOLIMEET_SERVICE_WELCOME_BOOKLET',
+            'ref'      => 'LA1',
             'name'     => 'WelcomeBooklet',
-        [
         ],
-            'position' => 20
-            'code'     => 'DOLIMEET_TRAINING_DATES',
-            'name'     => 'TrainingDates',
         [
-        ],
-            'position' => 10
-            'code'     => 'DOLIMEET_TRAINEES_LIST',
-            'name'     => 'TraineesList',
-        [
+            'position' => 40,
+            'code'     => 'DOLIMEET_SERVICE_RULES_OF_PROCEDURE',
+            'ref'      => 'RA1',
+            'name'     => 'RulesOfProcedure',
+        ]
     ];
 }
