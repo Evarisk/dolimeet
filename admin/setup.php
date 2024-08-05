@@ -95,6 +95,11 @@ if ($action == 'update_formation_service') {
         }
     }
 
+    $traningSessionLocation = GETPOST('training_session_location');
+    if ($traningSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
+        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $traningSessionLocation, 'chaine', 0, '', $conf->entity);
+    }
+
     setEventMessage('SavedConfig');
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
@@ -176,13 +181,20 @@ print '</tr>';
 
 // FormationServices
 foreach ($formationServices as $formationService) {
-    print '<tr class="oddeven"><td><label for="' . $formationService['name'] . '">' . $langs->transnoentities($formationService['name']) . '</label></td><td>';
+    print '<tr class="oddeven"><td>' . $langs->transnoentities($formationService['name']) . '</td><td>';
     print img_picto('', 'service', 'class="pictofixedwidth"');
     $formationServiceCode = $formationService['code'];
-    $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'maxwidth500 widthcentpercentminusxx', 1);
-    print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&statut=0&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
+    $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'minwidth300 maxwidth400 widthcentpercentminusxx', 1);
+    print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&type=1&ref=' . $formationService['ref'] . '&label=' . $langs->transnoentities($formationService['name']) . '&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?' . $formationService['name'] . '=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
     print '</td></tr>';
 }
+
+// Training session location
+print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionLocation') . '</td><td>';
+print '<input type="radio" id="TrainingSessionLocationCompany" name="training_session_location" value="TrainingSessionLocationCompany"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationCompany' ? 'checked' : '') . '/><label for="TrainingSessionLocationCompany">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationCompany') . '</label><br>';
+print '<input type="radio" id="TrainingSessionLocationThirdParty" name="training_session_location" value="TrainingSessionLocationThirdParty"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationThirdParty' ? 'checked' : '') . '/><label for="TrainingSessionLocationThirdParty">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationThirdParty') . '</label><br>';
+print '<input type="radio" id="TrainingSessionLocationOther" name="training_session_location" value="TrainingSessionLocationOther"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationOther' ? 'checked' : '') . '/><label for="TrainingSessionLocationOther">' . img_picto('', 'fontawesome_fa-font_fas', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationOther') . '</label>';
+print '</td></tr>';
 
 print '</table>';
 print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
