@@ -609,6 +609,25 @@ class modDoliMeet extends DolibarrModules
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', json_encode($emailTemplateSatisfactionSurvey), 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 1, 'integer', 0, '', $conf->entity);
         }
+        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 1) {
+            require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
+            $saturneMail = new SaturneMail($this->db);
+
+            $saturneMail->entity        = 0;
+            $saturneMail->type_template = 'contract';
+            $saturneMail->lang          = 'fr_FR';
+            $saturneMail->datec         = $this->db->idate(dol_now());
+            $saturneMail->label         = $langs->transnoentities('CompletionCertificateDocumentLabel');
+            $saturneMail->position      = 100;
+            $saturneMail->enabled       = "isModEnabled('dolimeet')";
+            $saturneMail->topic         = $langs->transnoentities('CompletionCertificateDocumentTopic');
+            $saturneMail->joinfiles     = 1;
+            $saturneMail->content       = $langs->transnoentities('CompletionCertificateDocumentContent');
+
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $saturneMail->create($user), 'chaine', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 2, 'integer', 0, '', $conf->entity);
+        }
 
         // Create extrafields during init.
         require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
