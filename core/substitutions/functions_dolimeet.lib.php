@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2023-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,4 +126,14 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
             }
         }
     }
+
+    $substitutionarray['__DOLIMEET_SERVICE_LABEL__']                    = '';
+    $substitutionarray['__DOLIMEET_TRAINING_SESSION_HOURS_DURATIONS__'] = '';
+    $substitutionarray['__DOLIMEET_TRAINING_SESSION_DAYS_DURATIONS__']  = '';
+    $substitutionarray['__DOLIMEET_PROPAL_REF__']                       = '';
+    $substitutionarray['__DOLIMEET_FORMATION_PROJECT_LABEL__']          = $langs->transnoentities('Formation') . ' - ';
+    $substitutionarray['__DOLIMEET_FORMATION_PROJECT_LABEL__']         .= $substitutionarray['__DOLIMEET_SERVICE_LABEL__'] . ' - ';
+    $substitutionarray['__DOLIMEET_FORMATION_PROJECT_LABEL__']         .= $substitutionarray['__TRAINING_SESSION_HOURS_DURATIONS__'] . ' - ';
+    $substitutionarray['__DOLIMEET_FORMATION_PROJECT_LABEL__']         .= $substitutionarray['__TRAINING_SESSION_DAYS_DURATIONS__'] . ' - ';
+    $substitutionarray['__DOLIMEET_FORMATION_PROJECT_LABEL__']         .= $substitutionarray['__PROPAL_REF__'];
 }

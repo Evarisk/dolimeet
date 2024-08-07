@@ -32,6 +32,9 @@ if (file_exists('../dolimeet.main.inc.php')) {
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+if (isModEnabled('fckeditor')) {
+    require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+}
 
 // Load DoliMeet libraries
 require_once __DIR__ . '/../lib/dolimeet.lib.php';
@@ -98,6 +101,13 @@ if ($action == 'update_formation_service') {
     $traningSessionLocation = GETPOST('training_session_location');
     if ($traningSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
         dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $traningSessionLocation, 'chaine', 0, '', $conf->entity);
+    }
+
+    if (isModEnabled('fckeditor')) {
+        $formationProjectLabel = GETPOST('DOLIMEET_FORMATION_PROJECT_LABEL', 'none');
+        if ($formationProjectLabel != getDolGlobalString('DOLIMEET_FORMATION_PROJECT_LABEL')) {
+            dolibarr_set_const($db, 'DOLIMEET_FORMATION_PROJECT_LABEL', $formationProjectLabel, 'chaine', 0, '', $conf->entity);
+        }
     }
 
     setEventMessage('SavedConfig');
@@ -195,6 +205,28 @@ print '<input type="radio" id="TrainingSessionLocationCompany" name="training_se
 print '<input type="radio" id="TrainingSessionLocationThirdParty" name="training_session_location" value="TrainingSessionLocationThirdParty"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationThirdParty' ? 'checked' : '') . '/><label for="TrainingSessionLocationThirdParty">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationThirdParty') . '</label><br>';
 print '<input type="radio" id="TrainingSessionLocationOther" name="training_session_location" value="TrainingSessionLocationOther"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationOther' ? 'checked' : '') . '/><label for="TrainingSessionLocationOther">' . img_picto('', 'fontawesome_fa-font_fas', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationOther') . '</label>';
 print '</td></tr>';
+
+if (isModEnabled('fckeditor')) {
+    $substitutionArray = getCommonSubstitutionArray($langs);
+    complete_substitutions_array($substitutionArray, $langs);
+
+    // Substitution array/string
+    $helpForSubstitution = '';
+    if (is_array($substitutionArray) && count($substitutionArray)) {
+        $helpForSubstitution .= $langs->trans('AvailableVariables') . ' : <br>';
+    }
+    foreach ($substitutionArray as $key => $val) {
+        $helpForSubstitution .= $key . ' -> '. $langs->trans(dol_string_nohtmltag(dolGetFirstLineOfText($val))) . '<br>';
+    }
+
+    // Formation project label
+    $formationProjectLabel = $langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PROJECT_LABEL')) ?: $langs->transnoentities('FormationProjectLabel');
+    print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('FormationProjectLabelTitle'), $helpForSubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
+    print '</td><td>';
+    $dolEditor = new DolEditor('DOLIMEET_FORMATION_PROJECT_LABEL', $formationProjectLabel, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+    $dolEditor->Create();
+    print '</td></tr>';
+}
 
 print '</table>';
 print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
