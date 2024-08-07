@@ -177,6 +177,12 @@ if (!empty($fromType)) {
             $search['search_internal_attendants'] = $fromID;
             $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
+        case 'product' :
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
+            $objectLinked                         = new Product($db);
+            $search['search_internal_attendants'] = $fromID;
+            $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
+            break;
         default :
             $error++;
             $objectLinked = null;

@@ -46,4 +46,9 @@ INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `activ
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
-
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'internal', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'internal', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'internal', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
