@@ -139,7 +139,7 @@ class ActionsDolimeet
     {
         global $extrafields, $langs;
 
-        if (preg_match('/propalcard|projectcard/', $parameters['context'])) {
+        if (preg_match('/projectcard|propalcard|contractcard/', $parameters['context'])) {
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
             $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
@@ -152,7 +152,15 @@ class ActionsDolimeet
             $extrafields->attributes['propal']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_end']);
             $extrafields->attributes['propal']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_durations']);
 
+            $extrafields->attributes['contrat']['label']['label']                     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
+            $extrafields->attributes['contrat']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
+            $extrafields->attributes['contrat']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
+            $extrafields->attributes['contrat']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
+            $extrafields->attributes['contrat']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
+            $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
+
             if (strpos($parameters['context'], 'propalcard') !== false) {
+                $extrafields->attributes['propal']['hidden']['trainingsession_service']   = 1;
                 $extrafields->attributes['propal']['hidden']['trainingsession_location']  = 1;
                 $extrafields->attributes['propal']['hidden']['trainingsession_start']     = 1;
                 $extrafields->attributes['propal']['hidden']['trainingsession_end']       = 1;
@@ -840,6 +848,57 @@ class ActionsDolimeet
                     $moreHtmlStatus = '<br><br><div><i class="fas fa-3x fa-exclamation-triangle pictowarning"></i> ' . $langs->trans('DontForgotAddSessionTrainerAndTrainee') . '</div>';
                     $this->resprints = $moreHtmlStatus;
                 }
+            }
+        }
+
+        if (strpos($parameters['context'], 'projectcard') !== false) {
+            // Load DoliMeet libraries
+            require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+
+            $error             = 0;
+            $formationServices = get_formation_service();
+            foreach ($formationServices as $formationService) {
+                $formationServiceID = getDolGlobalInt($formationService['code']);
+                if ($formationServiceID <= 0) {
+                    $error++;
+                }
+            }
+
+            if ($error > 0) {
+                $moreHtmlStatus  = '<div class="wpeo-notice notice-warning">';
+                $moreHtmlStatus .= '<div class="notice-content">';
+                $moreHtmlStatus .= '<div class="notice-title">' . $langs->trans('ServicesNotConfiguredForTraining');
+                $moreHtmlStatus .= '<div class="notice-subtitle"><a class="butAction" href="' . dol_buildpath('custom/dolimeet/admin/setup.php', 1) . '">' . img_picto('', 'fontawesome_fa-cog_fas', 'class="paddingright"') . $langs->trans('Config') . '</a></div>';
+                $moreHtmlStatus .= '</div></div></div>';
+
+                $this->resprints = $moreHtmlStatus;
+            }
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the dolGetButtonAction function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function dolGetButtonAction(array $parameters, $object, string $action): int
+    {
+        global $langs;
+
+        if (strpos($parameters['context'], 'projectcard') !== false) {
+            $langs->load('propal');
+            if ($parameters['html'] == $langs->trans('AddProp')) {
+                $explodedCompiledAttributes       = explode('projectid', $parameters['compiledAttributes']);
+                $parameters['compiledAttributes'] = $explodedCompiledAttributes[0] . 'options_trainingsession_type=' . $object->array_options['options_trainingsession_type'] . '&options_trainingsession_service=' . $object->array_options['options_trainingsession_service'] . '&projectid' . $explodedCompiledAttributes[1];
+
+                $this->resprints = '<' . $parameters['tag'] . ' ' . $parameters['compiledAttributes'] . '>' . dol_escape_htmltag($parameters['html']) . '</' . $parameters['tag'] . '>';
+
+                return 1;
             }
         }
 
