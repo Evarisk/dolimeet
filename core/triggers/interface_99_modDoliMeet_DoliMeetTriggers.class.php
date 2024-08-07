@@ -238,7 +238,34 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     }
                 }
                 break;
+
+            case 'PROPAL_CREATE' :
+                // Load DoliMeet libraries
+                require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+
+                $product    = new Product($this->db);
+                $propalLine = new PropaleLigne($this->db);
+
+                $formationServices = get_formation_service();
+
+                foreach ($formationServices as $formationService) {
+                    $confName = $formationService['code'];
+                    $product->fetch($conf->global->$confName);
+                    $propalLine->fk_propal      = $object->id;
+                    $propalLine->fk_parent_line = 0;
+                    $propalLine->fk_product     = $product->id;
+                    $propalLine->product_label  = $product->label;
+                    $propalLine->product_desc   = $product->description;
+                    $propalLine->tva_tx         = 20;
+                    $propalLine->date_creation  = $object->db->idate(dol_now());
+                    $propalLine->qty            = 1;
+                    $propalLine->rang           = $formationService['position'];
+                    $propalLine->product_type   = 1;
+                    $propalLine->insert($user);
+                }
+                break;
         }
+
         return 0;
     }
 }

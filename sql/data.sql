@@ -38,3 +38,12 @@ INSERT INTO llx_c_email_templates (entity, module, type_template, lang, private,
 
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'internal', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+
+-- 1.5.0
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'internal', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'internal', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'internal', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+

@@ -103,47 +103,151 @@ class ActionsDolimeet
         return 0; // or return 1 to replace standard code.
     }
 
+    /**
+     * Overloading the addHtmlHeader function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addHtmlHeader(array $parameters): int
+    {
+        if (strpos($parameters['context'], 'projectcard') !== false) {
+            $resourcesRequired = [
+                'css' => '/custom/saturne/css/saturne.min.css',
+                'js'  => '/custom/saturne/js/saturne.min.js'
+            ];
+
+            $out  = '<!-- Includes CSS added by module saturne -->';
+            $out .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath($resourcesRequired['css'], 1) . '">';
+            $out .= '<!-- Includes JS added by module saturne -->';
+            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+
+            $this->resprints = $out;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
 
     /**
-     * Overloading the printCommonFooter function : replacing the parent's function with the one below.
+     * Overloading the formObjectOptions function : replacing the parent's function with the one below
      *
-     * @param  array     $parameters Hook metadatas (context, etc...).
-     * @return int                   0 < on error, 0 on success, 1 to replace standard code.
+     * @param  array     $parameters Hook metadatas (context, etc...)
+     * @return int                   0 < on error, 0 on success, 1 to replace standard code
      * @throws Exception
      */
     public function formObjectOptions(array $parameters): int
     {
-        if (strpos($parameters['context'], 'propalcard') !== false) {
-            global $extrafields;
+        global $extrafields, $langs;
 
-            $extrafields->attributes['propal']['hidden']['trainingsession_location']  = 1;
-            $extrafields->attributes['propal']['hidden']['trainingsession_start']     = 1;
-            $extrafields->attributes['propal']['hidden']['trainingsession_end']       = 1;
-            $extrafields->attributes['propal']['hidden']['trainingsession_durations'] = 1;
+        if (preg_match('/propalcard|projectcard/', $parameters['context'])) {
+            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+
+            $extrafields->attributes['projet']['label']['trainingsession_type']    = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
+            $extrafields->attributes['projet']['label']['trainingsession_service'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
+
+            $extrafields->attributes['propal']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
+            $extrafields->attributes['propal']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
+            $extrafields->attributes['propal']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_start']);
+            $extrafields->attributes['propal']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_end']);
+            $extrafields->attributes['propal']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_durations']);
+
+            if (strpos($parameters['context'], 'propalcard') !== false) {
+                $extrafields->attributes['propal']['hidden']['trainingsession_location']  = 1;
+                $extrafields->attributes['propal']['hidden']['trainingsession_start']     = 1;
+                $extrafields->attributes['propal']['hidden']['trainingsession_end']       = 1;
+                $extrafields->attributes['propal']['hidden']['trainingsession_durations'] = 1;
+
+                ?>
+                <script>
+                    $(document).on('change', '#options_trainingsession_type', function() {
+                        var type = $(this).val();
+                        if (type > 0) {
+                            $('#options_trainingsession_location').closest('tr').show();
+                            $('#options_trainingsession_start').closest('tr').show();
+                            $('#options_trainingsession_end').closest('tr').show();
+                            $('#options_trainingsession_durations').closest('tr').show();
+                        } else {
+                            $('#options_trainingsession_location').closest('tr').hide();
+                            $('#options_trainingsession_start').closest('tr').hide();
+                            $('#options_trainingsession_end').closest('tr').hide();
+                            $('#options_trainingsession_durations').closest('tr').hide();
+                        }
+                    });
+                </script>
+                <?php
+            }
+
+            if (strpos($parameters['context'], 'projectcard') !== false) {
+                $extrafields->attributes['projet']['hidden']['trainingsession_service'] = 1;
+
+                ?>
+                <script>
+                    $(document).on('change', '#options_trainingsession_type', function() {
+                        var type = $(this).val();
+                        if (type > 0) {
+                            $('#options_trainingsession_service').closest('tr').show();
+                        } else {
+                            $('#options_trainingsession_service').closest('tr').hide();
+                        }
+                    });
+                    $(document).on('change', '#options_trainingsession_service', function() {
+                        $('.tableforfieldcreate tr').eq(1).find('td').eq(1).find('input[type="text"]').val($(this).find('option:selected').text());
+                        window.saturne.loader.display($('.tableforfieldcreate tr').eq(1).find('td').eq(1));
+                        setTimeout(function() {
+                            window.saturne.loader.remove($('.tableforfieldcreate tr').eq(1).find('td').eq(1));
+                        }, 1000);
+                    });
+                </script>
+                <?php
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printObjectLineTitle function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printObjectLineTitle(array $parameters, $object, string $action): int
+    {
+        global $langs;
+
+        if (strpos($parameters['context'], 'propalcard') !== false) {
+            $out = '<th class="linecolaction">' . $langs->transnoentities('Action') . '</th>'
 
             ?>
             <script>
-                $(document).on('change', '#options_trainingsession_type', function() {
-                    var type = $(this).val();
-                    console.log(type);
-                    if (type > 0) {
-                        $('#options_trainingsession_location').closest('tr').show();
-                        $('#options_trainingsession_start').closest('tr').show();
-                        $('#options_trainingsession_end').closest('tr').show();
-                        $('#options_trainingsession_durations').closest('tr').show();
-                    } else {
-                        $('#options_trainingsession_location').closest('tr').hide();
-                        $('#options_trainingsession_start').closest('tr').hide();
-                        $('#options_trainingsession_end').closest('tr').hide();
-                        $('#options_trainingsession_durations').closest('tr').hide();
-                    }
-                });
+                $('#linecoldescription').after(<?php echo json_encode($out); ?>);
             </script>
             <?php
         }
 
         return 0; // or return 1 to replace standard code
     }
+
+    /**
+     * Overloading the printObjectLine function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadatas (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @param  string       $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printObjectLine(array $parameters, $object, string $action): int
+    {
+        if (strpos($parameters['context'], 'propalcard') !== false) {
+
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
 
     /**
      * Overloading the printCommonFooter function : replacing the parent's function with the one below.
@@ -565,10 +669,6 @@ class ActionsDolimeet
             }
         }
 
-        if ($parameters['currentcontext'] == 'propalcard') {
-            print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=create_formation"><i class="fas fa-edit"></i> ' . $langs->trans('Formation') . '</a>';
-        }
-
         if (in_array($parameters['currentcontext'], ['thirdpartycard', 'thirdpartycomm'])) {
             if (isModEnabled('propal') && $user->hasRight('propal', 'creer') && $object->status == 1) {
                 print '<div class="inline-block divButAction"><a class="butAction" href="' . DOL_URL_ROOT . '/comm/propal/card.php?socid=' . $object->id . '&action=create">' . img_picto('', 'fontawesome_file-signature_fas_white', 'class="pictofixedwidth"') . $langs->trans('ProposalFormation') . '</a></div>';
@@ -646,38 +746,6 @@ class ActionsDolimeet
                 $object->array_options['options_trainingsession_durations'] = $duration;
                 $object->updateExtrafield('trainingsession_durations');
                 return 1;
-            }
-        }
-
-        if (strpos($parameters['context'], 'propalcard') !== false) {
-            if ($action == 'create_formation') {
-                // Load Dolibarr libraries
-                require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
-
-                // Load DoliMeet libraries
-                require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
-
-                $product    = new Product($this->db);
-                $propalLine = new PropaleLigne($this->db);
-                $project    = new Project($this->db);
-
-                $formationServices = get_formation_service();
-
-                foreach ($formationServices as $formationService) {
-                    $confName = $formationService['code'];
-                    $product->fetch($conf->global->$confName);
-                    $propalLine->fk_propal      = $object->id;
-                    $propalLine->fk_parent_line = 0;
-                    $propalLine->fk_product     = $product->id;
-                    $propalLine->product_label  = $product->label;
-                    $propalLine->product_desc   = $product->description;
-                    $propalLine->tva_tx         = 20;
-                    $propalLine->date_creation  = $object->db->idate(dol_now());
-                    $propalLine->qty            = 1;
-                    $propalLine->rang           = $formationService['position'];
-                    $propalLine->product_type   = 0;
-                    $propalLine->insert($user);
-                }
             }
         }
 
