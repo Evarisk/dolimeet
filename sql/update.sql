@@ -25,3 +25,6 @@ ALTER TABLE `llx_saturne_object_signature` ADD `attendance` SMALLINT NULL AFTER 
 ALTER TABLE `llx_c_trainingsession_type` CHANGE `active` `active` TINYINT(4) NULL DEFAULT '1';
 ALTER TABLE `llx_c_trainingsession_type` ADD `position` INT NULL DEFAULT '0' AFTER `active`;
 ALTER TABLE `llx_dolimeet_session` DROP `model_pdf`, DROP `last_main_doc`, DROP `document_url`;
+
+-- 1.5.0
+ALTER TABLE `llx_dolimeet_session` ADD `modele` BOOLEAN NULL DEFAULT FALSE AFTER `type`;

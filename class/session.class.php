@@ -123,6 +123,7 @@ class Session extends SaturneObject
         'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 1],
         'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 3, 'validate' => 1],
         'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 0],
+        'modele'         => ['type' => 'boolean',      'label' => 'Modele',           'enabled' => 1, 'position' => 65,  'notnull' => 0, 'visible' => 1],
         'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1],
         'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
@@ -197,6 +198,11 @@ class Session extends SaturneObject
      * @var string Object type.
      */
     public string $type;
+
+    /**
+     * @var bool Modele
+     */
+    public bool $modele = false;
 
     /**
      * @var int|null|string Duration.
@@ -816,4 +822,3 @@ class SessionDocument extends SaturneDocuments
         parent::__construct($db, $this->module, $objectType);
     }
 }
-

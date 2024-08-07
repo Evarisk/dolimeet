@@ -27,6 +27,7 @@ CREATE TABLE llx_dolimeet_session(
   date_end      datetime NOT NULL,
   duration      integer,
   type          varchar(128),
+  modele        boolean DEFAULT FALSE,
   content       text,
   note_public   text,
   note_private  text,
