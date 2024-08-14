@@ -135,7 +135,7 @@ class ActionsDolimeet
      * @return int                   0 < on error, 0 on success, 1 to replace standard code
      * @throws Exception
      */
-    public function formObjectOptions(array $parameters): int
+    public function formObjectOptions(array $parameters, $object, $action): int
     {
         global $extrafields, $langs;
 
@@ -143,14 +143,14 @@ class ActionsDolimeet
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
             $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
-            $extrafields->attributes['projet']['label']['trainingsession_type']    = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
-            $extrafields->attributes['projet']['label']['trainingsession_service'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
+            $extrafields->attributes['projet']['label']['trainingsession_type']        = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
+            $extrafields->attributes['projet']['label']['trainingsession_service']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
+            $extrafields->attributes['projet']['label']['trainingsession_location']    = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
+            $extrafields->attributes['projet']['label']['trainingsession_nb_trainees'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_nb_trainees']);
 
             $extrafields->attributes['propal']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
+            $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
             $extrafields->attributes['propal']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
-            $extrafields->attributes['propal']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_start']);
-            $extrafields->attributes['propal']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_end']);
-            $extrafields->attributes['propal']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_durations']);
 
             $extrafields->attributes['contrat']['label']['label']                     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
             $extrafields->attributes['contrat']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
@@ -160,34 +160,15 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
 
             if (strpos($parameters['context'], 'propalcard') !== false) {
-                $extrafields->attributes['propal']['hidden']['trainingsession_service']   = 1;
-                $extrafields->attributes['propal']['hidden']['trainingsession_location']  = 1;
-                $extrafields->attributes['propal']['hidden']['trainingsession_start']     = 1;
-                $extrafields->attributes['propal']['hidden']['trainingsession_end']       = 1;
-                $extrafields->attributes['propal']['hidden']['trainingsession_durations'] = 1;
+                if (empty(GETPOST('options_trainingsession_type', 'int'))) {
+                    $extrafields->attributes['propal']['hidden']['trainingsession_service']  = 1;
+                    $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
+                }
 
-                ?>
-                <script>
-                    $(document).on('change', '#options_trainingsession_type', function() {
-                        var type = $(this).val();
-                        if (type > 0) {
-                            $('#options_trainingsession_location').closest('tr').show();
-                            $('#options_trainingsession_start').closest('tr').show();
-                            $('#options_trainingsession_end').closest('tr').show();
-                            $('#options_trainingsession_durations').closest('tr').show();
-                        } else {
-                            $('#options_trainingsession_location').closest('tr').hide();
-                            $('#options_trainingsession_start').closest('tr').hide();
-                            $('#options_trainingsession_end').closest('tr').hide();
-                            $('#options_trainingsession_durations').closest('tr').hide();
-                        }
-                    });
-                </script>
-                <?php
-            }
-
-            if (strpos($parameters['context'], 'projectcard') !== false) {
-                $extrafields->attributes['projet']['hidden']['trainingsession_service'] = 1;
+                // Hide extrafields trainingsession_service for view mode
+                if (empty($action)) {
+                    $extrafields->attributes['propal']['list']['trainingsession_service'] = 0;
+                }
 
                 ?>
                 <script>
@@ -195,16 +176,143 @@ class ActionsDolimeet
                         var type = $(this).val();
                         if (type > 0) {
                             $('#options_trainingsession_service').closest('tr').show();
+                            $('#options_trainingsession_location').closest('tr').show();
+                            $('.button-save').prop('disabled', true);
                         } else {
                             $('#options_trainingsession_service').closest('tr').hide();
+                            $('#options_trainingsession_location').closest('tr').hide();
                         }
                     });
+                </script>
+                <?php
+            }
+
+            if (strpos($parameters['context'], 'projectcard') !== false) {
+                // Hide extrafields for create mode
+                if (empty(GETPOST('options_trainingsession_type', 'int'))) {
+                    $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 1;
+                    $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 1;
+                    $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 1;
+                }
+
+                // Show extrafields for update mode if options_trainingsession_type is set
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
+                    $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 0;
+                    $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 0;
+                    $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 0;
+                }
+
+                // Disabled extrafields for view mode
+                if (empty($object->array_options['options_trainingsession_type']) && $action != 'create' && $action != 'edit') {
+                    $extrafields->attributes['projet']['list']['trainingsession_type']        = 0;
+                    $extrafields->attributes['projet']['list']['trainingsession_service']     = 0;
+                    $extrafields->attributes['projet']['list']['trainingsession_location']    = 0;
+                    $extrafields->attributes['projet']['list']['trainingsession_nb_trainees'] = 0;
+                }
+
+                $out  = '<div class="wpeo-notice notice-error">';
+                $out .= '<div class="notice-content left">';
+                $out .= '<div class="notice-title">' . $langs->transnoentities('ErrorMissingTrainingSessionProjectInfo') . '</div><div class="notice-subtitle"><ul>';
+                $out .= '<li class="notice-training-session-service">' . $langs->transnoentities('TrainingSessionService') . '</li>';
+                $out .= '<li class="notice-third-party">' . $langs->transnoentities('ThirdParty') . '</li>';
+                $out .= '<li class="notice-opportunity-status">' . $langs->transnoentities('OpportunityStatus') . '</li>';
+                $out .= '</ul></div></div></div>';
+
+                ?>
+                <script>
+                    $(document).on('change', '#options_trainingsession_type', function() {
+                        var type = $(this).val();
+                        if (type > 0) {
+                            $('#options_trainingsession_service').closest('tr').show();
+                            $('#options_trainingsession_location').closest('tr').show();
+                            $('#options_trainingsession_nb_trainees').closest('tr').show();
+                        } else {
+                            $('#options_trainingsession_service').closest('tr').hide();
+                            $('#options_trainingsession_location').closest('tr').hide();
+                            $('#options_trainingsession_nb_trainees').closest('tr').hide();
+                        }
+                    });
+
                     $(document).on('change', '#options_trainingsession_service', function() {
-                        $('.tableforfieldcreate tr').eq(1).find('td').eq(1).find('input[type="text"]').val($(this).find('option:selected').text());
-                        window.saturne.loader.display($('.tableforfieldcreate tr').eq(1).find('td').eq(1));
+                        let labelField = $('input[name="title"]');
+                        labelField.val($(this).find('option:selected').text());
+                        window.saturne.loader.display(labelField);
                         setTimeout(function() {
-                            window.saturne.loader.remove($('.tableforfieldcreate tr').eq(1).find('td').eq(1));
+                            window.saturne.loader.remove(labelField);
                         }, 1000);
+                    });
+
+                    $(document).ready(function(){
+                        let table = $('form table tr').eq(0);
+                        $('.field_options_trainingsession_type').insertAfter(table);
+                        $('.field_options_trainingsession_service').insertAfter('.field_options_trainingsession_type');
+                        $('.field_options_trainingsession_location').insertAfter('.field_options_trainingsession_service');
+                        $('.field_options_trainingsession_nb_trainees').insertAfter('.field_options_trainingsession_location');
+
+                        function checkFields() {
+                            let displayNotice = 0;
+                            let notice        = $('.fiche').find('.wpeo-notice');
+                            if ($('#options_trainingsession_type').val() > 0) {
+                                let labelField = $('input[name="title"]');
+                                console.log(labelField.val())
+                                if (labelField.val().length <= 0) {
+                                    displayNotice++;
+                                } else {
+                                    notice.find('.notice-label').fadeOut(400, function() {
+                                        $(this).remove();
+                                    });
+                                }
+
+                                let thirdPartyField = $('#socid');
+                                if (thirdPartyField.val() <= 0) {
+                                    displayNotice++;
+                                } else {
+                                    notice.find('.notice-third-party').fadeOut(400, function() {
+                                        $(this).remove();
+                                    });
+                                }
+
+                                let opportunityStatusField = $('#opp_status');
+                                if (opportunityStatusField.val() <= 0) {
+                                    displayNotice++;
+                                } else {
+                                    notice.find('.notice-opportunity-status').fadeOut(400, function() {
+                                        $(this).remove();
+                                    });
+                                }
+
+                                let opportunityPercentField = $('#opp_percent');
+                                if (opportunityPercentField.val().length <= 0) {
+                                    displayNotice++;
+                                }
+
+                                let trainingSessionServiceField = $('#options_trainingsession_service');
+                                if (trainingSessionServiceField.val() <= 0) {
+                                    displayNotice++;
+                                } else {
+                                    notice.find('.notice-training-session-service').fadeOut(400, function() {
+                                        $(this).remove();
+                                    });
+                                }
+
+                                if (displayNotice > 0 && notice.length == 0) {
+                                    $('.button-save').prop('disabled', true);
+                                    $('.fiche').prepend(<?php echo json_encode($out); ?>);
+                                } else if (displayNotice == 0) {
+                                    $('.button-save').prop('disabled', false);
+                                    notice.fadeOut(400, function() {
+                                        $(this).remove();
+                                    });
+                                }
+                            } else {
+                                $('.button-save').prop('disabled', false);
+                                notice.fadeOut(400, function() {
+                                    $(this).remove();
+                                });
+                            }
+                        }
+
+                        setInterval(checkFields, 1000);
                     });
                 </script>
                 <?php
@@ -213,49 +321,6 @@ class ActionsDolimeet
 
         return 0; // or return 1 to replace standard code
     }
-
-    /**
-     * Overloading the printObjectLineTitle function : replacing the parent's function with the one below
-     *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
-     */
-    public function printObjectLineTitle(array $parameters, $object, string $action): int
-    {
-        global $langs;
-
-        if (strpos($parameters['context'], 'propalcard') !== false) {
-            $out = '<th class="linecolaction">' . $langs->transnoentities('Action') . '</th>'
-
-            ?>
-            <script>
-                $('#linecoldescription').after(<?php echo json_encode($out); ?>);
-            </script>
-            <?php
-        }
-
-        return 0; // or return 1 to replace standard code
-    }
-
-    /**
-     * Overloading the printObjectLine function : replacing the parent's function with the one below
-     *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
-     */
-    public function printObjectLine(array $parameters, $object, string $action): int
-    {
-        if (strpos($parameters['context'], 'propalcard') !== false) {
-
-        }
-
-        return 0; // or return 1 to replace standard code
-    }
-
 
     /**
      * Overloading the printCommonFooter function : replacing the parent's function with the one below.
@@ -633,6 +698,36 @@ class ActionsDolimeet
             }
         }
 
+        if (strpos($parameters['context'], 'sessioncard') !== false) {
+            global $object;
+
+            ?>
+            <script>
+                function updateFieldUrls(objectType, fields) {
+                    fields.forEach(function(field) {
+                        let titleField = $(`.titlefield.fieldname_${field}`).find('a');
+                        if (titleField.length) {
+                            let newTitleHref = titleField.attr('href') + '&object_type=' + objectType;
+                            titleField.attr('href', newTitleHref);
+                        }
+
+                        let valueField = $(`.valuefield.fieldname_${field}`).find('form');
+                        if (valueField.length) {
+                            let newValueAction = valueField.attr('action') + '?object_type=' + objectType;
+                            valueField.attr('action', newValueAction);
+                        }
+                    });
+                }
+
+                let objectType = <?php echo json_encode($object->element); ?>;
+                let fields = ['date_start', 'date_end', 'duration'];
+
+                updateFieldUrls(objectType, fields);
+
+            </script>
+            <?php
+        }
+
         return 0; // or return 1 to replace standard code.
     }
 
@@ -894,7 +989,7 @@ class ActionsDolimeet
             $langs->load('propal');
             if ($parameters['html'] == $langs->trans('AddProp')) {
                 $explodedCompiledAttributes       = explode('projectid', $parameters['compiledAttributes']);
-                $parameters['compiledAttributes'] = $explodedCompiledAttributes[0] . 'options_trainingsession_type=' . $object->array_options['options_trainingsession_type'] . '&options_trainingsession_service=' . $object->array_options['options_trainingsession_service'] . '&projectid' . $explodedCompiledAttributes[1];
+                $parameters['compiledAttributes'] = $explodedCompiledAttributes[0] . 'options_trainingsession_type=' . $object->array_options['options_trainingsession_type'] . '&options_trainingsession_service=' . $object->array_options['options_trainingsession_service'] . '&options_trainingsession_location=' . $object->array_options['options_trainingsession_location'] . '&projectid' . $explodedCompiledAttributes[1];
 
                 $this->resprints = '<' . $parameters['tag'] . ' ' . $parameters['compiledAttributes'] . '>' . dol_escape_htmltag($parameters['html']) . '</' . $parameters['tag'] . '>';
 

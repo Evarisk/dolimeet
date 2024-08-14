@@ -60,6 +60,8 @@ window.dolimeet.session.init = function() {
  */
 window.dolimeet.session.event = function() {
     $(document).on('change', '#fk_soc', window.dolimeet.session.reloadField);
+  $(document).on('change', '#modele', window.dolimeet.session.test);
+  $(document).on('change', '#element_type', window.dolimeet.session.test2);
 };
 
 /**
@@ -103,6 +105,66 @@ window.dolimeet.session.reloadField = function() {
     success: function(resp) {
       $('.field_fk_project').replaceWith($(resp).find('.field_fk_project'));
       $('.field_fk_contrat').replaceWith($(resp).find('.field_fk_contrat'));
+    },
+    error: function() {}
+  });
+};
+
+
+/**
+ * Session reload field
+ *
+ * @memberof DoliMeet_Session
+ *
+ * @since   1.5.0
+ * @version 1.5.0
+ *
+ * @returns {void}
+ */
+window.dolimeet.session.test = function() {
+  let token          = window.saturne.toolbox.getToken();
+  let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
+  let field          = this.checked ? 'on' : 'off';
+
+  $.ajax({
+    url: document.URL + querySeparator + 'modele=' + field + '&token=' + token,
+    type: 'POST',
+    processData: false,
+    contentType: false,
+    success: function(resp) {
+      $('.fiche').replaceWith($(resp).find('.fiche'));
+    },
+    error: function() {}
+  });
+};
+
+/**
+ * Reload specific field element_type and fk_element
+ *
+ * @memberof Saturne_Utils
+ *
+ * @since   1.2.0
+ * @version 1.2.0
+ *
+ * @returns {void}
+ */
+window.dolimeet.session.test2 = function() {
+  let token          = window.saturne.toolbox.getToken();
+  let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
+  let field          = $(this).val();
+  let modeleField    = $('#modele').is(':checked') ? 'on' : 'off';
+
+  window.saturne.loader.display($('.field_element_type'));
+  window.saturne.loader.display($('.field_fk_element'));
+
+  $.ajax({
+    url: document.URL + querySeparator + 'modele=' + modeleField + '&element_type=' + field + '&token=' + token,
+    type: 'POST',
+    processData: false,
+    contentType: false,
+    success: function(resp) {
+      $('.field_element_type').replaceWith($(resp).find('.field_element_type'));
+      $('.field_fk_element').replaceWith($(resp).find('.field_fk_element'));
     },
     error: function() {}
   });

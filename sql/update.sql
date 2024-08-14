@@ -27,4 +27,11 @@ ALTER TABLE `llx_c_trainingsession_type` ADD `position` INT NULL DEFAULT '0' AFT
 ALTER TABLE `llx_dolimeet_session` DROP `model_pdf`, DROP `last_main_doc`, DROP `document_url`;
 
 -- 1.5.0
-ALTER TABLE `llx_dolimeet_session` ADD `modele` BOOLEAN NULL DEFAULT FALSE AFTER `type`;
+ALTER TABLE `llx_dolimeet_session` ADD `hour_start` INT NULL AFTER `date_end`;
+ALTER TABLE `llx_dolimeet_session` ADD `hour_end` INT NULL AFTER `hour_start`;
+ALTER TABLE `llx_dolimeet_session` ADD `element_type` VARCHAR(128) NULL AFTER `type`;
+ALTER TABLE `llx_dolimeet_session` ADD `modele` BOOLEAN NULL DEFAULT FALSE AFTER `element_type`;
+ALTER TABLE `llx_dolimeet_session` ADD `position` TINYINT(4) NULL AFTER `modele`;
+ALTER TABLE `llx_dolimeet_session` ADD `fk_element` INT NULL AFTER `fk_soc`;
+ALTER TABLE `llx_dolimeet_session` CHANGE `date_start` `date_start` DATETIME NULL;
+ALTER TABLE `llx_dolimeet_session` CHANGE `date_end` `date_end` DATETIME NULL;

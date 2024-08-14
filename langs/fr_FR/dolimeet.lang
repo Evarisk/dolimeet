@@ -104,7 +104,7 @@ TrainingSession                       = Session de formation
 Trainingsession                       = Session de formation
 Trainingsessions                      = sessions de formation
 TrainingSessions                      = Sessions de formation
-TrainingSessionsInclusiveWriting      = Session(s) de formation
+TrainingSessionsInclusiveWriting      = Détails des %d session(s) de formation
 TheTrainingsession                    = la session de formation
 OfTrainingsession                     = de la session de formation
 TrainingsessionList                   = Liste des sessions de formation
@@ -131,7 +131,7 @@ LinkDolimeet_trainsess                = Activer le lien avec les sessions de for
 LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles
 TrainingSessionStartErrorMatchingDate = <strong> Erreur : cohérence des dates de début de la formation. </strong><br> La date de début de la formation du contrat n'est pas égale à la date début de la première session de formation %s.
 TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates de fin de la formation. </strong><br> La date de fin de la formation du contrat n'est pas égale à la date fin de la dernière session de formation %s.
-TrainingSessionDurations              = Durée totale des sessions de formation
+TrainingSessionDurations              = Durée de la formation
 TrainingSessionStartHelp              = Date de début de la première session de formation du contrat
 TrainingSessionEndHelp                = Date de fin de la dernière session de formation du contrat
 TrainingSessionTypeHelp               = Type de formation liée au contrat
@@ -140,7 +140,17 @@ TrainingSessionDurationHelp           = Durée totale des sessions HH:MM (ex: 60
 CalculatedTotalSessionDuration        = Durée totale calculée :
 TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
 NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à toute les sessions.
+ErrorMissingTrainingSessionProjectInfo = Erreur : information du projet de formation manquante
+FormationTitle                        = Objet de la formation
+FormationInfoTitle                    = <strong>1 - Objet, nature et durée de la formation</strong>
+FormationInfoTitleTest                = <strong>2 - Session de formation</strong>
 
+
+# Extrafields - Attributs supplémentaires
+TrainingSessionService        = Services de formation
+TrainingSessionServiceHelp    = Services de formation permettant de définir les services liés à la formation et de générer les sessions de formation associées
+TrainingSessionNbTrainees     = Nombre de stagiaires
+TrainingSessionNbTraineesHelp = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
@@ -265,3 +275,7 @@ Sessiontrainer                    = Formateur
 Billing                           = Commanditaire
 Customer                          = Client
 ServicesNotConfiguredForTraining  = Vous n'avez pas configuré les services nécessaire à la formation
+HourEnd                           = Heure de fin
+FormationPublicNoteTraineeListTitle = Note publique avec la liste des stagiaires
+FormationPublicNoteTraineeList    = <strong>3 - Liste des stagiaires </strong><ul><li>Nom, Prénom, Email, Titre</li></ul>
+ToBePlanned                       = à planifier

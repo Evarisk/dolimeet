@@ -108,6 +108,16 @@ if ($action == 'update_formation_service') {
         if ($formationProjectLabel != getDolGlobalString('DOLIMEET_FORMATION_PROJECT_LABEL')) {
             dolibarr_set_const($db, 'DOLIMEET_FORMATION_PROJECT_LABEL', $formationProjectLabel, 'chaine', 0, '', $conf->entity);
         }
+
+        $formationPublicNoteDate = GETPOST('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE', 'none');
+        if ($formationPublicNoteDate != getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE')) {
+            dolibarr_set_const($db, 'DOLIMEET_FORMATION_PUBLIC_NOTE_DATE', $formationPublicNoteDate, 'chaine', 0, '', $conf->entity);
+        }
+
+        $formationPublicNoteTraineeList = GETPOST('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST', 'none');
+        if ($formationPublicNoteTraineeList != getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST')) {
+            dolibarr_set_const($db, 'DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST', $formationPublicNoteTraineeList, 'chaine', 0, '', $conf->entity);
+        }
     }
 
     setEventMessage('SavedConfig');
@@ -224,6 +234,22 @@ if (isModEnabled('fckeditor')) {
     print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('FormationProjectLabelTitle'), $helpForSubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
     print '</td><td>';
     $dolEditor = new DolEditor('DOLIMEET_FORMATION_PROJECT_LABEL', $formationProjectLabel, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+    $dolEditor->Create();
+    print '</td></tr>';
+
+    // Formation public note date
+    $formationPublicNoteDate = $langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE')) ?: $langs->transnoentities('FormationPublicNoteDate');
+    print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('FormationPublicNoteDateTitle'), $helpForSubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
+    print '</td><td>';
+    $dolEditor = new DolEditor('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE', $formationPublicNoteDate, '100%', 300, 'dolibarr_details', '', false, true, getDolGlobalInt('FCKEDITOR_ENABLE_NOTE_PUBLIC'), 'ROWS_5', 70);
+    $dolEditor->Create();
+    print '</td></tr>';
+
+    // Formation Public note trainee list
+    $formationPublicNoteTraineeList = $langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST')) ?: $langs->transnoentities('FormationPublicNoteTraineeList');
+    print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('FormationPublicNoteTraineeListTitle'), $helpForSubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
+    print '</td><td>';
+    $dolEditor = new DolEditor('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST', $formationPublicNoteTraineeList, '100%', 300, 'dolibarr_details', '', false, true, getDolGlobalInt('FCKEDITOR_ENABLE_NOTE_PUBLIC'), 'ROWS_5', 70);
     $dolEditor->Create();
     print '</td></tr>';
 }

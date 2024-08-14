@@ -62,11 +62,12 @@ class Session extends SaturneObject
      */
     public string $picto = '';
 
-    public const STATUS_DELETED   = -1;
-    public const STATUS_DRAFT     = 0;
-    public const STATUS_VALIDATED = 1;
-    public const STATUS_LOCKED    = 2;
-    public const STATUS_ARCHIVED  = 3;
+    public const STATUS_DELETED       = -1;
+    public const STATUS_DRAFT         = 0;
+    public const STATUS_VALIDATED     = 1;
+    public const STATUS_LOCKED        = 2;
+    public const STATUS_ARCHIVED      = 3;
+    public const STATUS_TO_BE_PLANNED = 4;
 
     /**
      *  'type' field format:
@@ -114,24 +115,29 @@ class Session extends SaturneObject
         'ref'            => ['type' => 'varchar(128)', 'label' => 'Ref',              'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'validate' => 1, 'comment' => 'Reference of object'],
         'ref_ext'        => ['type' => 'varchar(128)', 'label' => 'RefExt',           'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0],
         'entity'         => ['type' => 'integer',      'label' => 'Entity',           'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0, 'index' => 1],
-        'date_creation'  => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2],
+        'date_creation'  => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => 1, 'position' => 40,  'positionList' => 300, 'notnull' => 1, 'visible' => 2],
         'tms'            => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 1, 'visible' => 0],
         'import_key'     => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
-        'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived']],
+        'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived', 4 => 'ToBePlanned']],
         'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1, 'autofocusoncreate' => 1],
-        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'notnull' => 1, 'visible' => 1],
-        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 1],
-        'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 3, 'validate' => 1],
+        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'positionList' => 31, 'notnull' => 0, 'visible' => 1, 'alwayseditable' => 1],
+        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'positionList' => 32, 'notnull' => 0, 'visible' => 1, 'alwayseditable' => 1],
+        'hour_start'     => ['type' => 'duration',     'label' => 'HourStart',        'enabled' => 1, 'position' => 121, 'notnull' => 0, 'visible' => 1],
+        'hour_end'       => ['type' => 'duration',     'label' => 'HourEnd',          'enabled' => 1, 'position' => 122, 'notnull' => 0, 'visible' => 1],
+        'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 3, 'validate' => 1],
         'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 0],
-        'modele'         => ['type' => 'boolean',      'label' => 'Modele',           'enabled' => 1, 'position' => 65,  'notnull' => 0, 'visible' => 1],
-        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1],
+        'element_type'   => ['type' => 'select',       'label' => 'ElementType',      'enabled' => 1, 'position' => 91, 'notnull' => 0, 'visible' => 3, 'css' => 'maxwidth150 widthcentpercentminusxx'],
+        'fk_element'     => ['type' => 'integer',      'label' => 'FkElement',        'enabled' => 1, 'position' => 92, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx'],
+        'modele'         => ['type' => 'boolean',      'label' => 'Modele',           'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 1],
+        'position'       => ['type' => 'integer',     'label' => 'Position',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 3],
+        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'positionList' => 33, 'notnull' => 0, 'visible' => 1, 'alwayseditable' => 1],
         'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',     'enabled' => 1,                         'position' => 170, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
         'fk_user_modif'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserModif',  'picto' => 'user',     'enabled' => 1,                         'position' => 180, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
         'fk_soc'         => ['type' => 'integer:Societe:societe/class/societe.class.php',   'label' => 'ThirdParty', 'picto' => 'company',  'enabled' => '$conf->societe->enabled', 'position' => 80,  'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'societe.rowid'],
         'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php',    'label' => 'Project',    'picto' => 'project',  'enabled' => '$conf->project->enabled', 'position' => 90,  'notnull' => 0,  'visible'=> 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
-        'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php',   'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 100, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid']
+        'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php',   'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 100, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid'],
     ];
 
     /**
@@ -190,6 +196,16 @@ class Session extends SaturneObject
     public $date_end;
 
     /**
+     * @var int|null|string Start hour
+     */
+    public $hour_start;
+
+    /**
+     * @var int|null|string End hour
+     */
+    public $hour_end;
+
+    /**
      * @var string Content.
      */
     public string $content;
@@ -200,9 +216,24 @@ class Session extends SaturneObject
     public string $type;
 
     /**
+     * @var string|null Element type
+     */
+    public ?string $element_type = '';
+
+    /**
+     * @var int|string Element ID
+     */
+    public $fk_element;
+
+    /**
      * @var bool Modele
      */
     public bool $modele = false;
+
+    /**
+     * @var int|null Position
+     */
+    public ?int $position;
 
     /**
      * @var int|null|string Duration.
@@ -273,6 +304,14 @@ class Session extends SaturneObject
             default :
                 $this->picto = 'dolimeet_color@dolimeet';
                 break;
+        }
+
+        if (!$this->modele) {
+            $this->fields['hour_start']['enabled']   = 0;
+            $this->fields['hour_end']['enabled']     = 0;
+            $this->fields['position']['enabled']     = 0;
+            $this->fields['element_type']['enabled'] = 0;
+            $this->fields['fk_element']['enabled']   = 0;
         }
     }
 
@@ -400,24 +439,26 @@ class Session extends SaturneObject
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
 
-            $this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-            $this->labelStatus[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
-            $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('ValidatePendingSignature');
-            $this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-            $this->labelStatus[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
+            $this->labelStatus[self::STATUS_DELETED]       = $langs->transnoentitiesnoconv('Deleted');
+            $this->labelStatus[self::STATUS_DRAFT]         = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatus[self::STATUS_VALIDATED]     = $langs->transnoentitiesnoconv('ValidatePendingSignature');
+            $this->labelStatus[self::STATUS_LOCKED]        = $langs->transnoentitiesnoconv('Locked');
+            $this->labelStatus[self::STATUS_ARCHIVED]      = $langs->transnoentitiesnoconv('Archived');
+            $this->labelStatus[self::STATUS_TO_BE_PLANNED] = $langs->transnoentitiesnoconv('ToBePlanned');
 
-            $this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-            $this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
-            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('ValidatePendingSignature');
-            $this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-            $this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
+            $this->labelStatusShort[self::STATUS_DELETED]       = $langs->transnoentitiesnoconv('Deleted');
+            $this->labelStatusShort[self::STATUS_DRAFT]         = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatusShort[self::STATUS_VALIDATED]     = $langs->transnoentitiesnoconv('ValidatePendingSignature');
+            $this->labelStatusShort[self::STATUS_LOCKED]        = $langs->transnoentitiesnoconv('Locked');
+            $this->labelStatusShort[self::STATUS_ARCHIVED]      = $langs->transnoentitiesnoconv('Archived');
+            $this->labelStatusShort[self::STATUS_TO_BE_PLANNED] = $langs->transnoentitiesnoconv('ToBePlanned');
         }
 
         $statusType = 'status' . $status;
         if ($status == self::STATUS_DELETED) {
             $statusType = 'status0';
         }
-        if ($status == self::STATUS_VALIDATED) {
+        if ($status == self::STATUS_VALIDATED || $status == self::STATUS_TO_BE_PLANNED) {
             $statusType = 'status3';
         }
         if ($status == self::STATUS_LOCKED) {
