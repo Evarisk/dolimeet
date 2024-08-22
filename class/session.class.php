@@ -62,12 +62,11 @@ class Session extends SaturneObject
      */
     public string $picto = '';
 
-    public const STATUS_DELETED       = -1;
-    public const STATUS_DRAFT         = 0;
-    public const STATUS_VALIDATED     = 1;
-    public const STATUS_LOCKED        = 2;
-    public const STATUS_ARCHIVED      = 3;
-    public const STATUS_TO_BE_PLANNED = 4;
+    public const STATUS_DELETED   = -1;
+    public const STATUS_DRAFT     = 0;
+    public const STATUS_VALIDATED = 1;
+    public const STATUS_LOCKED    = 2;
+    public const STATUS_ARCHIVED  = 3;
 
     /**
      *  'type' field format:
@@ -118,19 +117,17 @@ class Session extends SaturneObject
         'date_creation'  => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => 1, 'position' => 40,  'positionList' => 300, 'notnull' => 1, 'visible' => 2],
         'tms'            => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 1, 'visible' => 0],
         'import_key'     => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
-        'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived', 4 => 'ToBePlanned']],
+        'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived']],
         'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1, 'autofocusoncreate' => 1],
-        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'positionList' => 31, 'notnull' => 0, 'visible' => 1, 'alwayseditable' => 1],
-        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'positionList' => 32, 'notnull' => 0, 'visible' => 1, 'alwayseditable' => 1],
-        'hour_start'     => ['type' => 'duration',     'label' => 'HourStart',        'enabled' => 1, 'position' => 121, 'notnull' => 0, 'visible' => 1],
-        'hour_end'       => ['type' => 'duration',     'label' => 'HourEnd',          'enabled' => 1, 'position' => 122, 'notnull' => 0, 'visible' => 1],
+        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'positionList' => 31, 'notnull' => 0, 'visible' => 1],
+        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'positionList' => 32, 'notnull' => 0, 'visible' => 1],
         'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 3, 'validate' => 1],
         'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 0],
         'element_type'   => ['type' => 'select',       'label' => 'ElementType',      'enabled' => 1, 'position' => 91, 'notnull' => 0, 'visible' => 3, 'css' => 'maxwidth150 widthcentpercentminusxx'],
         'fk_element'     => ['type' => 'integer',      'label' => 'FkElement',        'enabled' => 1, 'position' => 92, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx'],
         'modele'         => ['type' => 'boolean',      'label' => 'Modele',           'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 1],
-        'position'       => ['type' => 'integer',     'label' => 'Position',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 3],
-        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'positionList' => 33, 'notnull' => 0, 'visible' => 1, 'alwayseditable' => 1],
+        'position'       => ['type' => 'integer',      'label' => 'Position',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 3],
+        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'positionList' => 33, 'notnull' => 0, 'visible' => 1],
         'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',     'enabled' => 1,                         'position' => 170, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
@@ -194,16 +191,6 @@ class Session extends SaturneObject
      * @var int|string End date.
      */
     public $date_end;
-
-    /**
-     * @var int|null|string Start hour
-     */
-    public $hour_start;
-
-    /**
-     * @var int|null|string End hour
-     */
-    public $hour_end;
 
     /**
      * @var string Content.
@@ -283,6 +270,8 @@ class Session extends SaturneObject
      */
     public function __construct(DoliDB $db, string $objectType = 'session')
     {
+        global $conf;
+
         $this->type = $objectType;
 
         parent::__construct($db, $this->module, $objectType);
@@ -307,8 +296,6 @@ class Session extends SaturneObject
         }
 
         if (!$this->modele) {
-            $this->fields['hour_start']['enabled']   = 0;
-            $this->fields['hour_end']['enabled']     = 0;
             $this->fields['position']['enabled']     = 0;
             $this->fields['element_type']['enabled'] = 0;
             $this->fields['fk_element']['enabled']   = 0;
@@ -444,21 +431,19 @@ class Session extends SaturneObject
             $this->labelStatus[self::STATUS_VALIDATED]     = $langs->transnoentitiesnoconv('ValidatePendingSignature');
             $this->labelStatus[self::STATUS_LOCKED]        = $langs->transnoentitiesnoconv('Locked');
             $this->labelStatus[self::STATUS_ARCHIVED]      = $langs->transnoentitiesnoconv('Archived');
-            $this->labelStatus[self::STATUS_TO_BE_PLANNED] = $langs->transnoentitiesnoconv('ToBePlanned');
 
             $this->labelStatusShort[self::STATUS_DELETED]       = $langs->transnoentitiesnoconv('Deleted');
             $this->labelStatusShort[self::STATUS_DRAFT]         = $langs->transnoentitiesnoconv('StatusDraft');
             $this->labelStatusShort[self::STATUS_VALIDATED]     = $langs->transnoentitiesnoconv('ValidatePendingSignature');
             $this->labelStatusShort[self::STATUS_LOCKED]        = $langs->transnoentitiesnoconv('Locked');
             $this->labelStatusShort[self::STATUS_ARCHIVED]      = $langs->transnoentitiesnoconv('Archived');
-            $this->labelStatusShort[self::STATUS_TO_BE_PLANNED] = $langs->transnoentitiesnoconv('ToBePlanned');
         }
 
         $statusType = 'status' . $status;
         if ($status == self::STATUS_DELETED) {
             $statusType = 'status0';
         }
-        if ($status == self::STATUS_VALIDATED || $status == self::STATUS_TO_BE_PLANNED) {
+        if ($status == self::STATUS_VALIDATED) {
             $statusType = 'status3';
         }
         if ($status == self::STATUS_LOCKED) {

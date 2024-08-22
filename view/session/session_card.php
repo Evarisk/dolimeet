@@ -171,24 +171,8 @@ if (empty($resHook)) {
         }
 
         if (GETPOST('modele') == 1) {
-            unset($object->fields['date_start']);
-            unset($object->fields['date_end']);
             unset($object->fields['fk_soc']);
             unset($object->fields['fk_contrat']);
-
-            if (empty(GETPOST('hour_starthour'))) {
-                $_POST['hour_starthour'] = 0;
-            }
-            if (empty(GETPOST('hour_startmin'))) {
-                $_POST['hour_startmin'] = 0;
-            }
-            if (empty(GETPOST('hour_endhour'))) {
-                $_POST['hour_endhour'] = 0;
-            }
-            if (empty(GETPOST('hour_endmin'))) {
-                $_POST['hour_endmin'] = 0;
-            }
-            $_POST['status'] = Session::STATUS_TO_BE_PLANNED;
         }
     }
 
@@ -246,32 +230,53 @@ if ($action == 'create') {
 
     print '<table class="border centpercent tableforfieldcreate">';
 
+    $now = dol_getdate(dol_now());
+
     if (GETPOST('modele') == 'on') {
-        $object->fields['hour_start']['enabled']   = 1;
-        $object->fields['hour_end']['enabled']     = 1;
+        // Set default fields
+        unset($object->fields['fk_soc']);
+        unset($object->fields['fk_contrat']);
+
         $object->fields['position']['enabled']     = 1;
+        $object->fields['position']['notnull']     = 1;
+        $object->fields['position']['default']     = 1;
         $object->fields['element_type']['enabled'] = 1;
         $object->fields['fk_element']['enabled']   = 1;
 
-        unset($object->fields['date_start']);
-        unset($object->fields['date_end']);
-        unset($object->fields['fk_soc']);
-        unset($object->fields['fk_contrat']);
-        unset($object->fields['fk_project']);
-
-        if (isModEnabled('service')) {
+        // Set service fields
+        if (isModEnabled('service') && GETPOST('element_type') == 'service') {
+            $object->fields['element_type']['picto']                    = 'service';
             $object->fields['element_type']['arrayofkeyval']['service'] = $langs->trans('Service');
+            $object->fields['fk_element']['type']                       = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
+            $object->fields['fk_element']['picto']                      = 'service';
+            $object->fields['fk_element']['label']                      = $langs->trans('Service');
         }
 
-        if (GETPOST('element_type') == 'service') {
-            $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:(fk_product_type:=:1)';
-            $object->fields['fk_element']['picto']   = 'service';
-            $object->fields['fk_element']['label']   = $langs->trans('Service');
-            $object->fields['element_type']['picto'] = 'service';
+        if (!GETPOSTISSET('date_start')) {
+            $_POST['date_startyear']  = $now['year'];
+            $_POST['date_startmonth'] = $now['mon'];
+            $_POST['date_startday']   = $now['mday'];
+            $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR'));
+            $_POST['date_starthour']  = $time[0];
+            $_POST['date_startmin']   = $time[1];
+        }
+
+        if (!GETPOSTISSET('date_end')) {
+            $_POST['date_endyear']  = $now['year'];
+            $_POST['date_endmonth'] = $now['mon'];
+            $_POST['date_endday']   = $now['mday'];
+            $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR'));
+            $_POST['date_endhour']  = $time[0];
+            $_POST['date_endmin']   = $time[1];
+        }
+
+        if (!GETPOSTISSET('date_start') && !GETPOSTISSET('date_end')) {
+            $timeToSecond = convertTime2Seconds($_POST['date_endhour'], $_POST['date_endmin']) - convertTime2Seconds($_POST['date_starthour'], $_POST['date_startmin']);
+            $_POST['duration'] = $timeToSecond;
         }
     }
 
-    $now = dol_getdate(dol_now());
+
 
     if ($_POST['fk_soc'] == -1) {
         $_POST['fk_soc'] = 0;

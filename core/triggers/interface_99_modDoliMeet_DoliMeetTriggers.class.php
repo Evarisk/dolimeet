@@ -178,6 +178,16 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_VALIDATE';
                 $actioncomm->label = $langs->trans('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
                 $actioncomm->create($user);
+
+                if ($action == 'TRAININGSESSION_VALIDATE' && $object->modele == 1 && $object->fk_project > 0 && $object->fk_element > 0) {
+                    // Load DoliMeet libraries
+                    require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+
+                    $project = new Project($this->db);
+
+                    $project->fetch($object->fk_project);
+                    set_public_note($project, $project);
+                }
                 break;
 
             // UNVALIDATE.
@@ -242,56 +252,21 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'PROJECT_CREATE' :
             case 'PROJECT_MODIFY' :
                 if (is_array(GETPOST('options_trainingsession_service', 'array')) && !empty(GETPOST('options_trainingsession_service', 'array'))) {
-                    if (dol_strlen($object->note_public) == 0) {
-                        $durations = 0;
-                        if (isset($object->array_options['options_trainingsession_service']) && !empty($object->array_options['options_trainingsession_service'])) {
-                            // Load DoliMeet libraries
-                            require_once __DIR__ . '/../../class/trainingsession.class.php';
+                    // Load DoliMeet libraries
+                    require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
-                            $trainingSession = new TrainingSession($this->db);
+                    set_public_note($object, $object);
+                }
+                break;
 
-                            $object->array_options['options_trainingsession_service'] = explode(',', $object->array_options['options_trainingsession_service']);
-                            foreach ($object->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-                                $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
-                                if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                                    foreach ($trainingSessions as $trainingSession) {
-                                        $durations += $trainingSession->duration;
-                                    }
-                                }
-                            }
-                        }
+            case 'PROJECT_ADD_CONTACT' :
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
+                    $contactType = getDictionaryValue('c_type_contact', 'code', GETPOST('typecontact'));
+                    if ($contactType == 'TRAINEE') {
+                        // Load DoliMeet libraries
+                        require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
-                        $object->note_public  = '<br />' . $langs->transnoentities('FormationInfoTitle') . '<br />';
-                        $object->note_public .= $langs->transnoentities('FormationTitle') . ' : ' . $object->title . '<br />';
-                        $object->note_public .= $langs->transnoentities('TrainingSessionType') . ' : ' . $langs->transnoentities(getDictionaryValue('c_trainingsession_type', 'ref', $object->array_options['options_trainingsession_type'])) . '<br />';
-                        $object->note_public .= $langs->transnoentities('TrainingSessionDurations') . ' : <strong>' . convertSecondToTime($durations) . '</strong>' . ' ' . dol_strtolower($langs->transnoentities('Hours')) . '<br />';
-                        $object->note_public .= $langs->transnoentities('TrainingSessionLocation') . ' : ' . (dol_strlen($object->array_options['options_trainingsession_location']) > 0  ? $object->array_options['options_trainingsession_location'] : $langs->transnoentities('NoData')) . '<br />';
-                        $object->note_public .= $langs->transnoentities('TrainingSessionNbTrainees') . ' : ' . (dol_strlen($object->array_options['options_trainingsession_nb_trainees']) > 0 ? $object->array_options['options_trainingsession_nb_trainees'] : $langs->transnoentities('NoData')) . '<br /><br />';
-
-                        if (isset($object->array_options['options_trainingsession_service']) && !empty($object->array_options['options_trainingsession_service'])) {
-                            // Load DoliMeet libraries
-                            require_once __DIR__ . '/../../class/trainingsession.class.php';
-
-                            $trainingSession = new TrainingSession($this->db);
-
-                            foreach ($object->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-                                $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
-                                if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                                    $object->note_public .= $langs->transnoentities('FormationInfoTitleTest') . '<br />';
-                                    $object->note_public .= $langs->transnoentities('TrainingSessionsInclusiveWriting', count($trainingSessions)) . ' : ' . '<br />';
-                                    foreach ($trainingSessions as $trainingSession) {
-                                        $object->note_public .= dol_print_date($trainingSession->date_start, 'day') . ' - <strong>' . $trainingSession->fields['status']['arrayofkeyval'][4] . '</strong> - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuser') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuser') . '</strong><br />';
-                                    }
-                                }
-                            }
-                        }
-
-    //                    $substitutionArray = getCommonSubstitutionArray($langs, 0, null, $object);
-    //                    complete_substitutions_array($substitutionArray, $langs, $object);
-    //                    $formationProjectPublicNote = make_substitutions($langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PROJECT_PUBLIC_NOTE')), $substitutionArray);
-                        $object->note_public .= '<br />' . (dol_strlen($formationProjectPublicNote) > 0 ? $langs->transnoentities($formationProjectPublicNote) : $langs->transnoentities('FormationPublicNoteTraineeList'));
-
-                        $object->setValueFrom('note_public', $object->note_public);
+                        set_public_note($object, $object);
                     }
                 }
                 break;
@@ -415,49 +390,20 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         }
                     }
 
-                    $durations = 0;
-                    if (isset($object->array_options['options_trainingsession_service']) && !empty($object->array_options['options_trainingsession_service'])) {
-                        // Load DoliMeet libraries
-                        require_once __DIR__ . '/../../class/trainingsession.class.php';
-
-                        $trainingSession = new TrainingSession($this->db);
-
-                        $object->array_options['options_trainingsession_service'] = explode(',', $object->array_options['options_trainingsession_service']);
-                        foreach ($object->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-                            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
-                            if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                                foreach ($trainingSessions as $trainingSession) {
-                                    $durations += $trainingSession->duration;
-                                }
-                            }
-                        }
-                    }
-
-                    $object->note_public  = '<br />' . $langs->transnoentities('FormationInfoTitle') . '<br />';
-
-                    $project->fetch($object->fk_project);
-                    $object->note_public .= $langs->transnoentities('FormationTitle') . ' : ' . $project->title . '<br />';
-
-                    $object->note_public .= $langs->transnoentities('TrainingSessionType') . ' : ' . $langs->transnoentities(getDictionaryValue('c_trainingsession_type', 'ref', $object->array_options['options_trainingsession_type'])) . '<br />';
-                    $object->note_public .= $langs->transnoentities('TrainingSessionDurations') . ' : <strong>' . convertSecondToTime($durations) . '</strong>' . ' ' . dol_strtolower($langs->transnoentities('Hours')) . '<br />';
-                    $object->note_public .= $langs->transnoentities('TrainingSessionLocation') . ' : ' . (dol_strlen($object->array_options['options_trainingsession_location']) > 0  ? $object->array_options['options_trainingsession_location'] : $langs->transnoentities('NoData')) . '<br /><br />';
-
-                    $durations = 0;
+                    // Create training session from propal
                     if (isset($object->linked_objects['propal']) && !empty($object->linked_objects['propal'])) {
                         // Load DoliMeet libraries
                         require_once __DIR__ . '/../../class/trainingsession.class.php';
 
-                        $trainingSession = new TrainingSession($this->db);
+                        $trainingSession = new Trainingsession($this->db);
 
                         $propal->fetch($object->linked_objects['propal']);
                         if (strpos($propal->array_options['options_trainingsession_service'], ',') === false) {
                             $propal->array_options['options_trainingsession_service'] = explode(',', $propal->array_options['options_trainingsession_service']);
                         }
                         foreach ($propal->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-                            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
+                            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.modele = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
                             if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                                $object->note_public .= $langs->transnoentities('FormationInfoTitleTest') . '<br />';
-                                $object->note_public .= $langs->transnoentities('TrainingSessionsInclusiveWriting', count($trainingSessions)) . ' : ' . '<br />';
                                 foreach ($trainingSessions as $trainingSession) {
                                     $trainingSession->ref           = '';
                                     $trainingSession->date_creation = dol_now();
@@ -468,40 +414,13 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                     $trainingSession->fk_contrat    = $object->id;
 
                                     $trainingSession->create($user);
-
-                                    $object->note_public .= dol_print_date($trainingSession->date_start, 'day') . ' - <strong>' . $trainingSession->fields['status']['arrayofkeyval'][$trainingSession->status] . '</strong> - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuser') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuser') . '</strong><br />';
-                                    $durations += $trainingSession->duration;
                                 }
                             }
                         }
                     }
 
-                    $internalTrainee = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
-                    $externalTrainee = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
-                    if ((is_array($internalTrainee) && !empty($internalTrainee)) || (is_array($externalTrainee) && !empty($externalTrainee))) {
-                        $object->note_public .= $langs->transnoentities('PublicNoteTraineeList') . '<ul>';
-                        $contacts = array_merge($internalTrainee, $externalTrainee);
-                        foreach ($contacts as $contact) {
-                            $object->note_public .= '<li>' . dol_strtoupper($contact['lastname']) . (dol_strlen($contact['firstname']) > 0 ? ', ' . ucfirst($contact['firstname']) : '') . (dol_strlen($contact['email']) > 0 ? ', ' . $contact['email'] : '') . '</li>';
-                        }
-                        $object->note_public .= '</ul>';
-                    } else {
-                        //                    $substitutionArray = getCommonSubstitutionArray($langs, 0, null, $object);
-                        //                    complete_substitutions_array($substitutionArray, $langs, $object);
-                        //                    $formationProjectPublicNote = make_substitutions($langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PROJECT_PUBLIC_NOTE')), $substitutionArray);
-                        $object->note_public .= '<br />' . (dol_strlen($formationProjectPublicNote) > 0 ? $langs->transnoentities($formationProjectPublicNote) : $langs->transnoentities('FormationPublicNoteTraineeList'));
-                    }
-
-                    if ($propal->id > 0) {
-                        $object->note_public .= '<strong>' . $langs->transnoentities('Proposal') . ' : ' . $propal->ref . '</strong><ul>';
-                        $object->note_public .= '<li>' . $langs->transnoentities('AmountHT') . ' : ' . price($propal->total_ht, 0, '', 1, -1, -1, 'auto') . '</li>';
-                        $object->note_public .= '<li>' . $langs->transnoentities('AmountVAT') . ' : ' . price($propal->total_tva, 0, '', 1, -1, -1, 'auto') . '</li>';
-                        $object->note_public .= '<li>' . $langs->transnoentities('AmountTTC') . ' : ' . price($propal->total_ttc, 0, '', 1, -1, -1, 'auto') . '</li></ul>';
-                    } else {
-                        $object->note_public .= $langs->transnoentities('ObjectNotFound', $langs->transnoentities('Proposal'));
-                    }
-
-                    $object->setValueFrom('note_public', $object->note_public);
+                    $project->fetch($object->fk_project);
+                    set_public_note($object, $project, $propal);
                 }
                 break;
 

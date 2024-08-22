@@ -158,165 +158,212 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
             $extrafields->attributes['contrat']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
             $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
+        }
 
-            if (strpos($parameters['context'], 'propalcard') !== false) {
-                if (empty(GETPOST('options_trainingsession_type', 'int'))) {
-                    $extrafields->attributes['propal']['hidden']['trainingsession_service']  = 1;
-                    $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
-                }
-
-                // Hide extrafields trainingsession_service for view mode
-                if (empty($action)) {
-                    $extrafields->attributes['propal']['list']['trainingsession_service'] = 0;
-                }
-
-                ?>
-                <script>
-                    $(document).on('change', '#options_trainingsession_type', function() {
-                        var type = $(this).val();
-                        if (type > 0) {
-                            $('#options_trainingsession_service').closest('tr').show();
-                            $('#options_trainingsession_location').closest('tr').show();
-                            $('.button-save').prop('disabled', true);
-                        } else {
-                            $('#options_trainingsession_service').closest('tr').hide();
-                            $('#options_trainingsession_location').closest('tr').hide();
-                        }
-                    });
-                </script>
-                <?php
+        if (strpos($parameters['context'], 'propalcard') !== false) {
+            if (empty(GETPOST('options_trainingsession_type', 'int'))) {
+                $extrafields->attributes['propal']['hidden']['trainingsession_service']  = 1;
+                $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
             }
 
-            if (strpos($parameters['context'], 'projectcard') !== false) {
-                // Hide extrafields for create mode
-                if (empty(GETPOST('options_trainingsession_type', 'int'))) {
-                    $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 1;
-                    $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 1;
-                    $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 1;
-                }
+            // Hide extrafields trainingsession_service for view mode
+            if (empty($action)) {
+                $extrafields->attributes['propal']['list']['trainingsession_service'] = 0;
+            }
 
-                // Show extrafields for update mode if options_trainingsession_type is set
-                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
-                    $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 0;
-                    $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 0;
-                    $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 0;
-                }
+            ?>
+            <script>
+                $(document).on('change', '#options_trainingsession_type', function() {
+                    var type = $(this).val();
+                    if (type > 0) {
+                        $('#options_trainingsession_service').closest('tr').show();
+                        $('#options_trainingsession_location').closest('tr').show();
+                    } else {
+                        $('#options_trainingsession_service').closest('tr').hide();
+                        $('#options_trainingsession_location').closest('tr').hide();
+                    }
+                });
+            </script>
+            <?php
+        }
 
-                // Disabled extrafields for view mode
-                if (empty($object->array_options['options_trainingsession_type']) && $action != 'create' && $action != 'edit') {
-                    $extrafields->attributes['projet']['list']['trainingsession_type']        = 0;
-                    $extrafields->attributes['projet']['list']['trainingsession_service']     = 0;
-                    $extrafields->attributes['projet']['list']['trainingsession_location']    = 0;
-                    $extrafields->attributes['projet']['list']['trainingsession_nb_trainees'] = 0;
-                }
+        if (strpos($parameters['context'], 'projectcard') !== false) {
+            // Hide extrafields for create mode
+            if (empty(GETPOST('options_trainingsession_type', 'int'))) {
+                $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 1;
+                $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 1;
+                $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 1;
+                $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 1;
+            }
 
-                $out  = '<div class="wpeo-notice notice-error">';
-                $out .= '<div class="notice-content left">';
-                $out .= '<div class="notice-title">' . $langs->transnoentities('ErrorMissingTrainingSessionProjectInfo') . '</div><div class="notice-subtitle"><ul>';
-                $out .= '<li class="notice-training-session-service">' . $langs->transnoentities('TrainingSessionService') . '</li>';
-                $out .= '<li class="notice-third-party">' . $langs->transnoentities('ThirdParty') . '</li>';
-                $out .= '<li class="notice-opportunity-status">' . $langs->transnoentities('OpportunityStatus') . '</li>';
-                $out .= '</ul></div></div></div>';
+            // Show extrafields for update mode if options_trainingsession_type is set
+            if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
+                $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 0;
+                $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 0;
+                $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 0;
+            }
 
-                ?>
-                <script>
-                    $(document).on('change', '#options_trainingsession_type', function() {
-                        var type = $(this).val();
-                        if (type > 0) {
-                            $('#options_trainingsession_service').closest('tr').show();
-                            $('#options_trainingsession_location').closest('tr').show();
-                            $('#options_trainingsession_nb_trainees').closest('tr').show();
-                        } else {
-                            $('#options_trainingsession_service').closest('tr').hide();
-                            $('#options_trainingsession_location').closest('tr').hide();
-                            $('#options_trainingsession_nb_trainees').closest('tr').hide();
-                        }
-                    });
+            // Disabled extrafields for view mode
+            if (empty($object->array_options['options_trainingsession_type']) && $action != 'create' && $action != 'edit') {
+                $extrafields->attributes['projet']['list']['trainingsession_type']        = 0;
+                $extrafields->attributes['projet']['list']['trainingsession_service']     = 0;
+                $extrafields->attributes['projet']['list']['trainingsession_location']    = 0;
+                $extrafields->attributes['projet']['list']['trainingsession_nb_trainees'] = 0;
+            }
 
-                    $(document).on('change', '#options_trainingsession_service', function() {
-                        let labelField = $('input[name="title"]');
-                        labelField.val($(this).find('option:selected').text());
-                        window.saturne.loader.display(labelField);
-                        setTimeout(function() {
-                            window.saturne.loader.remove(labelField);
-                        }, 1000);
-                    });
+            $out  = '<div class="wpeo-notice notice-error">';
+            $out .= '<div class="notice-content left">';
+            $out .= '<div class="notice-title">' . $langs->transnoentities('ErrorMissingTrainingSessionProjectInfo') . '</div><div class="notice-subtitle"><ul>';
+            $out .= '<li class="notice-training-session-service">' . $langs->transnoentities('TrainingSessionService') . '</li>';
+            $out .= '<li class="notice-third-party">' . $langs->transnoentities('ThirdParty') . '</li>';
+            $out .= '<li class="notice-opportunity-status">' . $langs->transnoentities('OpportunityStatus') . '</li>';
+            $out .= '</ul></div></div></div>';
 
-                    $(document).ready(function(){
-                        let table = $('form table tr').eq(0);
-                        $('.field_options_trainingsession_type').insertAfter(table);
-                        $('.field_options_trainingsession_service').insertAfter('.field_options_trainingsession_type');
-                        $('.field_options_trainingsession_location').insertAfter('.field_options_trainingsession_service');
-                        $('.field_options_trainingsession_nb_trainees').insertAfter('.field_options_trainingsession_location');
+            ?>
+            <script>
+                $(document).on('change', '#socid', function() {
+                    var type = $(this).val();
+                    if (type > 0) {
+                        $('#options_trainingsession_type').removeAttr('disabled');
+                    } else {
+                        $('#options_trainingsession_type').attr('disabled', 'disabled');
+                    }
+                });
 
-                        function checkFields() {
-                            let displayNotice = 0;
-                            let notice        = $('.fiche').find('.wpeo-notice');
-                            if ($('#options_trainingsession_type').val() > 0) {
-                                let labelField = $('input[name="title"]');
-                                console.log(labelField.val())
-                                if (labelField.val().length <= 0) {
-                                    displayNotice++;
-                                } else {
-                                    notice.find('.notice-label').fadeOut(400, function() {
-                                        $(this).remove();
-                                    });
-                                }
+                $(document).on('change', '#options_trainingsession_type', function() {
+                    var type = $(this).val();
+                    if (type > 0) {
+                        $('#options_trainingsession_service').closest('tr').show();
+                        $('#options_trainingsession_location').closest('tr').show();
+                        $('#options_trainingsession_nb_trainees').closest('tr').show();
+                    } else {
+                        $('#options_trainingsession_service').closest('tr').hide();
+                        $('#options_trainingsession_location').closest('tr').hide();
+                        $('#options_trainingsession_nb_trainees').closest('tr').hide();
+                    }
+                });
 
-                                let thirdPartyField = $('#socid');
-                                if (thirdPartyField.val() <= 0) {
-                                    displayNotice++;
-                                } else {
-                                    notice.find('.notice-third-party').fadeOut(400, function() {
-                                        $(this).remove();
-                                    });
-                                }
+                $(document).on('change', '#options_trainingsession_service', function() {
+                    let labelField = $('input[name="title"]');
+                    labelField.val($(this).find('option:selected').text());
+                    window.saturne.loader.display(labelField);
+                    setTimeout(function() {
+                        window.saturne.loader.remove(labelField);
+                    }, 1000);
+                });
 
-                                let opportunityStatusField = $('#opp_status');
-                                if (opportunityStatusField.val() <= 0) {
-                                    displayNotice++;
-                                } else {
-                                    notice.find('.notice-opportunity-status').fadeOut(400, function() {
-                                        $(this).remove();
-                                    });
-                                }
+                $(document).ready(function(){
+                    let table = $('form table tr').eq(0);
+                    $('.field_options_trainingsession_type').insertAfter(table);
+                    $('.field_options_trainingsession_service').insertAfter('.field_options_trainingsession_type');
+                    $('.field_options_trainingsession_location').insertAfter('.field_options_trainingsession_service');
+                    $('.field_options_trainingsession_nb_trainees').insertAfter('.field_options_trainingsession_location');
 
-                                let opportunityPercentField = $('#opp_percent');
-                                if (opportunityPercentField.val().length <= 0) {
-                                    displayNotice++;
-                                }
-
-                                let trainingSessionServiceField = $('#options_trainingsession_service');
-                                if (trainingSessionServiceField.val() <= 0) {
-                                    displayNotice++;
-                                } else {
-                                    notice.find('.notice-training-session-service').fadeOut(400, function() {
-                                        $(this).remove();
-                                    });
-                                }
-
-                                if (displayNotice > 0 && notice.length == 0) {
-                                    $('.button-save').prop('disabled', true);
-                                    $('.fiche').prepend(<?php echo json_encode($out); ?>);
-                                } else if (displayNotice == 0) {
-                                    $('.button-save').prop('disabled', false);
-                                    notice.fadeOut(400, function() {
-                                        $(this).remove();
-                                    });
-                                }
+                    function checkFields() {
+                        let displayNotice = 0;
+                        let notice        = $('.fiche').find('.wpeo-notice');
+                        if ($('#options_trainingsession_type').val() > 0) {
+                            let labelField = $('input[name="title"]');
+                            console.log(labelField.val())
+                            if (labelField.val().length <= 0) {
+                                displayNotice++;
                             } else {
+                                notice.find('.notice-label').fadeOut(400, function() {
+                                    $(this).remove();
+                                });
+                            }
+
+                            let thirdPartyField = $('#socid');
+                            if (thirdPartyField.val() <= 0) {
+                                displayNotice++;
+                            } else {
+                                notice.find('.notice-third-party').fadeOut(400, function() {
+                                    $(this).remove();
+                                });
+                            }
+
+                            let opportunityStatusField = $('#opp_status');
+                            if (opportunityStatusField.val() <= 0) {
+                                displayNotice++;
+                            } else {
+                                notice.find('.notice-opportunity-status').fadeOut(400, function() {
+                                    $(this).remove();
+                                });
+                            }
+
+                            let opportunityPercentField = $('#opp_percent');
+                            if (opportunityPercentField.val().length <= 0) {
+                                displayNotice++;
+                            }
+
+                            let trainingSessionServiceField = $('#options_trainingsession_service');
+                            if (trainingSessionServiceField.val() <= 0) {
+                                displayNotice++;
+                            } else {
+                                notice.find('.notice-training-session-service').fadeOut(400, function() {
+                                    $(this).remove();
+                                });
+                            }
+
+                            if (displayNotice > 0 && notice.length == 0) {
+                                $('.button-save').prop('disabled', true);
+                                $('.fiche').prepend(<?php echo json_encode($out); ?>);
+                            } else if (displayNotice == 0) {
                                 $('.button-save').prop('disabled', false);
                                 notice.fadeOut(400, function() {
                                     $(this).remove();
                                 });
                             }
+                        } else {
+                            $('.button-save').prop('disabled', false);
+                            notice.fadeOut(400, function() {
+                                $(this).remove();
+                            });
                         }
+                    }
 
-                        setInterval(checkFields, 1000);
-                    });
-                </script>
-                <?php
-            }
+                    setInterval(checkFields, 1000);
+                    if ($('#socid').val() < 0) {
+                        $('#options_trainingsession_type').attr('disabled', 'disabled');
+                    }
+                });
+            </script>
+            <?php
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printFieldListOption function : replacing the parent's function with the one below
+     *
+     * @param  array     $parameters Hook metadatas (context, etc...)
+     * @return int                   0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
+    public function printFieldListOption(array $parameters): int
+    {
+        global $extrafields, $langs;
+
+        if (preg_match('/projectlist|propallist|contractlist/', $parameters['context'])) {
+            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+
+            $extrafields->attributes['projet']['label']['trainingsession_type']        = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
+            $extrafields->attributes['projet']['label']['trainingsession_service']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
+            $extrafields->attributes['projet']['label']['trainingsession_location']    = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
+            $extrafields->attributes['projet']['label']['trainingsession_nb_trainees'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_nb_trainees']);
+
+            $extrafields->attributes['propal']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
+            $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
+            $extrafields->attributes['propal']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
+
+            $extrafields->attributes['contrat']['label']['label']                     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
+            $extrafields->attributes['contrat']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
+            $extrafields->attributes['contrat']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
+            $extrafields->attributes['contrat']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
+            $extrafields->attributes['contrat']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
+            $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
         }
 
         return 0; // or return 1 to replace standard code
@@ -698,32 +745,29 @@ class ActionsDolimeet
             }
         }
 
-        if (strpos($parameters['context'], 'sessioncard') !== false) {
-            global $object;
+        if (strpos($parameters['context'], 'projectcard') !== false) {
+            global $action, $object;
 
-            ?>
-            <script>
-                function updateFieldUrls(objectType, fields) {
-                    fields.forEach(function(field) {
-                        let titleField = $(`.titlefield.fieldname_${field}`).find('a');
-                        if (titleField.length) {
-                            let newTitleHref = titleField.attr('href') + '&object_type=' + objectType;
-                            titleField.attr('href', newTitleHref);
-                        }
+            if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && $action != 'create' && $action != 'edit') {
+                require_once __DIR__ . '/trainingsession.class.php';
 
-                        let valueField = $(`.valuefield.fieldname_${field}`).find('form');
-                        if (valueField.length) {
-                            let newValueAction = valueField.attr('action') + '?object_type=' + objectType;
-                            valueField.attr('action', newValueAction);
-                        }
-                    });
+                $trainingSession = new Trainingsession($this->db);
+                $out                                                      = [];
+                $object->array_options['options_trainingsession_service'] = explode(',', $object->array_options['options_trainingsession_service']);
+                foreach ($object->array_options['options_trainingsession_service'] as $index => $trainingSessionServiceId) {
+                    $trainingSession->fetch('', '', ' AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId);
+                    if ($object->array_options['options_trainingsession_service'][$index] != $trainingSession->fk_element) {
+                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession&modele=on&fk_project=' . $object->id . '&element_type=service&fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddTrainingSession') . '"></span></a>';
+                    } else {
+                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_list.php?object_type=trainingsession&search_modele=1&search_fk_project=' . $object->id . '&search_element_type=service&search_fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-eye valignmiddle" title="' . $langs->transnoentities('SeeTrainingSessionModel') . '"></span></a>';
+                    }
                 }
+            } ?>
 
-                let objectType = <?php echo json_encode($object->element); ?>;
-                let fields = ['date_start', 'date_end', 'duration'];
-
-                updateFieldUrls(objectType, fields);
-
+            <script>
+                $('.project_extras_trainingsession_service .select2-container-multi-dolibarr .select2-choices-dolibarr li').each(function(index) {
+                    $(this).append(<?php echo json_encode($out); ?>[index]);
+                });
             </script>
             <?php
         }
@@ -849,31 +893,6 @@ class ActionsDolimeet
                 $object->array_options['options_trainingsession_durations'] = $duration;
                 $object->updateExtrafield('trainingsession_durations');
                 return 1;
-            }
-        }
-
-        return 0; // or return 1 to replace standard code
-    }
-
-    /**
-     *  Overloading the printFieldListTitle function : replacing the parent's function with the one below
-     *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
-     */
-    public function printFieldPreListTitle(array $parameters, $object, string $action): int
-    {
-        global $extrafields, $langs;
-
-        if (strpos($parameters['context'], 'contractlist') !== false) {
-            $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-            foreach ($extrafields->attributes['contrat']['enabled'] as $key => $moduleExtraFiels) {
-                if (strpos($moduleExtraFiels, 'dolimeet') !== false) {
-                    $extrafields->attributes['contrat']['label'][$key] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label'][$key]);
-                }
             }
         }
 
@@ -1047,6 +1066,30 @@ class ActionsDolimeet
             }
 
             $this->results = $parameters;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the saturneIndex function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return void
+     */
+    public function saturneIndex(array $parameters)
+    {
+        global $conf, $langs;
+
+        if (strpos($parameters['context'], 'dolimeetindex') !== false) {
+            $out = '<div class="wpeo-notice notice-info">';
+            $out .= '<div class="notice-content">';
+            $out .= '<div class="notice-title"><strong>' . $langs->trans('SetupDefaultDataNotCreated') . '</strong></div>';
+            $out .= '<div class="notice-subtitle"><strong>' . $langs->trans('HowToSetupDefaultData') . ' <a href="admin/setup.php">' . $langs->trans('ConfigDefaultData') . '</a></strong></div>';
+            $out .= '</div>';
+            $out .= '</div>';
+
+            $this->resprints = $out;
         }
 
         return 0; // or return 1 to replace standard code

@@ -41,6 +41,15 @@ OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par d
 TrainingContract                            = Convention de formation
 WelcomeBooklet                              = Livret d'acceuil
 RulesOfProcedure                            = Réglement intérieur
+FormationServiceMainCategory                = Choix de la catégorie principale des services de formation
+FormationHours                              = Durée de la formation
+MorningStartHour                            = Heure de début de matinée
+MorningEndHour                              = Heure de fin de matinée
+AfternoonStartHour                          = Heure de début d'après-midi
+AfternoonEndHour                            = Heure de fin d'après-midi
+TrainingSessionLocationCompany              = Lieu de formation (société)
+TrainingSessionLocationThirdParty           = Lieu de formation (tiers)
+TrainingSessionLocationOther                = Autre lieu de formation par défaut
 
 
 
@@ -49,7 +58,10 @@ RulesOfProcedure                            = Réglement intérieur
 #
 
 # Data - Donnée
-EnableDolimeet = Veuillez activer le module DoliMeet pour accéder à cette page
+SetupDefaultDataNotCreated = Vous n'avez pas créé les données par défaut de DoliMeet
+HowToSetupDefaultData      = Pour configurer les données par défaut de DoliMeet, veuillez cliquer sur ce lien :
+ConfigDefaultData          = Configuration des données par défaut de DoliMeet
+EnableDolimeet             = Veuillez activer le module DoliMeet pour accéder à cette page
 
 
 
@@ -151,6 +163,7 @@ TrainingSessionService        = Services de formation
 TrainingSessionServiceHelp    = Services de formation permettant de définir les services liés à la formation et de générer les sessions de formation associées
 TrainingSessionNbTrainees     = Nombre de stagiaires
 TrainingSessionNbTraineesHelp = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
+SeeTrainingSessionModel       = Voir le/les modèle(s) de session de formation
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
@@ -279,3 +292,4 @@ HourEnd                           = Heure de fin
 FormationPublicNoteTraineeListTitle = Note publique avec la liste des stagiaires
 FormationPublicNoteTraineeList    = <strong>3 - Liste des stagiaires </strong><ul><li>Nom, Prénom, Email, Titre</li></ul>
 ToBePlanned                       = à planifier
+PublicNoteTraineeList             = <strong>3 - Liste des stagiaires </strong>

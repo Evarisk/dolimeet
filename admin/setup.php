@@ -32,9 +32,7 @@ if (file_exists('../dolimeet.main.inc.php')) {
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
-if (isModEnabled('fckeditor')) {
-    require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
-}
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 
 // Load DoliMeet libraries
 require_once __DIR__ . '/../lib/dolimeet.lib.php';
@@ -52,7 +50,9 @@ $value      = GETPOST('value', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Initialize view objects
-$form = new Form($db);
+$form        = new Form($db);
+$formOther   = new FormOther($db);
+$extraFields = new ExtraFields($db);
 
 $formationServices = get_formation_service();
 
@@ -98,26 +98,36 @@ if ($action == 'update_formation_service') {
         }
     }
 
-    $traningSessionLocation = GETPOST('training_session_location');
-    if ($traningSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
-        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $traningSessionLocation, 'chaine', 0, '', $conf->entity);
+    $categoryID = GETPOST('main_category', 'int');
+    if ($categoryID != getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY')) {
+        dolibarr_set_const($db, 'DOLIMEET_FORMATION_MAIN_CATEGORY', $categoryID, 'integer', 0, '', $conf->entity);
+
+        $filter            = 'product:label:rowid::fk_product_type = 1 AND entity = $ENTITY$ AND rowid IN (SELECT cp.fk_product FROM llx_categorie_product cp LEFT JOIN llx_categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . $categoryID . ')';
+        $extraFieldsArrays = ['trainingsession_service' => ['Label' => 'TrainingSessionService', 'type' => 'chkbxlst', 'length' => '', 'elementtype' => ['propal', 'projet'], 'position' => 10, 'params' => 'a:1:{s:7:"options";a:1:{s:' . dol_strlen($filter) . ':"' . $filter . '";N;}}', 'list' => 1, 'help' => 'TrainingSessionServiceHelp', 'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']]];
+        foreach ($extraFieldsArrays as $key => $extraField) {
+            foreach ($extraField['elementtype'] as $extraFieldElementType) {
+                $extraFields->fetch_name_optionals_label($extraFieldElementType);
+                $extraFields->update($key, $extraField['Label'], $extraField['type'], $extraField['length'], $extraFieldElementType, 0, 0, 436304 . $extraField['position'], $extraField['params'], '', '', $extraField['list'], $extraField['help'], '', '', $extraField['entity'], $extraField['langfile'], $extraField['enabled'] . ' && isModEnabled("' . $extraFieldElementType . '")', 0, 0, $extraField['css']);
+            }
+        }
     }
 
-    if (isModEnabled('fckeditor')) {
-        $formationProjectLabel = GETPOST('DOLIMEET_FORMATION_PROJECT_LABEL', 'none');
-        if ($formationProjectLabel != getDolGlobalString('DOLIMEET_FORMATION_PROJECT_LABEL')) {
-            dolibarr_set_const($db, 'DOLIMEET_FORMATION_PROJECT_LABEL', $formationProjectLabel, 'chaine', 0, '', $conf->entity);
+    $timePeriods = [
+        'morning_start_hour'   => 'DOLIMEET_TRAININGSESSION_MORNING_START_HOUR',
+        'morning_end_hour'     => 'DOLIMEET_TRAININGSESSION_MORNING_END_HOUR',
+        'afternoon_start_hour' => 'DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR',
+        'afternoon_end_hour'   => 'DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR'
+    ];
+    foreach ($timePeriods as $postKey => $globalKey) {
+        $timeInSeconds = GETPOST($postKey);
+        if ($timeInSeconds != getDolGlobalString($globalKey)) {
+            dolibarr_set_const($db, $globalKey, $timeInSeconds, 'integer', 0, '', $conf->entity);
         }
+    }
 
-        $formationPublicNoteDate = GETPOST('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE', 'none');
-        if ($formationPublicNoteDate != getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE')) {
-            dolibarr_set_const($db, 'DOLIMEET_FORMATION_PUBLIC_NOTE_DATE', $formationPublicNoteDate, 'chaine', 0, '', $conf->entity);
-        }
-
-        $formationPublicNoteTraineeList = GETPOST('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST', 'none');
-        if ($formationPublicNoteTraineeList != getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST')) {
-            dolibarr_set_const($db, 'DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST', $formationPublicNoteTraineeList, 'chaine', 0, '', $conf->entity);
-        }
+    $traningSessionLocation = GETPOST('training_session_location');
+    if ($traningSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
+        dolibarr_set_const($db, 'DOLIMEET_FORMATION_MAIN_CATEGORY', $categoryID, 'integer', 0, '', $conf->entity);
     }
 
     setEventMessage('SavedConfig');
@@ -209,50 +219,27 @@ foreach ($formationServices as $formationService) {
     print '</td></tr>';
 }
 
+// Set default main category
+print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationServiceMainCategory') . '</td><td>';
+print img_picto('', 'category', 'class="pictofixedwidth"');
+print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
+print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddTag') . '"></span></a>';
+print '</td></tr>';
+
+// Formation hours
+print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationHours') . '</td><td>';
+print $langs->transnoentities('MorningStartHour') . '<input type="time" class="marginleftonly" name="morning_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR') . '" /><br>';
+print $langs->transnoentities('MorningEndHour')  . '<input type="time" class="marginleftonly" name="morning_end_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR') . '" /><br>';
+print $langs->transnoentities('AfternoonStartHour')  . '<input type="time" class="marginleftonly" name="afternoon_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR') . '" /><br>';
+print $langs->transnoentities('AfternoonEndHour')  . '<input type="time" class="marginleftonly" name="afternoon_end_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR') . '" /><br>';
+print '</td></tr>';
+
 // Training session location
 print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionLocation') . '</td><td>';
 print '<input type="radio" id="TrainingSessionLocationCompany" name="training_session_location" value="TrainingSessionLocationCompany"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationCompany' ? 'checked' : '') . '/><label for="TrainingSessionLocationCompany">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationCompany') . '</label><br>';
 print '<input type="radio" id="TrainingSessionLocationThirdParty" name="training_session_location" value="TrainingSessionLocationThirdParty"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationThirdParty' ? 'checked' : '') . '/><label for="TrainingSessionLocationThirdParty">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationThirdParty') . '</label><br>';
 print '<input type="radio" id="TrainingSessionLocationOther" name="training_session_location" value="TrainingSessionLocationOther"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationOther' ? 'checked' : '') . '/><label for="TrainingSessionLocationOther">' . img_picto('', 'fontawesome_fa-font_fas', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationOther') . '</label>';
 print '</td></tr>';
-
-if (isModEnabled('fckeditor')) {
-    $substitutionArray = getCommonSubstitutionArray($langs);
-    complete_substitutions_array($substitutionArray, $langs);
-
-    // Substitution array/string
-    $helpForSubstitution = '';
-    if (is_array($substitutionArray) && count($substitutionArray)) {
-        $helpForSubstitution .= $langs->trans('AvailableVariables') . ' : <br>';
-    }
-    foreach ($substitutionArray as $key => $val) {
-        $helpForSubstitution .= $key . ' -> '. $langs->trans(dol_string_nohtmltag(dolGetFirstLineOfText($val))) . '<br>';
-    }
-
-    // Formation project label
-    $formationProjectLabel = $langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PROJECT_LABEL')) ?: $langs->transnoentities('FormationProjectLabel');
-    print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('FormationProjectLabelTitle'), $helpForSubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
-    print '</td><td>';
-    $dolEditor = new DolEditor('DOLIMEET_FORMATION_PROJECT_LABEL', $formationProjectLabel, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
-    $dolEditor->Create();
-    print '</td></tr>';
-
-    // Formation public note date
-    $formationPublicNoteDate = $langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE')) ?: $langs->transnoentities('FormationPublicNoteDate');
-    print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('FormationPublicNoteDateTitle'), $helpForSubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
-    print '</td><td>';
-    $dolEditor = new DolEditor('DOLIMEET_FORMATION_PUBLIC_NOTE_DATE', $formationPublicNoteDate, '100%', 300, 'dolibarr_details', '', false, true, getDolGlobalInt('FCKEDITOR_ENABLE_NOTE_PUBLIC'), 'ROWS_5', 70);
-    $dolEditor->Create();
-    print '</td></tr>';
-
-    // Formation Public note trainee list
-    $formationPublicNoteTraineeList = $langs->transnoentities(getDolGlobalString('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST')) ?: $langs->transnoentities('FormationPublicNoteTraineeList');
-    print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('FormationPublicNoteTraineeListTitle'), $helpForSubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
-    print '</td><td>';
-    $dolEditor = new DolEditor('DOLIMEET_FORMATION_PUBLIC_NOTE_TRAINEE_LIST', $formationPublicNoteTraineeList, '100%', 300, 'dolibarr_details', '', false, true, getDolGlobalInt('FCKEDITOR_ENABLE_NOTE_PUBLIC'), 'ROWS_5', 70);
-    $dolEditor->Create();
-    print '</td></tr>';
-}
 
 print '</table>';
 print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';

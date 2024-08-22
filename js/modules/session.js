@@ -62,6 +62,11 @@ window.dolimeet.session.event = function() {
     $(document).on('change', '#fk_soc', window.dolimeet.session.reloadField);
   $(document).on('change', '#modele', window.dolimeet.session.test);
   $(document).on('change', '#element_type', window.dolimeet.session.test2);
+  $('#date_start, #date_starthour, #date_startmin, #date_end, #date_endhour, #date_endmin').change(function () {
+    setTimeout(function () {
+      window.dolimeet.session.getDiffTimestamp();
+    }, 100);
+  });
 };
 
 /**
@@ -168,4 +173,43 @@ window.dolimeet.session.test2 = function() {
     },
     error: function() {}
   });
+};
+
+/**
+ * Reload specific field element_type and fk_element
+ *
+ * @memberof Saturne_Utils
+ *
+ * @since   1.2.0
+ * @version 1.2.0
+ *
+ * @returns {void}
+ */
+window.dolimeet.session.getDiffTimestamp = function() {
+  let dayap   = $('#date_startday').val();
+  let monthap = $('#date_startmonth').val();
+  let yearap  = $('#date_startyear').val();
+  let hourap  = $('#date_starthour').val() > 0 ? $('#date_starthour').val() : 0;
+  let minap   = $('#date_startmin').val() > 0 ? $('#date_startmin').val() : 0;
+
+  let dayp2   = $('#date_endday').val();
+  let monthp2 = $('#date_endmonth').val();
+  let yearp2  = $('#date_endyear').val();
+  let hourp2  = $('#date_endhour').val() > 0 ? $('#date_endhour').val() : 0;
+  let minp2   = $('#date_endmin').val() > 0 ? $('#date_endmin').val() : 0;
+
+  if (yearap != '' && monthap != '' && dayap != '' && yearp2 != '' && monthp2 != '' && dayp2 != '') {
+    let dateap = new Date(yearap, monthap - 1, dayap, hourap, minap);
+    let datep2 = new Date(yearp2, monthp2 - 1, dayp2, hourp2, minp2);
+
+    let diffTimeStamp      = (datep2.getTime() - dateap.getTime()) / 3600000;
+    let diffTimeStampInMin = ((datep2.getTime() - dateap.getTime()) / 60000);
+    if (diffTimeStamp > 0) {
+      $('input[name="durationhour"]').val((diffTimeStampInMin - (diffTimeStampInMin % 60)) / 60);
+      $('input[name="durationmin"]').val(Math.abs((diffTimeStampInMin % 60)));
+    } else {
+      $('input[name="durationhour"]').val(0);
+      $('input[name="durationmin"]').val(0);
+    }
+  }
 };
