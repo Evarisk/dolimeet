@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -163,7 +163,7 @@ class ActionsDolimeet
             if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) && isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
                 $filter  = 'product as p:ref|label:rowid::fk_product_type = 1 AND entity = $ENTITY$';
                 $filter .= ' AND rowid IN (SELECT cp.fk_product FROM llx_categorie_product cp LEFT JOIN llx_categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
-                $filter .= ' AND EXISTS (SELECT 1 FROM llx_dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.modele = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
+                $filter .= ' AND EXISTS (SELECT 1 FROM llx_dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
 
                 $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => [$filter => '']];
                 $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => [$filter => '']];
@@ -767,9 +767,9 @@ class ActionsDolimeet
                 foreach ($object->array_options['options_trainingsession_service'] as $index => $trainingSessionServiceId) {
                     $trainingSession->fetch('', '', ' AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId);
                     if ($object->array_options['options_trainingsession_service'][$index] != $trainingSession->fk_element) {
-                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession&modele=on&fk_project=' . $object->id . '&element_type=service&fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddTrainingSession') . '"></span></a>';
+                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession&model=on&fk_project=' . $object->id . '&element_type=service&fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddTrainingSession') . '"></span></a>';
                     } else {
-                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_list.php?object_type=trainingsession&search_modele=1&search_fk_project=' . $object->id . '&search_element_type=service&search_fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-eye valignmiddle" title="' . $langs->transnoentities('SeeTrainingSessionModel') . '"></span></a>';
+                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_list.php?object_type=trainingsession&search_model=1&search_fk_project=' . $object->id . '&search_element_type=service&search_fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-eye valignmiddle" title="' . $langs->transnoentities('SeeTrainingSessionModel') . '"></span></a>';
                     }
                 }
             } ?>
@@ -823,12 +823,6 @@ class ActionsDolimeet
                         dol_print_error('', $object->error);
                     }
                 }
-            }
-        }
-
-        if (in_array($parameters['currentcontext'], ['thirdpartycard', 'thirdpartycomm'])) {
-            if (isModEnabled('propal') && $user->hasRight('propal', 'creer') && $object->status == 1) {
-                print '<div class="inline-block divButAction"><a class="butAction" href="' . DOL_URL_ROOT . '/comm/propal/card.php?socid=' . $object->id . '&action=create">' . img_picto('', 'fontawesome_file-signature_fas_white', 'class="pictofixedwidth"') . $langs->trans('ProposalFormation') . '</a></div>';
             }
         }
 
@@ -975,30 +969,6 @@ class ActionsDolimeet
             }
         }
 
-        if (strpos($parameters['context'], 'projectcard') !== false) {
-            // Load DoliMeet libraries
-            require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
-
-            $error             = 0;
-            $formationServices = get_formation_service();
-            foreach ($formationServices as $formationService) {
-                $formationServiceID = getDolGlobalInt($formationService['code']);
-                if ($formationServiceID <= 0) {
-                    $error++;
-                }
-            }
-
-            if ($error > 0) {
-                $moreHtmlStatus  = '<div class="wpeo-notice notice-warning">';
-                $moreHtmlStatus .= '<div class="notice-content">';
-                $moreHtmlStatus .= '<div class="notice-title">' . $langs->trans('ServicesNotConfiguredForTraining');
-                $moreHtmlStatus .= '<div class="notice-subtitle"><a class="butAction" href="' . dol_buildpath('custom/dolimeet/admin/setup.php', 1) . '">' . img_picto('', 'fontawesome_fa-cog_fas', 'class="paddingright"') . $langs->trans('Config') . '</a></div>';
-                $moreHtmlStatus .= '</div></div></div>';
-
-                $this->resprints = $moreHtmlStatus;
-            }
-        }
-
         return 0; // or return 1 to replace standard code.
     }
 
@@ -1052,7 +1022,7 @@ class ActionsDolimeet
                     break;
                 case 'product' :
                     $objectElement = $parameters['object']->element;
-                    $filter        = 't.status >= 0 AND t.modele = 1 AND t.element_type = "service" AND t.fk_element = ' . $parameters['object']->id;
+                    $filter        = 't.status >= 0 AND t.model = 1 AND t.element_type = "service" AND t.fk_element = ' . $parameters['object']->id;
                     break;
                 default :
                     $objectElement = $parameters['object']->element;

@@ -1,4 +1,4 @@
--- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+-- Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ ALTER TABLE `llx_dolimeet_session` DROP `model_pdf`, DROP `last_main_doc`, DROP 
 
 -- 1.5.0
 ALTER TABLE `llx_dolimeet_session` ADD `element_type` VARCHAR(128) NULL AFTER `type`;
-ALTER TABLE `llx_dolimeet_session` ADD `modele` BOOLEAN NULL DEFAULT FALSE AFTER `element_type`;
-ALTER TABLE `llx_dolimeet_session` ADD `position` TINYINT(4) NULL AFTER `modele`;
+ALTER TABLE `llx_dolimeet_session` ADD `model` BOOLEAN NULL DEFAULT FALSE AFTER `element_type`;
+ALTER TABLE `llx_dolimeet_session` ADD `position` TINYINT(4) NULL AFTER `model`;
 ALTER TABLE `llx_dolimeet_session` ADD `fk_element` INT NULL AFTER `fk_soc`;
 ALTER TABLE `llx_dolimeet_session` CHANGE `date_start` `date_start` DATETIME NULL;
 ALTER TABLE `llx_dolimeet_session` CHANGE `date_end` `date_end` DATETIME NULL;

@@ -1,4 +1,4 @@
--- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+-- Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ CREATE TABLE llx_dolimeet_session(
   duration      integer,
   type          varchar(128),
   element_type  varchar(128),
-  modele        boolean DEFAULT FALSE,
+  model         boolean DEFAULT FALSE,
   position      tinyint(4),
   content       text,
   note_public   text,

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 global $conf, $db, $langs, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['admin']);
+saturne_load_langs(['categories']);
 
 // Get parameters
 $action     = GETPOST('action', 'alpha');
@@ -91,7 +91,7 @@ if ($action == 'set_satisfaction_survey') {
     exit;
 }
 
-if ($action == 'update_formation_service') {
+if ($action == 'update_formation_datas') {
     foreach ($formationServices as $formationService) {
         $formationServiceID = GETPOST($formationService['name'], 'int');
         if ($formationServiceID > 0) {
@@ -99,7 +99,7 @@ if ($action == 'update_formation_service') {
         }
     }
 
-    $categoryID = GETPOST('main_category', 'int');
+    $categoryID = GETPOST('formation_main_category', 'int');
     if ($categoryID != getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY')) {
         dolibarr_set_const($db, 'DOLIMEET_FORMATION_MAIN_CATEGORY', $categoryID, 'integer', 0, '', $conf->entity);
     }
@@ -199,14 +199,14 @@ print load_fiche_titre($langs->transnoentities('Formation'), '', '');
 
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="formation_form">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="update_formation_service">';
+print '<input type="hidden" name="action" value="update_formation_datas">';
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->transnoentities('Name') . '</td>';
-print '<td>' . $langs->transnoentities('Service') . '</td>';
+print '<td>' . $langs->transnoentities('Value') . '</td>';
 print '</tr>';
 
-// FormationServices
+// Formation services
 foreach ($formationServices as $formationService) {
     print '<tr class="oddeven"><td>' . $langs->transnoentities($formationService['name']) . '</td><td>';
     print img_picto('', 'service', 'class="pictofixedwidth"');
@@ -219,19 +219,19 @@ foreach ($formationServices as $formationService) {
 // Set default main category
 print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationServiceMainCategory') . '</td><td>';
 print img_picto('', 'category', 'class="pictofixedwidth"');
-print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
-print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddTag') . '"></span></a>';
+print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'formation_main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
+print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
 print '</td></tr>';
 
 // Training session templates project
 print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionTemplates') . '</td><td>';
 print img_picto('', 'project', 'class="pictofixedwidth"');
-$formProjects->select_projects(-1, (GETPOSTISSET('training_session_templates_project') ? GETPOST('training_session_templates_project', 'int') : getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')), 'training_session_templates_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500 widthcentpercentminusx');
+$formProjects->select_projects(-1, (GETPOSTISSET('training_session_templates_project') ? GETPOST('training_session_templates_project', 'int') : getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')), 'training_session_templates_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'minwidth300 maxwidth400 widthcentpercentminusxx');
 print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?training_session_templates_project=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProject') . '"></span></a>';
 print '</td></tr>';
 
-// Formation hours
-print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationHours') . '</td><td>';
+// Training session durations
+print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionDurations') . '</td><td>';
 print $langs->transnoentities('MorningStartHour') . '<input type="time" class="marginleftonly" name="morning_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR') . '" /><br>';
 print $langs->transnoentities('MorningEndHour')  . '<input type="time" class="marginleftonly" name="morning_end_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR') . '" /><br>';
 print $langs->transnoentities('AfternoonStartHour')  . '<input type="time" class="marginleftonly" name="afternoon_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR') . '" /><br>';

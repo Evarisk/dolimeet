@@ -142,24 +142,6 @@ if (empty($resHook)) {
         }
     }
 
-    // Action clone object.
-    if ($action == 'confirm_to_plan' && $permissiontoadd) {
-        $result = $object->validate($user, false);
-        if ($result > 0) {
-            // Set locked OK
-            $urltogo = str_replace('__ID__', $result, $backtopage);
-            $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-            header("Location: " . $urltogo);
-            exit;
-        } elseif (!empty($object->errors)) { // Set locked KO
-            setEventMessages('', $object->errors, 'errors');
-        } else {
-            setEventMessages($object->error, [], 'errors');
-        }
-    }
-
-    // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen.
-
     if ($action == 'add' && $permissiontoadd) {
         $durationHour = GETPOST('durationhour');
         $durationMin  = GETPOST('durationmin');
@@ -170,12 +152,13 @@ if (empty($resHook)) {
             $_POST['durationmin'] = 0;
         }
 
-        if (GETPOST('modele') == 1) {
+        if (GETPOST('model') == 1) {
             unset($object->fields['fk_soc']);
             unset($object->fields['fk_contrat']);
         }
     }
 
+    // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen.
     require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
     // Actions set_thirdparty, set_project
@@ -232,7 +215,7 @@ if ($action == 'create') {
 
     $now = dol_getdate(dol_now());
 
-    if (GETPOST('modele') == 'on' || GETPOST('modele') == 1) {
+    if (GETPOST('model') == 'on' || GETPOST('model') == 1) {
         // Set default fields
         unset($object->fields['fk_soc']);
         unset($object->fields['fk_contrat']);
@@ -242,8 +225,7 @@ if ($action == 'create') {
         $object->fields['position']['default']     = 1;
         $object->fields['element_type']['enabled'] = 1;
         $object->fields['fk_element']['enabled']   = 1;
-        $_POST['modele']                           = 'on';
-
+        $_POST['model']                           = 'on';
 
         // Set service fields
         if (isModEnabled('service')) {
@@ -366,7 +348,7 @@ if (($id || $ref) && $action == 'edit') {
 
     print '<table class="border centpercent tableforfieldedit">';
 
-    if ($object->modele == 1) {
+    if ($object->model == 1) {
         $object->fields['position']['enabled']     = 1;
         $object->fields['element_type']['enabled'] = 1;
         $object->fields['fk_element']['enabled']   = 1;
@@ -387,14 +369,14 @@ if (($id || $ref) && $action == 'edit') {
         }
     }
 
-//    if ($_POST['fk_soc'] == -1) {
-//        $_POST['fk_soc'] = 0;
-//    }
+    if ($_POST['fk_soc'] == -1) {
+        $_POST['fk_soc'] = 0;
+    }
 
-//    if (GETPOST('fk_soc')) {
-//        $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
-//        $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
-//    }
+    if (GETPOST('fk_soc')) {
+        $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+        $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
+    }
 
     $conf->tzuserinputkey = 'tzuser';
 
@@ -495,7 +477,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $documentType   = 'MeetingDocument';
             break;
         case 'trainingsession' :
-            if ($object->modele == 0) {
+            if ($object->model == 0) {
                 $attendantsRole = ['Trainee', 'SessionTrainer'];
             }
             $documentType = 'AttendanceSheetDocument';
@@ -543,7 +525,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     unset($object->fields['fk_soc']);     // Hide field already shown in banner.
     unset($object->fields['fk_contrat']); // Hide field already shown in banner.
 
-    if ($object->modele == 1) {
+    if ($object->model == 1) {
         $object->fields['element_type']['enabled'] = 1;
         $object->fields['fk_element']['enabled']   = 1;
 
@@ -615,7 +597,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
 
-            if ($object->modele == 0) {
+            if ($object->model == 0) {
                 // Sign
                 $displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
                 if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
@@ -690,7 +672,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     }
 
     if ($action != 'presend') {
-        if ($object->element == 'trainingsession' && $object->modele == 0) {
+        if ($object->element == 'trainingsession' && $object->model == 0) {
             print '<div class="fichecenter"><div class="fichehalfleft">';
             print '<a href="#builddoc"></a>'; // ancre.
 

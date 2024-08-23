@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,7 +182,7 @@ if (!empty($fromType)) {
             $object->fields['fk_element']['enabled'] = 0;
             $object->fields['fk_contrat']['enabled'] = 0;
             $object->fields['fk_soc']['enabled']     = 0;
-            $search['modele']                        = 1;
+            $search['model']                         = 1;
             break;
         default :
             $error++;
@@ -505,7 +505,7 @@ if ($optioncss != '') {
 if (!empty($fromType) && $fromID > 0) {
     $fromurl = '&fromtype=' . urlencode($fromType) . '&fromid=' . urlencode($fromID);
     if ($fromType == 'product') {
-        $fromurl .= '&modele=on&element_type=service&fk_project=' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . '&fk_element=' . $fromID;
+        $fromurl .= '&model=on&element_type=service&fk_project=' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . '&fk_element=' . $fromID;
     }
     $param .= $fromurl;
 }

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2023-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -107,9 +107,9 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
 
         $project->array_options['options_trainingsession_service'] = explode(',', $project->array_options['options_trainingsession_service']);
         foreach ($project->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.modele = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
+            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
             if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                $publicNotePart2  = $langs->transnoentities('FormationInfoTitleTest') . '<br />';
+                $publicNotePart2  = $langs->transnoentities('TrainingSessionTitle') . '<br />';
                 $publicNotePart2 .= $langs->transnoentities('TrainingSessionsInclusiveWriting', count($trainingSessions)) . ' : ' . '<br />';
                 foreach ($trainingSessions as $trainingSession) {
                     $durations += $trainingSession->duration;
