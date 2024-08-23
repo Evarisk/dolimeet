@@ -232,7 +232,7 @@ if ($action == 'create') {
 
     $now = dol_getdate(dol_now());
 
-    if (GETPOST('modele') == 'on') {
+    if (GETPOST('modele') == 'on' || GETPOST('modele') == 1) {
         // Set default fields
         unset($object->fields['fk_soc']);
         unset($object->fields['fk_contrat']);
@@ -242,61 +242,56 @@ if ($action == 'create') {
         $object->fields['position']['default']     = 1;
         $object->fields['element_type']['enabled'] = 1;
         $object->fields['fk_element']['enabled']   = 1;
+        $_POST['modele']                           = 'on';
+
 
         // Set service fields
-        if (isModEnabled('service') && GETPOST('element_type') == 'service') {
-            $object->fields['element_type']['picto']                    = 'service';
+        if (isModEnabled('service')) {
             $object->fields['element_type']['arrayofkeyval']['service'] = $langs->trans('Service');
-            $object->fields['fk_element']['type']                       = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
-            $object->fields['fk_element']['picto']                      = 'service';
-            $object->fields['fk_element']['label']                      = $langs->trans('Service');
         }
 
-        if (!GETPOSTISSET('date_start')) {
-            $_POST['date_startyear']  = $now['year'];
-            $_POST['date_startmonth'] = $now['mon'];
-            $_POST['date_startday']   = $now['mday'];
-            $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR'));
-            $_POST['date_starthour']  = $time[0];
-            $_POST['date_startmin']   = $time[1];
+        if (GETPOST('element_type') == 'service') {
+            $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
+            $object->fields['fk_element']['picto']   = 'service';
+            $object->fields['fk_element']['label']   = $langs->trans('Service');
+            $object->fields['element_type']['picto'] = 'service';
+        } else {
+            if (GETPOSTISSET('fk_element')) {
+                $_GET['fk_element'] = '';
+            }
         }
 
-        if (!GETPOSTISSET('date_end')) {
-            $_POST['date_endyear']  = $now['year'];
-            $_POST['date_endmonth'] = $now['mon'];
-            $_POST['date_endday']   = $now['mday'];
-            $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR'));
-            $_POST['date_endhour']  = $time[0];
-            $_POST['date_endmin']   = $time[1];
+        $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR'));
+        $_POST['date_starthour']  = $time[0];
+        $_POST['date_startmin']   = $time[1];
+
+        $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR'));
+        $_POST['date_endhour']  = $time[0];
+        $_POST['date_endmin']   = $time[1];
+
+        $timeToSecond = convertTime2Seconds($_POST['date_endhour'], $_POST['date_endmin']) - convertTime2Seconds($_POST['date_starthour'], $_POST['date_startmin']);
+        $_POST['duration'] = $timeToSecond;
+    } else {
+        $_POST['date_starthour'] = $now['hours'];
+        $_POST['date_startmin']  = $now['minutes'];
+
+        if ($object->element == 'meeting') {
+            $_POST['date_endhour'] = $now['hours'] + 1;
+            $_POST['date_endmin']  = $now['minutes'];
         }
 
-        if (!GETPOSTISSET('date_start') && !GETPOSTISSET('date_end')) {
-            $timeToSecond = convertTime2Seconds($_POST['date_endhour'], $_POST['date_endmin']) - convertTime2Seconds($_POST['date_starthour'], $_POST['date_startmin']);
-            $_POST['duration'] = $timeToSecond;
+        if ($_POST['fk_soc'] == -1) {
+            $_POST['fk_soc'] = 0;
         }
     }
 
+    $_POST['date_startyear']  = $now['year'];
+    $_POST['date_startmonth'] = $now['mon'];
+    $_POST['date_startday']   = $now['mday'];
 
-
-    if ($_POST['fk_soc'] == -1) {
-        $_POST['fk_soc'] = 0;
-    }
-
-//    if (!GETPOSTISSET('date_start')) {
-//        $_POST['date_startyear']  = $now['year'];
-//        $_POST['date_startmonth'] = $now['mon'];
-//        $_POST['date_startday']   = $now['mday'];
-//        $_POST['date_starthour']  = $now['hours'];
-//        $_POST['date_startmin']   = $now['minutes'];
-//    }
-//
-//    if ($object->element == 'meeting' && !GETPOSTISSET('date_end')) {
-//        $_POST['date_endyear']  = $now['year'];
-//        $_POST['date_endmonth'] = $now['mon'];
-//        $_POST['date_endday']   = $now['mday'];
-//        $_POST['date_endhour']  = $now['hours'] + 1;
-//        $_POST['date_endmin']   = $now['minutes'];
-//    }
+    $_POST['date_endyear']  = $now['year'];
+    $_POST['date_endmonth'] = $now['mon'];
+    $_POST['date_endday']   = $now['mday'];
 
     $fromType = GETPOSTISSET('fromtype') ? GETPOST('fromtype', 'alpha') : ''; // element type.
     $fromID   = GETPOSTISSET('fromid') ? GETPOST('fromid', 'int') : 0;        //element id.
@@ -304,7 +299,6 @@ if ($action == 'create') {
     if (GETPOST('fk_soc')) {
         $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
         $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
-
     }
 
     if (!empty($fromType)) {
@@ -461,10 +455,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
     }
-    // Lock confirmation
-    if (($action == 'to_plan' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('ToPlanObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmToPlanObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_to_plan', '', 'yes', 'actionButtonToPlan', 350, 600);
-    }
 
     // Clone confirmation.
     if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
@@ -505,8 +495,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $documentType   = 'MeetingDocument';
             break;
         case 'trainingsession' :
-            $attendantsRole = [$object->modele == 0 ? 'Trainee' : '', 'SessionTrainer'];
-            $documentType   = 'AttendanceSheetDocument';
+            if ($object->modele == 0) {
+                $attendantsRole = ['Trainee', 'SessionTrainer'];
+            }
+            $documentType = 'AttendanceSheetDocument';
             break;
         case 'audit' :
             $attendantsRole = ['Auditee', 'Auditor'];
@@ -698,7 +690,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     }
 
     if ($action != 'presend') {
-        if ($object->element == 'trainingsession') {
+        if ($object->element == 'trainingsession' && $object->modele == 0) {
             print '<div class="fichecenter"><div class="fichehalfleft">';
             print '<a href="#builddoc"></a>'; // ancre.
 

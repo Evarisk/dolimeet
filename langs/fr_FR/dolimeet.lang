@@ -62,6 +62,7 @@ SetupDefaultDataNotCreated = Vous n'avez pas créé les données par défaut de 
 HowToSetupDefaultData      = Pour configurer les données par défaut de DoliMeet, veuillez cliquer sur ce lien :
 ConfigDefaultData          = Configuration des données par défaut de DoliMeet
 EnableDolimeet             = Veuillez activer le module DoliMeet pour accéder à cette page
+TrainingSessionTemplates   = Modèles de sessions de formation
 
 
 
@@ -131,7 +132,6 @@ ActionFormation                       = Action de formation
 ActionFormationApprentissage          = Action de formation par apprentissage
 ActionVAE                             = Action de VAE
 BilanCompetences                      = Bilan de compétences
-TrainingSessionType                   = Type de formation
 TrainingSessionLocation               = Lieu de la formation
 TrainingsessionsCategoriesArea        = Espace des tags/catégories des sessions de formations
 DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un formateur et un stagiaire au contrat de formation.
@@ -146,7 +146,6 @@ TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates d
 TrainingSessionDurations              = Durée de la formation
 TrainingSessionStartHelp              = Date de début de la première session de formation du contrat
 TrainingSessionEndHelp                = Date de fin de la dernière session de formation du contrat
-TrainingSessionTypeHelp               = Type de formation liée au contrat
 TrainingSessionLocationHelp           = Lieu où s'est réalisé la formation liée au contrat
 TrainingSessionDurationHelp           = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
 CalculatedTotalSessionDuration        = Durée totale calculée :
@@ -157,10 +156,11 @@ FormationTitle                        = Objet de la formation
 FormationInfoTitle                    = <strong>1 - Objet, nature et durée de la formation</strong>
 FormationInfoTitleTest                = <strong>2 - Session de formation</strong>
 
-
 # Extrafields - Attributs supplémentaires
+TrainingSessionType           = Type de formation
+TrainingSessionTypeHelp       = Veuillez selectionner un tiers pour faire un projet de formation
 TrainingSessionService        = Services de formation
-TrainingSessionServiceHelp    = Services de formation permettant de définir les services liés à la formation et de générer les sessions de formation associées
+TrainingSessionServiceHelp    = Les services de formation sont identifiés par le Tags/catégories que vous avez choisi dans les réglages, la valeur par défaut est "Formation".<br>Si la liste est vide cela vient sûrement du fait que vous n'avez aucun service associé à ce Tags.
 TrainingSessionNbTrainees     = Nombre de stagiaires
 TrainingSessionNbTraineesHelp = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
 SeeTrainingSessionModel       = Voir le/les modèle(s) de session de formation

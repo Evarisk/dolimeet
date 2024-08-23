@@ -124,7 +124,7 @@ class Session extends SaturneObject
         'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 3, 'validate' => 1],
         'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 0],
         'element_type'   => ['type' => 'select',       'label' => 'ElementType',      'enabled' => 1, 'position' => 91, 'notnull' => 0, 'visible' => 3, 'css' => 'maxwidth150 widthcentpercentminusxx'],
-        'fk_element'     => ['type' => 'integer',      'label' => 'FkElement',        'enabled' => 1, 'position' => 92, 'notnull' => 0, 'visible' => 3, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx'],
+        'fk_element'     => ['type' => 'integer',      'label' => 'FkElement',        'enabled' => 1, 'position' => 92, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx'],
         'modele'         => ['type' => 'boolean',      'label' => 'Modele',           'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 1],
         'position'       => ['type' => 'integer',      'label' => 'Position',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 3],
         'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'positionList' => 33, 'notnull' => 0, 'visible' => 1],
@@ -298,7 +298,6 @@ class Session extends SaturneObject
         if (!$this->modele) {
             $this->fields['position']['enabled']     = 0;
             $this->fields['element_type']['enabled'] = 0;
-            $this->fields['fk_element']['enabled']   = 0;
         }
     }
 

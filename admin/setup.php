@@ -50,9 +50,10 @@ $value      = GETPOST('value', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Initialize view objects
-$form        = new Form($db);
-$formOther   = new FormOther($db);
-$extraFields = new ExtraFields($db);
+$form         = new Form($db);
+$formOther    = new FormOther($db);
+$formProjects = new FormProjets($db);
+$extraFields  = new ExtraFields($db);
 
 $formationServices = get_formation_service();
 
@@ -101,15 +102,11 @@ if ($action == 'update_formation_service') {
     $categoryID = GETPOST('main_category', 'int');
     if ($categoryID != getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY')) {
         dolibarr_set_const($db, 'DOLIMEET_FORMATION_MAIN_CATEGORY', $categoryID, 'integer', 0, '', $conf->entity);
+    }
 
-        $filter            = 'product:label:rowid::fk_product_type = 1 AND entity = $ENTITY$ AND rowid IN (SELECT cp.fk_product FROM llx_categorie_product cp LEFT JOIN llx_categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . $categoryID . ')';
-        $extraFieldsArrays = ['trainingsession_service' => ['Label' => 'TrainingSessionService', 'type' => 'chkbxlst', 'length' => '', 'elementtype' => ['propal', 'projet'], 'position' => 10, 'params' => 'a:1:{s:7:"options";a:1:{s:' . dol_strlen($filter) . ':"' . $filter . '";N;}}', 'list' => 1, 'help' => 'TrainingSessionServiceHelp', 'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']]];
-        foreach ($extraFieldsArrays as $key => $extraField) {
-            foreach ($extraField['elementtype'] as $extraFieldElementType) {
-                $extraFields->fetch_name_optionals_label($extraFieldElementType);
-                $extraFields->update($key, $extraField['Label'], $extraField['type'], $extraField['length'], $extraFieldElementType, 0, 0, 436304 . $extraField['position'], $extraField['params'], '', '', $extraField['list'], $extraField['help'], '', '', $extraField['entity'], $extraField['langfile'], $extraField['enabled'] . ' && isModEnabled("' . $extraFieldElementType . '")', 0, 0, $extraField['css']);
-            }
-        }
+    $trainingSessionTemplatesProject = GETPOST('training_session_templates_project', 'int');
+    if ($trainingSessionTemplatesProject > 0) {
+        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT', $trainingSessionTemplatesProject, 'integer', 0, '', $conf->entity);
     }
 
     $timePeriods = [
@@ -224,6 +221,13 @@ print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationServiceMain
 print img_picto('', 'category', 'class="pictofixedwidth"');
 print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
 print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddTag') . '"></span></a>';
+print '</td></tr>';
+
+// Training session templates project
+print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionTemplates') . '</td><td>';
+print img_picto('', 'project', 'class="pictofixedwidth"');
+$formProjects->select_projects(-1, (GETPOSTISSET('training_session_templates_project') ? GETPOST('training_session_templates_project', 'int') : getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')), 'training_session_templates_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500 widthcentpercentminusx');
+print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?training_session_templates_project=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProject') . '"></span></a>';
 print '</td></tr>';
 
 // Formation hours

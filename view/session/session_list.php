@@ -178,10 +178,11 @@ if (!empty($fromType)) {
             $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'product' :
-            require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
-            $objectLinked                         = new Product($db);
-            $search['search_internal_attendants'] = $fromID;
-            $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
+            $objectLinked = new Product($db);
+            $object->fields['fk_element']['enabled'] = 0;
+            $object->fields['fk_contrat']['enabled'] = 0;
+            $object->fields['fk_soc']['enabled']     = 0;
+            $search['modele']                        = 1;
             break;
         default :
             $error++;
@@ -309,7 +310,7 @@ $sql .= ' FROM ' . MAIN_DB_PREFIX . $object->table_element . ' as t';
 if (isset($extrafields->attributes[$object->table_element]['label']) && is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) {
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $object->table_element . '_extrafields as ef on (t.rowid = ef.fk_object)';
 }
-if (dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
+if (dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray) && $fromType != 'product') {
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'element_element as e on (e.fk_source = ' . $fromID . ' AND e.sourcetype="' . $fromType . '" AND e.targettype = "saturne_' . $objectType . '")';
 } elseif (is_array($signatoryObjectsArray) && in_array($fromType, $signatoryObjectsArray)) {
     if ($fromType == 'thirdparty') {
@@ -350,7 +351,9 @@ if ($object->ismultientitymanaged == 1) {
 }
 $sql .= ' AND t.status >= 0';
 
-if (is_array($signatoryObjectsArray) && dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
+if ($fromType == 'product') {
+    $sql .= ' AND t.fk_element = ' . $fromID . ' AND t.element_type = "service"';
+} elseif (is_array($signatoryObjectsArray) && dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
     $sql .= ' AND t.rowid = e.fk_target ';
 } elseif (is_array($signatoryObjectsArray) && in_array($fromType, $signatoryObjectsArray)) {
     $sql .= ' AND t.rowid = e.fk_object ';
@@ -501,6 +504,9 @@ if ($optioncss != '') {
 }
 if (!empty($fromType) && $fromID > 0) {
     $fromurl = '&fromtype=' . urlencode($fromType) . '&fromid=' . urlencode($fromID);
+    if ($fromType == 'product') {
+        $fromurl .= '&modele=on&element_type=service&fk_project=' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . '&fk_element=' . $fromID;
+    }
     $param .= $fromurl;
 }
 if (!empty($objectType)) {

@@ -158,6 +158,16 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
             $extrafields->attributes['contrat']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
             $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
+
+            // Initialize the param attribute for trainingsession_service
+            if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) && isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
+                $filter  = 'product as p:ref|label:rowid::fk_product_type = 1 AND entity = $ENTITY$';
+                $filter .= ' AND rowid IN (SELECT cp.fk_product FROM llx_categorie_product cp LEFT JOIN llx_categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
+                $filter .= ' AND EXISTS (SELECT 1 FROM llx_dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.modele = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
+
+                $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => [$filter => '']];
+                $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => [$filter => '']];
+            }
         }
 
         if (strpos($parameters['context'], 'propalcard') !== false) {
@@ -1029,7 +1039,7 @@ class ActionsDolimeet
     {
         global $conf, $db;
 
-        if (preg_match('/main/', $parameters['context'])) {
+        if (strpos($parameters['context'], 'main') !== false) {
             $nbSessions = 0;
             require_once __DIR__ . '/session.class.php';
             $session = new Session($db);
@@ -1040,11 +1050,15 @@ class ActionsDolimeet
                 case 'contract' :
                     $objectElement = 'contrat';
                     break;
+                case 'product' :
+                    $objectElement = $parameters['object']->element;
+                    $filter        = 't.status >= 0 AND t.modele = 1 AND t.element_type = "service" AND t.fk_element = ' . $parameters['object']->id;
+                    break;
                 default :
                     $objectElement = $parameters['object']->element;
                     break;
             }
-            $filter  = 't.status >= 0 AND t.fk_' . $objectElement . ' = ' . $parameters['object']->id;
+            $filter  = $filter ?? 't.status >= 0 AND t.fk_' . $objectElement . ' = ' . $parameters['object']->id;
             $filter .= GETPOST('object_type') ? " AND t.type = '" . GETPOST('object_type') . "'" : '';
             $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
             if (is_array($sessions) && !empty($sessions)) {
