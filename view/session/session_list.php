@@ -888,7 +888,8 @@ while ($i < $imaxinloop) {
                     if (!isset($totalarray['val']['t.' . $key])) {
                         $totalarray['val']['t.' . $key] = 0;
                     }
-                    $totalarray['val']['t.' . $key] += $object->$key;
+                    $totalarray['type'][$totalarray['nbfield']] = $val['type'];
+                    $totalarray['val']['t.' . $key]  += $object->$key;
                 }
             } elseif ($key == 'Custom') {
                 foreach ($val as $resource) {

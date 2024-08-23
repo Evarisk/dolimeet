@@ -160,7 +160,7 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
 
             // Initialize the param attribute for trainingsession_service
-            if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) && isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
+            if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
                 $filter  = 'product as p:ref|label:rowid::fk_product_type = 1 AND entity = $ENTITY$';
                 $filter .= ' AND rowid IN (SELECT cp.fk_product FROM llx_categorie_product cp LEFT JOIN llx_categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
                 $filter .= ' AND EXISTS (SELECT 1 FROM llx_dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
@@ -766,10 +766,8 @@ class ActionsDolimeet
                 $object->array_options['options_trainingsession_service'] = explode(',', $object->array_options['options_trainingsession_service']);
                 foreach ($object->array_options['options_trainingsession_service'] as $index => $trainingSessionServiceId) {
                     $trainingSession->fetch('', '', ' AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId);
-                    if ($object->array_options['options_trainingsession_service'][$index] != $trainingSession->fk_element) {
-                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession&model=on&fk_project=' . $object->id . '&element_type=service&fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddTrainingSession') . '"></span></a>';
-                    } else {
-                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_list.php?object_type=trainingsession&search_model=1&search_fk_project=' . $object->id . '&search_element_type=service&search_fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-eye valignmiddle" title="' . $langs->transnoentities('SeeTrainingSessionModel') . '"></span></a>';
+                    if ($object->array_options['options_trainingsession_service'][$index] == $trainingSession->fk_element) {
+                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_list.php?object_type=trainingsession&search_model=1&search_fk_project=' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . '&search_element_type=service&search_fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-eye valignmiddle" title="' . $langs->transnoentities('SeeTrainingSessionModel') . '"></span></a>';
                     }
                 }
             } ?>
@@ -898,6 +896,27 @@ class ActionsDolimeet
                 $object->updateExtrafield('trainingsession_durations');
                 return 1;
             }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the beforePDFCreation function : replacing the parent's function with the one below
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     The object to process
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function beforePDFCreation(array $parameters): int
+    {
+        global $conf;
+
+        if ($parameters['object']->element == 'contrat' && isset($parameters['object']->array_options['options_trainingsession_type']) && !empty($parameters['object']->array_options['options_trainingsession_type'])) {
+            $conf->global->CONTRACT_HIDE_QTY_ON_PDF          = 1;
+            $conf->global->CONTRACT_HIDE_PRICE_ON_PDF        = 1;
+            $conf->global->CONTRACT_HIDE_PLANNED_DATE_ON_PDF = 1;
+            $conf->global->CONTRACT_HIDE_REAL_DATE_ON_PDF    = 1;
         }
 
         return 0; // or return 1 to replace standard code

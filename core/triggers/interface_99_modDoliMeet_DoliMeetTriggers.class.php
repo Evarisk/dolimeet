@@ -188,7 +188,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                     $project->fetch($object->fk_project);
                     $contract->fetch($object->fk_contrat);
-                    set_public_note($project, $contract);
+                    set_public_note($contract, $project);
                 }
                 break;
 
@@ -248,6 +248,11 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
                         set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
                     }
+
+                    $project = new Project($this->db);
+
+                    $project->fetch($object->fk_project);
+                    set_public_note($object, $project);
                 }
                 break;
 
@@ -348,6 +353,21 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 }
                 break;
 
+            case 'PROPAL_ADD_CONTACT' :
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
+                    $contactType = getDictionaryValue('c_type_contact', 'code', GETPOST('typecontact'));
+                    if ($contactType == 'TRAINEE') {
+                        // Load DoliMeet libraries
+                        require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+
+                        $project  = new Project($this->db);
+
+                        $project->fetch($object->fk_project);
+                        set_public_note($object, $project);
+                    }
+                }
+                break;
+
             case 'CONTRACT_CREATE' :
                 if (GETPOST('options_trainingsession_type', 'int') > 0) {
                     // Load DoliMeet libraries
@@ -410,6 +430,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                     $trainingSession->ref           = '';
                                     $trainingSession->date_creation = dol_now();
                                     $trainingSession->status        = Session::STATUS_DRAFT;
+                                    $trainingSession->element_type  = null;
+                                    $trainingSession->fk_element    = '';
+                                    $trainingSession->model         = false;
+                                    $trainingSession->position      = null;
                                     $trainingSession->fk_soc        = $object->socid;
                                     $trainingSession->fk_project    = $object->fk_project;
                                     $trainingSession->fk_contrat    = $object->id;
