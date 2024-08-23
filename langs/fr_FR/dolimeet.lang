@@ -290,4 +290,7 @@ Billing                           = Commanditaire
 Customer                          = Client
 HourEnd                           = Heure de fin
 ToBePlanned                       = à planifier
-
+ErrorDuration                     = Erreur : durée du service manquante
+ErrorStatus                       = Erreur : statut du de la session de formation invalide : %s
+ErrrorDurationNotMatching         = Erreur : cohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
+ServiceReadyToBeUsed              = Service prêt à être utilisé

@@ -111,7 +111,7 @@ class ActionsDolimeet
      */
     public function addHtmlHeader(array $parameters): int
     {
-        if (strpos($parameters['context'], 'projectcard') !== false) {
+        if (preg_match('/projectcard|productcard/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/custom/saturne/css/saturne.min.css',
                 'js'  => '/custom/saturne/js/saturne.min.js'
@@ -988,6 +988,56 @@ class ActionsDolimeet
             }
         }
 
+        if (strpos($parameters['context'], 'productcard') !== false) {
+            $categorieIDs = $object->getCategoriesCommon('product');
+            if (is_array($categorieIDs) && !empty($categorieIDs)) {
+                $error = 0;
+                foreach ($categorieIDs as $categoryID) {
+                    if ($categoryID == getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY')) {
+                        if ($object->duration_value <= 0) {
+                            $error++;
+                            $this->errors[] = $langs->transnoentities('ErrorDuration');
+                        } else {
+                            require_once __DIR__ . '/trainingsession.class.php';
+
+                            $trainingSession  = new Trainingsession($this->db);
+                            $trainingSessions = $trainingSession->fetchAll('', '', 0, 0, ['customsql' => 't.status >= 0 AND t.model = 1 AND t.fk_element = ' . $object->id]);
+                            if (is_array($trainingSessions) && !empty($trainingSessions)) {
+                                $durations = 0;
+                                foreach ($trainingSessions as $trainingSession) {
+                                    $durations += $trainingSession->duration;
+                                    if ($trainingSession->status == 0) {
+                                        $error++;
+                                        $this->errors[] = $langs->transnoentities('ErrorStatus', $trainingSession->ref);
+                                    }
+                                }
+                                if ($durations != convertTime2Seconds($object->duration)) {
+                                    $error++;
+                                    $this->errors[] = $langs->transnoentities('ErrrorDurationNotMatching');
+                                }
+                            } else {
+                                $error++;
+                                $this->errors[] = $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($trainingSession->element)));
+                            }
+                        }
+                    }
+                }
+
+                $moreHtmlStatus  = '<div class="wpeo-notice notice-' . ($error == 0 ? 'success' : 'error') . '">';
+                $moreHtmlStatus .= '<div class="notice-content">';
+                $moreHtmlStatus .= '<div class="notice-title">';
+                if ($error > 0) {
+                    foreach ($this->errors as $error) {
+                        $moreHtmlStatus .= $error . '<br>';
+                    }
+                } else {
+                    $moreHtmlStatus .= $langs->transnoentities('ServiceReadyToBeUsed');
+                }
+                $moreHtmlStatus .= '</div></div></div>';
+                $this->resprints = $moreHtmlStatus;
+            }
+        }
+
         return 0; // or return 1 to replace standard code.
     }
 
@@ -1122,7 +1172,7 @@ class ActionsDolimeet
             }
 
             if ($error > 0) {
-                $out  = '<div class="wpeo-notice notice-info">';
+                $out  = '<div class="wpeo-notice notice-error">';
                 $out .= '<div class="notice-content">';
                 $out .= '<div class="notice-title"><strong>' . $langs->trans('SetupDefaultDataNotCreated', $moduleName) . '</strong></div>';
                 $out .= '<div class="notice-subtitle"><strong>' . $langs->trans('HowToSetupDefaultData', $moduleName) . ' <a href="admin/setup.php">' . $langs->trans('ConfigDefaultData', $moduleName) . '</a></strong></div>';
