@@ -118,7 +118,7 @@ if ($action == 'update_formation_datas') {
     foreach ($timePeriods as $postKey => $globalKey) {
         $timeInSeconds = GETPOST($postKey);
         if ($timeInSeconds != getDolGlobalString($globalKey)) {
-            dolibarr_set_const($db, $globalKey, $timeInSeconds, 'integer', 0, '', $conf->entity);
+            dolibarr_set_const($db, $globalKey, $timeInSeconds, 'chaine', 0, '', $conf->entity);
         }
     }
 

@@ -1063,17 +1063,55 @@ class ActionsDolimeet
      */
     public function saturneIndex(array $parameters)
     {
-        global $conf, $langs;
+        global $conf, $langs, $moduleName;
 
         if (strpos($parameters['context'], 'dolimeetindex') !== false) {
-            $out = '<div class="wpeo-notice notice-info">';
-            $out .= '<div class="notice-content">';
-            $out .= '<div class="notice-title"><strong>' . $langs->trans('SetupDefaultDataNotCreated') . '</strong></div>';
-            $out .= '<div class="notice-subtitle"><strong>' . $langs->trans('HowToSetupDefaultData') . ' <a href="admin/setup.php">' . $langs->trans('ConfigDefaultData') . '</a></strong></div>';
-            $out .= '</div>';
-            $out .= '</div>';
+            $error          = 0;
+            $formationConfs = [
+                'integer' => [
+                    'DOLIMEET_SERVICE_TRAINING_CONTRACT',
+                    'DOLIMEET_SERVICE_WELCOME_BOOKLET',
+                    'DOLIMEET_SERVICE_RULES_OF_PROCEDURE',
+                    'DOLIMEET_FORMATION_MAIN_CATEGORY',
+                    'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT'
+                ],
+                'chaine' => [
+                    'DOLIMEET_TRAININGSESSION_MORNING_START_HOUR',
+                    'DOLIMEET_TRAININGSESSION_MORNING_END_HOUR',
+                    'DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR',
+                    'DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR',
+                    'DOLIMEET_TRAININGSESSION_LOCATION'
+                ]
+            ];
+            foreach ($formationConfs as $confType => $formationConfsByType) {
+                foreach ($formationConfsByType as $formationConf) {
 
-            $this->resprints = $out;
+                    $confValue = dolibarr_get_const($this->db, $formationConf, $conf->entity);
+                    switch ($confType) {
+                        case 'integer':
+                            if ((int)$confValue <= 0) {
+                                $error++;
+                            }
+                            break;
+                        case 'chaine':
+                            if (dol_strlen($confValue) <= 0) {
+                                $error++;
+                            }
+                            break;
+                    }
+                }
+            }
+
+            if ($error > 0) {
+                $out  = '<div class="wpeo-notice notice-info">';
+                $out .= '<div class="notice-content">';
+                $out .= '<div class="notice-title"><strong>' . $langs->trans('SetupDefaultDataNotCreated', $moduleName) . '</strong></div>';
+                $out .= '<div class="notice-subtitle"><strong>' . $langs->trans('HowToSetupDefaultData', $moduleName) . ' <a href="admin/setup.php">' . $langs->trans('ConfigDefaultData', $moduleName) . '</a></strong></div>';
+                $out .= '</div>';
+                $out .= '</div>';
+
+                $this->resprints = $out;
+            }
         }
 
         return 0; // or return 1 to replace standard code
