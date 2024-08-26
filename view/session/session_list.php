@@ -657,7 +657,7 @@ foreach ($object->fields as $key => $val) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
     } elseif (in_array($val['type'], ['timestamp'])) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
-    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval'])) {
+    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval']) && $key != 'fk_element') {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'right';
     }
     if (!empty($arrayfields['t.' . $key]['checked'])) {
@@ -737,7 +737,7 @@ foreach ($object->fields as $key => $val) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
     } elseif (in_array($val['type'], ['timestamp'])) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
-    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval'])) {
+    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval']) && $key != 'fk_element') {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'right';
     }
     $cssforfield = preg_replace('/small\s*/', '', $cssforfield);	// the 'small' css must not be used for the title label
@@ -851,11 +851,10 @@ while ($i < $imaxinloop) {
                 $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
             }
 
-            if (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && !in_array($key, ['rowid', 'status']) && empty($val['arrayofkeyval'])) {
+            if (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && !in_array($key, ['rowid', 'status']) && empty($val['arrayofkeyval']) && $key != 'fk_element') {
                 $cssforfield .= ($cssforfield ? ' ' : '') . 'right';
             }
             //if (in_array($key, array('fk_soc', 'fk_user', 'fk_warehouse'))) $cssforfield = 'tdoverflowmax100';
-
             if (!empty($arrayfields['t.' . $key]['checked'])) {
                 print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '');
                 if (preg_match('/tdoverflow/', $cssforfield)) {
@@ -871,6 +870,11 @@ while ($i < $imaxinloop) {
                     $object->element       = $object->type;
                     print $object->getNomUrl(1);
                     $object->element = $previousObjectElement;
+                } elseif ($key == 'fk_element') {
+                    if ($object->element_type == 'service') {
+                        $val['type'] = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
+                        print $object->showOutputField($val, $key, $object->$key);
+                    }
                 } else {
                     print $object->showOutputField($val, $key, $object->$key);
                 }
