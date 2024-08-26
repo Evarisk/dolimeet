@@ -177,7 +177,7 @@ print $langs->trans('EnableObjectDescription', $langs->trans('TrainingSession'))
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DOLIMEET_TRAININGSESSION_MENU_ENABLED');
+print ajax_constantonoff('DOLIMEET_TRAININGSESSION_MENU_ENABLED',  [], null, 0, 0, 1);
 print '</td>';
 print '</tr>';
 
@@ -194,87 +194,89 @@ print '</tr>';
 
 print '</table>';
 
-// Formation
-print load_fiche_titre($langs->transnoentities('Formation'), '', '');
+if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
+    // Formation
+    print load_fiche_titre($langs->transnoentities('Formation'), '', '');
 
-print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="formation_form">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="update_formation_datas">';
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->transnoentities('Name') . '</td>';
-print '<td>' . $langs->transnoentities('Value') . '</td>';
-print '</tr>';
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="formation_form">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="update_formation_datas">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->transnoentities('Name') . '</td>';
+    print '<td>' . $langs->transnoentities('Value') . '</td>';
+    print '</tr>';
 
-// Formation services
-foreach ($formationServices as $formationService) {
-    print '<tr class="oddeven"><td>' . $langs->transnoentities($formationService['name']) . '</td><td>';
-    print img_picto('', 'service', 'class="pictofixedwidth"');
-    $formationServiceCode = $formationService['code'];
-    $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'minwidth300 maxwidth400 widthcentpercentminusxx', 1);
-    print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&type=1&ref=' . $formationService['ref'] . '&label=' . $langs->transnoentities($formationService['name']) . '&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?' . $formationService['name'] . '=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
+    // Formation services
+    foreach ($formationServices as $formationService) {
+        print '<tr class="oddeven"><td>' . $langs->transnoentities($formationService['name']) . '</td><td>';
+        print img_picto('', 'service', 'class="pictofixedwidth"');
+        $formationServiceCode = $formationService['code'];
+        $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'minwidth300 maxwidth400 widthcentpercentminusxx', 1);
+        print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&type=1&ref=' . $formationService['ref'] . '&label=' . $langs->transnoentities($formationService['name']) . '&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?' . $formationService['name'] . '=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
+        print '</td></tr>';
+    }
+
+    // Set default main category
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationServiceMainCategory') . '</td><td>';
+    print img_picto('', 'category', 'class="pictofixedwidth"');
+    print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'formation_main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
+    print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
     print '</td></tr>';
+
+    // Training session templates project
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionTemplates') . '</td><td>';
+    print img_picto('', 'project', 'class="pictofixedwidth"');
+    $formProjects->select_projects(-1, (GETPOSTISSET('training_session_templates_project') ? GETPOST('training_session_templates_project', 'int') : getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')), 'training_session_templates_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'minwidth300 maxwidth400 widthcentpercentminusxx');
+    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?training_session_templates_project=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProject') . '"></span></a>';
+    print '</td></tr>';
+
+    // Training session durations
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionDurations') . '</td><td>';
+    print $langs->transnoentities('MorningStartHour') . '<input type="time" class="marginleftonly" name="morning_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR') . '" /><br>';
+    print $langs->transnoentities('MorningEndHour') . '<input type="time" class="marginleftonly" name="morning_end_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR') . '" /><br>';
+    print $langs->transnoentities('AfternoonStartHour') . '<input type="time" class="marginleftonly" name="afternoon_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR') . '" /><br>';
+    print $langs->transnoentities('AfternoonEndHour') . '<input type="time" class="marginleftonly" name="afternoon_end_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR') . '" /><br>';
+    print '</td></tr>';
+
+    // Training session location
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionLocation') . '</td><td>';
+    print '<input type="radio" id="TrainingSessionLocationCompany" name="training_session_location" value="TrainingSessionLocationCompany"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationCompany' ? 'checked' : '') . '/><label for="TrainingSessionLocationCompany">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationCompany') . '</label><br>';
+    print '<input type="radio" id="TrainingSessionLocationThirdParty" name="training_session_location" value="TrainingSessionLocationThirdParty"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationThirdParty' ? 'checked' : '') . '/><label for="TrainingSessionLocationThirdParty">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationThirdParty') . '</label><br>';
+    print '<input type="radio" id="TrainingSessionLocationOther" name="training_session_location" value="TrainingSessionLocationOther"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationOther' ? 'checked' : '') . '/><label for="TrainingSessionLocationOther">' . img_picto('', 'fontawesome_fa-font_fas', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationOther') . '</label>';
+    print '</td></tr>';
+
+    print '</table>';
+    print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+    print '</form>';
+
+    print load_fiche_titre($langs->trans('TrainingSessions'), '', '');
+
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="set_session_trainer_responsible">';
+
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Name') . '</td>';
+    print '<td>' . $langs->trans('Description') . '</td>';
+    print '<td>' . $langs->trans('Value') . '</td>';
+    print '</tr>';
+
+    print '<tr class="oddeven"><td>';
+    print $langs->trans('SessionTrainerResponsible');
+    print '</td><td>';
+    print $langs->transnoentities('SessionTrainerResponsibleDesc');
+    print '</td>';
+
+    print '<td class="minwidth400 maxwidth500">';
+    print img_picto($langs->trans('User'), 'user', 'class="pictofixedwidth"') . $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1, null, 0, '', '', '0', 0, 0, '', 0, '', 'minwidth400 maxwidth500');
+    print '</td></tr>';
+
+    print '</table>';
+    print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+    print '</form>';
 }
-
-// Set default main category
-print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationServiceMainCategory') . '</td><td>';
-print img_picto('', 'category', 'class="pictofixedwidth"');
-print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'formation_main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
-print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
-print '</td></tr>';
-
-// Training session templates project
-print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionTemplates') . '</td><td>';
-print img_picto('', 'project', 'class="pictofixedwidth"');
-$formProjects->select_projects(-1, (GETPOSTISSET('training_session_templates_project') ? GETPOST('training_session_templates_project', 'int') : getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')), 'training_session_templates_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'minwidth300 maxwidth400 widthcentpercentminusxx');
-print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?training_session_templates_project=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProject') . '"></span></a>';
-print '</td></tr>';
-
-// Training session durations
-print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionDurations') . '</td><td>';
-print $langs->transnoentities('MorningStartHour') . '<input type="time" class="marginleftonly" name="morning_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR') . '" /><br>';
-print $langs->transnoentities('MorningEndHour')  . '<input type="time" class="marginleftonly" name="morning_end_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR') . '" /><br>';
-print $langs->transnoentities('AfternoonStartHour')  . '<input type="time" class="marginleftonly" name="afternoon_start_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR') . '" /><br>';
-print $langs->transnoentities('AfternoonEndHour')  . '<input type="time" class="marginleftonly" name="afternoon_end_hour" value="' . getDolGlobalString('DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR') . '" /><br>';
-print '</td></tr>';
-
-// Training session location
-print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionLocation') . '</td><td>';
-print '<input type="radio" id="TrainingSessionLocationCompany" name="training_session_location" value="TrainingSessionLocationCompany"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationCompany' ? 'checked' : '') . '/><label for="TrainingSessionLocationCompany">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationCompany') . '</label><br>';
-print '<input type="radio" id="TrainingSessionLocationThirdParty" name="training_session_location" value="TrainingSessionLocationThirdParty"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationThirdParty' ? 'checked' : '') . '/><label for="TrainingSessionLocationThirdParty">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationThirdParty') . '</label><br>';
-print '<input type="radio" id="TrainingSessionLocationOther" name="training_session_location" value="TrainingSessionLocationOther"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationOther' ? 'checked' : '') . '/><label for="TrainingSessionLocationOther">' . img_picto('', 'fontawesome_fa-font_fas', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationOther') . '</label>';
-print '</td></tr>';
-
-print '</table>';
-print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
-print '</form>';
-
-print load_fiche_titre($langs->trans('TrainingSessions'), '', '');
-
-print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="set_session_trainer_responsible">';
-
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans('Name') . '</td>';
-print '<td>' . $langs->trans('Description') . '</td>';
-print '<td>' . $langs->trans('Value') . '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td>';
-print $langs->trans('SessionTrainerResponsible');
-print '</td><td>';
-print $langs->transnoentities('SessionTrainerResponsibleDesc');
-print '</td>';
-
-print '<td class="minwidth400 maxwidth500">';
-print img_picto($langs->trans('User'), 'user', 'class="pictofixedwidth"') . $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1, null, 0, '', '', '0', 0, 0, '', 0, '','minwidth400 maxwidth500');
-print '</td></tr>';
-
-print '</table>';
-print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
-print '</form>';
 
 if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
     require_once __DIR__ . '/../../digiquali/class/sheet.class.php';
