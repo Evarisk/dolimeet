@@ -231,28 +231,48 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 break;
 
             case 'CONTRAT_ADD_CONTACT' :
-                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
                     if (GETPOST('userid')) {
-                        $contactID     = GETPOST('userid');
+                        $contactID = GETPOST('userid');
                         $contactSource = 'internal';
                     } else {
-                        $contactID     = GETPOST('contactid');
+                        $contactID = GETPOST('contactid');
                         $contactSource = 'external';
                     }
-                    $contactTypeID      = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
-                    $contactCode        = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
-                    $contactsCodeWanted = ['CUSTOMER', 'BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
 
-                    if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
-                        set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
+                    $contactTypeID = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
+                    $contactCode   = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
+
+                    if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+                        $contactsCodeWanted = ['CUSTOMER', 'BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+                        if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
+                            set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
+                        }
                     }
 
-                    $project = new Project($this->db);
+                    if ($contactCode == 'TRAINEE') {
+                        $project = new Project($this->db);
 
-                    $project->fetch($object->fk_project);
-                    set_public_note($object, $project);
+                        $project->fetch($object->fk_project);
+                        set_public_note($object, $project);
+                    }
+
+                    if ($contactCode == 'TRAINEE' || $contactCode == 'SESSIONTRAINER') {
+                        require_once __DIR__ . '/../../class/trainingsession.class.php';
+                        require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+
+                        $trainingSession  = new Trainingsession($this->db);
+                        $signatory        = new SaturneSignature($this->db, 'dolimeet', $trainingSession->element);
+
+                        $trainingSessions = $trainingSession->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . Session::STATUS_DRAFT . ' AND t.fk_contrat = ' . $object->id]);
+                        if (is_array($trainingSessions) && !empty($trainingSessions)) {
+                            foreach ($trainingSessions as $trainingSession) {
+                                $signatory->setSignatory($trainingSession->id,  $trainingSession->element, (($contactSource == 'internal') ? 'user' : 'socpeople'), [$contactID], (($contactCode == 'TRAINEE') ? 'Trainee' : 'SessionTrainer'), 1);
+                            }
+                        }
+                    }
                 }
                 break;
 
