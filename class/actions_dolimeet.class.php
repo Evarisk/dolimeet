@@ -111,7 +111,7 @@ class ActionsDolimeet
      */
     public function addHtmlHeader(array $parameters): int
     {
-        if (preg_match('/projectcard|productcard/', $parameters['context'])) {
+        if (preg_match('/projectcard|productcard|contractcard/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/custom/saturne/css/saturne.min.css',
                 'js'  => '/custom/saturne/js/saturne.min.js'
@@ -152,12 +152,13 @@ class ActionsDolimeet
             $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
             $extrafields->attributes['propal']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
 
-            $extrafields->attributes['contrat']['label']['label']                     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
-            $extrafields->attributes['contrat']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
-            $extrafields->attributes['contrat']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
-            $extrafields->attributes['contrat']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
-            $extrafields->attributes['contrat']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
-            $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
+            $extrafields->attributes['contrat']['label']['label']                          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
+            $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
+            $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
+            $extrafields->attributes['contrat']['label']['trainingsession_start']          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
+            $extrafields->attributes['contrat']['label']['trainingsession_end']            = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
+            $extrafields->attributes['contrat']['label']['trainingsession_durations']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
+            $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
 
             // Initialize the param attribute for trainingsession_service
             if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
@@ -368,12 +369,13 @@ class ActionsDolimeet
             $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
             $extrafields->attributes['propal']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
 
-            $extrafields->attributes['contrat']['label']['label']                     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
-            $extrafields->attributes['contrat']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
-            $extrafields->attributes['contrat']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
-            $extrafields->attributes['contrat']['label']['trainingsession_start']     = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
-            $extrafields->attributes['contrat']['label']['trainingsession_end']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
-            $extrafields->attributes['contrat']['label']['trainingsession_durations'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
+            $extrafields->attributes['contrat']['label']['label']                          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
+            $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
+            $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
+            $extrafields->attributes['contrat']['label']['trainingsession_start']          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
+            $extrafields->attributes['contrat']['label']['trainingsession_end']            = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
+            $extrafields->attributes['contrat']['label']['trainingsession_durations']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
+            $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
         }
 
         return 0; // or return 1 to replace standard code
@@ -486,7 +488,7 @@ class ActionsDolimeet
 
                 saturne_load_langs();
 
-                $survey   = new Survey($this->db);
+                $survey    = new Survey($this->db);
                 $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
@@ -965,26 +967,48 @@ class ActionsDolimeet
     {
         global $langs;
 
-        // Do something only for the current context.
         if (strpos($parameters['context'], 'contractcard') !== false) {
-            if (isModEnabled('contrat')) {
-                $error = 0;
-                $attendantInternalSessionTrainerArray = $object->liste_contact(-1, 'internal', 0, 'SESSIONTRAINER');
-                $attendantInternalTraineeArray        = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
-                $attendantExternalSessionTrainerArray = $object->liste_contact(-1, 'external', 0, 'SESSIONTRAINER');
-                $attendantExternalTraineeArray        = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
+            if (!empty($object->array_options['options_trainingsession_type'])) {
+                $contacts             = [];
+                $contactRoleBySources = [
+                    'internal' => [
+                        'warning' => ['trainee', 'sessiontrainer']
+                    ],
+                    'external' => [
+                        'info'    => ['billing', 'customer'],
+                        'warning' => ['trainee', 'sessiontrainer', 'opco']
+                    ]
+                ];
+                foreach ($contactRoleBySources as $contactSource => $contactNoticeTypes) {
+                    foreach ($contactNoticeTypes as $contactNoticeType => $contactRoles) {
+                        foreach ($contactRoles as $contactRole) {
+                            if (empty($object->liste_contact(-1, $contactSource, 0, dol_strtoupper($contactRole)))) {
+                                $contacts[$contactNoticeType][$contactRole]++;
+                                if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
+                                    $contacts['info']['opco']++;
+                                    unset($contacts['warning']['opco']);
+                                }
+                            }
+                        }
+                    }
+                }
 
-                if ((is_array($attendantInternalSessionTrainerArray) && empty($attendantInternalSessionTrainerArray)) && (is_array($attendantExternalSessionTrainerArray) && empty($attendantExternalSessionTrainerArray))) {
-                    $error++;
-                }
-                if ((is_array($attendantInternalTraineeArray) && empty($attendantInternalTraineeArray)) && (is_array($attendantExternalTraineeArray) && empty($attendantExternalTraineeArray))) {
-                    $error++;
+                $moreHtmlStatus = '';
+                foreach ($contacts as $contactNoticeType => $contactRoles) {
+                    $moreHtmlStatus .= '<div class="wpeo-notice notice-' . $contactNoticeType . '">';
+                    $moreHtmlStatus .= '<div class="notice-content">';
+                    $moreHtmlStatus .= '<div class="notice-title">';
+                    foreach ($contactRoles as $contactRole => $role) {
+                        if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
+                            $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                            continue;
+                        }
+                        $moreHtmlStatus .= $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                    }
+                    $moreHtmlStatus .= '</div></div></div>';
                 }
 
-                if (!empty($object->array_options['options_trainingsession_type']) && $error > 0) {
-                    $moreHtmlStatus = '<br><br><div><i class="fas fa-3x fa-exclamation-triangle pictowarning"></i> ' . $langs->trans('DontForgotAddSessionTrainerAndTrainee') . '</div>';
-                    $this->resprints = $moreHtmlStatus;
-                }
+                $this->resprints = $moreHtmlStatus;
             }
         }
 

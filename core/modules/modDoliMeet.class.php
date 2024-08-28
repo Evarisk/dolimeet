@@ -658,6 +658,9 @@ class modDoliMeet extends DolibarrModules
             }
         }
 
+        $extraFields->update('trainingsession_opco_financing', 'TrainingSessionOpcoFinancing', 'boolean', '', 'contrat', 0, 0, $this->numero . 60, '', '', '', 1, 'TrainingSessionOpcoFinancingHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+        $extraFields->addExtraField('trainingsession_opco_financing', 'TrainingSessionOpcoFinancing', 'boolean', $this->numero . 60, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionOpcoFinancingHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+
         return $this->_init($sql, $options);
     }
 

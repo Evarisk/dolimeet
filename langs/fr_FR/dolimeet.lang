@@ -143,20 +143,22 @@ NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pou
 ErrorMissingTrainingSessionProjectInfo = Erreur : information du projet de formation manquante
 
 # Extrafields - Attributs supplémentaires
-TrainingSessionType           = Type de formation
-TrainingSessionTypeHelp       = Veuillez selectionner un tiers pour faire un projet de formation
-TrainingSessionService        = Services de formation
-TrainingSessionServiceHelp    = Les services de formation sont identifiés par le Tags/catégories que vous avez choisi dans les réglages, la valeur par défaut est "Formation".<br>Si la liste est vide cela vient sûrement du fait que vous n'avez aucun service associé à ce Tags.
-SeeTrainingSessionModel       = Voir le/les modèle(s) de session de formation
-TrainingSessionLocation       = Lieu de la formation
-TrainingSessionLocationHelp   = Lieu où s'est réalisé la formation liée au contrat
-TrainingSessionStart          = Date de début de la formation
-TrainingSessionStartHelp      = Date de début de la première session de formation du contrat
-TrainingSessionEnd            = Date de fin de la formation
-TrainingSessionEndHelp        = Date de fin de la dernière session de formation du contrat
-TrainingSessionDurationHelp   = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
-TrainingSessionNbTrainees     = Nombre de stagiaires
-TrainingSessionNbTraineesHelp = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
+TrainingSessionType              = Type de formation
+TrainingSessionTypeHelp          = Veuillez selectionner un tiers pour faire un projet de formation
+TrainingSessionService           = Services de formation
+TrainingSessionServiceHelp       = Les services de formation sont identifiés par le Tags/catégories que vous avez choisi dans les réglages, la valeur par défaut est "Formation".<br>Si la liste est vide cela vient sûrement du fait que vous n'avez aucun service associé à ce Tags.
+SeeTrainingSessionModel          = Voir le/les modèle(s) de session de formation
+TrainingSessionLocation          = Lieu de la formation
+TrainingSessionLocationHelp      = Lieu où s'est réalisé la formation liée au contrat
+TrainingSessionStart             = Date de début de la formation
+TrainingSessionStartHelp         = Date de début de la première session de formation du contrat
+TrainingSessionEnd               = Date de fin de la formation
+TrainingSessionEndHelp           = Date de fin de la dernière session de formation du contrat
+TrainingSessionDurationHelp      = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
+TrainingSessionOpcoFinancing     = Financement avec un OPCO
+TrainingSessionOpcoFinancingHelp = Cocher la case si vous voulez un financement avec un OPCO
+TrainingSessionNbTrainees        = Nombre de stagiaires
+TrainingSessionNbTraineesHelp    = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
 
 # Public note - Note publique
 FormationInfoTitle               = <strong>1 - Objet, nature et durée de la formation</strong>
@@ -294,3 +296,4 @@ ErrorDuration                     = Erreur : durée du service manquante
 ErrorStatus                       = Erreur : statut du de la session de formation invalide : %s
 ErrrorDurationNotMatching         = Erreur : cohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
 ServiceReadyToBeUsed              = Service prêt à être utilisé
+OpcoInfo                          = Voulez vous faire financer la formation par un OPCO ?
