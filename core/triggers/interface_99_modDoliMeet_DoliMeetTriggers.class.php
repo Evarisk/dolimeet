@@ -186,9 +186,14 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $project  = new Project($this->db);
                     $contract = new Contrat($this->db);
 
-                    $project->fetch($object->fk_project);
                     $contract->fetch($object->fk_contrat);
-                    set_public_note($contract, $project);
+                    $contract->fetchObjectLinked(null, 'propal', $contract->id, 'contrat');
+                    if (isset($contract->linkedObjects['propal']) && !empty($contract->linkedObjects['propal']) && count($contract->linkedObjects['propal']) == 1) {
+                        $project->fetch($object->fk_project);
+
+                        $propal = array_shift($contract->linkedObjects['propal']);
+                        set_public_note($contract, $project, $propal);
+                    }
                 }
                 break;
 
@@ -235,10 +240,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
                     if (GETPOST('userid')) {
-                        $contactID = GETPOST('userid');
+                        $contactID     = GETPOST('userid');
                         $contactSource = 'internal';
                     } else {
-                        $contactID = GETPOST('contactid');
+                        $contactID     = GETPOST('contactid');
                         $contactSource = 'external';
                     }
 
@@ -253,10 +258,15 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     }
 
                     if ($contactCode == 'TRAINEE') {
-                        $project = new Project($this->db);
+                        $object->fetchObjectLinked(null, 'propal', $object->id, 'contrat');
+                        if (isset($object->linkedObjects['propal']) && !empty($object->linkedObjects['propal']) && count($object->linkedObjects['propal']) == 1) {
+                            $project = new Project($this->db);
 
-                        $project->fetch($object->fk_project);
-                        set_public_note($object, $project);
+                            $project->fetch($object->fk_project);
+
+                            $propal = array_shift($object->linkedObjects['propal']);
+                            set_public_note($object, $project, $propal);
+                        }
                     }
 
                     if ($contactCode == 'TRAINEE' || $contactCode == 'SESSIONTRAINER') {
@@ -272,28 +282,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $signatory->setSignatory($trainingSession->id,  $trainingSession->element, (($contactSource == 'internal') ? 'user' : 'socpeople'), [$contactID], (($contactCode == 'TRAINEE') ? 'Trainee' : 'SessionTrainer'), 1);
                             }
                         }
-                    }
-                }
-                break;
-
-            case 'PROJECT_CREATE' :
-            case 'PROJECT_MODIFY' :
-                if (is_array(GETPOST('options_trainingsession_service', 'array')) && !empty(GETPOST('options_trainingsession_service', 'array'))) {
-                    // Load DoliMeet libraries
-                    require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
-
-                    set_public_note($object, $object);
-                }
-                break;
-
-            case 'PROJECT_ADD_CONTACT' :
-                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
-                    $contactType = getDictionaryValue('c_type_contact', 'code', GETPOST('typecontact'));
-                    if ($contactType == 'TRAINEE') {
-                        // Load DoliMeet libraries
-                        require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
-
-                        set_public_note($object, $object);
                     }
                 }
                 break;
@@ -314,7 +302,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             continue;
                         }
                         $confName = $formationService['code'];
-                        $result   = $product->fetch($conf->global->$confName);
+                        $result   = $product->fetch(getDolGlobalInt($confName));
 
                         if ($result > 0) {
                             $propalLine->fk_propal      = $object->id;
@@ -332,25 +320,23 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     }
 
                     // Add formation services on propal value stored in project options training session service
-                    if (is_array(GETPOST('options_trainingsession_service', 'array')) && !empty(GETPOST('options_trainingsession_service', 'array'))) {
-                        $propalLinePosition = 10;
-                        foreach (GETPOST('options_trainingsession_service', 'array') as $trainingSessionServiceId) {
-                            $product->fetch($trainingSessionServiceId);
+                    $propalLinePosition = 10;
+                    foreach (GETPOST('options_trainingsession_service', 'array') as $trainingSessionServiceId) {
+                        $product->fetch($trainingSessionServiceId);
 
-                            $propalLine->fk_propal      = $object->id;
-                            $propalLine->fk_parent_line = 0;
-                            $propalLine->fk_product     = $product->id;
-                            $propalLine->product_label  = $product->label;
-                            $propalLine->product_desc   = $product->description;
-                            $propalLine->tva_tx         = $product->tva_tx;
-                            $propalLine->subprice       = $product->price;
-                            $propalLine->date_creation  = $object->db->idate(dol_now());
-                            $propalLine->qty            = 1;
-                            $propalLine->rang           = $propalLinePosition++;
-                            $propalLine->product_type   = 1;
+                        $propalLine->fk_propal      = $object->id;
+                        $propalLine->fk_parent_line = 0;
+                        $propalLine->fk_product     = $product->id;
+                        $propalLine->product_label  = $product->label;
+                        $propalLine->product_desc   = $product->description;
+                        $propalLine->tva_tx         = $product->tva_tx;
+                        $propalLine->subprice       = $product->price;
+                        $propalLine->date_creation  = $object->db->idate(dol_now());
+                        $propalLine->qty            = 1;
+                        $propalLine->rang           = $propalLinePosition++;
+                        $propalLine->product_type   = 1;
 
-                            $object->addline($propalLine->product_desc, $propalLine->subprice, $propalLine->qty, $propalLine->tva_tx, 0.0, 0.0, $propalLine->fk_product, 0.0, 'HT', 0.0, 0, $propalLine->product_type, $propalLine->rang, 0, 0, 0, 0, $propalLine->product_label, '', '', 0, null);
-                        }
+                        $object->addline($propalLine->product_desc, $propalLine->subprice, $propalLine->qty, $propalLine->tva_tx, 0.0, 0.0, $propalLine->fk_product, 0.0, 'HT', 0.0, 0, $propalLine->product_type, $propalLine->rang, 0, 0, 0, 0, $propalLine->product_label, '', '', 0, null);
                     }
 
                     // Add project data on propal
@@ -366,9 +352,11 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             }
                         }
 
-                        // Add public note form project
-                        $object->note_public = dol_strlen($object->note_public) > 0 ? $object->note_public . '<br /><br />' . $project->note_public : $project->note_public;
-                        $object->setValueFrom('note_public', $object->note_public);
+
+                        $project  = new Project($this->db);
+
+                        $project->fetch($object->fk_project);
+                        set_public_note($object, $project);
                     }
                 }
                 break;
@@ -407,7 +395,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     foreach ($formationServices as $formationService) {
                         if ($formationService['ref'] == 'F0') {
                             $confName = $formationService['code'];
-                            $result   = $product->fetch($conf->global->$confName);
+                            $result   = $product->fetch(getDolGlobalInt($confName));
 
                             if ($result > 0) {
                                 $contratLigne->fk_contrat = $object->id;
@@ -462,10 +450,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 }
                             }
                         }
-                    }
 
-                    $project->fetch($object->fk_project);
-                    set_public_note($object, $project, $propal);
+                        $project->fetch($object->fk_project);
+                        set_public_note($object, $project, $propal);
+                    }
                 }
                 break;
         }

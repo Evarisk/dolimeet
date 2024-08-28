@@ -94,7 +94,7 @@ if ($action == 'set_satisfaction_survey') {
 if ($action == 'update_formation_datas') {
     foreach ($formationServices as $formationService) {
         $formationServiceID = GETPOST($formationService['name'], 'int');
-        if ($formationServiceID > 0) {
+        if ($formationServiceID != 0) {
             dolibarr_set_const($db, $formationService['code'], $formationServiceID, 'integer', 0, '', $conf->entity);
         }
     }
@@ -105,7 +105,7 @@ if ($action == 'update_formation_datas') {
     }
 
     $trainingSessionTemplatesProject = GETPOST('training_session_templates_project', 'int');
-    if ($trainingSessionTemplatesProject > 0) {
+    if ($trainingSessionTemplatesProject != 0) {
         dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT', $trainingSessionTemplatesProject, 'integer', 0, '', $conf->entity);
     }
 
@@ -122,9 +122,9 @@ if ($action == 'update_formation_datas') {
         }
     }
 
-    $traningSessionLocation = GETPOST('training_session_location');
-    if ($traningSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
-        dolibarr_set_const($db, 'DOLIMEET_FORMATION_MAIN_CATEGORY', $categoryID, 'integer', 0, '', $conf->entity);
+    $trainingSessionLocation = GETPOST('training_session_location');
+    if ($trainingSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
+        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $categoryID, 'integer', 0, '', $conf->entity);
     }
 
     setEventMessage('SavedConfig');

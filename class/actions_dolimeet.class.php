@@ -163,8 +163,8 @@ class ActionsDolimeet
             // Initialize the param attribute for trainingsession_service
             if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
                 $filter  = 'product as p:ref|label:rowid::fk_product_type = 1 AND entity = $ENTITY$';
-                $filter .= ' AND rowid IN (SELECT cp.fk_product FROM llx_categorie_product cp LEFT JOIN llx_categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
-                $filter .= ' AND EXISTS (SELECT 1 FROM llx_dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
+                $filter .= ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
+                $filter .= ' AND EXISTS (SELECT 1 FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
 
                 $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => [$filter => '']];
                 $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => [$filter => '']];
@@ -203,7 +203,6 @@ class ActionsDolimeet
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 1;
                 $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 1;
-                $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 1;
                 $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 1;
             }
 

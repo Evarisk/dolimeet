@@ -178,7 +178,8 @@ if (!empty($fromType)) {
             $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
         case 'product' :
-            $objectLinked = new Product($db);
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/product.lib.php';
+            $objectLinked                            = new Product($db);
             $object->fields['fk_element']['enabled'] = 0;
             $object->fields['fk_contrat']['enabled'] = 0;
             $object->fields['fk_soc']['enabled']     = 0;

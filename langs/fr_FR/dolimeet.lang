@@ -41,7 +41,7 @@ OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par d
 
 # Formation - Formation
 TrainingContract                  = Convention de formation
-WelcomeBooklet                    = Livret d'acceuil
+WelcomeBooklet                    = Livret d'accueil
 RulesOfProcedure                  = Réglement intérieur
 FormationServiceMainCategory      = Catégorie principale des services de formation
 TrainingSessionTemplates          = Modèles de sessions de formation
@@ -293,7 +293,7 @@ Customer                          = Client
 HourEnd                           = Heure de fin
 ToBePlanned                       = à planifier
 ErrorDuration                     = Erreur : durée du service manquante
-ErrorStatus                       = Erreur : statut du de la session de formation invalide : %s
-ErrrorDurationNotMatching         = Erreur : cohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
+ErrorStatus                       = Erreur : statut de la session de formation invalide : %s
+ErrrorDurationNotMatching         = Erreur : incohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
 ServiceReadyToBeUsed              = Service prêt à être utilisé
 OpcoInfo                          = Voulez vous faire financer la formation par un OPCO ?
