@@ -67,7 +67,7 @@ saturne_check_access($permissionToRead);
 
 if ($action == 'set_session_trainer_responsible') {
     $responsibleId = GETPOST('session_trainer_responsible_id');
-    if ($responsibleId != $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE) {
+    if ($responsibleId != getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE')) {
         dolibarr_set_const($db, 'DOLIMEET_SESSION_TRAINER_RESPONSIBLE', $responsibleId, 'integer', 0, '', $conf->entity);
     }
 
@@ -81,7 +81,7 @@ if ($action == 'set_satisfaction_survey') {
     foreach ($satisfactionSurveys as $satisfactionSurvey) {
         $satisfactionSurveyID = GETPOST($satisfactionSurvey . '_satisfaction_survey_model');
         $confName             = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
-        if ($satisfactionSurveyID != $conf->global->$confName) {
+        if ($satisfactionSurveyID != getDolGlobalInt($confName)) {
             dolibarr_set_const($db, $confName, $satisfactionSurveyID, 'integer', 0, '', $conf->entity);
         }
     }
@@ -94,7 +94,7 @@ if ($action == 'set_satisfaction_survey') {
 if ($action == 'update_formation_datas') {
     foreach ($formationServices as $formationService) {
         $formationServiceID = GETPOST($formationService['name'], 'int');
-        if ($formationServiceID != 0) {
+        if ($formationServiceID > 0 && $formationServiceID != getDolGlobalInt($formationService['code'])) {
             dolibarr_set_const($db, $formationService['code'], $formationServiceID, 'integer', 0, '', $conf->entity);
         }
     }
@@ -105,7 +105,7 @@ if ($action == 'update_formation_datas') {
     }
 
     $trainingSessionTemplatesProject = GETPOST('training_session_templates_project', 'int');
-    if ($trainingSessionTemplatesProject != 0) {
+    if ($trainingSessionTemplatesProject != getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')) {
         dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT', $trainingSessionTemplatesProject, 'integer', 0, '', $conf->entity);
     }
 
@@ -124,7 +124,7 @@ if ($action == 'update_formation_datas') {
 
     $trainingSessionLocation = GETPOST('training_session_location');
     if ($trainingSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
-        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $categoryID, 'integer', 0, '', $conf->entity);
+        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $trainingSessionLocation, 'chaine', 0, '', $conf->entity);
     }
 
     setEventMessage('SavedConfig');
@@ -212,7 +212,7 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
         print '<tr class="oddeven"><td>' . $langs->transnoentities($formationService['name']) . '</td><td>';
         print img_picto('', 'service', 'class="pictofixedwidth"');
         $formationServiceCode = $formationService['code'];
-        $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : $conf->global->$formationServiceCode), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'minwidth300 maxwidth400 widthcentpercentminusxx', 1);
+        $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : getDolGlobalInt($formationServiceCode)), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'minwidth300 maxwidth400 widthcentpercentminusxx', 1);
         print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&type=1&ref=' . $formationService['ref'] . '&label=' . $langs->transnoentities($formationService['name']) . '&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?' . $formationService['name'] . '=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
         print '</td></tr>';
     }
@@ -270,7 +270,7 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
     print '</td>';
 
     print '<td class="minwidth400 maxwidth500">';
-    print img_picto($langs->trans('User'), 'user', 'class="pictofixedwidth"') . $form->select_dolusers($conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'session_trainer_responsible_id', 1, null, 0, '', '', '0', 0, 0, '', 0, '', 'minwidth400 maxwidth500');
+    print img_picto($langs->trans('User'), 'user', 'class="pictofixedwidth"') . $form->select_dolusers(getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE'), 'session_trainer_responsible_id', 1, null, 0, '', '', '0', 0, 0, '', 0, '', 'minwidth400 maxwidth500');
     print '</td></tr>';
 
     print '</table>';
@@ -306,7 +306,7 @@ if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_V
 
         print '<td class="minwidth400 maxwidth500">';
         $confName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
-        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList($conf->global->$confName, $satisfactionSurvey . '_satisfaction_survey_model', 's.type = "survey" AND s.status = ' . Sheet::STATUS_LOCKED, '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
+        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList(getDolGlobalInt($confName), $satisfactionSurvey . '_satisfaction_survey_model', 's.type = "survey" AND s.status = ' . Sheet::STATUS_LOCKED, '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
         print '</td></tr>';
     }
 

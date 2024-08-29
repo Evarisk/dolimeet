@@ -221,7 +221,7 @@ class ActionsDolimeet
                 $extrafields->attributes['projet']['list']['trainingsession_nb_trainees'] = 0;
             }
 
-            $out  = '<div class="wpeo-notice notice-error">';
+            $out  = '<div class="wpeo-notice notice-warning">';
             $out .= '<div class="notice-content left">';
             $out .= '<div class="notice-title">' . $langs->transnoentities('ErrorMissingTrainingSessionProjectInfo') . '</div><div class="notice-subtitle"><ul>';
             $out .= '<li class="notice-training-session-service">' . $langs->transnoentities('TrainingSessionService') . '</li>';

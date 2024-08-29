@@ -140,11 +140,11 @@ TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates d
 CalculatedTotalSessionDuration        = Durée totale calculée :
 TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
 NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à toute les sessions.
-ErrorMissingTrainingSessionProjectInfo = Erreur : information du projet de formation manquante
+ErrorMissingTrainingSessionProjectInfo = Attention : information du projet de formation manquante
 
 # Extrafields - Attributs supplémentaires
 TrainingSessionType              = Type de formation
-TrainingSessionTypeHelp          = Veuillez selectionner un tiers pour faire un projet de formation
+TrainingSessionTypeHelp          = Veuillez sélectionner un tiers pour créer un projet de formation
 TrainingSessionService           = Services de formation
 TrainingSessionServiceHelp       = Les services de formation sont identifiés par le Tags/catégories que vous avez choisi dans les réglages, la valeur par défaut est "Formation".<br>Si la liste est vide cela vient sûrement du fait que vous n'avez aucun service associé à ce Tags.
 SeeTrainingSessionModel          = Voir le/les modèle(s) de session de formation
