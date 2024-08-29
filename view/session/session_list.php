@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,6 +177,14 @@ if (!empty($fromType)) {
             $search['search_internal_attendants'] = $fromID;
             $moreHtml = '<a href="' . dol_buildpath('/user/list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
             break;
+        case 'product' :
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/product.lib.php';
+            $objectLinked                            = new Product($db);
+            $object->fields['fk_element']['enabled'] = 0;
+            $object->fields['fk_contrat']['enabled'] = 0;
+            $object->fields['fk_soc']['enabled']     = 0;
+            $search['model']                         = 1;
+            break;
         default :
             $error++;
             $objectLinked = null;
@@ -303,7 +311,7 @@ $sql .= ' FROM ' . MAIN_DB_PREFIX . $object->table_element . ' as t';
 if (isset($extrafields->attributes[$object->table_element]['label']) && is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) {
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $object->table_element . '_extrafields as ef on (t.rowid = ef.fk_object)';
 }
-if (dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
+if (dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray) && $fromType != 'product') {
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'element_element as e on (e.fk_source = ' . $fromID . ' AND e.sourcetype="' . $fromType . '" AND e.targettype = "saturne_' . $objectType . '")';
 } elseif (is_array($signatoryObjectsArray) && in_array($fromType, $signatoryObjectsArray)) {
     if ($fromType == 'thirdparty') {
@@ -344,7 +352,9 @@ if ($object->ismultientitymanaged == 1) {
 }
 $sql .= ' AND t.status >= 0';
 
-if (is_array($signatoryObjectsArray) && dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
+if ($fromType == 'product') {
+    $sql .= ' AND t.fk_element = ' . $fromID . ' AND t.element_type = "service"';
+} elseif (is_array($signatoryObjectsArray) && dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
     $sql .= ' AND t.rowid = e.fk_target ';
 } elseif (is_array($signatoryObjectsArray) && in_array($fromType, $signatoryObjectsArray)) {
     $sql .= ' AND t.rowid = e.fk_object ';
@@ -495,6 +505,9 @@ if ($optioncss != '') {
 }
 if (!empty($fromType) && $fromID > 0) {
     $fromurl = '&fromtype=' . urlencode($fromType) . '&fromid=' . urlencode($fromID);
+    if ($fromType == 'product') {
+        $fromurl .= '&model=on&element_type=service&fk_project=' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . '&fk_element=' . $fromID;
+    }
     $param .= $fromurl;
 }
 if (!empty($objectType)) {
@@ -645,7 +658,7 @@ foreach ($object->fields as $key => $val) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
     } elseif (in_array($val['type'], ['timestamp'])) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
-    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval'])) {
+    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval']) && $key != 'fk_element') {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'right';
     }
     if (!empty($arrayfields['t.' . $key]['checked'])) {
@@ -725,7 +738,7 @@ foreach ($object->fields as $key => $val) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
     } elseif (in_array($val['type'], ['timestamp'])) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
-    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval'])) {
+    } elseif (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && $val['label'] != 'TechnicalID' && empty($val['arrayofkeyval']) && $key != 'fk_element') {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'right';
     }
     $cssforfield = preg_replace('/small\s*/', '', $cssforfield);	// the 'small' css must not be used for the title label
@@ -839,11 +852,10 @@ while ($i < $imaxinloop) {
                 $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
             }
 
-            if (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && !in_array($key, ['rowid', 'status']) && empty($val['arrayofkeyval'])) {
+            if (in_array($val['type'], ['double(24,8)', 'double(6,3)', 'integer', 'real', 'price']) && !in_array($key, ['rowid', 'status']) && empty($val['arrayofkeyval']) && $key != 'fk_element') {
                 $cssforfield .= ($cssforfield ? ' ' : '') . 'right';
             }
             //if (in_array($key, array('fk_soc', 'fk_user', 'fk_warehouse'))) $cssforfield = 'tdoverflowmax100';
-
             if (!empty($arrayfields['t.' . $key]['checked'])) {
                 print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '');
                 if (preg_match('/tdoverflow/', $cssforfield)) {
@@ -859,6 +871,11 @@ while ($i < $imaxinloop) {
                     $object->element       = $object->type;
                     print $object->getNomUrl(1);
                     $object->element = $previousObjectElement;
+                } elseif ($key == 'fk_element') {
+                    if ($object->element_type == 'service') {
+                        $val['type'] = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
+                        print $object->showOutputField($val, $key, $object->$key);
+                    }
                 } else {
                     print $object->showOutputField($val, $key, $object->$key);
                 }
@@ -876,7 +893,8 @@ while ($i < $imaxinloop) {
                     if (!isset($totalarray['val']['t.' . $key])) {
                         $totalarray['val']['t.' . $key] = 0;
                     }
-                    $totalarray['val']['t.' . $key] += $object->$key;
+                    $totalarray['type'][$totalarray['nbfield']] = $val['type'];
+                    $totalarray['val']['t.' . $key]  += $object->$key;
                 }
             } elseif ($key == 'Custom') {
                 foreach ($val as $resource) {
