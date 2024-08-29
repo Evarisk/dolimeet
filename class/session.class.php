@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,11 +119,15 @@ class Session extends SaturneObject
         'import_key'     => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
         'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived']],
         'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1, 'autofocusoncreate' => 1],
-        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'notnull' => 1, 'visible' => 1],
-        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 1],
+        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 1],
+        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1],
         'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 3, 'validate' => 1],
         'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 0],
-        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1],
+        'element_type'   => ['type' => 'select',       'label' => 'ElementType',      'enabled' => 1, 'position' => 91,  'notnull' => 0, 'visible' => 3, 'css' => 'maxwidth150 widthcentpercentminusxx'],
+        'fk_element'     => ['type' => 'integer',      'label' => 'FkElement',        'enabled' => 1, 'position' => 92,  'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'csslist' => 'left'],
+        'model'          => ['type' => 'boolean',      'label' => 'Template',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 1],
+        'position'       => ['type' => 'integer',      'label' => 'Position',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 3],
+        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1, 'isameasure' => 1, 'csslist' => 'right'],
         'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',     'enabled' => 1,                         'position' => 170, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
@@ -199,6 +203,26 @@ class Session extends SaturneObject
     public string $type;
 
     /**
+     * @var string|null Element type
+     */
+    public ?string $element_type = '';
+
+    /**
+     * @var int|string Element ID
+     */
+    public $fk_element;
+
+    /**
+     * @var bool Model
+     */
+    public bool $model = false;
+
+    /**
+     * @var int|null Position
+     */
+    public ?int $position;
+
+    /**
      * @var int|null|string Duration.
      */
     public $duration;
@@ -267,6 +291,11 @@ class Session extends SaturneObject
             default :
                 $this->picto = 'dolimeet_color@dolimeet';
                 break;
+        }
+
+        if (!$this->model) {
+            $this->fields['position']['enabled']     = 0;
+            $this->fields['element_type']['enabled'] = 0;
         }
     }
 
@@ -816,4 +845,3 @@ class SessionDocument extends SaturneDocuments
         parent::__construct($db, $this->module, $objectType);
     }
 }
-
