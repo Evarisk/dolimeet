@@ -590,12 +590,13 @@ class modDoliMeet extends DolibarrModules
         addDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
 
+        // Load Saturne libraries
+        require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
+        $saturneMail = new SaturneMail($this->db, 'contrat');
+
+
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
-            // Load Saturne libraries
-            require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
-
-            $saturneMail = new SaturneMail($this->db, 'contrat');
-
             $position = 100;
             $satisfactionSurveys = ['customer', 'billing', 'trainee', 'sessiontrainer', 'opco'];
             foreach ($satisfactionSurveys as $satisfactionSurvey) {
@@ -607,7 +608,7 @@ class modDoliMeet extends DolibarrModules
                 $saturneMail->position      = $position;
                 $saturneMail->enabled       = "isModEnabled('contrat')";
                 $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyTopic', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
-                $saturneMail->joinfiles     = 1;
+                $saturneMail->joinfiles     = 0;
                 $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyContent', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
 
                 $emailTemplateSatisfactionSurvey[$satisfactionSurvey] = $saturneMail->create($user);
@@ -653,6 +654,19 @@ class modDoliMeet extends DolibarrModules
             $projectID = $project->create($user);
 
             dolibarr_set_const($this->db, 'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT', $projectID, 'integer', 0, '', $conf->entity);
+        }
+
+        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_UPDATED') == 0) {
+            $emailTemplateSatisfactionSurveys = json_decode(dolibarr_get_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'), true);
+            if (is_array($emailTemplateSatisfactionSurveys) && !empty($emailTemplateSatisfactionSurveys)) {
+                foreach ($emailTemplateSatisfactionSurveys as $emailTemplateSatisfactionSurvey) {
+                    $saturneMail->fetch($emailTemplateSatisfactionSurvey);
+                    $saturneMail->joinfiles = 0;
+                    $saturneMail->setValueFrom('joinfiles', $saturneMail->joinfiles, '', '', 'int', '', $user);
+                }
+            }
+
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_UPDATED', 1, 'integer', 0, '', $conf->entity);
         }
 
         // Create extrafields during init.

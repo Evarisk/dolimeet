@@ -27,6 +27,7 @@ ALTER TABLE `llx_c_trainingsession_type` ADD `position` INT NULL DEFAULT '0' AFT
 ALTER TABLE `llx_dolimeet_session` DROP `model_pdf`, DROP `last_main_doc`, DROP `document_url`;
 
 -- 1.5.0
+UPDATE `llx_c_email_templates` SET `joinfiles` = '0' WHERE `llx_c_email_templates`.`label` = 'Signature_Feuille_Présence';
 ALTER TABLE `llx_dolimeet_session` ADD `element_type` VARCHAR(128) NULL AFTER `type`;
 ALTER TABLE `llx_dolimeet_session` ADD `model` BOOLEAN NULL DEFAULT FALSE AFTER `element_type`;
 ALTER TABLE `llx_dolimeet_session` ADD `position` TINYINT(4) NULL AFTER `model`;
