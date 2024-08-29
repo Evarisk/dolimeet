@@ -39,6 +39,21 @@ SessiontrainerSatisfactionSurveyDescription = Définit le modèle utilisé par d
 OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
 OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction OPCO
 
+# Formation - Formation
+TrainingContract                  = Convention de formation
+WelcomeBooklet                    = Livret d'accueil
+RulesOfProcedure                  = Réglement intérieur
+FormationServiceMainCategory      = Catégorie principale des services de formation
+TrainingSessionTemplates          = Modèles de sessions de formation
+TrainingSessionDurations          = Durée de la formation
+MorningStartHour                  = Heure de début de matinée
+MorningEndHour                    = Heure de fin de matinée
+AfternoonStartHour                = Heure de début d'après-midi
+AfternoonEndHour                  = Heure de fin d'après-midi
+TrainingSessionLocationCompany    = Lieu de formation (société)
+TrainingSessionLocationThirdParty = Lieu de formation (tiers)
+TrainingSessionLocationOther      = Autre lieu de formation par défaut
+
 
 
 #
@@ -106,17 +121,12 @@ OfTrainingsession                     = de la session de formation
 TrainingsessionList                   = Liste des sessions de formation
 TrainingSessionList                   = Liste des sessions de formation
 TrainingSessionCreate                 = Créer une session de formation
-Contract                              = Contrat
 NewTrainingsession                    = Nouvelle session de formation
 ModifyTrainingsession                 = Modifier une session de formation
-TrainingSessionStart                  = Date de début de la formation
-TrainingSessionEnd                    = Date de fin de la formation
 ActionFormation                       = Action de formation
 ActionFormationApprentissage          = Action de formation par apprentissage
 ActionVAE                             = Action de VAE
 BilanCompetences                      = Bilan de compétences
-TrainingSessionType                   = Type de formation
-TrainingSessionLocation               = Lieu de la formation
 TrainingsessionsCategoriesArea        = Espace des tags/catégories des sessions de formations
 DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un formateur et un stagiaire au contrat de formation.
 AttendantsFromContract                = Participants du contrat
@@ -127,24 +137,50 @@ LinkDolimeet_trainsess                = Activer le lien avec les sessions de for
 LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles
 TrainingSessionStartErrorMatchingDate = <strong> Erreur : cohérence des dates de début de la formation. </strong><br> La date de début de la formation du contrat n'est pas égale à la date début de la première session de formation %s.
 TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates de fin de la formation. </strong><br> La date de fin de la formation du contrat n'est pas égale à la date fin de la dernière session de formation %s.
-TrainingSessionDurations              = Durée des sessions de formation
-TrainingSessionOpcoFinancing          = Financement avec un OPCO
-TrainingSessionStartHelp              = Date de début de la première session de formation du contrat
-TrainingSessionEndHelp                = Date de fin de la dernière session de formation du contrat
-TrainingSessionTypeHelp               = Type de formation liée au contrat
-TrainingSessionLocationHelp           = Lieu où s'est réalisé la formation liée au contrat
-TrainingSessionDurationHelp           = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
-TrainingSessionOpcoFinancingHelp      = Cocher la case si vous voulez un financement avec un OPCO
 CalculatedTotalSessionDuration        = Durée totale calculée :
 TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
 NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à toute les sessions.
+ErrorMissingTrainingSessionProjectInfo = Attention : information du projet de formation manquante
 
+# Extrafields - Attributs supplémentaires
+TrainingSessionType              = Type de formation
+TrainingSessionTypeHelp          = Veuillez sélectionner un tiers pour créer un projet de formation
+TrainingSessionService           = Services de formation
+TrainingSessionServiceHelp       = Les services de formation sont identifiés par le Tags/catégories que vous avez choisi dans les réglages, la valeur par défaut est "Formation".<br>Si la liste est vide cela vient sûrement du fait que vous n'avez aucun service associé à ce Tags.
+SeeTrainingSessionModel          = Voir le/les modèle(s) de session de formation
+TrainingSessionLocation          = Lieu de la formation
+TrainingSessionLocationHelp      = Lieu où s'est réalisé la formation liée au contrat
+TrainingSessionStart             = Date de début de la formation
+TrainingSessionStartHelp         = Date de début de la première session de formation du contrat
+TrainingSessionEnd               = Date de fin de la formation
+TrainingSessionEndHelp           = Date de fin de la dernière session de formation du contrat
+TrainingSessionDurationHelp      = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
+TrainingSessionOpcoFinancing     = Financement avec un OPCO
+TrainingSessionOpcoFinancingHelp = Cocher la case si vous voulez un financement avec un OPCO
+TrainingSessionNbTrainees        = Nombre de stagiaires
+TrainingSessionNbTraineesHelp    = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
+
+# Public note - Note publique
+FormationInfoTitle               = <strong>1 - Objet, nature et durée de la formation</strong>
+FormationTitle                   = Objet de la formation
+TrainingSessionTitle             = <strong>2 - Session de formation</strong>
+TrainingSessionsInclusiveWriting = Détails des %d session(s) de formation
+PublicNoteTraineeList            = <strong>3 - Liste des stagiaires </strong>
+FormationPublicNoteTraineeList   = <strong>3 - Liste des stagiaires </strong><ul><li>Nom, Prénom, Email, Titre</li></ul>
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
 Trainee                                     = Stagiaire
+TypeContact_project_internal_SESSIONTRAINER = Formateur
+TypeContact_project_external_SESSIONTRAINER = Formateur
+TypeContact_propal_internal_SESSIONTRAINER  = Formateur
+TypeContact_propal_external_SESSIONTRAINER  = Formateur
 TypeContact_contrat_internal_SESSIONTRAINER = Formateur
 TypeContact_contrat_external_SESSIONTRAINER = Formateur
+TypeContact_project_internal_TRAINEE        = Stagiaire
+TypeContact_project_external_TRAINEE        = Stagiaire
+TypeContact_propal_internal_TRAINEE         = Stagiaire
+TypeContact_propal_external_TRAINEE         = Stagiaire
 TypeContact_contrat_internal_TRAINEE        = Stagiaire
 TypeContact_contrat_external_TRAINEE        = Stagiaire
 
@@ -224,6 +260,8 @@ AttendancePresentAuditRate           = Taux de présence aux audits
 AttendanceDelayAuditRate             = Taux de retard aux audits
 AttendanceAbsentAuditRate            = Taux d'absence aux audits
 
+
+
 #
 # Email - Email
 #
@@ -243,7 +281,6 @@ SatisfactionSurveyContent = Bonjour,<br/><br/>Nous vous envoyons ce mail afin de
 TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
-SetContrat                        = Définir contrat
 DateAndTime                       = Date et horaire
 SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
 SetSatisfactionSurvey             = Créer enquête de satisfaction
@@ -253,5 +290,10 @@ FillSatisfactionSurvey            = Remplir l'enquête de satisfaction %s
 Sessiontrainer                    = Formateur
 Billing                           = Commanditaire
 Customer                          = Client
+HourEnd                           = Heure de fin
+ToBePlanned                       = à planifier
+ErrorDuration                     = Erreur : durée du service manquante
+ErrorStatus                       = Erreur : statut de la session de formation invalide : %s
+ErrrorDurationNotMatching         = Erreur : incohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
+ServiceReadyToBeUsed              = Service prêt à être utilisé
 OpcoInfo                          = Voulez vous faire financer la formation par un OPCO ?
-

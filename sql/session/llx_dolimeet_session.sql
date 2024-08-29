@@ -1,4 +1,4 @@
--- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+-- Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -23,16 +23,22 @@ CREATE TABLE llx_dolimeet_session(
   import_key    varchar(14),
   status        integer NOT NULL,
   label         varchar(255),
-  date_start    datetime NOT NULL,
-  date_end      datetime NOT NULL,
+  date_start    datetime,
+  date_end      datetime,
+  hour_start    integer,
+  hour_end      integer,
   duration      integer,
   type          varchar(128),
+  element_type  varchar(128),
+  model         boolean DEFAULT FALSE,
+  position      tinyint(4),
   content       text,
   note_public   text,
   note_private  text,
   fk_project    integer,
   fk_contrat    integer,
   fk_soc        integer,
+  fk_element    integer,
   fk_user_creat integer NOT NULL,
   fk_user_modif integer
 ) ENGINE=innodb;
