@@ -205,6 +205,10 @@ foreach ($object->fields as $key => $val) {
 }
 
 // Definition of array of fields for columns
+if ($objectType == 'trainingsession') {
+    $object->fields['fk_element']['type'] = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
+}
+
 $arrayfields = [];
 foreach ($object->fields as $key => $val) {
     // If $val['visible']==0, then we never show the field
@@ -871,11 +875,6 @@ while ($i < $imaxinloop) {
                     $object->element       = $object->type;
                     print $object->getNomUrl(1);
                     $object->element = $previousObjectElement;
-                } elseif ($key == 'fk_element') {
-                    if ($object->element_type == 'service') {
-                        $val['type'] = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
-                        print $object->showOutputField($val, $key, $object->$key);
-                    }
                 } else {
                     print $object->showOutputField($val, $key, $object->$key);
                 }
