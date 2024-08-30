@@ -166,7 +166,7 @@ FormationTitle                   = Objet de la formation
 TrainingSessionTitle             = <strong>2 - Session de formation</strong>
 TrainingSessionsInclusiveWriting = Détails des %d session(s) de formation
 PublicNoteTraineeList            = <strong>3 - Liste des stagiaires </strong>
-FormationPublicNoteTraineeList   = <strong>3 - Liste des stagiaires </strong><ul><li>Nom, Prénom, Email, Titre</li></ul>
+FormationPublicNoteTraineeList   = <strong>3 - Liste des stagiaires en attente </strong><ul><li>Nom, Prénom, Email, Titre</li></ul>
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur

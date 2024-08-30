@@ -135,7 +135,6 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
     $object->note_public .= $langs->transnoentities('TrainingSessionType') . ' : ' . $langs->transnoentities(getDictionaryValue('c_trainingsession_type', 'ref', $project->array_options['options_trainingsession_type'])) . '<br />';
     $object->note_public .= $langs->transnoentities('TrainingSessionDurations') . ' : <strong>' . convertSecondToTime($durations) . '</strong>' . ' ' . dol_strtolower($langs->transnoentities('Hours')) . '<br />';
     $object->note_public .= $langs->transnoentities('TrainingSessionLocation') . ' : ' . (dol_strlen($project->array_options['options_trainingsession_location']) > 0  ? $project->array_options['options_trainingsession_location'] : $langs->transnoentities('NoData')) . '<br />';
-    $object->note_public .= $langs->transnoentities('TrainingSessionNbTrainees') . ' : ' . (dol_strlen($project->array_options['options_trainingsession_nb_trainees']) > 0 ? $project->array_options['options_trainingsession_nb_trainees'] : $langs->transnoentities('NoData')) . '<br /><br />';
 
     // Part 2 - Training sessions
     $object->note_public .= $publicNotePart2;
@@ -144,8 +143,9 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
     $internalTrainee = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
     $externalTrainee = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
     if ((is_array($internalTrainee) && !empty($internalTrainee)) || (is_array($externalTrainee) && !empty($externalTrainee))) {
-        $object->note_public .= '<br />' . $langs->transnoentities('PublicNoteTraineeList') . '<ul>';
+        $object->note_public .= '<br />' . $langs->transnoentities('PublicNoteTraineeList') . '<br />';
         $contacts = array_merge($internalTrainee, $externalTrainee);
+        $object->note_public .= $langs->transnoentities('TrainingSessionNbTrainees') . ' : ' . count($contacts) . '<br /><ul>';
         foreach ($contacts as $contact) {
             $object->note_public .= '<li>' . dol_strtoupper($contact['lastname']) . (dol_strlen($contact['firstname']) > 0 ? ', ' . ucfirst($contact['firstname']) : '') . (dol_strlen($contact['email']) > 0 ? ', ' . $contact['email'] : '') . '</li>';
         }

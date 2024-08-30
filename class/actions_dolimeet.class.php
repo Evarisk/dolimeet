@@ -143,10 +143,9 @@ class ActionsDolimeet
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
             $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
-            $extrafields->attributes['projet']['label']['trainingsession_type']        = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
-            $extrafields->attributes['projet']['label']['trainingsession_service']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
-            $extrafields->attributes['projet']['label']['trainingsession_location']    = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
-            $extrafields->attributes['projet']['label']['trainingsession_nb_trainees'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_nb_trainees']);
+            $extrafields->attributes['projet']['label']['trainingsession_type']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
+            $extrafields->attributes['projet']['label']['trainingsession_service']  = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
+            $extrafields->attributes['projet']['label']['trainingsession_location'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
 
             $extrafields->attributes['propal']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
             $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
@@ -201,24 +200,21 @@ class ActionsDolimeet
         if (strpos($parameters['context'], 'projectcard') !== false) {
             // Hide extrafields for create mode
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
-                $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 1;
-                $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 1;
-                $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 1;
+                $extrafields->attributes['projet']['hidden']['trainingsession_service']  = 1;
+                $extrafields->attributes['projet']['hidden']['trainingsession_location'] = 1;
             }
 
             // Show extrafields for update mode if options_trainingsession_type is set
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
-                $extrafields->attributes['projet']['hidden']['trainingsession_service']     = 0;
-                $extrafields->attributes['projet']['hidden']['trainingsession_location']    = 0;
-                $extrafields->attributes['projet']['hidden']['trainingsession_nb_trainees'] = 0;
+                $extrafields->attributes['projet']['hidden']['trainingsession_service']  = 0;
+                $extrafields->attributes['projet']['hidden']['trainingsession_location'] = 0;
             }
 
             // Disabled extrafields for view mode
             if (empty($object->array_options['options_trainingsession_type']) && $action != 'create' && $action != 'edit') {
-                $extrafields->attributes['projet']['list']['trainingsession_type']        = 0;
-                $extrafields->attributes['projet']['list']['trainingsession_service']     = 0;
-                $extrafields->attributes['projet']['list']['trainingsession_location']    = 0;
-                $extrafields->attributes['projet']['list']['trainingsession_nb_trainees'] = 0;
+                $extrafields->attributes['projet']['list']['trainingsession_type']     = 0;
+                $extrafields->attributes['projet']['list']['trainingsession_service']  = 0;
+                $extrafields->attributes['projet']['list']['trainingsession_location'] = 0;
             }
 
             $out  = '<div class="wpeo-notice notice-warning">';
@@ -245,11 +241,9 @@ class ActionsDolimeet
                     if (type > 0) {
                         $('#options_trainingsession_service').closest('tr').show();
                         $('#options_trainingsession_location').closest('tr').show();
-                        $('#options_trainingsession_nb_trainees').closest('tr').show();
                     } else {
                         $('#options_trainingsession_service').closest('tr').hide();
                         $('#options_trainingsession_location').closest('tr').hide();
-                        $('#options_trainingsession_nb_trainees').closest('tr').hide();
                     }
                 });
 
@@ -267,7 +261,6 @@ class ActionsDolimeet
                     $('.field_options_trainingsession_type').insertAfter(table);
                     $('.field_options_trainingsession_service').insertAfter('.field_options_trainingsession_type');
                     $('.field_options_trainingsession_location').insertAfter('.field_options_trainingsession_service');
-                    $('.field_options_trainingsession_nb_trainees').insertAfter('.field_options_trainingsession_location');
 
                     function checkFields() {
                         let displayNotice = 0;
@@ -359,10 +352,9 @@ class ActionsDolimeet
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
             $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
-            $extrafields->attributes['projet']['label']['trainingsession_type']        = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
-            $extrafields->attributes['projet']['label']['trainingsession_service']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
-            $extrafields->attributes['projet']['label']['trainingsession_location']    = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
-            $extrafields->attributes['projet']['label']['trainingsession_nb_trainees'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_nb_trainees']);
+            $extrafields->attributes['projet']['label']['trainingsession_type']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
+            $extrafields->attributes['projet']['label']['trainingsession_service']  = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
+            $extrafields->attributes['projet']['label']['trainingsession_location'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
 
             $extrafields->attributes['propal']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
             $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
