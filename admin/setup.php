@@ -127,6 +127,11 @@ if ($action == 'update_formation_datas') {
         dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $trainingSessionLocation, 'chaine', 0, '', $conf->entity);
     }
 
+    $trainingSessionAbsenceRate = GETPOST('training_session_absence_rate', 'int');
+    if ($trainingSessionAbsenceRate != getDolGlobalInt('DOLIMEET_TRAININGSESSION_ABSENCE_RATE')) {
+        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_ABSENCE_RATE', $trainingSessionAbsenceRate, 'integer', 0, '', $conf->entity);
+    }
+
     setEventMessage('SavedConfig');
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
@@ -244,6 +249,12 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
     print '<input type="radio" id="TrainingSessionLocationCompany" name="training_session_location" value="TrainingSessionLocationCompany"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationCompany' ? 'checked' : '') . '/><label for="TrainingSessionLocationCompany">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationCompany') . '</label><br>';
     print '<input type="radio" id="TrainingSessionLocationThirdParty" name="training_session_location" value="TrainingSessionLocationThirdParty"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationThirdParty' ? 'checked' : '') . '/><label for="TrainingSessionLocationThirdParty">' . img_picto('', 'company', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationThirdParty') . '</label><br>';
     print '<input type="radio" id="TrainingSessionLocationOther" name="training_session_location" value="TrainingSessionLocationOther"' . (getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION') == 'TrainingSessionLocationOther' ? 'checked' : '') . '/><label for="TrainingSessionLocationOther">' . img_picto('', 'fontawesome_fa-font_fas', 'class="paddingright"') . $langs->transnoentities('TrainingSessionLocationOther') . '</label>';
+    print '</td></tr>';
+
+    // Training session absence rate
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionAbsenceRate') . '</td><td>';
+    print img_picto('', 'sort-numeric-down', 'class="pictofixedwidth"');
+    print '<input type="number" name="training_session_absence_rate" min="0" max="100" value="' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_ABSENCE_RATE') . '"/>';
     print '</td></tr>';
 
     print '</table>';
