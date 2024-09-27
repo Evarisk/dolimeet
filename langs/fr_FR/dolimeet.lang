@@ -53,6 +53,7 @@ AfternoonEndHour                  = Heure de fin d'après-midi
 TrainingSessionLocationCompany    = Lieu de formation (société)
 TrainingSessionLocationThirdParty = Lieu de formation (tiers)
 TrainingSessionLocationOther      = Autre lieu de formation par défaut
+TrainingSessionAbsenceRate        = Taux d'absence acceptable aux sessions de formation
 
 
 

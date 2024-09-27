@@ -36,7 +36,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 {
     global $conf, $db, $user;
 
-    if ($object->element == 'contrat') {
+    if ($object && $object->element == 'contrat') {
         // Load Saturne libraries
         require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
         require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
@@ -76,8 +76,6 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
         }
 
         $substitutionarray['__DOLIMEET_CONTRACT_LABEL__']                    = $object->array_options['options_label'];
-        $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_START__']    = $object->array_options['options_trainingsession_start'];
-        $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_END__']      = $object->array_options['options_trainingsession_end'];
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_TYPE__']     = $object->array_options['options_trainingsession_type'];
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_LOCATION__'] = $object->array_options['options_trainingsession_location'];
 

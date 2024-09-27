@@ -230,6 +230,7 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR', 'chaine', '14:00', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR', 'chaine', '18:00', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_LOCATION', 'chaine', 'TrainingSessionLocationOther', '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_ABSENCE_RATE', 'integer', 20, '', 0, 'current'],
 
             // CONST GENERAL CONST.
             $i++ => ['CONTACT_SHOW_EMAIL_PHONE_TOWN_SELECTLIST', 'integer', 1, '', 0, 'current'],
@@ -629,7 +630,9 @@ class modDoliMeet extends DolibarrModules
             $saturneMail->joinfiles     = 0;
             $saturneMail->content       = $langs->transnoentities('CompletionCertificateDocumentContent');
 
-            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $saturneMail->create($user), 'chaine', 0, '', $conf->entity);
+            $emailTemplateID = $saturneMail->create($user);
+
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $emailTemplateID, 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 2, 'integer', 0, '', $conf->entity);
         }
 
@@ -673,17 +676,29 @@ class modDoliMeet extends DolibarrModules
             'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',  'length' => '',  'elementtype' => ['contrat', 'propal', 'projet'], 'position' => 10, 'params' => 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']],
             'trainingsession_service'        => ['Label' => 'TrainingSessionService',       'type' => 'chkbxlst', 'length' => '',  'elementtype' => ['propal', 'projet'],            'position' => 10, 'params' => '',                                                                       'list' => 1, 'help' => 'TrainingSessionServiceHelp',                                             'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']],
             'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat', 'propal', 'projet'], 'position' => 20, 'params' => '',                                                                       'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']],
-            'trainingsession_start'          => ['Label' => 'TrainingSessionStart',         'type' => 'datetime', 'length' => '',  'elementtype' => ['contrat'],                     'position' => 30, 'params' => '',                                                                       'list' => 1, 'help' => 'TrainingSessionStartHelp',                                               'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"],
-            'trainingsession_end'            => ['Label' => 'TrainingSessionEnd',           'type' => 'datetime', 'length' => '',  'elementtype' => ['contrat'],                     'position' => 40, 'params' => '',                                                                       'list' => 1, 'help' => 'TrainingSessionEndHelp',                                                 'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"],
-            'trainingsession_durations'      => ['Label' => 'TrainingSessionDurations',     'type' => 'int',      'length' => '',  'elementtype' => ['contrat'],                     'position' => 50, 'params' => '',                                                                       'list' => 5, 'help' => 'TrainingSessionDurationHelp',                                            'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"],
-            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',  'length' => '',  'elementtype' => ['contrat'],                     'position' => 60, 'params' => '',                                                                       'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp',                                       'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"]
+            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',  'length' => '',  'elementtype' => ['contrat'],                     'position' => 60, 'params' => '', 'alwayseditable' => 1,                                                'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp',                                       'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"]
         ];
 
         foreach ($extraFieldsArrays as $key => $extraField) {
             foreach ($extraField['elementtype'] as $extraFieldElementType) {
                 $extraFields->update($key, $extraField['Label'], $extraField['type'], $extraField['length'], $extraFieldElementType, 0, 0, $this->numero . $extraField['position'], $extraField['params'], '', '', $extraField['list'], ($extraField['help'][$extraFieldElementType] ?? $extraField['help']), '', '', $extraField['entity'], $extraField['langfile'], $extraField['enabled'] . ' && isModEnabled("' . $extraFieldElementType . '")', 0, 0, $extraField['css']);
-                $extraFields->addExtraField($key, $extraField['Label'], $extraField['type'], $this->numero . $extraField['position'], $extraField['length'], $extraFieldElementType, 0, 0, '', $extraField['params'], '', '', $extraField['list'], $extraField['help'], '', $extraField['entity'], $extraField['langfile'], $extraField['enabled'] . ' && isModEnabled("' . $extraFieldElementType . '")', 0, 0, $extraField['css']);
+                $extraFields->addExtraField($key, $extraField['Label'], $extraField['type'], $this->numero . $extraField['position'], $extraField['length'], $extraFieldElementType, 0, 0, '', $extraField['params'], $extraField['alwayseditable'], '', $extraField['list'], $extraField['help'], '', $extraField['entity'], $extraField['langfile'], $extraField['enabled'] . ' && isModEnabled("' . $extraFieldElementType . '")', 0, 0, $extraField['css']);
             }
+        }
+
+        if (getDolGlobalInt('DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 0) {
+            $extraFieldsArrays = [
+                'trainingsession_start'     => ['elementtype' => ['contrat']],
+                'trainingsession_end'       => ['elementtype' => ['contrat']],
+                'trainingsession_durations' => ['elementtype' => ['contrat']]
+            ];
+
+            foreach ($extraFieldsArrays as $key => $extraField) {
+                foreach ($extraField['elementtype'] as $extraFieldElementType) {
+                    $extraFields->delete($key, $extraFieldElementType);
+                }
+            }
+            dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
         }
 
         return $this->_init($sql, $options);

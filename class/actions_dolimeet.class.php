@@ -154,9 +154,6 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['label']                          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
             $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
             $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
-            $extrafields->attributes['contrat']['label']['trainingsession_start']          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
-            $extrafields->attributes['contrat']['label']['trainingsession_end']            = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
-            $extrafields->attributes['contrat']['label']['trainingsession_durations']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
             $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
 
             // Initialize the param attribute for trainingsession_service
@@ -363,9 +360,6 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['label']                          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
             $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
             $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
-            $extrafields->attributes['contrat']['label']['trainingsession_start']          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_start']);
-            $extrafields->attributes['contrat']['label']['trainingsession_end']            = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_end']);
-            $extrafields->attributes['contrat']['label']['trainingsession_durations']      = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_durations']);
             $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
         }
 
@@ -664,87 +658,21 @@ class ActionsDolimeet
                 require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
                 require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
 
-                // Load DoliMeet libraries
-                require_once __DIR__ . '/session.class.php';
-
                 saturne_load_langs();
 
-                // Handle consistency of contract trainingsession dates
-                $session = new Session($this->db);
-
-                $filter = ' AND t.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_start ASC';
-                $session->fetch('', '', $filter);
-
-                $out = img_picto('', 'check', 'class="marginleftonly"');
-                if ($session->date_start != $object->array_options['options_trainingsession_start']) {
-                    $out = $form->textwithpicto('', $langs->trans('TrainingSessionStartErrorMatchingDate', $session->ref), 1, 'warning');
-                } ?>
-                <script>
-                    jQuery('.contrat_extras_trainingsession_start').append(<?php echo json_encode($out); ?>);
-                </script>
-                <?php
-
-                $filter = ' AND t.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id . ' ORDER BY t.date_end DESC';
-                $session->fetch('', '', $filter);
-
-                $out = img_picto('', 'check', 'class="marginleftonly"');
-                if ($session->date_end != $object->array_options['options_trainingsession_end']) {
-                    $out = $form->textwithpicto('', $langs->trans('TrainingSessionEndErrorMatchingDate', $session->ref), 1, 'warning');
-                } ?>
-                <script>
-                    jQuery('.contrat_extras_trainingsession_end').append(<?php echo json_encode($out); ?>);
-                </script>
-                <?php
-
-                // Handle session durations
-                $sessionDurations = 0;
-                $filter           = 't.status >= 0 AND t.type = "trainingsession" AND t.fk_contrat = ' . $object->id;
-                $sessions         = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
-                if (is_array($sessions) && !empty($sessions)) {
-                    foreach ($sessions as $sessionSingle) {
-                        $sessionDurations += $sessionSingle->duration;
-                    }
-                }
-                if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'trainingsession_durations') {
-                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">';
-                    $out .= '<form enctype="multipart/form-data" action="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '" method="post" name="formextra">';
-                    $out .= '<input type="hidden" name="action" value="update_extras">';
-                    $out .= '<input type="hidden" name="attribute" value="trainingsession_durations">';
-                    $out .= '<input type="hidden" name="token" value="'.newToken().'">';
-                    $out .= '<input type="hidden" name="confirm" value="yes">';
-                    $out .= $form->select_duration('duration', $object->array_options['options_trainingsession_durations'], 0, 'text', 0, 1);
-                    $out .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans('Modify')).'">' . '</td></tr>';
-                } else {
-                    $out = '<td id="' . $object->element . '_extras_trainingsession_durations_' . $object->id . '" class="valuefield ' . $object->element . '_extras_trainingsession_durations">' . ($object->array_options['options_trainingsession_durations'] > 0 ? convertSecondToTime($object->array_options['options_trainingsession_durations'], 'allhourmin') : '00:00') . ' - ';
-                    $out .= $langs->trans('CalculatedTotalSessionDuration') . ' ' . ($sessionDurations > 0 ? convertSecondToTime($sessionDurations, 'allhourmin') : '00:00');
-                    if ($sessionDurations != $object->array_options['options_trainingsession_durations']) {
-                        $out .= $form->textwithpicto('', $langs->trans('TrainingSessionDurationErrorMatching', $session->ref), 1, 'warning');
-                    }
-                    $out .= '</td></tr>';
-                } ?>
-                <script>
-                    jQuery('.valuefield.contrat_extras_trainingsession_durations').replaceWith(<?php echo json_encode($out); ?>);
-                </script>
-                <?php
-
                 // Handle saturne_show_documents for completion certificate document generation
-                if ($session->id > 0) {
-                    print '<link rel="stylesheet" type="text/css" href="../custom/saturne/css/saturne.min.css">';
+                $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
+                $objRef     = dol_sanitizeFileName($object->ref);
+                $dirFiles   = 'completioncertificatedocument/' . $objRef;
+                $fileDir    = $upload_dir . '/' . $dirFiles;
+                $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-                    $upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
-                    $objRef     = dol_sanitizeFileName($object->ref);
-                    $dirFiles   = 'completioncertificatedocument/' . $objRef;
-                    $fileDir    = $upload_dir . '/' . $dirFiles;
-                    $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
+                $html = saturne_show_documents('dolimeet:CompletioncertificateDocument', $dirFiles, $fileDir, $urlSource, $user->rights->contrat->creer, $user->rights->contrat->supprimer, '', 1, 0, 0, 0, 0, '', 0, $langs->defaultlang, '', $object, 0, 'remove_file', (($object->statut > Contrat::STATUS_DRAFT && getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) ? 1 : 0), $langs->trans('DefineSessionTrainerResponsible') . '<br>' . $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities(ucfirst($object->element))))); ?>
 
-                    $html = saturne_show_documents('dolimeet:CompletioncertificateDocument', $dirFiles, $fileDir, $urlSource, $user->rights->contrat->creer, $user->rights->contrat->supprimer, '', 1, 0, 0, 0, 0, '', 0, $langs->defaultlang, '', $object, 0, 'remove_file', (($object->statut > Contrat::STATUS_DRAFT && getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) ? 1 : 0), $langs->trans('DefineSessionTrainerResponsible') . '<br>' . $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities(ucfirst($object->element))))); ?>
-
-                    <script src="../custom/saturne/js/saturne.min.js"></script>
-                    <script>
-                        jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html); ?>);
-                    </script>
-                    <?php
-                }
+                <script>
+                    jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html); ?>);
+                </script>
+                <?php
             }
         }
 
