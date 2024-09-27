@@ -778,7 +778,9 @@ class ActionsDolimeet
                 header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
                 exit;
             }
+        }
 
+        if (strpos($parameters['context'], 'contractcard') !== false) {
             if ($action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument_odt')) {
                 require_once __DIR__ . '/dolimeetdocuments/completioncertificatedocument.class.php';
 
@@ -888,43 +890,47 @@ class ActionsDolimeet
 
         if (strpos($parameters['context'], 'contractcard') !== false) {
             if (!empty($object->array_options['options_trainingsession_type'])) {
-                $contacts             = [];
-                $contactRoleBySources = [
-                    'internal' => [
-                        'warning' => ['trainee', 'sessiontrainer']
-                    ],
-                    'external' => [
-                        'info'    => ['billing', 'customer'],
-                        'warning' => ['trainee', 'sessiontrainer', 'opco']
-                    ]
+                $contactRoles = [
+                    'trainee'        => ['source' => 'both',     'notice' => 'warning'],
+                    'sessiontrainer' => ['source' => 'both',     'notice' => 'warning'],
+                    'billing'        => ['source' => 'external', 'notice' => 'info'],
+                    'customer'       => ['source' => 'external', 'notice' => 'info'],
+                    'opco'           => ['source' => 'external', 'notice' => 'info'],
                 ];
-                foreach ($contactRoleBySources as $contactSource => $contactNoticeTypes) {
-                    foreach ($contactNoticeTypes as $contactNoticeType => $contactRoles) {
-                        foreach ($contactRoles as $contactRole) {
-                            if (empty($object->liste_contact(-1, $contactSource, 0, dol_strtoupper($contactRole)))) {
-                                $contacts[$contactNoticeType][$contactRole]++;
-                                if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
-                                    $contacts['info']['opco']++;
-                                    unset($contacts['warning']['opco']);
-                                }
-                            }
+                foreach ($contactRoles as $contactRole => $contactInfos) {
+                    $contacts = [];
+                    if ($contactInfos['source'] == 'both') {
+                        $internalContacts = $object->liste_contact(-1, 'internal', 0, dol_strtoupper($contactRole));
+                        $externalContacts = $object->liste_contact(-1, 'external', 0, dol_strtoupper($contactRole));
+                        if ((is_array($internalContacts) && !empty($internalContacts)) || (is_array($externalContacts) && !empty($externalContacts))) {
+                            $contacts = array_merge($internalContacts, $externalContacts);
                         }
+                    } else {
+                        $contacts = $object->liste_contact(-1, $contactInfos['source'], 0, dol_strtoupper($contactRole));
+                    }
+                    if (is_array($contacts) && empty($contacts)) {
+                        if ($object->array_options['options_trainingsession_opco_financing'] == 1 && $contactRole == 'opco') {
+                            $contactInfos['notice'] = 'warning';
+                        }
+                        $contactsNoticeByRoles[$contactInfos['notice']][$contactRole] = $contactInfos;
                     }
                 }
 
                 $moreHtmlStatus = '';
-                foreach ($contacts as $contactNoticeType => $contactRoles) {
-                    $moreHtmlStatus .= '<div class="wpeo-notice notice-' . $contactNoticeType . '">';
-                    $moreHtmlStatus .= '<div class="notice-content">';
-                    $moreHtmlStatus .= '<div class="notice-title">';
-                    foreach ($contactRoles as $contactRole => $role) {
-                        if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
-                            $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
-                            continue;
+                if (!empty($contactsNoticeByRoles)) {
+                    foreach ($contactsNoticeByRoles as $contactNoticeType => $contactRoles) {
+                        $moreHtmlStatus .= '<div class="wpeo-notice notice-' . $contactNoticeType . '">';
+                        $moreHtmlStatus .= '<div class="notice-content">';
+                        $moreHtmlStatus .= '<div class="notice-title">';
+                        foreach ($contactRoles as $contactRole => $role) {
+                            if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
+                                $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                                continue;
+                            }
+                            $moreHtmlStatus .= $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
                         }
-                        $moreHtmlStatus .= $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                        $moreHtmlStatus .= '</div></div></div>';
                     }
-                    $moreHtmlStatus .= '</div></div></div>';
                 }
 
                 $this->resprints = $moreHtmlStatus;
@@ -1025,7 +1031,7 @@ class ActionsDolimeet
             $nbSessions = 0;
             require_once __DIR__ . '/session.class.php';
             $session = new Session($db);
-            switch ($parameters['object']->element) {
+            switch ($parameters['object']->element ?? '') {
                 case 'societe' :
                     $objectElement = 'soc';
                     break;
@@ -1037,10 +1043,10 @@ class ActionsDolimeet
                     $filter        = 't.status >= 0 AND t.model = 1 AND t.element_type = "service" AND t.fk_element = ' . $parameters['object']->id;
                     break;
                 default :
-                    $objectElement = $parameters['object']->element;
+                    $objectElement = $parameters['object']->element ?? '';
                     break;
             }
-            $filter  = $filter ?? 't.status >= 0 AND t.fk_' . $objectElement . ' = ' . $parameters['object']->id;
+            $filter  = $filter ?? 't.status >= 0 AND t.fk_' . $objectElement . ' = ' . ($parameters['object']->id ?? 0);
             $filter .= GETPOST('object_type') ? " AND t.type = '" . GETPOST('object_type') . "'" : '';
             $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
             if (is_array($sessions) && !empty($sessions)) {
@@ -1060,8 +1066,6 @@ class ActionsDolimeet
                     }
                 }
             }
-
-            $this->results = $parameters;
         }
 
         return 0; // or return 1 to replace standard code
@@ -1277,97 +1281,90 @@ class ActionsDolimeet
             if (strpos((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), 'completioncertificate') !== false) {
                 require_once __DIR__ . '/session.class.php';
 
-                $session   = new Session($this->db);
-                $document  = new CompletioncertificateDocument($this->db);
-                $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
+                $session = new Session($this->db);
 
-                $contactList   = [];
-                $signedTrainee = [];
-                $sessions      = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 0']);
-                // We retrieve internal & external user linked to the contract
                 foreach (['internal', 'external'] as $source) {
                     $contactList[$source] = $object->liste_contact(-1, $source, 0, 'TRAINEE');
-                    // We need our array keys to start with 1 for further logic
-                    array_unshift($contactList[$source],'');
-                    unset($contactList[$source][0]);
                 }
-                // Because of the structure of $contactList we need a second array where we will remove someone if he is present for ONE session
-                $absentTrainee = $contactList;
 
+                $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . ' AND t.status >= 1']);
                 if (is_array($sessions) && !empty($sessions)) {
+                    $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
+
+                    $durations  = 0;
+                    $nbSessions = count($sessions);
+                    $contactIds = [];
                     foreach ($sessions as $session) {
-                        $signatories = $signatory->fetchSignatories($session->id, 'trainingsession', 'role = "Trainee"');
-                        foreach ($signatories as $signatory) {
-                            $type     = ($signatory->element_type == 'user' ? 'internal' : 'external');
-                            $absentId = array_column($absentTrainee[$type], 'id');
-
-                            // We search for the key in $contactList corresponding to the current $signatory->element_id
-                            array_unshift($absentId,'');
-                            unset($absentId[0]);
-                            // array_search return false (0) if it doesn't find, that's why we need our $absentTrainee array to start by 1
-                            $key = array_search($signatory->element_id, $absentId);
-
-                            if ($signatory->attendance != SaturneSignature::ATTENDANCE_ABSENT) {
-                                // If the $signatory is present then we will remove it from the $absentTrainee array
-                                if ($key > 0) {
-                                    unset($absentTrainee[$type][$key]);
+                        $absentSignatories = $signatory->fetchSignatories($session->id, 'trainingsession', 't.role = "Trainee"' . ' AND t.attendance = ' . SaturneSignature::ATTENDANCE_ABSENT);
+                        if (is_array($absentSignatories) && !empty($absentSignatories)) {
+                            foreach ($absentSignatories as $signatory) {
+                                $type       = ($signatory->element_type == 'user' ? 'internal' : 'external');
+                                $contactIds = array_column($contactList[$type], 'id');
+                                if (in_array($signatory->element_id, $contactIds)) {
+                                    $absentTrainees[$signatory->element_id]['lastname']  = $signatory->lastname;
+                                    $absentTrainees[$signatory->element_id]['firstname'] = $signatory->firstname;
+                                    $absentTrainees[$signatory->element_id]['type']      = $type;
+                                    $absentTrainees[$signatory->element_id]['nbAbsence']++;
                                 }
-                                $signedTrainee[$type][$signatory->element_id] += $session->duration;
+                            }
+                        }
+                        $durations += $session->duration;
+                    }
+
+                    if (!empty($absentTrainees)) {
+                        foreach ($absentTrainees as $absentId => $absentTrainee) {
+                            if (($absentTrainee['nbAbsence'] / $nbSessions * 100) > getDolGlobalInt('DOLIMEET_TRAININGSESSION_ABSENCE_RATE')) {
+                                $key = array_search($absentId, $contactIds);
+                                unset($contactList[$absentTrainee['type']][$key]);
+                                setEventMessages($langs->trans('NoCertificateBecauseAbsent', $absentTrainee['lastname'], $absentTrainee['firstname']), [], 'warnings');
                             }
                         }
                     }
-                    $lastSession = end($sessions);
-                    $dateEnd     = $lastSession->date_end;
-                    if ($dateEnd != $object->array_options['options_trainingsession_end']) {
-                        setEventMessages($langs->trans('TrainingSessionEndErrorMatchingDate', $lastSession->ref), [], 'warnings');
-                    }
-                }
 
-                if (!empty($absentTrainee)) {
-                    foreach ($absentTrainee as $absentType) {
-                        foreach($absentType as $contact) {
-                            setEventMessages($langs->trans('NoCertificateBecauseAbsent', $contact['lastname'], $contact['firstname']), [], 'warnings');
-                        }
-                    }
-                }
+                    if (!empty($contactList)) {
+                        $document                              = new CompletioncertificateDocument($this->db);
+                        $parameters['moreparams']['attendant'] = new stdClass();
 
-                $parameters['moreparams']['object']             = $object;
-                $parameters['moreparams']['object']->element    = 'trainingsession';
-                $parameters['moreparams']['object']->date_start = $object->array_options['options_trainingsession_start'];
-                $parameters['moreparams']['object']->date_end   = $object->array_options['options_trainingsession_end'];
-                $parameters['moreparams']['object']->fk_contrat = $object->id;
-
-                if (!empty($contactList) && !empty($signedTrainee)) {
-                    foreach ($contactList as $contactType) {
-                        foreach($contactType as $contact) {
-                            if (is_array($signedTrainee[$contact['source']]) && array_key_exists($contact['id'], $signedTrainee[$contact['source']])) {
-                                $parameters['moreparams']['attendant']               = $signatory;
+                        $parameters['moreparams']['object']             = $object;
+                        $parameters['moreparams']['object']->element    = 'trainingsession';
+                        $parameters['moreparams']['object']->fk_contrat = $object->id;
+                        $parameters['moreparams']['object']->date_start = current($sessions)->date_start;
+                        $parameters['moreparams']['object']->date_end   = end($sessions)->date_end;
+                        $parameters['moreparams']['object']->duration   = $durations;
+                        foreach ($contactList as $contactType) {
+                            foreach($contactType as $contact) {
                                 $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
                                 $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
                                 $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
                                 $parameters['moreparams']['attendant']->element_id   = $contact['id'];
-                                $parameters['moreparams']['object']->duration        = $signedTrainee[$contact['source']][$contact['id']];
 
                                 $document->element = 'trainingsessiondocument';
+
                                 $result = $document->generateDocument((!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']), $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $parameters['moreparams']);
+                                // Need to reset $document->error because commonGenerateDocument call unwanted function dol_delete_preview
+                                if ($document->error == 'ErrorObjectNoSupportedByFunction') {
+                                    $document->error = '';
+                                }
                                 if ($result <= 0) {
                                     setEventMessages($document->error, $document->errors, 'errors');
                                 }
+
+                                $documentType = explode('_odt', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']));
+                                if ($document->element != $documentType[0]) {
+                                    $document->element = $documentType[0];
+                                }
+
+                                setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=dolimeet&file=' . urlencode($document->element . '/' . $object->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $document->last_main_doc, []);
                             }
                         }
-                    }
 
-                    $documentType = explode('_odt', (!empty($parameters['models']) ? $parameters['models'][1] : $parameters['model']));
-                    if ($document->element != $documentType[0]) {
-                        $document->element = $documentType[0];
-                    }
-                    setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=dolimeet&file=' . urlencode($document->element . '/' . $object->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $document->last_main_doc, []);
-                    $urlToRedirect = $_SERVER['REQUEST_URI'];
-                    $urlToRedirect = preg_replace('/#builddoc$/', '', $urlToRedirect);
-                    $urlToRedirect = preg_replace('/action=builddoc&?/', '', $urlToRedirect); // To avoid infinite loop
-                    if (!GETPOST('forcebuilddoc')){
-                        header('Location: ' . $urlToRedirect . '#builddoc');
-                        exit;
+                        $urlToRedirect = $_SERVER['REQUEST_URI'];
+                        $urlToRedirect = preg_replace('/#builddoc$/', '', $urlToRedirect);
+                        $urlToRedirect = preg_replace('/action=builddoc&?/', '', $urlToRedirect); // To avoid infinite loop
+                        if (!GETPOST('forcebuilddoc')){
+                            header('Location: ' . $urlToRedirect . '#builddoc');
+                            exit;
+                        }
                     }
                 }
             }
