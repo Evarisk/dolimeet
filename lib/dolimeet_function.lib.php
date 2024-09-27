@@ -119,7 +119,7 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
                 foreach ($trainingSessions as $trainingSession) {
                     $durations += $trainingSession->duration;
                     if ($object->element == 'contrat') {
-                        $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuser') . ' - <strong>' . $langs->transnoentities('Validate') . '</strong>';
+                        $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuser') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
                     } else {
                         $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
                     }
