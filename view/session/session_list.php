@@ -109,7 +109,7 @@ $search_array_options = $extrafields->getOptionalsFromPost($object->table_elemen
 // Default sort order (if not yet defined by previous GETPOST)
 if (!$sortfield) {
     reset($object->fields); // Reset is required to avoid key() to return null
-    $sortfield = 't.date_creation';
+    $sortfield = 't.date_start';
 }
 if (!$sortorder) {
     $sortorder = 'DESC';

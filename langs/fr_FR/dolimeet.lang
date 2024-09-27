@@ -140,7 +140,7 @@ TrainingSessionStartErrorMatchingDate = <strong> Erreur : cohérence des dates d
 TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates de fin de la formation. </strong><br> La date de fin de la formation du contrat n'est pas égale à la date fin de la dernière session de formation %s.
 CalculatedTotalSessionDuration        = Durée totale calculée :
 TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
-NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à toute les sessions.
+NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à au moins une session.
 ErrorMissingTrainingSessionProjectInfo = Attention : information du projet de formation manquante
 
 # Extrafields - Attributs supplémentaires
