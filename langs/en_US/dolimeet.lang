@@ -30,8 +30,6 @@ DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 
 # Setup
 SatisfactionSurvey                          = Satisfaction survey
-CustomerSatisfactionSurvey                  = Customer satisfaction survey
-CustomerSatisfactionSurveyDescription       = Defines the model used by default for customer satisfaction surveys
 BillingSatisfactionSurvey                   = Billing satisfaction survey
 BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
 TraineeSatisfactionSurvey                   = Trainee satisfaction survey

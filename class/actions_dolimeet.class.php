@@ -477,7 +477,7 @@ class ActionsDolimeet
                 $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
-                $contactsCodeWanted = ['CUSTOMER', 'BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+                $contactsCodeWanted = ['BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
 
                 $object->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
 
