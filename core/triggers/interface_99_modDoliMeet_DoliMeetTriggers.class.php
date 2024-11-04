@@ -295,10 +295,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $product    = new Product($this->db);
                     $propalLine = new PropaleLigne($this->db);
 
-                    // Add formation services on propal (by default LA1, RA1)
+                    // Add formation services on propal (by default FOR_ADM_GP1, FOR_ADM_LA1)
                     $formationServices = get_formation_service();
                     foreach ($formationServices as $formationService) {
-                        if ($formationService['ref'] == 'F0') {
+                        if ($formationService['ref'] == 'FOR_ADM_CF1' || $formationService['ref'] == 'FOR_ADM_RI1') {
                             continue;
                         }
                         $confName = $formationService['code'];
@@ -390,10 +390,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                     $langs->load('propal');
 
-                    // Add formation services on contract (by default F0)
+                    // Add formation services on contract (by default FOR_ADM_CF1, FOR_ADM_RI1)
                     $formationServices = get_formation_service();
                     foreach ($formationServices as $formationService) {
-                        if ($formationService['ref'] == 'F0') {
+                        if ($formationService['ref'] == 'FOR_ADM_CF1' || $formationService['ref'] == 'FOR_ADM_RI1') {
                             $confName = $formationService['code'];
                             $result   = $product->fetch(getDolGlobalInt($confName));
 
