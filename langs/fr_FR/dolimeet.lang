@@ -41,6 +41,7 @@ OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par d
 
 # Formation - Formation
 TrainingContract                  = Convention de formation
+PracticalGuide                    = Guide pratique
 WelcomeBooklet                    = Livret d'accueil
 RulesOfProcedure                  = Réglement intérieur
 FormationServiceMainCategory      = Catégorie principale des services de formation

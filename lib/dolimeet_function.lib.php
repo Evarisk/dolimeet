@@ -65,21 +65,27 @@ function get_formation_service(): array
     return [
         [
             'position' => 10,
-            'code' => 'DOLIMEET_SERVICE_TRAINING_CONTRACT',
-            'ref' => 'F0',
-            'name' => 'TrainingContract',
+            'code'     => 'DOLIMEET_SERVICE_TRAINING_CONTRACT',
+            'ref'      => 'FOR_ADM_CF1',
+            'name'     => 'TrainingContract'
         ],
         [
             'position' => 30,
-            'code' => 'DOLIMEET_SERVICE_WELCOME_BOOKLET',
-            'ref' => 'LA1',
-            'name' => 'WelcomeBooklet',
+            'code'     => 'DOLIMEET_SERVICE_PRACTICAL_GUIDE',
+            'ref'      => 'FOR_ADM_GP1',
+            'name'     => 'PracticalGuide'
         ],
         [
             'position' => 40,
-            'code' => 'DOLIMEET_SERVICE_RULES_OF_PROCEDURE',
-            'ref' => 'RA1',
-            'name' => 'RulesOfProcedure',
+            'code'     => 'DOLIMEET_SERVICE_WELCOME_BOOKLET',
+            'ref'      => 'FOR_ADM_LA1',
+            'name'     => 'WelcomeBooklet'
+        ],
+        [
+            'position' => 50,
+            'code'     => 'DOLIMEET_SERVICE_RULES_OF_PROCEDURE',
+            'ref'      => 'FOR_ADM_RI1',
+            'name'     => 'RulesOfProcedure'
         ]
     ];
 }

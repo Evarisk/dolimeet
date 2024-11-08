@@ -226,7 +226,7 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
     print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationServiceMainCategory') . '</td><td>';
     print img_picto('', 'category', 'class="pictofixedwidth"');
     print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'formation_main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
-    print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
+    print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&label=' . $langs->transnoentities('Formation') . '&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
     print '</td></tr>';
 
     // Training session templates project
