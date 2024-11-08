@@ -28,8 +28,6 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
-CustomerSatisfactionSurvey                  = Enquête de satisfaction client
-CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
 BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire
 BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire
 TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire

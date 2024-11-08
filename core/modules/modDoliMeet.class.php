@@ -598,7 +598,7 @@ class modDoliMeet extends DolibarrModules
 
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             $position = 100;
-            $satisfactionSurveys = ['customer', 'billing', 'trainee', 'sessiontrainer', 'opco'];
+            $satisfactionSurveys = ['billing', 'trainee', 'sessiontrainer', 'opco'];
             foreach ($satisfactionSurveys as $satisfactionSurvey) {
                 $saturneMail->entity        = 0;
                 $saturneMail->type_template = 'contract';

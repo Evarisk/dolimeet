@@ -251,7 +251,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $contactCode   = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
 
                     if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
-                        $contactsCodeWanted = ['CUSTOMER', 'BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+                        $contactsCodeWanted = ['BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
                         if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
                             set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
                         }
