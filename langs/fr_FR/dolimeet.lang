@@ -159,6 +159,7 @@ TrainingSessionOpcoFinancing     = Financement avec un OPCO
 TrainingSessionOpcoFinancingHelp = Cocher la case si vous voulez un financement avec un OPCO
 TrainingSessionNbTrainees        = Nombre de stagiaires
 TrainingSessionNbTraineesHelp    = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
+SyllabusHelp                     = Programme de la formation
 
 # Public note - Note publique
 FormationInfoTitle               = <strong>1 - Objet, nature et durée de la formation</strong>
@@ -296,6 +297,7 @@ Customer                          = Client
 HourEnd                           = Heure de fin
 ToBePlanned                       = à planifier
 ErrorDuration                     = Erreur : durée du service manquante
+ErrorSyllabus                     = Erreur : programme de la formation manquant
 ErrorStatus                       = Erreur : statut de la session de formation invalide : %s
 ErrrorDurationNotMatching         = Erreur : incohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
 ServiceReadyToBeUsed              = Service prêt à être utilisé

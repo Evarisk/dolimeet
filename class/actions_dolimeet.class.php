@@ -139,7 +139,7 @@ class ActionsDolimeet
     {
         global $extrafields, $langs;
 
-        if (preg_match('/projectcard|propalcard|contractcard/', $parameters['context'])) {
+        if (preg_match('/projectcard|propalcard|contractcard|productcard/', $parameters['context'])) {
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
             $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
@@ -155,6 +155,8 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
             $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
             $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
+
+            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
 
             // Initialize the param attribute for trainingsession_service
             if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
@@ -331,6 +333,14 @@ class ActionsDolimeet
             <?php
         }
 
+        if (strpos($parameters['context'], 'productcard')) {
+            global $extrafields, $object;
+
+            if ($object->type == $object::TYPE_PRODUCT) {
+                $extrafields->attributes['product']['list']['syllabus'] = 0;
+            }
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -345,7 +355,7 @@ class ActionsDolimeet
     {
         global $extrafields, $langs;
 
-        if (preg_match('/projectlist|propallist|contractlist/', $parameters['context'])) {
+        if (preg_match('/projectlist|propallist|contractlist|productservicelist/', $parameters['context'])) {
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
             $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
@@ -361,6 +371,8 @@ class ActionsDolimeet
             $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
             $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
             $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
+
+            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
         }
 
         return 0; // or return 1 to replace standard code
@@ -946,44 +958,52 @@ class ActionsDolimeet
                         if ($object->duration_value <= 0) {
                             $error++;
                             $this->errors[] = $langs->transnoentities('ErrorDuration');
-                        } else {
-                            require_once __DIR__ . '/trainingsession.class.php';
-
-                            $trainingSession  = new Trainingsession($this->db);
-                            $trainingSessions = $trainingSession->fetchAll('', '', 0, 0, ['customsql' => 't.status >= 0 AND t.model = 1 AND t.fk_element = ' . $object->id]);
-                            if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                                $durations = 0;
-                                foreach ($trainingSessions as $trainingSession) {
-                                    $durations += $trainingSession->duration;
-                                    if ($trainingSession->status == 0) {
-                                        $error++;
-                                        $this->errors[] = $langs->transnoentities('ErrorStatus', $trainingSession->ref);
-                                    }
-                                }
-                                if ($durations != convertTime2Seconds($object->duration)) {
-                                    $error++;
-                                    $this->errors[] = $langs->transnoentities('ErrrorDurationNotMatching');
-                                }
-                            } else {
-                                $error++;
-                                $this->errors[] = $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($trainingSession->element)));
-                            }
                         }
-                    }
-                }
 
-                $moreHtmlStatus  = '<div class="wpeo-notice notice-' . ($error == 0 ? 'success' : 'error') . '">';
-                $moreHtmlStatus .= '<div class="notice-content">';
-                $moreHtmlStatus .= '<div class="notice-title">';
-                if ($error > 0) {
-                    foreach ($this->errors as $error) {
-                        $moreHtmlStatus .= $error . '<br>';
+                        if (isset($object->array_options['options_syllabus']) && dol_strlen($object->array_options['options_syllabus']) <= 0) {
+                            $error++;
+                            $this->errors[] = $langs->transnoentities('ErrorSyllabus');
+                        }
+
+                        require_once __DIR__ . '/trainingsession.class.php';
+
+                        $trainingSession  = new Trainingsession($this->db);
+                        $trainingSessions = $trainingSession->fetchAll('', '', 0, 0, ['customsql' => 't.status >= 0 AND t.model = 1 AND t.fk_element = ' . $object->id]);
+                        if (is_array($trainingSessions) && !empty($trainingSessions)) {
+                            $durations = 0;
+                            foreach ($trainingSessions as $trainingSession) {
+                                $durations += $trainingSession->duration;
+                                if ($trainingSession->status == 0) {
+                                    $error++;
+                                    $this->errors[] = $langs->transnoentities('ErrorStatus', $trainingSession->ref);
+                                }
+                            }
+
+                            if ($durations != convertTime2Seconds($object->duration)) {
+                                $error++;
+                                $this->errors[] = $langs->transnoentities('ErrrorDurationNotMatching');
+                            }
+                        } else {
+                            $error++;
+                            $this->errors[] = $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($trainingSession->element)));
+                        }
+
+                        $moreHtmlStatus  = '<div class="wpeo-notice notice-' . ($error == 0 ? 'success' : 'error') . '">';
+                        $moreHtmlStatus .= '<div class="notice-content">';
+                        $moreHtmlStatus .= '<div class="notice-title">';
+                        if ($error > 0) {
+                            foreach ($this->errors as $error) {
+                                $moreHtmlStatus .= $error . '<br>';
+                            }
+                        } else {
+                            $moreHtmlStatus .= $langs->transnoentities('ServiceReadyToBeUsed');
+                        }
+                        $moreHtmlStatus .= '</div></div></div>';
+                        $this->resprints = $moreHtmlStatus;
+
+                        break;
                     }
-                } else {
-                    $moreHtmlStatus .= $langs->transnoentities('ServiceReadyToBeUsed');
                 }
-                $moreHtmlStatus .= '</div></div></div>';
-                $this->resprints = $moreHtmlStatus;
             }
         }
 
