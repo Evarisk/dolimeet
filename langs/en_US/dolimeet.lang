@@ -32,12 +32,12 @@ DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 SatisfactionSurvey                          = Satisfaction survey
 BillingSatisfactionSurvey                   = Billing satisfaction survey
 BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
+CustomerSatisfactionSurvey                  = Customer satisfaction survey
+CustomerSatisfactionSurveyDescription       = Defines the model used by default for customer satisfaction surveys
 TraineeSatisfactionSurvey                   = Trainee satisfaction survey
 TraineeSatisfactionSurveyDescription        = Defines the model used by default for trainee satisfaction surveys
 SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
 SessiontrainerSatisfactionSurveyDescription = Defines the model used by default for session trainer satisfaction surveys
-OpcoSatisfactionSurvey                      = OPCO satisfaction survey
-OpcoSatisfactionSurveyDescription           = Defines the model used by default for OPCO satisfaction surveys
 
 
 
