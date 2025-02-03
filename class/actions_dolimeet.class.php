@@ -137,7 +137,7 @@ class ActionsDolimeet
      */
     public function formObjectOptions(array $parameters, $object, $action): int
     {
-        global $extrafields, $langs;
+        global $conf, $extrafields, $form, $langs;
 
         if (preg_match('/projectcard|propalcard|contractcard|productcard/', $parameters['context'])) {
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
@@ -159,13 +159,18 @@ class ActionsDolimeet
             $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
 
             // Initialize the param attribute for trainingsession_service
-            if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
-                $filter  = 'product as p:label:rowid::fk_product_type = 1 AND entity = $ENTITY$';
-                $filter .= ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
-                $filter .= ' AND EXISTS (SELECT 1 FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
-
+            $filter = '';
+            if (DOL_VERSION >= '20.0.0') { // @TODO Bon courage a celui qui devra maintenir ce code
+                if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
+                    $filter  = 'product as p:label:rowid::(fk_product_type:=:1 AND entity:=:$ENTITY$)';
+                    $filter .= ' AND (rowid:IN:SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
+                    $filter .= ' AND (rowid:IN:SELECT ds.fk_element FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ')';
+                }
                 $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => [$filter => '']];
                 $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => [$filter => '']];
+            } else {
+                $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => ['' => NULL]];
+                $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => ['' => NULL]];
             }
         }
 
@@ -223,6 +228,26 @@ class ActionsDolimeet
             $out .= '<li class="notice-third-party">' . $langs->transnoentities('ThirdParty') . '</li>';
             $out .= '<li class="notice-opportunity-status">' . $langs->transnoentities('OpportunityStatus') . '</li>';
             $out .= '</ul></div></div></div>';
+
+//            $out2  = '<tr class="field_options_trainingsession_service project_extras_trainingsession_service trextrafields_collapse" data-element="extrafield" data-targetelement="project" data-targetid="">';
+//            $out2 .= '<td class="titlefieldmax45 wordbreak">';
+//            $out2 .= $form->textwithpicto($langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']), $langs->transnoentities($extrafields->attributes['projet']['help']['trainingsession_service']));
+//            $out2 .= '</td><td class="valuefieldcreate project_extras_trainingsession_service">';
+//
+//            $filter = [
+//                'customsql' => 'fk_product_type = 1 AND entity = ' . $conf->entity .
+//                ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')' .
+//                ' AND rowid IN (SELECT ds.fk_element FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = t.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = t.duration * 3600)'
+//            ];
+//            $a = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filter);
+//            if (!empty($a) && is_array($a)) {
+//                foreach ($a as $product) {
+//                    $b[$product->id] = $product->label;
+//                }
+//            }
+//            $out2 .= Form::multiselectarray('options_trainingsession_service', $b, $object->array_options['options_trainingsession_service']);
+//            $out2 .= '</td></tr>';
+//            print $out2
 
             ?>
             <script>
@@ -489,7 +514,7 @@ class ActionsDolimeet
                 $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
-                $contactsCodeWanted = ['BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+                $contactsCodeWanted = ['BILLING', 'CUSTOMER', 'TRAINEE', 'SESSIONTRAINER'];
 
                 $object->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
 

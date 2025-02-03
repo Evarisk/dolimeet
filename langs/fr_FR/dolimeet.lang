@@ -28,14 +28,14 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
-BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire
-BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire
+BillingSatisfactionSurvey                   = Enquête de satisfaction financeur
+BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction financeur
+CustomerSatisfactionSurvey                  = Enquête de satisfaction client
+CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
 TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
 TraineeSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction stagiaire
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
 SessiontrainerSatisfactionSurveyDescription = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction formateur
-OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
-OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction OPCO
 
 # Formation - Formation
 TrainingContract                  = Convention de formation
@@ -292,7 +292,7 @@ NeedToSetSatisfactionSurvey       = Configuration de l'enquête de satisfaction 
 DefineSessionTrainerResponsible   = Vous devez définir le responsable du dispensateur de formation dans la configuration de DoliMeet.
 FillSatisfactionSurvey            = Remplir l'enquête de satisfaction %s
 Sessiontrainer                    = Formateur
-Billing                           = Commanditaire
+Billing                           = Financeur
 Customer                          = Client
 HourEnd                           = Heure de fin
 ToBePlanned                       = à planifier

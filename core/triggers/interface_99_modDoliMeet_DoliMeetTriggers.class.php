@@ -251,7 +251,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $contactCode   = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
 
                     if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
-                        $contactsCodeWanted = ['BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+                        $contactsCodeWanted = ['BILLING', 'CUSTOMER', 'TRAINEE', 'SESSIONTRAINER'];
                         if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
                             set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
                         }
@@ -381,8 +381,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
-                    $this->db->begin();
-
                     $propal       = new Propal($this->db);
                     $product      = new Product($this->db);
                     $contratLigne = new ContratLigne($this->db);
@@ -415,6 +413,9 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $contratLigne->price_ht        = 0;
                                 $contratLigne->remise          = 0;
 
+                                // Todo changer par addline
+                                $this->db->begin();
+
                                 $contratLigne->insert($user);
                             }
                         }
@@ -428,7 +429,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         $trainingSession = new Trainingsession($this->db);
 
                         $propal->fetch($object->linked_objects['propal']);
-                        if (strpos($propal->array_options['options_trainingsession_service'], ',') === false) {
+                        if (strpos($propal->array_options['options_trainingsession_service'], ',') !== false) {
                             $propal->array_options['options_trainingsession_service'] = explode(',', $propal->array_options['options_trainingsession_service']);
                         }
                         foreach ($propal->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
