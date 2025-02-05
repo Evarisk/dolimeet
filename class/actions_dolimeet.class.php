@@ -137,7 +137,7 @@ class ActionsDolimeet
      */
     public function formObjectOptions(array $parameters, $object, $action): int
     {
-        global $extrafields, $langs;
+        global $conf, $extrafields, $form, $langs;
 
         if (preg_match('/projectcard|propalcard|contractcard|productcard/', $parameters['context'])) {
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
@@ -160,9 +160,7 @@ class ActionsDolimeet
 
             // Initialize the param attribute for trainingsession_service
             if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
-                $filter  = 'product as p:label:rowid::fk_product_type = 1 AND entity = $ENTITY$';
-                $filter .= ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
-                $filter .= ' AND EXISTS (SELECT 1 FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
+                $filter  = 'product as p:label:rowid::(fk_product_type:=:1) AND (entity:=:$ENTITY$)';
 
                 $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => [$filter => '']];
                 $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => [$filter => '']];
@@ -327,6 +325,42 @@ class ActionsDolimeet
                     setInterval(checkFields, 1000);
                     if ($('#socid').val() < 0) {
                         $('#options_trainingsession_type').attr('disabled', 'disabled');
+                    }
+                });
+            </script>
+            <?php
+        }
+
+        if (strpos($parameters['context'], 'propalcard') !== false ||
+            strpos($parameters['context'], 'projectcard') !== false) {
+
+            $objectCard = strpos($parameters['context'], 'propalcard') !== false ? 'propal' : 'projet';
+
+            $out2 = '<td class="titlefieldmax45 wordbreak">';
+            $out2 .= $form->textwithpicto($langs->transnoentities($extrafields->attributes[$objectCard]['label']['trainingsession_service']), $langs->transnoentities($extrafields->attributes[$objectCard]['help']['trainingsession_service']));
+            $out2 .= '</td><td class="valuefieldcreate ' . $objectCard . '_extras_trainingsession_service">';
+
+            $filter = [
+                'customsql' => 'fk_product_type = 1 AND entity = ' . $conf->entity .
+                    ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')' .
+                    ' AND rowid IN (SELECT ds.fk_element FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = t.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = t.duration * 3600)'
+            ];
+            $a = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filter);
+            $b = [];
+            if (!empty($a) && is_array($a)) {
+                foreach ($a as $product) {
+                    $b[$product->id] = $product->label;
+                }
+            }
+            $out2 .= Form::multiselectarray('options_trainingsession_service', $b, $object->array_options['options_trainingsession_service'], 0, 0, 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+            $out2 .= '</td>';
+
+            ?>
+            <script>
+                $(document).ready(function() {
+                    $('#options_trainingsession_service').closest('tr').html(<?php echo json_encode($out2); ?>);
+                    if ($('#options_trainingsession_type').val() <= 0) {
+                        $('#options_trainingsession_service').closest('tr').hide();
                     }
                 });
             </script>

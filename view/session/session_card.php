@@ -233,7 +233,7 @@ if ($action == 'create') {
         }
 
         if (GETPOST('element_type') == 'service') {
-            $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
+            $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:fk_product_type = 1 AND entity = ' . $conf->entity;
             $object->fields['fk_element']['picto']   = 'service';
             $object->fields['fk_element']['label']   = $langs->trans('Service');
             $object->fields['element_type']['picto'] = 'service';

@@ -576,6 +576,39 @@ class Session extends SaturneObject
     }
 
     /**
+     * Show input field.
+     *
+     * @param $val
+     * @param $key
+     * @param $value
+     * @param $moreparam
+     * @param $keysuffix
+     * @param $keyprefix
+     * @param $morecss
+     * @param $nonewbutton
+     * @return string|void
+     */
+    public function showInputField($val, $key, $value, $moreparam = '', $keysuffix = '', $keyprefix = '', $morecss = 0, $nonewbutton = 0)
+    {
+        if ($key == 'fk_element') {
+            if (GETPOSTISSET('element_type') || GETPOST('element_type') != '0') {
+                $out = '';
+                $valInfo = explode(':', $val['type']);
+                if (count($valInfo) >= 5) {
+                    require_once DOL_DOCUMENT_ROOT . '/' . $valInfo[2];
+                    $objects = saturne_fetch_all_object_type($valInfo[1], '', '', 0, 0, ['customsql' => $valInfo[4]]);
+                    if (is_array($objects) && !empty($objects)) {
+                        $objects = array_column($objects, 'ref', 'id');
+                        $out     = Form::selectarray($keyprefix . $key . $keysuffix, $objects, $value, 1, 0, 0, '', 0, 0, 0, '', !empty($val['css']) ? $val['css'] : 'minwidth200 maxwidth300 widthcentpercentminusx');
+                    }
+                }
+                return $out;
+            }
+        }
+        return parent::showInputField($val, $key, $value, $moreparam, $keysuffix, $keyprefix, $morecss, $nonewbutton);
+    }
+
+    /**
      * Load dashboard info
      *
      * @return array
