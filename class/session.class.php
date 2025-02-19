@@ -576,6 +576,41 @@ class Session extends SaturneObject
     }
 
     /**
+     * Return HTML string to put an input field into a page
+     * Code very similar with showInputField of extra fields
+     *
+     * @param  string          $key         Key of attribute
+     * @param  string|string[] $value       Preselected value to show (for date type it must be in timestamp format, for amount or price it must be a php numeric value, for array type must be array)
+     * @param  string          $moreparam   To add more parameters on html input tag
+     * @param  string          $keysuffix   Suffix string to add into name and id of field (can be used to avoid duplicate names)
+     * @param  string          $keyprefix   Prefix string to add into name and id of field (can be used to avoid duplicate names)
+     * @param  string|int      $morecss     Value for css to define style/length of field. May also be a numeric
+     * @param  int<0,1>        $nonewbutton Force to not show the new button on field that are links to object
+     * @return string          $out         HTML string to put an input field into a page
+     * @throws Exception
+     */
+    public function showInputField($val, $key, $value, $moreparam = '', $keysuffix = '', $keyprefix = '', $morecss = 0, $nonewbutton = 0): string
+    {
+        if ($key == 'fk_element') {
+            if (GETPOSTISSET('element_type') || GETPOST('element_type') != '0') {
+                $out     = '';
+                $valInfo = explode(':', $val['type']);
+                if (count($valInfo) >= 5) {
+                    require_once DOL_DOCUMENT_ROOT . '/' . $valInfo[2];
+
+                    $objects = saturne_fetch_all_object_type($valInfo[1], '', '', 0, 0, ['customsql' => $valInfo[4]]);
+                    if (is_array($objects) && !empty($objects)) {
+                        $objects = array_column($objects, 'ref', 'id');
+                        $out     = Form::selectarray($keyprefix . $key . $keysuffix, $objects, $value, 1, 0, 0, '', 0, 0, 0, '', !empty($val['css']) ? $val['css'] : 'minwidth200 maxwidth300 widthcentpercentminusx');
+                    }
+                }
+                return $out;
+            }
+        }
+        return parent::showInputField($val, $key, $value, $moreparam, $keysuffix, $keyprefix, $morecss, $nonewbutton);
+    }
+
+    /**
      * Load dashboard info
      *
      * @return array
