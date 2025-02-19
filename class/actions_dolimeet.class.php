@@ -331,34 +331,36 @@ class ActionsDolimeet
             <?php
         }
 
-        if (strpos($parameters['context'], 'propalcard') !== false ||
-            strpos($parameters['context'], 'projectcard') !== false) {
+        if (preg_match('/propalcard|projectcard/', $parameters['context'])) {
+            if ($object->element == 'project') {
+                $object->element = 'projet';
+            }
 
-            $objectCard = strpos($parameters['context'], 'propalcard') !== false ? 'propal' : 'projet';
+            $out = '<td class="titlefieldmax45 wordbreak">';
+            $out .= $form->textwithpicto($langs->transnoentities($extrafields->attributes[$object->element]['label']['trainingsession_service']), $langs->transnoentities($extrafields->attributes[$object->element]['help']['trainingsession_service']));
+            $out .= '</td><td class="valuefieldcreate ' . $object->element . '_extras_trainingsession_service">';
 
-            $out2 = '<td class="titlefieldmax45 wordbreak">';
-            $out2 .= $form->textwithpicto($langs->transnoentities($extrafields->attributes[$objectCard]['label']['trainingsession_service']), $langs->transnoentities($extrafields->attributes[$objectCard]['help']['trainingsession_service']));
-            $out2 .= '</td><td class="valuefieldcreate ' . $objectCard . '_extras_trainingsession_service">';
+            if ($object->element == 'projet') {
+                $object->element = 'project';
+            }
 
             $filter = [
                 'customsql' => 'fk_product_type = 1 AND entity = ' . $conf->entity .
                     ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')' .
                     ' AND rowid IN (SELECT ds.fk_element FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = t.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = t.duration * 3600)'
             ];
-            $a = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filter);
-            $b = [];
-            if (!empty($a) && is_array($a)) {
-                foreach ($a as $product) {
-                    $b[$product->id] = $product->label;
-                }
+            $products      = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filter);
+            $productsArray = [];
+            if (is_array($products) && !empty($products)) {
+                $productsArray = array_column($products, 'label', 'id');
             }
-            $out2 .= Form::multiselectarray('options_trainingsession_service', $b, $object->array_options['options_trainingsession_service'], 0, 0, 'minwidth100imp maxwidth500 widthcentpercentminusxx');
-            $out2 .= '</td>';
+            $out .= Form::multiselectarray('options_trainingsession_service', $productsArray, (!empty(GETPOST('options_trainingsession_service', 'array')) ? GETPOST('options_trainingsession_service', 'array') : $object->array_options['options_trainingsession_service']), 0, 0, 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+            $out .= '</td>';
 
             ?>
             <script>
                 $(document).ready(function() {
-                    $('#options_trainingsession_service').closest('tr').html(<?php echo json_encode($out2); ?>);
+                    $('#options_trainingsession_service').closest('tr').html(<?php echo json_encode($out); ?>);
                     if ($('#options_trainingsession_type').val() <= 0) {
                         $('#options_trainingsession_service').closest('tr').hide();
                     }
@@ -1061,7 +1063,6 @@ class ActionsDolimeet
             if ($parameters['html'] == $langs->trans('AddProp')) {
                 $explodedCompiledAttributes       = explode('projectid', $parameters['compiledAttributes']);
                 $parameters['compiledAttributes'] = $explodedCompiledAttributes[0] . 'options_trainingsession_type=' . $object->array_options['options_trainingsession_type'] . '&options_trainingsession_service=' . $object->array_options['options_trainingsession_service'] . '&options_trainingsession_location=' . $object->array_options['options_trainingsession_location'] . '&projectid' . $explodedCompiledAttributes[1];
-
                 $this->resprints = '<' . $parameters['tag'] . ' ' . $parameters['compiledAttributes'] . '>' . dol_escape_htmltag($parameters['html']) . '</' . $parameters['tag'] . '>';
 
                 return 1;
