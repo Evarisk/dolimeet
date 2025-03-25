@@ -496,6 +496,22 @@ class modDoliMeet extends DolibarrModules
                 'user'     => 2,
             ];
         }
+        
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=financial_and_pedagogical_report',
+            'type'     => 'left',
+            'titre'    => $langs->transnoentities('FinancialAndPedagogicalReportName'),
+            'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'financial_and_pedagogical_report',
+            'url'      => '/dolimeet/view/financial_and_pedagogical_report/financial_and_pedagogical_report.php',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => 'isModEnabled("dolimeet")',
+            'perms'    => '$user->rights->dolimeet->adminpage->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
     }
 
     /**

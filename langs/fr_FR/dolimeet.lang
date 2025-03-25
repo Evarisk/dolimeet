@@ -30,6 +30,28 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 ContactPublicInterfaceEnabled             = Activer l'interface publique d'ajout de contact au contrat
 ContactPublicInterfaceEnabledDescription  = Permet aux contacts externes d'être ajoutés aux contrats via une interface publique sécurisée
 
+# Financial and pedagogical report - Bilan pédagogique et financier
+FinancialAndPedagogicalReport = Bilan pédagogique et financier
+
+# Tags - catégories
+FinancialAndPedagogicalReportName          = BPF
+ApprenticeshipContractName                 = CT-APP
+ApprenticeshipContractDescription          = Contrats d'apprentissage
+ProfessionalizationContractName            = CT-PRO
+ProfessionalizationContractDescription     = Contrats de professionnalisation
+PromotionOrReconversionContractName        = Pro-A
+PromotionOrReconversionContractDescription = promotion ou de la reconversion par alternance
+IndividualTrainingLeavesName               = CIF-PTP
+IndividualTrainingLeavesDescription        = Congés individuels de formation et des projets de transition professionnelle
+CPFName                                    = CPF
+CPFDescription                             = Compte personnel de formation
+CSPName                                    = CSP/POEI
+CSPDescription                             = Dispositifs spécifiques pour les personnes en recherche d’emploi (CSP, POEI, etc.)
+SpecificDevicesForSelfEmployedName         = DSTNS
+SpecificDevicesForSelfEmployedDescription  = dispositifs spécifiques pour les travailleurs non-salariés
+DevelopmentPlanName                        = PDC/AD
+DevelopmentPlanDescription                 = Plan de développement des compétences ou d’autres dispositifs
+
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
