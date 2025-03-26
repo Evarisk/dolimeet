@@ -498,9 +498,9 @@ class modDoliMeet extends DolibarrModules
         }
         
         $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=financial_and_pedagogical_report',
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
             'type'     => 'left',
-            'titre'    => $langs->transnoentities('FinancialAndPedagogicalReportName'),
+            'titre'    => $langs->transnoentities('FinancialAndPedagogicalReport'),
             'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>',
             'mainmenu' => 'dolimeet',
             'leftmenu' => 'financial_and_pedagogical_report',

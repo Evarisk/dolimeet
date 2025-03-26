@@ -288,6 +288,11 @@ MeetingAttendance                    = Participation aux réunions
 TrainingsessionAttendance            = Participation aux sessions de formations
 AuditAttendance                      = Participation aux audits
 
+# Financial and pedagogical report - Bilan pédagogique et financier
+TrainingOrganizationInfos = A. IDENTIFICATION DE L'ORGANISME DE FORMATION
+GeneralInfos              = B. INFORMATIONS GÉNÉRALES
+
+
 #
 # Email - Email
 #
@@ -327,7 +332,7 @@ ErrorMissingFormationServiceConfig = Erreur : configuration des services de form
 #
 
 # Data - Donnée
-TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
+TrainingOrganizationNumber        = Numéro de déclaration de l'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
 DateAndTime                       = Date et horaire
