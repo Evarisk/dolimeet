@@ -74,6 +74,8 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
     {
         global $langs, $mysoc;
 
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+
         // Widget Title parameters
         $array['title']      = $langs->transnoentities('TrainingOrganizationInfos');
         $array['picto']      = 'fas fa-info';
