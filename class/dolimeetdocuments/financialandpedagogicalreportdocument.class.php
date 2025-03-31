@@ -57,12 +57,14 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
      */
     public function loadDashboard(): array
     {
-        $getTrainingOrganizationInfos = $this->getTrainingOrganizationInfos();
-        $getGeneralInfos = $this->getGeneralInfos();
+        $getTrainingOrganizationInfos                                      = self::getTrainingOrganizationInfos();
+        $getGeneralInfos                                                   = self::getGeneralInfos();
+        $getFinancialStatementExcludingTaxesOriginOfTheOrganizationsIncome = self::getFinancialStatementExcludingTaxesOriginOfTheOrganizationsIncome();
 
         $array['widgets'] = [
             $getTrainingOrganizationInfos,
-            $getGeneralInfos
+            $getGeneralInfos,
+            $getFinancialStatementExcludingTaxesOriginOfTheOrganizationsIncome
         ];
 
         return $array;
@@ -119,12 +121,67 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
             $langs->transnoentities('FiscalYearInformation')
         ];
 
-        $firstDayOfCurrentYear = dol_get_first_day(date('Y'), getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
+        //@todo gérer le choix de l'année fiscale
+        $firstDayOfCurrentYear = dol_get_first_day(date('Y') - 1, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
         $lastDayOfCurrentYear  = dol_time_plus_duree($firstDayOfCurrentYear, 1, 'y');
         $lastDayOfCurrentYear  = dol_time_plus_duree($lastDayOfCurrentYear, -1, 'd');
 
         $array['content'] = [
             dol_print_date($firstDayOfCurrentYear, 'day') . ' - ' . dol_print_date($lastDayOfCurrentYear, 'day')
+        ];
+
+        return $array;
+    }
+
+    public function getFinancialStatementExcludingTaxesOriginOfTheOrganizationsIncome(): array
+    {
+        global $conf, $langs;
+
+        // Widget Title parameters
+        $array['title']      = $langs->transnoentities('FinancialStatementExcludingTaxesOriginOfTheOrganizationsIncome');
+        $array['picto']      = 'fas fa-file-invoice-dollar';
+        $array['name']       = 'ControlsRepartition';
+        $array['widgetName'] = 'informations';
+
+        // Widget parameters
+        $array['label'] = [
+            $langs->transnoentities('CompaniesForEmployeeTraining')
+        ];
+
+        $firstDayOfCurrentYear = dol_get_first_day(date('Y') - 1, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
+        $lastDayOfCurrentYear  = dol_time_plus_duree($firstDayOfCurrentYear, 1, 'y');
+        $lastDayOfCurrentYear  = dol_time_plus_duree($lastDayOfCurrentYear, -1, 'd');
+
+        require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+
+        $filter        = ['customsql' => 'fk_product_type = 1 AND entity = ' . $conf->entity . ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')'];
+        $products      = saturne_fetch_all_object_type('Product', '', '', 0, 0, $filter);
+        $formationServices = [];
+        if (is_array($products) && !empty($products)) {
+            $formationServices = array_column($products, 'id', 'id');
+        }
+
+        $filter   = ['customsql' => 't.fk_statut >= 1 AND t.datef BETWEEN ' . "'" . dol_print_date($firstDayOfCurrentYear, 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($lastDayOfCurrentYear, 'dayrfc') . "'"];
+        $invoices = saturne_fetch_all_object_type('Facture', '', '', 0, 0, $filter);
+        $TotalHTBPFL1 = 0;
+        if (is_array($invoices) && !empty($invoices)) {
+            foreach ($invoices as $invoice) {
+                $invoice->fetch_lines();
+                if (!is_array($invoice->lines) || empty($invoice->lines)) {
+                    continue;
+                }
+
+                foreach ($invoice->lines as $line) {
+                    if (!in_array($line->fk_product, $formationServices)) {
+                        continue;
+                    }
+                    $TotalHTBPFL1 += $line->total_ht;
+                }
+            }
+        }
+
+        $array['content'] = [
+            round($TotalHTBPFL1) . ' ' . $langs->getCurrencySymbol($conf->currency)
         ];
 
         return $array;
