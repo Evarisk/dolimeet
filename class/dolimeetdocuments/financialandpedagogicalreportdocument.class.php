@@ -124,7 +124,7 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         ];
 
         //@todo gérer le choix de l'année fiscale
-        $firstDayOfCurrentYear = dol_get_first_day(date('Y') - 1, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
+        $firstDayOfCurrentYear = dol_get_first_day(date('Y') - 2, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
         $lastDayOfCurrentYear  = dol_time_plus_duree($firstDayOfCurrentYear, 1, 'y');
         $lastDayOfCurrentYear  = dol_time_plus_duree($lastDayOfCurrentYear, -1, 'd');
 
@@ -150,7 +150,7 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
             $langs->transnoentities('CompaniesForEmployeeTraining')
         ];
 
-        $firstDayOfCurrentYear = dol_get_first_day(date('Y') - 1, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
+        $firstDayOfCurrentYear = dol_get_first_day(date('Y') - 2, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
         $lastDayOfCurrentYear  = dol_time_plus_duree($firstDayOfCurrentYear, 1, 'y');
         $lastDayOfCurrentYear  = dol_time_plus_duree($lastDayOfCurrentYear, -1, 'd');
 
