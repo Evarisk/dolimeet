@@ -34,23 +34,47 @@ ContactPublicInterfaceEnabledDescription  = Permet aux contacts externes d'être
 FinancialAndPedagogicalReport = Bilan pédagogique et financier
 
 # Tags - catégories
-FinancialAndPedagogicalReportName          = BPF
-ApprenticeshipContractName                 = CT-APP
-ApprenticeshipContractDescription          = Contrats d'apprentissage
-ProfessionalizationContractName            = CT-PRO
-ProfessionalizationContractDescription     = Contrats de professionnalisation
-PromotionOrReconversionContractName        = Pro-A
-PromotionOrReconversionContractDescription = promotion ou de la reconversion par alternance
-IndividualTrainingLeavesName               = CIF-PTP
-IndividualTrainingLeavesDescription        = Congés individuels de formation et des projets de transition professionnelle
-CPFName                                    = CPF
-CPFDescription                             = Compte personnel de formation
-CSPName                                    = CSP/POEI
-CSPDescription                             = Dispositifs spécifiques pour les personnes en recherche d’emploi (CSP, POEI, etc.)
-SpecificDevicesForSelfEmployedName         = DSTNS
-SpecificDevicesForSelfEmployedDescription  = dispositifs spécifiques pour les travailleurs non-salariés
-DevelopmentPlanName                        = PDC/AD
-DevelopmentPlanDescription                 = Plan de développement des compétences ou d’autres dispositifs
+BPFTagC     = BPF
+BPFTagC1    = BPF-C1-EFS
+BPFTagC1bis = BPF-C1-OGFFF
+BPFTagC1a   = BPF-C1a-OGFFF-CT-APP
+BPFTagC1b   = BPF-C1b-OGFFF-CT-PRO
+BPFTagC1c   = BPF-C1c-OGFFF-Pro-A
+BPFTagC1d   = BPF-C1d-OGFFF-CIF-PTP
+BPFTagC1e   = BPF-C1e-OGFFF-CPF
+BPFTagC1f   = BPF-C1f-OGFFF-CSP/POEI
+BPFTagC1g   = BPF-C1g-OGFFF-DSTNS
+BPFTagC1h   = BPF-C1h-OGFFF-PDC/AD
+BPFTagC3    = BPF-C3-PPFA
+BPFTagC4    = BPF-C4-PPFPS-IE
+BPFTagC5    = BPF-C5-PPFPS-E
+BPFTagC6    = BPF-C6-PPFPS-CR
+BPFTagC7    = BPF-C7-PPFPS-FT
+BPFTagC8    = BPF-C8-PPFPS-ARP
+BPFTagC9    = BPF-C9-CT-PTI
+BPFTagC10   = BPF-C10-CT-AOF
+BPFTagC11   = BPF-C11-APTFP
+
+BPFTagCDescription     = Bilan pédagogique et financier
+BPFTagC1Description    = <b>1</b> - Entreprises pour la formation de leurs salariés
+BPFTagC1bisDescription = Organismes gestionnaires des fonds de la formation professionnelle pour des actions dispensées dans le cadre
+BPFTagC1aDescription   = <b>a</b> - Contrats d'apprentissage
+BPFTagC1bDescription   = <b>b</b> - Contrats de professionnalisation
+BPFTagC1cDescription   = <b>c</b> - Promotion ou de la reconversion par alternance
+BPFTagC1dDescription   = <b>d</b> - Congés individuels de formation et des projets de transition professionnelle
+BPFTagC1eDescription   = <b>e</b> - Compte personnel de formation
+BPFTagC1fDescription   = <b>f</b> - Dispositifs spécifiques pour les personnes en recherche d’emploi (CSP, POEI, etc.)
+BPFTagC1gDescription   = <b>g</b> - Dispositifs spécifiques pour les travailleurs non-salariés
+BPFTagC1hDescription   = <b>h</b> - Plan de développement des compétences ou d’autres dispositifs
+BPFTagC3Description    = <b>3</b> - Pouvoirs publics pour la formation de leurs agents (État, collectivités territoriales, établissements publics à caractère administratif)
+BPFTagC4Description    = <b>4</b> - Pouvoirs publics pour la formation de publics spécifiques : Instances européennes
+BPFTagC5Description    = <b>5</b> - Pouvoirs publics pour la formation de publics spécifiques : État
+BPFTagC6Description    = <b>6</b> - Pouvoirs publics pour la formation de publics spécifiques : Conseils régionaux
+BPFTagC7Description    = <b>7</b> - Pouvoirs publics pour la formation de publics spécifiques : France travail (ex Pôle emploi)
+BPFTagC8Description    = <b>8</b> - Pouvoirs publics pour la formation de publics spécifiques : Autres ressources publiques
+BPFTagC9Description    = <b>9</b> - Contrats conclus avec des personnes à titre individuel et à leurs frais
+BPFTagC10Description   = <b>10</b> - Contrats conclus avec d’autres organismes de formation (y compris CFA)
+BPFTagC11Description   = <b>11</b> - Autres produits au titre de la formation professionnelle
 
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
@@ -289,10 +313,41 @@ TrainingsessionAttendance            = Participation aux sessions de formations
 AuditAttendance                      = Participation aux audits
 
 # Financial and pedagogical report - Bilan pédagogique et financier
-TrainingOrganizationInfos                                      = A. IDENTIFICATION DE L'ORGANISME DE FORMATION
-GeneralInfos                                                   = B. INFORMATIONS GÉNÉRALES
-FinancialStatementExcludingTaxesOriginOfTheOrganizationsIncome = C. BILAN FINANCIER HORS TAXES : ORIGINE DES PRODUITS DE L’ORGANISME
-CompaniesForEmployeeTraining                                   = Entreprises pour la formation de leurs salariés
+BPFTitlePartA = A. IDENTIFICATION DE L'ORGANISME DE FORMATION
+BPFTitlePartB = B. INFORMATIONS GÉNÉRALES
+
+BPFTitlePartC       = C. BILAN FINANCIER HORS TAXES : ORIGINE DES PRODUITS DE L’ORGANISME
+BPFTagC2Description = <b>2</b>  - Total des produits provenant des organismes gestionnaires des fonds de la formation (total des lignes a à h)
+BPFTotalPartC       = TOTAL DES PRODUITS RÉALISÉS AU TITRE DE LA FORMATION PROFESSIONNELLE (total des lignes 1 à 11)
+BPFCAPartC          = Part du chiffre d'affaires global réalisée dans le domaine de la formation professionnelle (en %)
+
+BPFTitlePartD = D. BILAN FINANCIER HORS TAXES : CHARGES DE L’ORGANISME
+BPFTitlePartE = E. PERSONNES DISPENSANT DES HEURES DE FORMATION
+
+BPFTitlePartF   = F. BILAN PÉDAGOGIQUE : STAGIAIRES BÉNÉFICIANT D’UNE FORMATION DISPENSÉE PAR L’ORGANISME ET APPRENTIS EN FORMATION
+BPFTitlePartF1  = F - 1. TYPE DE STAGIAIRES DE L’ORGANISME
+BPFLabelPartF1a = <b>a</b> - Salariés d’employeurs privés hors apprentis
+BPFLabelPartF1b = <b>b</b> - Apprentis
+BPFLabelPartF1c = <b>c</b> - Personnes en recherche d’emploi formées par votre organisme de formation
+BPFLabelPartF1d = <b>d</b> - Particuliers à leurs propres frais formés par votre organisme de formation
+BPFLabelPartF1e = <b>e</b> - Autres stagiaires
+BPFLabelPartF1  = <b>1</b> - TOTAL (a + b + c + d + e)
+
+BPFTitlePartF2 = F - 2. DONT ACTIVITÉ SOUS-TRAITÉE DE L’ORGANISME
+BPFLabelPartF2 = Stagiaires ou apprentis dont l’action a été confiée par votre organisme à un autre organisme
+
+BPFTitlePartF3 = F - 3. OBJECTIF GÉNÉRAL DES PRESTATIONS DISPENSÉES
+BPFTitlePartF4 = F - 4. SPÉCIALITÉS DE FORMATION
+
+BPFTitlePartG  = G. BILAN PÉDAGOGIQUE : STAGIAIRES DONT LA FORMATION A ÉTÉ CONFIÉE A VOTRE ORGANISME PAR UN AUTRE ORGANISME DE FORMATION
+BPFLabelPartG5 = Formations confiées à votre organisme par un autre organisme de formation
+
+BPFTitlePartH    = H. PERSONNE AYANT LA QUALITÉ DE DIRIGEANT
+NameAndFirstName = Nom et prénom
+ManagementStatus = Qualité
+
+BPFTitlePartFooter         = PIED DE PAGE DU BILAN PÉDAGOGIQUE ET FINANCIER
+NameAndPositionOfSignatory = Nom et qualité du signataire
 
 #
 # Email - Email

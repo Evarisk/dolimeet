@@ -56,18 +56,20 @@ saturne_check_access($permissionToRead);
  */
 
 if ($action == 'generate_categories') {
-    $tagParentID = saturne_create_category($langs->transnoentities('FinancialAndPedagogicalReportName'), 'product');
-    $tags[]      = saturne_create_category($langs->transnoentities('ApprenticeshipContractName'), 'product', $tagParentID, '', '', $langs->transnoentities('ApprenticeshipContractDescription'));
-    $tags[]      = saturne_create_category($langs->transnoentities('ProfessionalizationContractName'), 'product', $tagParentID, '', '', $langs->transnoentities('ProfessionalizationContractDescription'));
-    $tags[]      = saturne_create_category($langs->transnoentities('PromotionOrReconversionContractName'), 'product', $tagParentID, '', '', $langs->transnoentities('PromotionOrReconversionContractDescription'));
-    $tags[]      = saturne_create_category($langs->transnoentities('IndividualTrainingLeavesName'), 'product', $tagParentID, '', '', $langs->transnoentities('IndividualTrainingLeavesDescription'));
-    $tags[]      = saturne_create_category($langs->transnoentities('CPFName'), 'product', $tagParentID, '', '', $langs->transnoentities('CPFDescription'));
-    $tags[]      = saturne_create_category($langs->transnoentities('CSPName'), 'product', $tagParentID, '', '', $langs->transnoentities('CSPDescription'));
-    $tags[]      = saturne_create_category($langs->transnoentities('SpecificDevicesForSelfEmployedName'), 'product', $tagParentID, '', '', $langs->transnoentities('SpecificDevicesForSelfEmployedDescription'));
-    $tags[]      = saturne_create_category($langs->transnoentities('DevelopmentPlanName'), 'product', $tagParentID, '', '', $langs->transnoentities('DevelopmentPlanDescription'));
+    $tagParentID = saturne_create_category($langs->transnoentities('BPFTagC'), 'product', 0, '', '', $langs->transnoentities('BPFTagCDescription'));
+    $BPFTags = ['C1', 'C1bis', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11'];
+    foreach ($BPFTags as $tag) {
+        $tagIDs[$tag] = saturne_create_category($langs->transnoentities('BPFTag' . $tag), 'product', $tagParentID, '', '', $langs->transnoentities('BPFTag' . $tag . 'Description'));
+    }
+
+    $BPFSubTagsC1bis = ['C1a', 'C1b', 'C1c', 'C1d', 'C1e', 'C1f', 'C1g', 'C1h'];
+    foreach ($BPFSubTagsC1bis as $tag) {
+        $subTagIDs[$tag] = saturne_create_category($langs->transnoentities('BPFTag' . $tag), 'product', $tagIDs['C1bis'], '', '', $langs->transnoentities('BPFTag' . $tag . 'Description'));
+    }
+    $tagIDs['C1bis'] = ['C1bis' => $tagIDs['C1bis'], $subTagIDs];
 
     dolibarr_set_const($db, 'DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORY_ID', $tagParentID, 'integer', 0, '', $conf->entity);
-    dolibarr_set_const($db, 'DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_SUBCATEGORIES_ID', json_encode($tags), 'chaine', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_SUBCATEGORIES_ID', json_encode($tagIDs), 'chaine', 0, '', $conf->entity);
     dolibarr_set_const($db, 'DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET', 1, 'integer', 0, '', $conf->entity);
 
     setEventMessages('SavedConfig', []);
@@ -93,29 +95,21 @@ $head = dolimeet_admin_prepare_head();
 print dol_get_fiche_head($head, 'settings', $title, -1, 'dolimeet_color@dolimeet');
 
 // Generate categories.
-print load_fiche_titre($langs->trans('SheetCategories'), '', '', 0, 'sheetCategories');
+print load_fiche_titre($langs->trans('Config'), '', '');
 
 print '<table class="noborder">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->trans('Name') . '</td>';
-print '<td class="center">' . $langs->trans('Status') . '</td>';
 print '<td class="center">' . $langs->trans('Action') . '</td>';
-print '<td class="center">' . $langs->trans('ShortInfo') . '</td>';
 print '</tr>';
 
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="generate_categories">';
 
-print '<tr><td>' . $langs->trans('GenerateCategories') . '</td>';
+print '<tr><td>' . $form->textwithpicto($langs->trans('BPFCategories'), $langs->trans('BPFCategoriesDescription')) . '</td>';
 print '<td class="center">';
-print getDolGlobalInt('DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
-print '</td>';
-print '<td class="center">';
-print getDolGlobalInt('DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? '<button class="butActionRefused">'.$langs->trans('Create') . '</button>' : '<input type="submit" class="button" value="'. $langs->trans('Create') . '">' ;
-print '</td>';
-print '<td class="center">';
-print $form->textwithpicto('', $langs->trans('CategoriesGeneration'));
+print '<button class="butAction' . (getDolGlobalInt('DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? 'Refused' : '') . '"' . (getDolGlobalInt('DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? 'disabled' : '') . '>' . $langs->trans('Create') . '</button>';
 print '</td></tr>';
 
 print '</form>';
