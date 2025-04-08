@@ -49,10 +49,24 @@ saturne_check_access($permissionToRead);
 $title = $langs->transnoentities('FinancialAndPedagogicalReport');
 saturne_header(0,'', $title, $helpUrl ?? '', '', 0, 0, [], [], '', 'mod-dolimeet bodyforlist');
 
-print load_fiche_titre($title, '', 'dolimeet_color.png@dolimeet');
+$years       = [];
+$currentYear = date('Y', dol_now());
+$showYears   = (!getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS') ? 2 : max(1, min(10, getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS'))));
+for ($i = 0; $i <= $showYears; $i++) {
+    $years[] = $currentYear - $i;
+}
+
+$moreHtmlRight  = img_picto($langs->trans('Filter') . ' ' . $langs->trans('Year'), 'title_agenda', 'class="pictofixedwidth"') . Form::selectarray('search_year', $years, $currentYear, 0,0, 1, '', 0, 0, 0, '', 'maxwidth100');
+$moreHtmlRight .= '<div class="wpeo-button button-square-30 select-dataset-dashboard-info" style="color: #ffffff !important;"><i class="button-icon fas fa-redo"></i></div>';
+
+print load_fiche_titre($title, $moreHtmlRight, 'dolimeet_color.png@dolimeet');
+
+print '<div class="fichecenter">';
 
 $moreParams = ['LoadFinancialAndPedagogicalReportDocument' => ['all']];
 $saturneDashboard->show_dashboard($moreParams);
+
+print '</div>';
 
 // End of page
 llxFooter();

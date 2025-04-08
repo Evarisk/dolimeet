@@ -283,24 +283,28 @@ class modDoliMeet extends DolibarrModules
                 MAIN_DB_PREFIX . 'c_trainingsession_type',
                 MAIN_DB_PREFIX . 'c_meeting_attendants_role',
                 MAIN_DB_PREFIX . 'c_trainingsession_attendants_role',
-                MAIN_DB_PREFIX . 'c_audit_attendants_role'
+                MAIN_DB_PREFIX . 'c_audit_attendants_role',
+                MAIN_DB_PREFIX . 'c_trainingsession_specialities'
             ],
             // Label of tables.
             'tablib' => [
                 'TrainingSessionType',
                 'Meeting',
                 'TrainingSession',
-                'Audit'
+                'Audit',
+                'TrainingSessionSpecialities'
             ],
             // Request to select fields.
             'tabsql' => [
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_type as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_meeting_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_attendants_role as f',
-                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_audit_attendants_role as f'
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_audit_attendants_role as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.code, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_specialities as f'
             ],
             // Sort order.
             'tabsqlsort' => [
+                'position ASC',
                 'position ASC',
                 'position ASC',
                 'position ASC',
@@ -311,24 +315,28 @@ class modDoliMeet extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'code,ref,label,description,position'
             ],
             // List of fields (list of fields to edit a record).
             'tabfieldvalue' => [
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'code,ref,label,description,position'
             ],
             // List of fields (list of fields for insert).
             'tabfieldinsert' => [
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'code,ref,label,description,position'
             ],
             // Name of columns with primary key (try to always name it 'rowid').
             'tabrowid' => [
+                'rowid',
                 'rowid',
                 'rowid',
                 'rowid',
@@ -336,6 +344,7 @@ class modDoliMeet extends DolibarrModules
             ],
             // Condition to show each dictionary.
             'tabcond' => [
+                $conf->dolimeet->enabled,
                 $conf->dolimeet->enabled,
                 $conf->dolimeet->enabled,
                 $conf->dolimeet->enabled,
