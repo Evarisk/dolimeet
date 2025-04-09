@@ -245,8 +245,12 @@ class ActionsDolimeet
                 });
 
                 $(document).on('change', '#options_trainingsession_service', function() {
-                    let labelField = $('input[name="title"]');
-                    labelField.val($(this).find('option:selected').text());
+                    let labelField      = $('input[name="title"]');
+                    let labelFieldValue = [];
+                    $.each($(this).find('option:selected'), function() {
+                        labelFieldValue.push($(this).text());
+                    });
+                    labelField.val(labelFieldValue.join(' | '));
                     window.saturne.loader.display(labelField);
                     setTimeout(function() {
                         window.saturne.loader.remove(labelField);
