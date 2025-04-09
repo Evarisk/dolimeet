@@ -103,6 +103,7 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
 {
     global $db, $langs;
 
+    $nbTrainees      = 0;
     $durations       = 0;
     $publicNotePart2 = '';
     if (isset($project->array_options['options_trainingsession_service']) && !empty($project->array_options['options_trainingsession_service'])) {
@@ -118,19 +119,21 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
             } else {
                 $filter = 't.status = 1 AND t.model = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId;
             }
+
             $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
-            if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                $publicNotePart2  = $langs->transnoentities('TrainingSessionTitle') . '<br />';
-                $publicNotePart2 .= $langs->transnoentities('TrainingSessionsInclusiveWriting', count($trainingSessions)) . ' : ' . '<br />';
-                foreach ($trainingSessions as $trainingSession) {
-                    $durations += $trainingSession->duration;
-                    if ($object->element == 'contrat') {
-                        $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuser') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
-                    } else {
-                        $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
-                    }
-                    $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuser') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuser') . '</strong><br />';
+            if (!is_array($trainingSessions) || empty($trainingSessions)) {
+                continue;
+            }
+
+            $nbTrainees += count($trainingSessions);
+            foreach ($trainingSessions as $trainingSession) {
+                $durations += $trainingSession->duration;
+                if ($object->element == 'contrat') {
+                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
+                } else {
+                    $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
                 }
+                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour') . '</strong><br />';
             }
         }
     }
@@ -143,7 +146,11 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
     $object->note_public .= $langs->transnoentities('TrainingSessionLocation') . ' : ' . (dol_strlen($project->array_options['options_trainingsession_location']) > 0  ? $project->array_options['options_trainingsession_location'] : $langs->transnoentities('NoData')) . '<br />';
 
     // Part 2 - Training sessions
-    $object->note_public .= $publicNotePart2;
+    if (isset($project->array_options['options_trainingsession_service']) && !empty($project->array_options['options_trainingsession_service'])) {
+        $object->note_public .= '<br />' . $langs->transnoentities('TrainingSessionTitle') . '<br />';
+        $object->note_public .= $langs->transnoentities('TrainingSessionsInclusiveWriting', $nbTrainees) . ' : ' . '<br />';
+        $object->note_public .= $publicNotePart2;
+    }
 
     // Part 3 - Trainee list
     $internalTrainee = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
