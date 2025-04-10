@@ -362,12 +362,12 @@ class ActionsDolimeet
             }
             $selected = [];
             if ($action == 'create') {
-                $selected = (!empty(GETPOST('options_trainingsession_service', 'array')) ? GETPOST('options_trainingsession_service', 'array') : []);
+                $selected = (!empty(GETPOST('options_trainingsession_service')) ? GETPOST('options_trainingsession_service') : []);
             } elseif ($action == 'edit') {
                 $selected = (!empty(GETPOST('options_trainingsession_service', 'array')) ? GETPOST('options_trainingsession_service', 'array') : $object->array_options['options_trainingsession_service']);
-                if (!is_array($selected)) {
-                    $selected = explode(',', $selected);
-                }
+            }
+            if (!is_array($selected)) {
+                $selected = explode(',', $selected);
             }
             $out .= Form::multiselectarray('options_trainingsession_service', $productsArray, $selected, 0, 0, 'minwidth100imp maxwidth500 widthcentpercentminusxx');
             $out .= '</td>';

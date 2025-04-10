@@ -129,11 +129,11 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
             foreach ($trainingSessions as $trainingSession) {
                 $durations += $trainingSession->duration;
                 if ($object->element == 'contrat') {
-                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
+                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuser') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
                 } else {
                     $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
                 }
-                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour') . '</strong><br />';
+                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuser') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuser') . '</strong><br />';
             }
         }
     }
