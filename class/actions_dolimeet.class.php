@@ -139,25 +139,26 @@ class ActionsDolimeet
     {
         global $conf, $extrafields, $form, $langs;
 
+        require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+
+        $objectsMetadata = saturne_get_objects_metadata();
+        foreach($objectsMetadata as $objectMetadata) {
+            if ($objectMetadata['tab_type'] != $object->element) {
+                continue;
+            }
+            if (strpos($parameters['context'], $objectMetadata['hook_name_card']) !== false) {
+                $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+                $extraFieldsNames = ['label', 'trainingsession_type', 'trainingsession_service', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
+                foreach ($extraFieldsNames as $extraFieldsName) {
+                    if (isset($extrafields->attributes[$object->table_element]['label'][$extraFieldsName])) {
+                        $extrafields->attributes[$object->table_element]['label'][$extraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes[$object->table_element]['label'][$extraFieldsName]);
+                    }
+                }
+            }
+        }
+
         if (preg_match('/projectcard|propalcard|contractcard|productcard/', $parameters['context'])) {
-            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-
-            $extrafields->attributes['projet']['label']['trainingsession_type']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
-            $extrafields->attributes['projet']['label']['trainingsession_service']  = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
-            $extrafields->attributes['projet']['label']['trainingsession_location'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
-
-            $extrafields->attributes['propal']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
-            $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
-            $extrafields->attributes['propal']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
-
-            $extrafields->attributes['contrat']['label']['label']                          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
-            $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
-            $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
-            $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
-
-            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
-
             // Initialize the param attribute for trainingsession_service
             if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
                 $filter  = 'product as p:label:rowid::(fk_product_type:=:1) AND (entity:=:$ENTITY$)';
@@ -403,26 +404,25 @@ class ActionsDolimeet
      */
     public function printFieldListOption(array $parameters): int
     {
-        global $extrafields, $langs;
+        global $extrafields, $langs, $object;
 
-        if (preg_match('/projectlist|propallist|contractlist|productservicelist/', $parameters['context'])) {
-            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+        require_once __DIR__ . '/../../saturne/lib/object.lib.php';
 
-            $extrafields->attributes['projet']['label']['trainingsession_type']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
-            $extrafields->attributes['projet']['label']['trainingsession_service']  = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
-            $extrafields->attributes['projet']['label']['trainingsession_location'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
-
-            $extrafields->attributes['propal']['label']['trainingsession_type']      = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
-            $extrafields->attributes['propal']['label']['trainingsession_service']   = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
-            $extrafields->attributes['propal']['label']['trainingsession_location']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
-
-            $extrafields->attributes['contrat']['label']['label']                          = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['label']);
-            $extrafields->attributes['contrat']['label']['trainingsession_type']           = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_type']);
-            $extrafields->attributes['contrat']['label']['trainingsession_location']       = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_location']);
-            $extrafields->attributes['contrat']['label']['trainingsession_opco_financing'] = $picto . $langs->transnoentities($extrafields->attributes['contrat']['label']['trainingsession_opco_financing']);
-
-            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
+        $objectsMetadata = saturne_get_objects_metadata();
+        foreach($objectsMetadata as $objectMetadata) {
+            if ($objectMetadata['tab_type'] != $object->element) {
+                continue;
+            }
+            if (strpos($parameters['context'], $objectMetadata['hook_name_list']) !== false) {
+                $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+                $extraFieldsNames = ['label', 'trainingsession_type', 'trainingsession_service', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
+                foreach ($extraFieldsNames as $extraFieldsName) {
+                    if (isset($extrafields->attributes[$object->table_element]['label'][$extraFieldsName])) {
+                        $extrafields->attributes[$object->table_element]['label'][$extraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes[$object->table_element]['label'][$extraFieldsName]);
+                    }
+                }
+            }
         }
 
         return 0; // or return 1 to replace standard code
