@@ -360,9 +360,17 @@ class ActionsDolimeet
             if (is_array($products) && !empty($products)) {
                 $productsArray = array_column($products, 'label', 'id');
             }
-            $out .= Form::multiselectarray('options_trainingsession_service', $productsArray, (!empty(GETPOST('options_trainingsession_service', 'array')) ? GETPOST('options_trainingsession_service', 'array') : $object->array_options['options_trainingsession_service']), 0, 0, 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+            $selected = [];
+            if ($action == 'create') {
+                $selected = (!empty(GETPOST('options_trainingsession_service', 'array')) ? GETPOST('options_trainingsession_service', 'array') : []);
+            } elseif ($action == 'edit') {
+                $selected = (!empty(GETPOST('options_trainingsession_service', 'array')) ? GETPOST('options_trainingsession_service', 'array') : $object->array_options['options_trainingsession_service']);
+                if (!is_array($selected)) {
+                    $selected = explode(',', $selected);
+                }
+            }
+            $out .= Form::multiselectarray('options_trainingsession_service', $productsArray, $selected, 0, 0, 'minwidth100imp maxwidth500 widthcentpercentminusxx');
             $out .= '</td>';
-
             ?>
             <script>
                 $(document).ready(function() {
