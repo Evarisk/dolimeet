@@ -381,8 +381,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
-                    $this->db->begin();
-
                     $propal       = new Propal($this->db);
                     $product      = new Product($this->db);
                     $contratLigne = new ContratLigne($this->db);
