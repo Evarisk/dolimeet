@@ -309,7 +309,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $propalLine->fk_parent_line = 0;
                             $propalLine->fk_product     = $product->id;
                             $propalLine->product_label  = $product->label;
-                            $propalLine->product_desc   = $product->description;
+                            $propalLine->desc           = $product->description;
                             $propalLine->tva_tx         = 20;
                             $propalLine->date_creation  = $object->db->idate(dol_now());
                             $propalLine->qty            = 1;
@@ -328,7 +328,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         $propalLine->fk_parent_line = 0;
                         $propalLine->fk_product     = $product->id;
                         $propalLine->product_label  = $product->label;
-                        $propalLine->product_desc   = $product->description;
+                        $propalLine->desc           = $product->description;
                         $propalLine->tva_tx         = $product->tva_tx;
                         $propalLine->subprice       = $product->price;
                         $propalLine->date_creation  = $object->db->idate(dol_now());
@@ -336,7 +336,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         $propalLine->rang           = $propalLinePosition++;
                         $propalLine->product_type   = 1;
 
-                        $object->addline($propalLine->product_desc, $propalLine->subprice, $propalLine->qty, $propalLine->tva_tx, 0.0, 0.0, $propalLine->fk_product, 0.0, 'HT', 0.0, 0, $propalLine->product_type, $propalLine->rang, 0, 0, 0, 0, $propalLine->product_label, '', '', 0, null);
+                        $object->addline($propalLine->desc, $propalLine->subprice, $propalLine->qty, $propalLine->tva_tx, 0.0, 0.0, $propalLine->fk_product, 0.0, 'HT', 0.0, 0, $propalLine->product_type, $propalLine->rang, 0, 0, 0, 0, $propalLine->product_label, '', '', 0, null);
                     }
 
                     // Add project data on propal
@@ -415,6 +415,9 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $contratLigne->total_ttc       = 0;
                                 $contratLigne->price_ht        = 0;
                                 $contratLigne->remise          = 0;
+
+                                //@todo compare addline and insert
+                                $this->db->begin();
 
                                 $contratLigne->insert($user);
                             }
