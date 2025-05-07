@@ -398,11 +398,12 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $result   = $product->fetch(getDolGlobalInt($confName));
 
                             if ($result > 0) {
-                                $contratLigne->fk_contrat = $object->id;
-                                $contratLigne->fk_product = $product->id;
-                                $contratLigne->tva_tx     = 20;
-                                $contratLigne->qty        = 1;
-                                $contratLigne->rang       = 1;
+                                $contratLigne->fk_contrat  = $object->id;
+                                $contratLigne->fk_product  = $product->id;
+                                $contratLigne->description = $product->description;
+                                $contratLigne->tva_tx      = 20;
+                                $contratLigne->qty         = 1;
+                                $contratLigne->rang        = 1;
 
                                 // Mandatory because default value is empty but required
                                 $contratLigne->remise_percent  = 0;

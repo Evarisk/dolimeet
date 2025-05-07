@@ -669,25 +669,22 @@ class modDoliMeet extends DolibarrModules
             dolibarr_set_const($this->db, 'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT', $projectID, 'integer', 0, '', $conf->entity);
         }
 
-        // Create extrafields during init.
-        require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
-        $extraFields = new ExtraFields($this->db);
-
-        $extraFieldsArrays = [
-            'label'                          => ['Label' => 'Label',                        'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => 1,   'params' => '',                                                                                               'list' => 1, 'help' => '',                                                                       'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']],
-            'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',  'length' => '',  'elementtype' => ['contrat', 'propal', 'projet'], 'position' => 10,  'params' => 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}',                         'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']],
-            'trainingsession_service'        => ['Label' => 'TrainingSessionService',       'type' => 'chkbxlst', 'length' => '',  'elementtype' => ['propal', 'projet'],            'position' => 10,  'params' => ['options' => ['product as p:label:rowid::(fk_product_type:=:1) AND (entity:=:$ENTITY$)' => '']], 'list' => 1, 'help' => 'TrainingSessionServiceHelp',                                             'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']],
-            'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat', 'propal', 'projet'], 'position' => 20,  'params' => '',                                                                                               'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')", ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']],
-            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',  'length' => '',  'elementtype' => ['contrat'],                     'position' => 60,  'params' => '', 'alwayseditable' => 1,                                                                        'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp',                                       'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"],
-            'syllabus'                       => ['Label' => 'Syllabus',                     'type' => 'html',     'length' => '',  'elementtype' => ['product'],                     'position' => 100, 'params' => '', 'alwayseditable' => 1,                                                                        'list' => 4, 'help' => 'SyllabusHelp',                                                           'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"]
+        // Create extrafields during init
+        $commonExtraFieldsValue = [
+            'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"
         ];
 
-        foreach ($extraFieldsArrays as $key => $extraField) {
-            foreach ($extraField['elementtype'] as $extraFieldElementType) {
-                $extraFields->update($key, $extraField['Label'], $extraField['type'], $extraField['length'], $extraFieldElementType, 0, 0, $this->numero . $extraField['position'], $extraField['params'], '', '', $extraField['list'], ($extraField['help'][$extraFieldElementType] ?? $extraField['help']), '', '', $extraField['entity'], $extraField['langfile'], $extraField['enabled'] . ' && isModEnabled("' . $extraFieldElementType . '")', 0, 0, $extraField['css']);
-                $extraFields->addExtraField($key, $extraField['Label'], $extraField['type'], $this->numero . $extraField['position'], $extraField['length'], $extraFieldElementType, 0, 0, '', $extraField['params'], $extraField['alwayseditable'], '', $extraField['list'], $extraField['help'], '', $extraField['entity'], $extraField['langfile'], $extraField['enabled'] . ' && isModEnabled("' . $extraFieldElementType . '")', 0, 0, $extraField['css']);
-            }
-        }
+        $extraFieldsArrays = [
+            'label'                          => ['Label' => 'Label',                        'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => $this->numero . 10,                                                             'list' => 1,                                                                                     'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',                   'elementtype' => ['contrat', 'propal', 'projet'], 'position' => $this->numero . 20, 'params' => ['c_trainingsession_type:label:rowid' => NULL], 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_service'        => ['Label' => 'TrainingSessionService',       'type' => 'chkbxlst',                  'elementtype' => ['propal', 'projet'],            'position' => $this->numero . 30, 'params' => [NULL],                                         'list' => 3, 'help' => 'TrainingSessionServiceHelp',                                             'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat', 'propal', 'projet'], 'position' => $this->numero . 40,                                                             'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',                   'elementtype' => ['contrat'],                     'position' => $this->numero . 50, 'alwayseditable' => 1,                                      'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp'],
+
+            'syllabus' => ['Label' => 'Syllabus', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 60, 'alwayseditable' => 1, 'list' => 4, 'help' => 'SyllabusHelp']
+        ];
+
+        saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
         if (getDolGlobalInt('DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 0) {
             $extraFieldsArrays = [
@@ -695,6 +692,9 @@ class modDoliMeet extends DolibarrModules
                 'trainingsession_end'       => ['elementtype' => ['contrat']],
                 'trainingsession_durations' => ['elementtype' => ['contrat']]
             ];
+
+            require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+            $extraFields = new ExtraFields($this->db);
 
             foreach ($extraFieldsArrays as $key => $extraField) {
                 foreach ($extraField['elementtype'] as $extraFieldElementType) {
