@@ -129,11 +129,11 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
             foreach ($trainingSessions as $trainingSession) {
                 $durations += $trainingSession->duration;
                 if ($object->element == 'contrat') {
-                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuser') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
+                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
                 } else {
                     $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
                 }
-                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuser') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuser') . '</strong><br />';
+                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
             }
         }
     }
@@ -142,7 +142,7 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
     $object->note_public  = '<br />' . $langs->transnoentities('FormationInfoTitle') . '<br />';
     $object->note_public .= $langs->transnoentities('FormationTitle') . ' : ' . $project->title . '<br />';
     $object->note_public .= $langs->transnoentities('TrainingSessionType') . ' : ' . $langs->transnoentities(getDictionaryValue('c_trainingsession_type', 'ref', $project->array_options['options_trainingsession_type'])) . '<br />';
-    $object->note_public .= $langs->transnoentities('TrainingSessionDurations') . ' : <strong>' . convertSecondToTime($durations) . '</strong>' . ' ' . dol_strtolower($langs->transnoentities('Hours')) . '<br />';
+    $object->note_public .= $langs->transnoentities('TrainingSessionDurations') . ' : <strong>' . convertSecondToTime($durations, 'allhourmin') . '</strong>' . ' ' . dol_strtolower($langs->transnoentities('Hours')) . '<br />';
     $object->note_public .= $langs->transnoentities('TrainingSessionLocation') . ' : ' . (dol_strlen($project->array_options['options_trainingsession_location']) > 0  ? $project->array_options['options_trainingsession_location'] : $langs->transnoentities('NoData')) . '<br />';
 
     // Part 2 - Training sessions
