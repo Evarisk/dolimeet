@@ -390,6 +390,13 @@ class ActionsDolimeet
             if ($object->type == $object::TYPE_PRODUCT) {
                 $extrafields->attributes['product']['list']['syllabus'] = 0;
             }
+
+            if (!empty($object->array_options['options_syllabus'])) {
+                $out = '<div class="longmessagecut">';
+                $out .= dolPrintHTML($object->array_options['options_syllabus']);
+                $out .= '</div>';
+                $object->array_options['options_syllabus'] = $out;
+            }
         }
 
         return 0; // or return 1 to replace standard code

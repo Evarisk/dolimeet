@@ -310,17 +310,17 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $propalLine->fk_product     = $product->id;
                             $propalLine->product_label  = $product->label;
                             $propalLine->desc           = $product->description;
-                            $propalLine->tva_tx         = 20;
-                            $propalLine->date_creation  = $object->db->idate(dol_now());
+                            $propalLine->tva_tx         = $product->tva_tx;
                             $propalLine->qty            = 1;
                             $propalLine->rang           = $formationService['position'];
                             $propalLine->product_type   = 1;
-                            $propalLine->insert($user);
+
+                            $object->addline($propalLine->desc, $propalLine->subprice, $propalLine->qty, $propalLine->tva_tx, 0.0, 0.0, $propalLine->fk_product, 0.0, 'HT', 0.0, 0, $propalLine->product_type, $propalLine->rang, 0, 0, 0, 0, $propalLine->product_label, '', '', 0, null);
                         }
                     }
 
                     // Add formation services on propal value stored in project options training session service
-                    $propalLinePosition = 10;
+                    $propalLinePosition = 20;
                     foreach (GETPOST('options_trainingsession_service', 'array') as $trainingSessionServiceId) {
                         $product->fetch($trainingSessionServiceId);
 
@@ -331,7 +331,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         $propalLine->desc           = $product->description;
                         $propalLine->tva_tx         = $product->tva_tx;
                         $propalLine->subprice       = $product->price;
-                        $propalLine->date_creation  = $object->db->idate(dol_now());
                         $propalLine->qty            = 1;
                         $propalLine->rang           = $propalLinePosition++;
                         $propalLine->product_type   = 1;
@@ -396,28 +395,14 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $result   = $product->fetch(getDolGlobalInt($confName));
 
                             if ($result > 0) {
-                                $contratLigne->fk_contrat  = $object->id;
-                                $contratLigne->fk_product  = $product->id;
                                 $contratLigne->description = $product->description;
-                                $contratLigne->tva_tx      = 20;
+                                $contratLigne->subprice    = $product->price;
                                 $contratLigne->qty         = 1;
-                                $contratLigne->rang        = 1;
+                                $contratLigne->tva_tx      = $product->tva_tx;
+                                $contratLigne->fk_product  = $product->id;
+                                $contratLigne->rang        = $formationService['position'];
 
-                                // Mandatory because default value is empty but required
-                                $contratLigne->remise_percent  = 0;
-                                $contratLigne->subprice        = 0;
-                                $contratLigne->total_ht        = 0;
-                                $contratLigne->total_tva       = 0;
-                                $contratLigne->total_localtax1 = 0;
-                                $contratLigne->total_localtax2 = 0;
-                                $contratLigne->total_ttc       = 0;
-                                $contratLigne->price_ht        = 0;
-                                $contratLigne->remise          = 0;
-
-                                //@todo compare addline and insert
-                                $this->db->begin();
-
-                                $contratLigne->insert($user);
+                                $object->addline($contratLigne->description, $contratLigne->subprice, $contratLigne->qty, $contratLigne->tva_tx, 0.0, 0.0, $contratLigne->fk_product, 0.0, '', '', 'HT', 0.0, 0, null, 0, [], null, $contratLigne->rang);
                             }
                         }
                     }
@@ -434,22 +419,24 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $propal->array_options['options_trainingsession_service'] = explode(',', $propal->array_options['options_trainingsession_service']);
                         }
                         foreach ($propal->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-                            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId]);
-                            if (is_array($trainingSessions) && !empty($trainingSessions)) {
-                                foreach ($trainingSessions as $trainingSession) {
-                                    $trainingSession->ref           = '';
-                                    $trainingSession->date_creation = dol_now();
-                                    $trainingSession->status        = Session::STATUS_DRAFT;
-                                    $trainingSession->element_type  = null;
-                                    $trainingSession->fk_element    = '';
-                                    $trainingSession->model         = false;
-                                    $trainingSession->position      = null;
-                                    $trainingSession->fk_soc        = $object->socid;
-                                    $trainingSession->fk_project    = $object->fk_project;
-                                    $trainingSession->fk_contrat    = $object->id;
+                            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $trainingSessionServiceId]);
+                            if (!is_array($trainingSessions) || empty($trainingSessions)) {
+                                continue;
+                            }
 
-                                    $trainingSession->create($user);
-                                }
+                            foreach ($trainingSessions as $trainingSession) {
+                                $trainingSession->ref           = '';
+                                $trainingSession->date_creation = dol_now();
+                                $trainingSession->status        = Session::STATUS_DRAFT;
+                                $trainingSession->element_type  = null;
+                                $trainingSession->fk_element    = '';
+                                $trainingSession->model         = false;
+                                $trainingSession->position      = null;
+                                $trainingSession->fk_soc        = $object->socid;
+                                $trainingSession->fk_project    = $object->fk_project;
+                                $trainingSession->fk_contrat    = $object->id;
+
+                               $trainingSession->create($user);
                             }
                         }
 
