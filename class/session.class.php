@@ -625,12 +625,14 @@ class Session extends SaturneObject
 
         $array['widgets'] = [
             0 => [
+                'title'         => $langs->transnoentities('ActivityMonitoring'),
                 'label'         => [$langs->transnoentities('NbMeetings'), $langs->transnoentities('NbTrainingsessions'), $langs->transnoentities('NbAudits')],
                 'content'       => [$getSessionInfos['meeting']['content'] ?? 0, $getSessionInfos['trainingsession']['content'] ?? 0, $getSessionInfos['audit']['content'] ?? 0],
                 'picto'         => $getSessionInfos['picto'],
                 'widgetName'    => $getSessionInfos['widgetName']
             ],
             1 => [
+                'title'      => $langs->transnoentities('AverageDurationByActivity'),
                 'label'      => [$langs->transnoentities('MoyenneDurationMeetings'), $langs->transnoentities('MoyenneDurationTrainingsessions'), $langs->transnoentities('MoyenneDurationAudits')],
                 'content'    => [$getSessionInfos['meeting']['moyenneDuration']['content'] ?? 0, $getSessionInfos['trainingsession']['moyenneDuration']['content'] ?? 0, $getSessionInfos['audit']['moyenneDuration']['content'] ?? 0],
                 'picto'      => $getSessionInfos['picto'],
@@ -638,6 +640,7 @@ class Session extends SaturneObject
             ]
         ];
         $attendantMeetingInfos = [
+            'title'      => $langs->transnoentities('MeetingAttendance'),
             'label'      => [$getAttendantInfos['meeting']['label'] ?? '', $getAttendantInfos['meeting']['contributor']['label'] ?? '', $getAttendantInfos['meeting']['responsible']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['present']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['delay']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['absent']['label'] ?? ''],
             'content'    => [$getAttendantInfos['meeting']['content'] ?? 0, $getAttendantInfos['meeting']['contributor']['content'] ?? 0, $getAttendantInfos['meeting']['responsible']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['absent']['content'] ?? 0],
             'picto'      => $getAttendantInfos['meeting']['picto'],
@@ -647,6 +650,7 @@ class Session extends SaturneObject
             $array['widgets'][] = $attendantMeetingInfos;
         }
         $attendantTrainingsessionInfos = [
+            'title'      => $langs->transnoentities('TrainingSessionAttendance'),
             'label'      => [$getAttendantInfos['trainingsession']['label'] ?? '', $getAttendantInfos['trainingsession']['trainee']['label'] ?? '', $getAttendantInfos['trainingsession']['sessionTrainer']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['present']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['delay']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['absent']['label'] ?? ''],
             'content'    => [$getAttendantInfos['trainingsession']['content'] ?? 0, $getAttendantInfos['trainingsession']['trainee']['content'] ?? 0, $getAttendantInfos['trainingsession']['sessionTrainer']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['absent']['content'] ?? 0],
             'picto'      => $getAttendantInfos['trainingsession']['picto'],
@@ -656,6 +660,7 @@ class Session extends SaturneObject
             $array['widgets'][] = $attendantTrainingsessionInfos;
         }
         $attendantAuditInfos = [
+            'title'      => $langs->transnoentities('AuditAttendance'),
             'label'      => [$getAttendantInfos['audit']['label'] ?? '', $getAttendantInfos['audit']['auditee']['label'] ?? '', $getAttendantInfos['audit']['auditor']['label'] ?? '', $getAttendantInfos['audit']['attendance']['present']['label'] ?? '', $getAttendantInfos['audit']['attendance']['delay']['label'] ?? '', $getAttendantInfos['audit']['attendance']['absent']['label'] ?? ''],
             'content'    => [$getAttendantInfos['audit']['content'] ?? 0, $getAttendantInfos['audit']['auditee']['content'] ?? 0, $getAttendantInfos['audit']['auditor']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['absent']['content'] ?? 0],
             'picto'      => $getAttendantInfos['audit']['picto'],
