@@ -27,6 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+include_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/lib/saturne_functions.lib.php';
