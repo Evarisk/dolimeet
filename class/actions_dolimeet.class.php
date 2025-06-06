@@ -1029,7 +1029,7 @@ class ActionsDolimeet
                                 }
                             }
 
-                            if ($durations != convertTime2Seconds($object->duration)) {
+                            if ($durations != (convertDurationtoHour($object->duration_value, $object->duration_unit)) * 3600) {
                                 $error++;
                                 $this->errors[] = $langs->transnoentities('ErrrorDurationNotMatching');
                             }
