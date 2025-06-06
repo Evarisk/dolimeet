@@ -57,14 +57,13 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
      */
     public function loadDashboard(): array
     {
-        // @todo a faire D
         $array    = [];
-        $BPFParts = ['A', 'B', 'C', 'E', 'F1', 'G', 'H', 'Footer'];
+        $BPFParts = ['A', 'B', 'C', 'D', 'E', 'F1', 'F2', 'F3', 'F4', 'G', 'H', 'Footer'];
         $BPFInfos = self::loadBPFInfos();
 
         foreach ($BPFParts as $part) {
             $getBPFPart = 'getBPFPart' . $part;
-            if (in_array($part, ['B', 'C', 'F1', 'G'])) {
+            if (in_array($part, ['B', 'C', 'F1', 'F2', 'F3', 'F4', 'G'])) {
                 $array['widgets'][] = self::$getBPFPart($BPFInfos);
             } else {
                 $array['widgets'][] = self::$getBPFPart();
@@ -114,7 +113,7 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         $formationServices = [];
         foreach ($BPFSubTagsC as $BPFSubTag) {
             // Load formation services
-            $filter   = ['customsql' => 'fk_product_type = 1 AND entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $BPFSubTag . ')'];
+            $filter   = ['customsql' => 't.fk_product_type = 1 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $BPFSubTag . ')'];
             $products = saturne_fetch_all_object_type('Product', '', '', 0, 0, $filter, 'AND', false, true, true);
             if (!is_array($products) || empty($products)) {
                 continue;
@@ -128,12 +127,13 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         $lastDayOfFiscalYear  = dol_time_plus_duree($firstDayOfFiscalYear, 1, 'y');
         $lastDayOfFiscalYear  = dol_time_plus_duree($lastDayOfFiscalYear, -1, 'd');
 
-        $filter   = ['customsql' => 't.fk_statut >= 1 AND t.datef BETWEEN ' . "'" . dol_print_date($firstDayOfFiscalYear, 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($lastDayOfFiscalYear, 'dayrfc') . "'"];
+        $filter   = ['customsql' => 't.fk_statut IN (' . Facture::STATUS_VALIDATED . ',' . Facture::STATUS_CLOSED . ') AND t.datef BETWEEN ' . "'" . dol_print_date($firstDayOfFiscalYear, 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($lastDayOfFiscalYear, 'dayrfc') . "'"];
         $invoices = saturne_fetch_all_object_type('Facture', '', '', 0, 0, $filter);
         if (!is_array($invoices) || empty($invoices)) {
             return [];
         }
 
+        $BPFInfos                                          = ['sales' => 0];
         $BPFInfosByTag                                     = [];
         [$totalHT, $NbTrainees, $TrainingSessionDurations] = [0, 0, 0];
         foreach ($invoices as $invoice) {
@@ -141,14 +141,14 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
             if (!is_array($invoice->lines) || empty($invoice->lines)) {
                 continue;
             }
-            $totalHT += $invoice->total_ht;
+            $BPFInfos['sales'] += $invoice->total_ht;
 
             foreach ($BPFSubTagsC as $BPFSubTag => $BPFSubTagID) {
                 if (!is_array($formationServices[$BPFSubTagID]) || empty($formationServices[$BPFSubTagID])) {
                     $BPFInfosByTag[$BPFSubTag] = [
                         'totalHT'                  => 0,
                         'NbTrainees'               => 0,
-                        'TrainingSessionDurations' => 0,
+                        'TrainingSessionDurations' => 0
                     ];
                     continue;
                 }
@@ -182,12 +182,21 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
 
                     foreach ($trainingSessions as $trainingSession) {
                         // Load trainee signatories
-                        $signatories = $signatory->fetchSignatory('Trainee', $trainingSession->id, $trainingSession->element);
+                        $signatories = $signatory->fetchSignatories($trainingSession->id, $trainingSession->element);
                         if (!is_array($signatories) || empty($signatories)) {
                             continue;
                         }
                         $NbTrainees               += count($signatories);
                         $TrainingSessionDurations += count($signatories) * $trainingSession->duration;
+
+                        foreach ($signatories as $signatory) {
+                            if ($signatory->role  != 'SessionTrainer' || $signatory->element_type  != 'socpeople') {
+                                continue;
+                            }
+
+                            $abd  += count($signatories);
+                            $abdc += count($signatories) * $trainingSession->duration;
+                        }
                     }
                 }
 
@@ -195,12 +204,14 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
                     'totalHT'                  => $totalHT,
                     'NbTrainees'               => $NbTrainees,
                     'TrainingSessionDurations' => $TrainingSessionDurations,
+                    'abd' => $abd,
+                    'abdc' => $abdc,
                 ];
             }
         }
 
         return [
-            'BPFInfos'             => $BPFInfosByTag,
+            'BPFInfos'             => array_merge($BPFInfos, $BPFInfosByTag),
             'firstDayOfFiscalYear' => $firstDayOfFiscalYear,
             'lastDayOfFiscalYear'  => $lastDayOfFiscalYear
         ];
@@ -298,7 +309,12 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         $array['label'][] = $langs->transnoentities('BPFCAPartC');
 
         $array['content'][] = round($BPFTotalPartC) . ' ' . $langs->getCurrencySymbol($conf->currency);
-        $array['content'][] = 'TODO';
+
+        $salesPercent = $langs->trans('NoData');
+        if ($BPFTotalPartC > 0 && $BPFInfos['BPFInfos']['sales'] > 0) {
+            $salesPercent = ceil($BPFTotalPartC / $BPFInfos['BPFInfos']['sales'] * 100) . ' %';
+        }
+        $array['content'][] = $salesPercent;
 
         return $array;
     }
