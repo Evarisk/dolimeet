@@ -260,8 +260,11 @@ NbAuditors                           = Nombre d'auditeurs
 AttendancePresentAuditRate           = Taux de présence aux audits
 AttendanceDelayAuditRate             = Taux de retard aux audits
 AttendanceAbsentAuditRate            = Taux d'absence aux audits
-
-
+ActivityMonitoring                   = Suivi des activités
+AverageDurationByActivity            = Durées moyennes par activité
+MeetingAttendance                    = Participation aux réunions
+TrainingSessionAttendance            = Participation aux sessions de formations
+AuditAttendance                      = Participation aux audits
 
 #
 # Email - Email

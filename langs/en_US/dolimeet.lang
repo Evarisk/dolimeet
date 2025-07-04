@@ -206,7 +206,11 @@ NbAuditors                           = Number of auditors
 AttendancePresentAuditRate           = Audit attendance rate
 AttendanceDelayAuditRate             = Late audit rate
 AttendanceAbsentAuditRate            = Absence rate from audits
-
+ActivityMonitoring                   = Activity monitoring
+AverageDurationByActivity            = Average duration by activity
+MeetingAttendance                    = Meeting attendance
+TrainingSessionAttendance            = Training session attendance
+AuditAttendance                      = Audit attendance
 
 
 #
