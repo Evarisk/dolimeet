@@ -172,16 +172,8 @@ FormationPublicNoteTraineeList   = <strong>3 - Liste des stagiaires en attente <
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
 Trainee                                     = Stagiaire
-TypeContact_project_internal_SESSIONTRAINER = Formateur
-TypeContact_project_external_SESSIONTRAINER = Formateur
-TypeContact_propal_internal_SESSIONTRAINER  = Formateur
-TypeContact_propal_external_SESSIONTRAINER  = Formateur
 TypeContact_contrat_internal_SESSIONTRAINER = Formateur
 TypeContact_contrat_external_SESSIONTRAINER = Formateur
-TypeContact_project_internal_TRAINEE        = Stagiaire
-TypeContact_project_external_TRAINEE        = Stagiaire
-TypeContact_propal_internal_TRAINEE         = Stagiaire
-TypeContact_propal_external_TRAINEE         = Stagiaire
 TypeContact_contrat_internal_TRAINEE        = Stagiaire
 TypeContact_contrat_external_TRAINEE        = Stagiaire
 
@@ -305,3 +297,5 @@ ErrorStatus                       = Erreur : statut de la session de formation i
 ErrrorDurationNotMatching         = Erreur : incohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
 ServiceReadyToBeUsed              = Service prêt à être utilisé
 OpcoInfo                          = Voulez vous faire financer la formation par un OPCO ?
+BillingTypeContactObjectNotFound  = Contact client facturation contrat - (%s) introuvable
+CustomerTypeContactObjectNotFound = Contact client suivi contrat - (%s) introuvable

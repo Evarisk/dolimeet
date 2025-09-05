@@ -954,11 +954,11 @@ class ActionsDolimeet
         if (strpos($parameters['context'], 'contractcard') !== false) {
             if (!empty($object->array_options['options_trainingsession_type'])) {
                 $contactRoles = [
-                    'trainee'        => ['source' => 'both',     'notice' => 'warning'],
-                    'sessiontrainer' => ['source' => 'both',     'notice' => 'warning'],
-                    'billing'        => ['source' => 'external', 'notice' => 'info'],
-                    'customer'       => ['source' => 'external', 'notice' => 'info'],
-                    'opco'           => ['source' => 'external', 'notice' => 'info'],
+                    'trainee'        => ['source' => 'both',     'notice' => 'warning', 'tradForNotFound' => 'ObjectNotFound'],
+                    'sessiontrainer' => ['source' => 'both',     'notice' => 'warning', 'tradForNotFound' => 'ObjectNotFound'],
+                    'billing'        => ['source' => 'external', 'notice' => 'info',    'tradForNotFound' => 'BillingTypeContactObjectNotFound'],
+                    'customer'       => ['source' => 'external', 'notice' => 'info',    'tradForNotFound' => 'CustomerTypeContactObjectNotFound'],
+                    'opco'           => ['source' => 'external', 'notice' => 'info',    'tradForNotFound' => 'ObjectNotFound'],
                 ];
                 foreach ($contactRoles as $contactRole => $contactInfos) {
                     $contacts = [];
@@ -984,13 +984,13 @@ class ActionsDolimeet
                     foreach ($contactsNoticeByRoles as $contactNoticeType => $contactRoles) {
                         $moreHtmlStatus .= '<div class="wpeo-notice notice-' . $contactNoticeType . '">';
                         $moreHtmlStatus .= '<div class="notice-content">';
-                        $moreHtmlStatus .= '<div class="notice-title">';
+                        $moreHtmlStatus .= '<div class="notice-subtitle">';
                         foreach ($contactRoles as $contactRole => $role) {
                             if ($object->array_options['options_trainingsession_opco_financing'] == 0 && $contactRole == 'opco') {
                                 $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
                                 continue;
                             }
-                            $moreHtmlStatus .= $langs->transnoentities('ObjectNotFound', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                            $moreHtmlStatus .= $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole))) . '<br>';
                         }
                         $moreHtmlStatus .= '</div></div></div>';
                     }
