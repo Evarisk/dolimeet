@@ -52,3 +52,17 @@ INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `activ
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+
+-- 21.0.0
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
