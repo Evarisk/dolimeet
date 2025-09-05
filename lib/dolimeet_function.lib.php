@@ -114,10 +114,10 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
 
         $project->array_options['options_trainingsession_service'] = explode(',', $project->array_options['options_trainingsession_service']);
         foreach ($project->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-            if ($object->element == 'contrat') {
+            if ($object->element === 'contrat') {
                 $filter = 't.status = 1 AND t.fk_contrat = ' . $object->id;
             } else {
-                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId;
+                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $trainingSessionServiceId;
             }
 
             $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
@@ -139,7 +139,7 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
     }
 
     // Part 1 - General information
-    $object->note_public  = '<br />' . $langs->transnoentities('FormationInfoTitle') . '<br />';
+    $object->note_public  = $langs->transnoentities('FormationInfoTitle') . '<br />';
     $object->note_public .= $langs->transnoentities('FormationTitle') . ' : ' . $project->title . '<br />';
     $object->note_public .= $langs->transnoentities('TrainingSessionType') . ' : ' . $langs->transnoentities(getDictionaryValue('c_trainingsession_type', 'ref', $project->array_options['options_trainingsession_type'])) . '<br />';
     $object->note_public .= $langs->transnoentities('TrainingSessionDurations') . ' : <strong>' . convertSecondToTime($durations, 'allhourmin') . '</strong>' . ' ' . dol_strtolower($langs->transnoentities('Hours')) . '<br />';
@@ -160,6 +160,7 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
         $contacts = array_merge($internalTrainee, $externalTrainee);
         $object->note_public .= $langs->transnoentities('TrainingSessionNbTrainees') . ' : ' . count($contacts) . '<br /><ul>';
         foreach ($contacts as $contact) {
+            //@todo option pour le mail
             $object->note_public .= '<li>' . dol_strtoupper($contact['lastname']) . (dol_strlen($contact['firstname']) > 0 ? ', ' . ucfirst($contact['firstname']) : '') . (dol_strlen($contact['email']) > 0 ? ', ' . $contact['email'] : '') . '</li>';
         }
         $object->note_public .= '</ul>';
