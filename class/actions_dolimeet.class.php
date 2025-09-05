@@ -172,14 +172,8 @@ class ActionsDolimeet
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['propal']['hidden']['trainingsession_service']  = 1;
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
-            }
+            } ?>
 
-            // Hide extrafields trainingsession_service for view mode
-            if (empty($action)) {
-                $extrafields->attributes['propal']['list']['trainingsession_service'] = 0;
-            }
-
-            ?>
             <script>
                 $(document).on('change', '#options_trainingsession_type', function() {
                     var type = $(this).val();
