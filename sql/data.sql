@@ -15,9 +15,9 @@
 
 -- 1.0.0
 INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'ActionFormation', 'ActionFormation', '', 1, 1);
-INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'BilanCompetences', 'BilanCompetences', '', 1, 10);
-INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'ActionVAE', 'ActionVAE', '', 1, 20);
-INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(4, 0, 'ActionFormationApprentissage', 'ActionFormationApprentissage', '', 1, 30);
+INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'BilanCompetences', 'BilanCompetences', '', 0, 10);
+INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'ActionVAE', 'ActionVAE', '', 0, 20);
+INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(4, 0, 'ActionFormationApprentissage', 'ActionFormationApprentissage', '', 0, 30);
 
 -- 1.1.0
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'internal', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
@@ -52,17 +52,3 @@ INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `activ
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
-
--- 21.0.0
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';

@@ -201,7 +201,7 @@ print '</table>';
 
 if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
     // Formation
-    print load_fiche_titre($langs->transnoentities('Formation'), '', '');
+    print load_fiche_titre($langs->transnoentities('Formation'), '', '', 0, 'formation');
 
     print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="formation_form">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -303,21 +303,22 @@ if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_V
     print '<table class="noborder centpercent">';
     print '<tr class="liste_titre">';
     print '<td>' . $langs->trans('Name') . '</td>';
-    print '<td>' . $langs->trans('Description') . '</td>';
     print '<td>' . $langs->trans('Value') . '</td>';
     print '</tr>';
 
-    $satisfactionSurveys = ['billing', 'trainee', 'sessiontrainer', 'opco'];
-    foreach ($satisfactionSurveys as $satisfactionSurvey) {
+    $satisfactionSurveys = [
+        'sessiontrainer' => ['picto' => 'user-tie'],
+        'trainee'        => ['picto' => 'user-graduate'],
+        'customer'       => ['picto' => 'building'],
+        'billing'        => ['picto' => 'file-invoice-dollar'],
+    ];
+    foreach ($satisfactionSurveys as $satisfactionSurveyRole => $satisfactionSurvey) {
         print '<tr class="oddeven"><td>';
-        print $langs->trans(ucfirst($satisfactionSurvey) . 'SatisfactionSurvey');
-        print '</td><td>';
-        print $langs->transnoentities(ucfirst($satisfactionSurvey) . 'SatisfactionSurveyDescription');
+        print $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $satisfactionSurvey['picto'] . '_fas', 'class="pictofixedwidth"') . $langs->trans(ucfirst($satisfactionSurveyRole) . 'SatisfactionSurvey'), $langs->transnoentities(ucfirst($satisfactionSurveyRole) . 'SatisfactionSurveyDescription'));
         print '</td>';
-
         print '<td class="minwidth400 maxwidth500">';
-        $confName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
-        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList(getDolGlobalInt($confName), $satisfactionSurvey . '_satisfaction_survey_model', 's.type = "survey" AND s.status = ' . Sheet::STATUS_LOCKED, '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
+        $confName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurveyRole) . '_SATISFACTION_SURVEY_SHEET';
+        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList(getDolGlobalInt($confName), $satisfactionSurveyRole . '_satisfaction_survey_model', 's.type = "survey" AND s.status = ' . Sheet::STATUS_LOCKED, '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
         print '</td></tr>';
     }
 

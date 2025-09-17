@@ -72,51 +72,60 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
     }
 
     /**
-     * Function called when a Dolibarr business event is done.
+     * Function called when a Dolibarr business event is done
      * All functions "runTrigger" are triggered if file
-     * is inside directory core/triggers.
+     * is inside directory core/triggers
      *
-     * @param  string       $action Event action code.
-     * @param  CommonObject $object Object.
-     * @param  User         $user   Object user.
-     * @param  Translate    $langs  Object langs.
-     * @param  Conf         $conf   Object conf.
-     * @return int                  0 < if KO, 0 if no triggered ran, >0 if OK.
+     * @param  string       $action Event action code
+     * @param  CommonObject $object Object
+     * @param  User         $user   Object user
+     * @param  Translate    $langs  Object langs
+     * @param  Conf         $conf   Object conf
+     * @return int                  0 < if KO, 0 if no triggered ran, >0 if OK
      * @throws Exception
      */
     public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf): int
     {
         if (!isModEnabled('dolimeet')) {
-            return 0; // If module is not enabled, we do nothing.
+            return 0; // If module is not enabled, we do nothing
         }
 
-        // Data and type of action are stored into $object and $action.
+        // Data and type of action are stored into $object and $action
         dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . '. id=' . $object->id);
 
         require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-        $now        = dol_now();
-        $actioncomm = new ActionComm($this->db);
 
-        $actioncomm->elementtype = $object->element . '@dolimeet';
-        $actioncomm->type_code   = 'AC_OTH_AUTO';
-        $actioncomm->datep       = $now;
-        $actioncomm->fk_element  = $object->id;
-        $actioncomm->userownerid = $user->id;
-        $actioncomm->percentage  = -1;
+        $actionComm = new ActionComm($this->db);
+
+        $triggerType = dol_ucfirst(dol_strtolower(explode('_', $action)[1]));
+
+        $actionComm->code        = 'AC_' . $action;
+        $actionComm->type_code   = 'AC_OTH_AUTO';
+        $actionComm->fk_element  = $object->id;
+        $actionComm->elementtype = $object->element . '@' . $object->module;
+        $actionComm->label       = $langs->transnoentities('Object' . $triggerType . 'Trigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+        $actionComm->datep       = dol_now();
+        $actionComm->userownerid = $user->id;
+        $actionComm->percentage  = -1;
 
         if (getDolGlobalInt('DOLIMEET_ADVANCED_TRIGGER') && !empty($object->fields)) {
-            $actioncomm->note_private = method_exists($object, 'getTriggerDescription') ? $object->getTriggerDescription($object) : '';
+            $actionComm->note_private = method_exists($object, 'getTriggerDescription') ? $object->getTriggerDescription($object) : '';
+        }
+
+        $objects      = ['MEETING', 'TRAININGSESSION', 'AUDIT'];
+        $triggerTypes = ['CREATE', 'MODIFY', 'DELETE', 'VALIDATE', 'UNVALIDATE', 'LOCK', 'ARCHIVE', 'SENTBYMAIL'];
+        $extraActions = [];
+
+        $actions = array_merge(
+            array_merge(...array_map(fn($s) => array_map(fn($p) => "{$p}_{$s}", $objects), $triggerTypes)),
+            $extraActions
+        );
+
+        if (in_array($action, $actions, true)) {
+            $actionComm->create($user);
         }
 
         switch ($action) {
-            // CREATE.
-            case 'MEETING_CREATE' :
-            case 'AUDIT_CREATE' :
-                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
-                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->create($user);
-                break;
-
             case 'TRAININGSESSION_CREATE' :
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
@@ -147,39 +156,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     }
                     $signatory->setSignatory($object->id, $object->element, (($attendant['source'] == 'internal') ? 'user' : 'socpeople'), [$attendant['id']], $attendantRole, 1);
                 }
-
-                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_CREATE';
-                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->create($user);
                 break;
 
-            // MODIFY.
-            case 'MEETING_MODIFY' :
-            case 'TRAININGSESSION_MODIFY' :
-            case 'AUDIT_MODIFY' :
-                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_MODIFY';
-                $actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->create($user);
-                break;
-
-            // DELETE.
-            case 'MEETING_DELETE' :
-            case 'TRAININGSESSION_DELETE' :
-            case 'AUDIT_DELETE' :
-                $actioncomm->code  = 'AC_ ' . strtoupper($object->element) . '_DELETE';
-                $actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->create($user);
-                break;
-
-            // VALIDATE.
-            case 'MEETING_VALIDATE' :
             case 'TRAININGSESSION_VALIDATE' :
-            case 'AUDIT_VALIDATE' :
-                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_VALIDATE';
-                $actioncomm->label = $langs->trans('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->create($user);
-
-                if ($action == 'TRAININGSESSION_VALIDATE' && $object->fk_project > 0 && $object->fk_contrat > 0) {
+                if ($object->fk_project > 0 && $object->fk_contrat > 0) {
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
@@ -195,44 +175,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         set_public_note($contract, $project, $propal);
                     }
                 }
-                break;
-
-            // UNVALIDATE.
-            case 'MEETING_UNVALIDATE' :
-            case 'TRAININGSESSION_UNVALIDATE' :
-            case 'AUDIT_UNVALIDATE' :
-                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_UNVALIDATE';
-                $actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->create($user);
-                break;
-
-            // LOCK.
-            case 'MEETING_LOCK' :
-            case 'TRAININGSESSION_LOCK' :
-            case 'AUDIT_LOCK' :
-                $actioncomm->code          = 'AC_' . strtoupper($object->element) . '_LOCK';
-                $actioncomm->label         = $langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->note_private .= $langs->trans('Status') . ' : ' . $langs->trans('Locked') . '</br>';
-                $actioncomm->create($user);
-                break;
-
-            // ARCHIVE.
-            case 'MEETING_ARCHIVE' :
-            case 'TRAININGSESSION_ARCHIVE' :
-            case 'AUDIT_ARCHIVE' :
-                $actioncomm->code          = 'AC_' . strtoupper($object->element) . '_ARCHIVE';
-                $actioncomm->label         = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->note_private .= $langs->trans('Status') . ' : ' . $langs->trans('Archived') . '</br>';
-                $actioncomm->create($user);
-                break;
-
-            // SENTBYMAIL.
-            case 'MEETING_SENTBYMAIL' :
-            case 'TRAININGSESSION_SENTBYMAIL' :
-            case 'AUDIT_SENTBYMAIL' :
-                $actioncomm->code  = 'AC_' . strtoupper($object->element) . '_SENTBYMAIL';
-                $actioncomm->label = $langs->trans('ObjectSentByMailTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-                $actioncomm->create($user);
                 break;
 
             case 'CONTRAT_ADD_CONTACT' :
@@ -287,15 +229,15 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 break;
 
             case 'PROPAL_CREATE' :
-                if (is_array(GETPOST('options_trainingsession_service', 'array')) && !empty(GETPOST('options_trainingsession_service', 'array'))) {
+                if (is_array(GETPOST('options_trainingsession_type', 'array')) && !empty(GETPOST('options_trainingsession_type', 'array'))) {
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
-                    $project    = new Project($this->db);
                     $product    = new Product($this->db);
                     $propalLine = new PropaleLigne($this->db);
 
                     // Add formation services on propal (by default FOR_ADM_GP1, FOR_ADM_LA1)
+                    $error             = 0;
                     $formationServices = get_formation_service();
                     foreach ($formationServices as $formationService) {
                         if ($formationService['ref'] == 'FOR_ADM_CF1' || $formationService['ref'] == 'FOR_ADM_RI1') {
@@ -316,61 +258,14 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $propalLine->product_type   = 1;
 
                             $object->addline($propalLine->desc, $propalLine->subprice, $propalLine->qty, $propalLine->tva_tx, 0.0, 0.0, $propalLine->fk_product, 0.0, 'HT', 0.0, 0, $propalLine->product_type, $propalLine->rang, 0, 0, 0, 0, $propalLine->product_label, '', '', 0, null);
+                        } else {
+                            $error++;
                         }
                     }
 
-                    // Add formation services on propal value stored in project options training session service
-                    $propalLinePosition = 20;
-                    foreach (GETPOST('options_trainingsession_service', 'array') as $trainingSessionServiceId) {
-                        $product->fetch($trainingSessionServiceId);
-
-                        $propalLine->fk_propal      = $object->id;
-                        $propalLine->fk_parent_line = 0;
-                        $propalLine->fk_product     = $product->id;
-                        $propalLine->product_label  = $product->label;
-                        $propalLine->desc           = $product->description;
-                        $propalLine->tva_tx         = $product->tva_tx;
-                        $propalLine->subprice       = $product->price;
-                        $propalLine->qty            = 1;
-                        $propalLine->rang           = $propalLinePosition++;
-                        $propalLine->product_type   = 1;
-
-                        $object->addline($propalLine->desc, $propalLine->subprice, $propalLine->qty, $propalLine->tva_tx, 0.0, 0.0, $propalLine->fk_product, 0.0, 'HT', 0.0, 0, $propalLine->product_type, $propalLine->rang, 0, 0, 0, 0, $propalLine->product_label, '', '', 0, null);
-                    }
-
-                    // Add project data on propal
-                    $result = $project->fetch($object->fk_project);
-                    if ($result > 0) {
-                        // Add contact on propal form project
-                        $externalContacts = $project->liste_contact();
-                        $internalContacts = $project->liste_contact(-1, 'internal');
-                        if ((is_array($externalContacts) && !empty($externalContacts)) || (is_array($internalContacts) && !empty($internalContacts))) {
-                            $contacts = array_merge($externalContacts, $internalContacts);
-                            foreach ($contacts as $contact) {
-                                $object->add_contact($contact['id'], $contact['code'], $contact['source']);
-                            }
-                        }
-
-
-                        $project  = new Project($this->db);
-
-                        $project->fetch($object->fk_project);
-                        set_public_note($object, $project);
-                    }
-                }
-                break;
-
-            case 'PROPAL_ADD_CONTACT' :
-                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
-                    $contactType = getDictionaryValue('c_type_contact', 'code', GETPOST('typecontact'));
-                    if ($contactType == 'TRAINEE') {
-                        // Load DoliMeet libraries
-                        require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
-
-                        $project  = new Project($this->db);
-
-                        $project->fetch($object->fk_project);
-                        set_public_note($object, $project);
+                    if ($error > 0) {
+                        setEventMessages('ErrorMissingFormationServiceConfig', [], 'errors');
+                        return -1;
                     }
                 }
                 break;
