@@ -28,14 +28,14 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
-BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire
-BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire
-TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
-TraineeSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction stagiaire
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
 SessiontrainerSatisfactionSurveyDescription = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction formateur
-OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
-OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction OPCO
+TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
+TraineeSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction stagiaire
+CustomerSatisfactionSurvey                  = Enquête de satisfaction client
+CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
+BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire/OPCO
+BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire/OPCO
 
 # Formation - Formation
 TrainingContract                  = Convention de formation
@@ -272,6 +272,20 @@ CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en p
 
 
 
+# Public interface - Interface publique
+PublicAddContact = Contact - Page publique
+
+
+
+#
+# Error - Erreur
+#
+
+# Data - Donnée
+ErrorMissingFormationServiceConfig = Erreur : configuration des services de formation manquantes<br><a href="../../custom/dolimeet/admin/setup.php#formation">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+
+
+
 #
 # Other
 #
@@ -297,5 +311,5 @@ ErrorStatus                       = Erreur : statut de la session de formation i
 ErrrorDurationNotMatching         = Erreur : incohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
 ServiceReadyToBeUsed              = Service prêt à être utilisé
 OpcoInfo                          = Voulez vous faire financer la formation par un OPCO ?
-BillingTypeContactObjectNotFound  = Contact client facturation contrat - (%s) introuvable
-CustomerTypeContactObjectNotFound = Contact client suivi contrat - (%s) introuvable
+BillingTypeContactObjectNotFound  = %s (Contact client facturation contrat) introuvable
+CustomerTypeContactObjectNotFound = %s (Contact client suivi contrat) introuvable

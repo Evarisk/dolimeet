@@ -146,7 +146,9 @@ class modDoliMeet extends DolibarrModules
                 'contractlist',
                 'propalcard',
                 'productcard',
-                'productservicelist'
+                'productservicelist',
+                'ajaxonlinesign',
+                'onlinesign'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
@@ -651,7 +653,7 @@ class modDoliMeet extends DolibarrModules
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_UPDATED', 1, 'integer', 0, '', $conf->entity);
         }
 
-        if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') == 0) {
+        if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') == 0 && isModEnabled('project')) {
             require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
             $numberingModules  = ['project' => getDolGlobalString('PROJECT_ADDON')];
@@ -675,11 +677,11 @@ class modDoliMeet extends DolibarrModules
         ];
 
         $extraFieldsArrays = [
-            'label'                          => ['Label' => 'Label',                        'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => $this->numero . 10,                                                             'list' => 1,                                                                                     'moreparams' => ['css' => 'minwidth100 maxwidth300']],
-            'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',                   'elementtype' => ['contrat', 'propal', 'projet'], 'position' => $this->numero . 20, 'params' => ['c_trainingsession_type:label:rowid' => NULL], 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'moreparams' => ['css' => 'minwidth100 maxwidth300']],
-            'trainingsession_service'        => ['Label' => 'TrainingSessionService',       'type' => 'chkbxlst',                  'elementtype' => ['propal', 'projet'],            'position' => $this->numero . 30, 'params' => [NULL],                                         'list' => 3, 'help' => 'TrainingSessionServiceHelp',                                             'moreparams' => ['css' => 'minwidth100 maxwidth300']],
-            'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat', 'propal', 'projet'], 'position' => $this->numero . 40,                                                             'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'moreparams' => ['css' => 'minwidth100 maxwidth300']],
-            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',                   'elementtype' => ['contrat'],                     'position' => $this->numero . 50, 'alwayseditable' => 1,                                      'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp'],
+            //virer le champs label et sevice
+            'label'                          => ['Label' => 'Label',                        'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => $this->numero . 10,                                                                           'list' => 1,                                                                                     'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',                   'elementtype' => ['contrat', 'propal', 'projet'], 'position' => $this->numero . 20, 'params' => ['c_trainingsession_type:label:rowid::(active:=:1)' => NULL], 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => $this->numero . 40,                                                                           'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',                   'elementtype' => ['contrat'],                     'position' => $this->numero . 50, 'alwayseditable' => 1,                                                    'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp'],
 
             'syllabus' => ['Label' => 'Syllabus', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 60, 'alwayseditable' => 1, 'list' => 4, 'help' => 'SyllabusHelp']
         ];

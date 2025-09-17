@@ -36,7 +36,11 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 {
     global $conf, $db, $user;
 
-    if ($object && $object->element == 'contrat') {
+    if (!is_object($object)) {
+        return;
+    }
+
+    if ($object->element == 'contrat') {
         // Load Saturne libraries
         require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
         require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
@@ -124,4 +128,6 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
             }
         }
     }
+
+    $substitutionarray['__DOLIMEET_PUBLIC_INTERFACE_CONTACT_URL__'] = dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id;
 }

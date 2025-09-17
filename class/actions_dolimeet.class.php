@@ -111,7 +111,7 @@ class ActionsDolimeet
      */
     public function addHtmlHeader(array $parameters): int
     {
-        if (preg_match('/projectcard|productcard|contractcard/', $parameters['context'])) {
+        if (preg_match('/projectcard|productcard|contractcard|contractcontactcard/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/custom/saturne/css/saturne.min.css',
                 'js'  => '/custom/saturne/js/saturne.min.js'
@@ -613,6 +613,46 @@ class ActionsDolimeet
             }
         }
 
+        if (preg_match('/contacttpl/', $parameters['context'])) {
+            global $object;
+
+            $contacts = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
+            if (!empty($contacts)) {
+                $outputLine = [];
+                foreach ($contacts as $contact) {
+                    $outputLine[$contact['rowid']]  = '<td class="tdoverflowmax200">';
+                    if ($contact['mandatory_signature'] == 1) {
+                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . DOL_URL_ROOT . '/custom/dolimeet/core/ajax/testajax.php?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Enabled'), 'switch_on') . '</a>';
+                    } else {
+                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . DOL_URL_ROOT . '/custom/dolimeet/core/ajax/testajax.php?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
+                    }
+                    $outputLine[$contact['rowid']] .= '</td>';
+                }
+
+                $outputLineHeader = '<th class="wrapcolumntitle liste_titre" title="' . $langs->transnoentities('MandatorySignature') . '">' . $langs->transnoentities('MandatorySignature') . '</th>';
+
+                $jsonData = json_encode($outputLine);
+                ?>
+                <script>
+                    // Target the second-to-last th element
+                    var targetTh = $('table.tagtable th:nth-last-child(2)');
+                    targetTh.before(<?php echo json_encode($outputLineHeader); ?>)
+
+                    function fillTable(data) {
+                        $('.oddeven').each(function() {
+                            var id       = $(this).data('rowid');
+                            var targetTd = $(this).find('td:nth-last-child(2)');
+                            targetTd.before(data[id]);
+                        });
+                    }
+
+                    var tableData = <?php echo $jsonData; ?>;
+                    fillTable(tableData);
+                </script>
+                <?php
+            }
+        }
+
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
             print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
@@ -736,6 +776,28 @@ class ActionsDolimeet
                     jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($html); ?>);
                 </script>
                 <?php
+            }
+
+            if ($object->statut != Contrat::STATUS_DRAFT && getDolGlobalString('CONTRACT_ALLOW_ONLINESIGN')) {
+                require_once __DIR__ . '/../lib/dolibarr_lib.php';
+
+                $contacts = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
+                if (!empty($contacts)) {
+                    $outputLine = '';
+                    foreach ($contacts as $contact) {
+                        if ($contact['mandatory_signature'] == 1) {
+                            $outputLine .= showOnlineSignatureUrl2('contract', $object->ref, $object, '', $contact);
+                        }
+                    }
+
+                    ?>
+                    <script>
+                        // Target the second-to-last th element
+                        var targetTh = $('.urllink');
+                        targetTh.after(<?php echo json_encode($outputLine); ?>)
+                    </script>
+                    <?php
+                }
             }
         }
 
@@ -909,6 +971,97 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the AddSignature function : replacing the parent's function with the one below
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     The object to process
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function AddSignature(array $parameters, $object): int
+    {
+        if (!GETPOSTISSET('contactid')) {
+            return 0;
+        }
+
+        global $langs, $sourcefile, $online_sign_name, $upload_dir, $filename, $newpdffilename;
+
+        // We build the new PDF
+        $pdf = pdf_getInstance();
+        if (class_exists('TCPDF')) {
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+        }
+        $pdf->SetFont(pdf_getPDFFont($langs));
+
+        if (getDolGlobalString('MAIN_DISABLE_PDF_COMPRESSION')) {
+            $pdf->SetCompression(false);
+        }
+
+        //$pdf->Open();
+        $pagecount = $pdf->setSourceFile($sourcefile);        // original PDF
+
+        $param = array();
+        $param['online_sign_name'] = $online_sign_name;
+        $param['pathtoimage'] = $upload_dir . $filename;
+
+        $s = array();    // Array with size of each page. Example array(w'=>210, 'h'=>297);
+        for ($i = 1; $i < ($pagecount + 1); $i++) {
+            try {
+                $tppl = $pdf->importPage($i);
+                $s = $pdf->getTemplatesize($tppl);
+                $pdf->AddPage($s['h'] > $s['w'] ? 'P' : 'L');
+                $pdf->useTemplate($tppl);
+
+                if (getDolGlobalString("CONTRACT_SIGNATURE_ON_ALL_PAGES")) {
+                    // A signature image file is 720 x 180 (ratio 1/4) but we use only the size into PDF
+                    // TODO Get position of box from PDF template
+
+                    if (getDolGlobalString("CONTRACT_SIGNATURE_XFORIMGSTART")) {
+                        $param['xforimgstart'] = getDolGlobalString("CONTRACT_SIGNATURE_XFORIMGSTART");
+                    } else {
+                        $param['xforimgstart'] = (empty($s['w']) ? 110 : $s['w'] / 2 - 0);
+                    }
+                    if (getDolGlobalString("CONTRACT_SIGNATURE_YFORIMGSTART")) {
+                        $param['yforimgstart'] = getDolGlobalString("CONTRACT_SIGNATURE_YFORIMGSTART");
+                    } else {
+                        $param['yforimgstart'] = (empty($s['h']) ? 250 : $s['h'] - 62);
+                    }
+                    if (getDolGlobalString("CONTRACT_SIGNATURE_WFORIMG")) {
+                        $param['wforimg'] = getDolGlobalString("CONTRACT_SIGNATURE_WFORIMG");
+                    } else {
+                        $param['wforimg'] = $s['w'] - ($param['xforimgstart'] + 16);
+                    }
+
+                    dolPrintSignatureImage($pdf, $langs, $param);
+                }
+            } catch (Exception $e) {
+                dol_syslog("Error when manipulating some PDF by onlineSign: " . $e->getMessage(), LOG_ERR);
+                $response = $e->getMessage();
+                $error++;
+            }
+        }
+
+        if (!getDolGlobalString("CONTRACT_SIGNATURE_ON_ALL_PAGES")) {
+            // A signature image file is 720 x 180 (ratio 1/4) but we use only the size into PDF
+            // TODO Get position of box from PDF template
+
+            $param['xforimgstart'] = (empty($s['w']) ? 110 : 15);
+            $param['yforimgstart'] = (empty($s['h']) ? 250 : $s['h'] - 62);
+            $param['wforimg'] = 89;
+
+            dolPrintSignatureImage($pdf, $langs, $param);
+        }
+
+        //$pdf->Close();
+        $pdf->Output($newpdffilename, "F");
+
+        // Index the new file and update the last_main_doc property of object.
+        $object->indexFile($newpdffilename, 1);
+
+        return 1; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below.
      *
      * @param  array $linkableObjectTypes  Array of linkable objects.
@@ -951,14 +1104,13 @@ class ActionsDolimeet
     {
         global $langs;
 
-        if (strpos($parameters['context'], 'contractcard') !== false) {
+        if (preg_match('/contractcard|contractcontactcard/', $parameters['context'])) {
             if (!empty($object->array_options['options_trainingsession_type'])) {
                 $contactRoles = [
-                    'trainee'        => ['source' => 'both',     'notice' => 'warning', 'tradForNotFound' => 'ObjectNotFound'],
-                    'sessiontrainer' => ['source' => 'both',     'notice' => 'warning', 'tradForNotFound' => 'ObjectNotFound'],
-                    'billing'        => ['source' => 'external', 'notice' => 'info',    'tradForNotFound' => 'BillingTypeContactObjectNotFound'],
-                    'customer'       => ['source' => 'external', 'notice' => 'info',    'tradForNotFound' => 'CustomerTypeContactObjectNotFound'],
-                    'opco'           => ['source' => 'external', 'notice' => 'info',    'tradForNotFound' => 'ObjectNotFound'],
+                    'sessiontrainer' => ['source' => 'both',     'notice' => 'warning', 'picto' => 'user-tie',            'tradForNotFound' => 'ObjectNotFound'],
+                    'trainee'        => ['source' => 'both',     'notice' => 'warning', 'picto' => 'user-graduate',       'tradForNotFound' => 'ObjectNotFound'],
+                    'billing'        => ['source' => 'external', 'notice' => 'warning', 'picto' => 'file-invoice-dollar', 'tradForNotFound' => 'BillingTypeContactObjectNotFound'],
+                    'customer'       => ['source' => 'external', 'notice' => 'warning', 'picto' => 'building',            'tradForNotFound' => 'CustomerTypeContactObjectNotFound'],
                 ];
                 foreach ($contactRoles as $contactRole => $contactInfos) {
                     $contacts = [];
@@ -979,6 +1131,8 @@ class ActionsDolimeet
                     }
                 }
 
+                $form = new Form($this->db);
+
                 $moreHtmlStatus = '';
                 if (!empty($contactsNoticeByRoles)) {
                     foreach ($contactsNoticeByRoles as $contactNoticeType => $contactRoles) {
@@ -990,11 +1144,13 @@ class ActionsDolimeet
                                 $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
                                 continue;
                             }
-                            $moreHtmlStatus .= $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole))) . '<br>';
+                            $moreHtmlStatus .= '<span class="marginrightonly">' . $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $role['picto'] . '_fas__2em'), $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole)))) . '</span>';
                         }
                         $moreHtmlStatus .= '</div></div></div>';
                     }
                 }
+
+                $moreHtmlStatus .= '<a href=""><button class="wpeo-button">Interface Publique</button></a>';
 
                 $this->resprints = $moreHtmlStatus;
             }
@@ -1055,32 +1211,6 @@ class ActionsDolimeet
                         break;
                     }
                 }
-            }
-        }
-
-        return 0; // or return 1 to replace standard code.
-    }
-
-    /**
-     * Overloading the dolGetButtonAction function : replacing the parent's function with the one below
-     *
-     * @param  array        $parameters Hook metadatas (context, etc...)
-     * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
-     * @return int                      0 < on error, 0 on success, 1 to replace standard code
-     */
-    public function dolGetButtonAction(array $parameters, $object, string $action): int
-    {
-        global $langs;
-
-        if (strpos($parameters['context'], 'projectcard') !== false) {
-            $langs->load('propal');
-            if ($parameters['html'] == $langs->trans('AddProp')) {
-                $explodedCompiledAttributes       = explode('projectid', $parameters['compiledAttributes']);
-                $parameters['compiledAttributes'] = $explodedCompiledAttributes[0] . 'options_trainingsession_type=' . $object->array_options['options_trainingsession_type'] . '&options_trainingsession_service=' . $object->array_options['options_trainingsession_service'] . '&options_trainingsession_location=' . $object->array_options['options_trainingsession_location'] . '&projectid' . $explodedCompiledAttributes[1];
-                $this->resprints = '<' . $parameters['tag'] . ' ' . $parameters['compiledAttributes'] . '>' . dol_escape_htmltag($parameters['html']) . '</' . $parameters['tag'] . '>';
-
-                return 1;
             }
         }
 
