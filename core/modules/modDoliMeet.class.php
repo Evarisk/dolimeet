@@ -678,8 +678,6 @@ class modDoliMeet extends DolibarrModules
         ];
 
         $extraFieldsArrays = [
-            //virer le champs label et sevice
-            'label'                          => ['Label' => 'Label',                        'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => $this->numero . 10,                                                                           'list' => 1,                                                                                     'moreparams' => ['css' => 'minwidth100 maxwidth300']],
             'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',                   'elementtype' => ['contrat', 'propal', 'projet'], 'position' => $this->numero . 20, 'params' => ['c_trainingsession_type:label:rowid::(active:=:1)' => NULL], 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'moreparams' => ['css' => 'minwidth100 maxwidth300']],
             'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => $this->numero . 40,                                                                           'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'moreparams' => ['css' => 'minwidth100 maxwidth300']],
             'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',                   'elementtype' => ['contrat'],                     'position' => $this->numero . 50, 'alwayseditable' => 1,                                                    'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp'],
@@ -705,6 +703,21 @@ class modDoliMeet extends DolibarrModules
                 }
             }
             dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+        } elseif (getDolGlobalInt('DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 1) {
+            $extraFieldsArrays = [
+                'label'                     => ['elementtype' => ['contrat']],
+                'trainingsession_service'   => ['elementtype' => ['propal', 'projet']],
+            ];
+
+            require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+            $extraFields = new ExtraFields($this->db);
+
+            foreach ($extraFieldsArrays as $key => $extraField) {
+                foreach ($extraField['elementtype'] as $extraFieldElementType) {
+                    $extraFields->delete($key, $extraFieldElementType);
+                }
+            }
+            dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 2, 'integer', 0, '', $conf->entity);
         }
 
         return $this->_init($sql, $options);

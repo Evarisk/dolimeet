@@ -111,7 +111,7 @@ class ActionsDolimeet
      */
     public function addHtmlHeader(array $parameters): int
     {
-        if (preg_match('/projectcard|productcard|contractcard|contractcontactcard/', $parameters['context'])) {
+        if (preg_match('/productcard|contractcard|contractcontactcard/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/custom/saturne/css/saturne.min.css',
                 'js'  => '/custom/saturne/js/saturne.min.js'
@@ -149,7 +149,7 @@ class ActionsDolimeet
             if (strpos($parameters['context'], $objectMetadata['hook_name_card']) !== false) {
                 $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
                 $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-                $extraFieldsNames = ['label', 'trainingsession_type', 'trainingsession_service', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
+                $extraFieldsNames = ['trainingsession_type', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
                 foreach ($extraFieldsNames as $extraFieldsName) {
                     if (isset($extrafields->attributes[$object->table_element]['label'][$extraFieldsName])) {
                         $extrafields->attributes[$object->table_element]['label'][$extraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes[$object->table_element]['label'][$extraFieldsName]);
@@ -158,19 +158,8 @@ class ActionsDolimeet
             }
         }
 
-        if (preg_match('/projectcard|propalcard|contractcard|productcard/', $parameters['context'])) {
-            // Initialize the param attribute for trainingsession_service
-            if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
-                $filter  = 'product as p:label:rowid::(fk_product_type:=:1) AND (entity:=:$ENTITY$)';
-
-                $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => [$filter => '']];
-                $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => [$filter => '']];
-            }
-        }
-
         if (strpos($parameters['context'], 'propalcard') !== false) {
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
-                $extrafields->attributes['propal']['hidden']['trainingsession_service']  = 1;
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
             } ?>
 
@@ -178,10 +167,8 @@ class ActionsDolimeet
                 $(document).on('change', '#options_trainingsession_type', function() {
                     var type = $(this).val();
                     if (type > 0) {
-                        $('#options_trainingsession_service').closest('tr').show();
                         $('#options_trainingsession_location').closest('tr').show();
                     } else {
-                        $('#options_trainingsession_service').closest('tr').hide();
                         $('#options_trainingsession_location').closest('tr').hide();
                     }
                 });
@@ -192,7 +179,6 @@ class ActionsDolimeet
         if (strpos($parameters['context'], 'projectcard') !== false) {
             // Hide extrafields for create mode
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
-                $extrafields->attributes['projet']['hidden']['trainingsession_service']  = 1;
                 $extrafields->attributes['projet']['hidden']['trainingsession_location'] = 1;
             }
 
@@ -214,7 +200,7 @@ class ActionsDolimeet
             $out .= '<div class="notice-title">' . $langs->transnoentities('ErrorMissingTrainingSessionProjectInfo') . '</div><div class="notice-subtitle"><ul>';
             $out .= '<li class="notice-training-session-service">' . $langs->transnoentities('TrainingSessionService') . '</li>';
             $out .= '<li class="notice-third-party">' . $langs->transnoentities('ThirdParty') . '</li>';
-            $out .= '<li class="notice-opportunity-status">' . $langs->transnoentities('OpportunityStatus') . '</li>';
+            $out .= '<li class="notice-opportunity-status">' . $langs->transnoentitie . '</li>';
             $out .= '</ul></div></div></div>';
 
             ?>
@@ -324,54 +310,6 @@ class ActionsDolimeet
                     setInterval(checkFields, 1000);
                     if ($('#socid').val() < 0) {
                         $('#options_trainingsession_type').attr('disabled', 'disabled');
-                    }
-                });
-            </script>
-            <?php
-        }
-
-        if (preg_match('/propalcard|projectcard/', $parameters['context'])) {
-            if ($object->element == 'project') {
-                $object->element = 'projet';
-            }
-
-            $out = '<td class="titlefieldmax45 wordbreak">';
-            $out .= $form->textwithpicto($langs->transnoentities($extrafields->attributes[$object->element]['label']['trainingsession_service']), $langs->transnoentities($extrafields->attributes[$object->element]['help']['trainingsession_service']));
-            $out .= '</td><td class="valuefieldcreate ' . $object->element . '_extras_trainingsession_service">';
-
-            if ($object->element == 'projet') {
-                $object->element = 'project';
-            }
-
-            $filter = [
-                'customsql' => 'fk_product_type = 1 AND entity = ' . $conf->entity .
-                    ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')' .
-                    ' AND rowid IN (SELECT ds.fk_element FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = t.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = t.duration * 3600)'
-            ];
-            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
-
-            $products      = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filter);
-            $productsArray = [];
-            if (is_array($products) && !empty($products)) {
-                $productsArray = array_column($products, 'label', 'id');
-            }
-            $selected = [];
-            if ($action == 'create') {
-                $selected = (!empty(GETPOST('options_trainingsession_service')) ? GETPOST('options_trainingsession_service') : []);
-            } elseif ($action == 'edit') {
-                $selected = (!empty(GETPOST('options_trainingsession_service', 'array')) ? GETPOST('options_trainingsession_service', 'array') : $object->array_options['options_trainingsession_service']);
-            }
-            if (!is_array($selected)) {
-                $selected = explode(',', $selected);
-            }
-            $out .= Form::multiselectarray('options_trainingsession_service', $productsArray, $selected, 0, 0, 'minwidth100imp maxwidth500 widthcentpercentminusxx');
-            $out .= '</td>';
-            ?>
-            <script>
-                $(document).ready(function() {
-                    $('#options_trainingsession_service').closest('tr').html(<?php echo json_encode($out); ?>);
-                    if ($('#options_trainingsession_type').val() <= 0) {
-                        $('#options_trainingsession_service').closest('tr').hide();
                     }
                 });
             </script>
@@ -801,31 +739,6 @@ class ActionsDolimeet
             }
         }
 
-        if (strpos($parameters['context'], 'projectcard') !== false) {
-            global $action, $object;
-
-            if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type']) && $action != 'create' && $action != 'edit') {
-                require_once __DIR__ . '/trainingsession.class.php';
-
-                $trainingSession = new Trainingsession($this->db);
-                $out                                                      = [];
-                $object->array_options['options_trainingsession_service'] = explode(',', $object->array_options['options_trainingsession_service']);
-                foreach ($object->array_options['options_trainingsession_service'] as $index => $trainingSessionServiceId) {
-                    $trainingSession->fetch('', '', ' AND t.element_type = "service" AND t.fk_element = ' . $trainingSessionServiceId);
-                    if ($object->array_options['options_trainingsession_service'][$index] == $trainingSession->fk_element) {
-                        $out[$index] = ' <a href="' . dol_buildpath('custom/dolimeet/view/session/session_list.php?object_type=trainingsession&search_model=1&search_fk_project=' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . '&search_element_type=service&search_fk_element=' . $trainingSessionServiceId . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id), 1) . '"><span class="fas fa-eye valignmiddle" title="' . $langs->transnoentities('SeeTrainingSessionModel') . '"></span></a>';
-                    }
-                }
-            } ?>
-
-            <script>
-                $('.project_extras_trainingsession_service .select2-container-multi-dolibarr .select2-choices-dolibarr li').each(function(index) {
-                    $(this).append(<?php echo json_encode($out); ?>[index]);
-                });
-            </script>
-            <?php
-        }
-
         return 0; // or return 1 to replace standard code.
     }
 
@@ -933,16 +846,6 @@ class ActionsDolimeet
 
                 header('Location: ' . $urlToRedirect);
                 exit;
-            }
-
-            if ($action == 'update_extras' && GETPOST('attribute') == 'trainingsession_durations') {
-                $hours    = GETPOST('durationhour', 'int');
-                $minutes  = GETPOST('durationmin', 'int');
-                $duration = convertTime2Seconds($hours, $minutes);
-
-                $object->array_options['options_trainingsession_durations'] = $duration;
-                $object->updateExtrafield('trainingsession_durations');
-                return 1;
             }
         }
 
@@ -1150,7 +1053,7 @@ class ActionsDolimeet
                     }
                 }
 
-                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '"><button class="wpeo-button">Interface Publique</button></a>';
+                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '" target="_blank"><button class="wpeo-button no-load">Interface Publique</button></a>';
 
                 $this->resprints = $moreHtmlStatus;
             }
