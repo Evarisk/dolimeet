@@ -1150,7 +1150,7 @@ class ActionsDolimeet
                     }
                 }
 
-                $moreHtmlStatus .= '<a href=""><button class="wpeo-button">Interface Publique</button></a>';
+                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '"><button class="wpeo-button">Interface Publique</button></a>';
 
                 $this->resprints = $moreHtmlStatus;
             }

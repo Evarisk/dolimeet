@@ -52,3 +52,5 @@ DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external'
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'BilanCompetences';
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionVAE';
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionFormationApprentissage';
+
+ALTER TABLE llx_element_contact ADD mandatory_signature TINYINT AFTER element_id;

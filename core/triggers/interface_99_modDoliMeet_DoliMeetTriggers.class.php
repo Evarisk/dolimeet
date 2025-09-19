@@ -229,7 +229,8 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 break;
 
             case 'PROPAL_CREATE' :
-                if (is_array(GETPOST('options_trainingsession_type', 'array')) && !empty(GETPOST('options_trainingsession_type', 'array'))) {
+                if (GETPOST('options_trainingsession_type', 'int') > 0) {
+
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 

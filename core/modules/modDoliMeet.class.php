@@ -239,6 +239,7 @@ class modDoliMeet extends DolibarrModules
             // CONST GENERAL CONST.
             $i++ => ['CONTACT_SHOW_EMAIL_PHONE_TOWN_SELECTLIST', 'integer', 1, '', 0, 'current'],
             $i++ => ['FCKEDITOR_ENABLE_NOTE_PUBLIC', 'integer', 1, '', 0, 'current'],
+            $i++ => ['CONTRACT_SHOW_SIGNATURE_STATUS_WITH_SERVICE_STATUS', 'chaine', 1, '', 0, 'current'],
             $i   => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current']
         ];
 
