@@ -48,6 +48,8 @@ DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal'
 DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
 DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
 DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
 
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'BilanCompetences';
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionVAE';
