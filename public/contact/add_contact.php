@@ -70,6 +70,9 @@ $action = GETPOST('action', 'aZ09');
 $object  = new Contrat($db);
 $contact = new Contact($db);
 
+$object->fetch($id);
+$object->fetchProject();
+
 /*
  * Actions
  */
@@ -136,7 +139,7 @@ saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card'); ?>
     <?php if (getDolGlobalInt('SATURNE_ENABLE_PUBLIC_INTERFACE')) : ?>
         <div class="public-card__header">
             <div class="header-information">
-                <div class="information-title"><?php echo $langs->trans('PublicAddContact'); ?></div>
+                <div class="information-title">Convention de formation <?php echo $object->ref . ' - ' . $object->project->ref . ' - ' . $object->project->title; ?></div>
             </div>
         </div>
 
