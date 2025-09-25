@@ -200,12 +200,8 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     if ($contactCode == 'TRAINEE') {
                         $object->fetchObjectLinked(null, 'propal', $object->id, 'contrat');
                         if (isset($object->linkedObjects['propal']) && !empty($object->linkedObjects['propal']) && count($object->linkedObjects['propal']) == 1) {
-                            $project = new Project($this->db);
-
-                            $project->fetch($object->fk_project);
-
                             $propal = array_shift($object->linkedObjects['propal']);
-                            set_public_note($object, $project, $propal);
+                            set_public_note($object, $propal, '');
                         }
                     }
 
