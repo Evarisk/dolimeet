@@ -145,15 +145,15 @@ saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card'); ?>
         <input type="hidden" name="action" value="add_contact">
             <div id="contactsList">
                 <div class="contact-row">
-                    <input type="text" name="firstname[]" placeholder="<?php echo $langs->transnoentities('FirstName'); ?>" required>
-                    <input type="text" name="lastname[]" placeholder="<?php echo $langs->transnoentities('LastName'); ?>" required>
-                    <input type="email" name="email[]" placeholder="<?php echo $langs->transnoentities('Email'); ?>" required>
+                    <input type="text" class="firstname" name="firstname[]" placeholder="<?php echo $langs->transnoentities('FirstName'); ?>" required>
+                    <input type="text" class="lastname" name="lastname[]" placeholder="<?php echo $langs->transnoentities('LastName'); ?>" required>
+                    <input type="email" class="email" name="email[]" placeholder="<?php echo $langs->transnoentities('Email'); ?>" required>
                 </div>
             </div>
 
             <div class="public-card__footer">
-                <button type="button" class="wpeo-button btn-add" id="addContact">+ Ajouter un contact</button>
-                <button type="submit" class="wpeo-button no-load btn-save"><i class="fas fa-save"></i></button>
+                <button type="button" class="wpeo-button btn-add" id="addContact" style="width: 90%; margin-top: 10px;">+ Ajouter un contact</button>
+                <button type="submit" class="wpeo-button no-load button-disable btn-save"><i class="fas fa-save"></i></button>
             </div>
         </form>
     <?php else :

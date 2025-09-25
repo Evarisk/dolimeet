@@ -143,7 +143,7 @@ class ActionsDolimeet
 
         $objectsMetadata = saturne_get_objects_metadata();
         foreach($objectsMetadata as $objectMetadata) {
-            if ($objectMetadata['tab_type'] != $object->element) {
+            if ($objectMetadata['link_name'] != $object->element) {
                 continue;
             }
             if (strpos($parameters['context'], $objectMetadata['hook_name_card']) !== false) {
@@ -170,146 +170,6 @@ class ActionsDolimeet
                         $('#options_trainingsession_location').closest('tr').show();
                     } else {
                         $('#options_trainingsession_location').closest('tr').hide();
-                    }
-                });
-            </script>
-            <?php
-        }
-
-        if (strpos($parameters['context'], 'projectcard') !== false) {
-            // Hide extrafields for create mode
-            if (empty(GETPOST('options_trainingsession_type', 'int'))) {
-                $extrafields->attributes['projet']['hidden']['trainingsession_location'] = 1;
-            }
-
-            // Show extrafields for update mode if options_trainingsession_type is set
-            if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
-                $extrafields->attributes['projet']['hidden']['trainingsession_service']  = 0;
-                $extrafields->attributes['projet']['hidden']['trainingsession_location'] = 0;
-            }
-
-            // Disabled extrafields for view mode
-            if (empty($object->array_options['options_trainingsession_type']) && $action != 'create' && $action != 'edit') {
-                $extrafields->attributes['projet']['list']['trainingsession_type']     = 0;
-                $extrafields->attributes['projet']['list']['trainingsession_service']  = 0;
-                $extrafields->attributes['projet']['list']['trainingsession_location'] = 0;
-            }
-
-            $out  = '<div class="wpeo-notice notice-warning">';
-            $out .= '<div class="notice-content left">';
-            $out .= '<div class="notice-title">' . $langs->transnoentities('ErrorMissingTrainingSessionProjectInfo') . '</div><div class="notice-subtitle"><ul>';
-            $out .= '<li class="notice-training-session-service">' . $langs->transnoentities('TrainingSessionService') . '</li>';
-            $out .= '<li class="notice-third-party">' . $langs->transnoentities('ThirdParty') . '</li>';
-            $out .= '<li class="notice-opportunity-status">' . $langs->transnoentitie . '</li>';
-            $out .= '</ul></div></div></div>';
-
-            ?>
-            <script>
-                $(document).on('change', '#socid', function() {
-                    var type = $(this).val();
-                    if (type > 0) {
-                        $('#options_trainingsession_type').removeAttr('disabled');
-                    } else {
-                        $('#options_trainingsession_type').attr('disabled', 'disabled');
-                    }
-                });
-
-                $(document).on('change', '#options_trainingsession_type', function() {
-                    var type = $(this).val();
-                    if (type > 0) {
-                        $('#options_trainingsession_service').closest('tr').show();
-                        $('#options_trainingsession_location').closest('tr').show();
-                    } else {
-                        $('#options_trainingsession_service').closest('tr').hide();
-                        $('#options_trainingsession_location').closest('tr').hide();
-                    }
-                });
-
-                $(document).on('change', '#options_trainingsession_service', function() {
-                    let labelField      = $('input[name="title"]');
-                    let labelFieldValue = [];
-                    $.each($(this).find('option:selected'), function() {
-                        labelFieldValue.push($(this).text());
-                    });
-                    labelField.val(labelFieldValue.join(' | '));
-                    window.saturne.loader.display(labelField);
-                    setTimeout(function() {
-                        window.saturne.loader.remove(labelField);
-                    }, 1000);
-                });
-
-                $(document).ready(function(){
-                    let table = $('form table tr').eq(0);
-                    $('.field_options_trainingsession_type').insertAfter(table);
-                    $('.field_options_trainingsession_service').insertAfter('.field_options_trainingsession_type');
-                    $('.field_options_trainingsession_location').insertAfter('.field_options_trainingsession_service');
-
-                    function checkFields() {
-                        let displayNotice = 0;
-                        let notice        = $('.fiche').find('.wpeo-notice');
-                        if ($('#options_trainingsession_type').val() > 0) {
-                            let labelField = $('input[name="title"]');
-                            console.log(labelField.val())
-                            if (labelField.val().length <= 0) {
-                                displayNotice++;
-                            } else {
-                                notice.find('.notice-label').fadeOut(400, function() {
-                                    $(this).remove();
-                                });
-                            }
-
-                            let thirdPartyField = $('#socid');
-                            if (thirdPartyField.val() <= 0) {
-                                displayNotice++;
-                            } else {
-                                notice.find('.notice-third-party').fadeOut(400, function() {
-                                    $(this).remove();
-                                });
-                            }
-
-                            let opportunityStatusField = $('#opp_status');
-                            if (opportunityStatusField.val() <= 0) {
-                                displayNotice++;
-                            } else {
-                                notice.find('.notice-opportunity-status').fadeOut(400, function() {
-                                    $(this).remove();
-                                });
-                            }
-
-                            let opportunityPercentField = $('#opp_percent');
-                            if (opportunityPercentField.val().length <= 0) {
-                                displayNotice++;
-                            }
-
-                            let trainingSessionServiceField = $('#options_trainingsession_service');
-                            if (trainingSessionServiceField.val() <= 0) {
-                                displayNotice++;
-                            } else {
-                                notice.find('.notice-training-session-service').fadeOut(400, function() {
-                                    $(this).remove();
-                                });
-                            }
-
-                            if (displayNotice > 0 && notice.length == 0) {
-                                $('.button-save').prop('disabled', true);
-                                $('.fiche').prepend(<?php echo json_encode($out); ?>);
-                            } else if (displayNotice == 0) {
-                                $('.button-save').prop('disabled', false);
-                                notice.fadeOut(400, function() {
-                                    $(this).remove();
-                                });
-                            }
-                        } else {
-                            $('.button-save').prop('disabled', false);
-                            notice.fadeOut(400, function() {
-                                $(this).remove();
-                            });
-                        }
-                    }
-
-                    setInterval(checkFields, 1000);
-                    if ($('#socid').val() < 0) {
-                        $('#options_trainingsession_type').attr('disabled', 'disabled');
                     }
                 });
             </script>
@@ -349,13 +209,13 @@ class ActionsDolimeet
 
         $objectsMetadata = saturne_get_objects_metadata();
         foreach($objectsMetadata as $objectMetadata) {
-            if ($objectMetadata['tab_type'] != $object->element) {
+            if ($objectMetadata['link_name'] != $object->element) {
                 continue;
             }
             if (strpos($parameters['context'], $objectMetadata['hook_name_list']) !== false) {
                 $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
                 $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-                $extraFieldsNames = ['label', 'trainingsession_type', 'trainingsession_service', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
+                $extraFieldsNames = ['trainingsession_type', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
                 foreach ($extraFieldsNames as $extraFieldsName) {
                     if (isset($extrafields->attributes[$object->table_element]['label'][$extraFieldsName])) {
                         $extrafields->attributes[$object->table_element]['label'][$extraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes[$object->table_element]['label'][$extraFieldsName]);
@@ -736,6 +596,24 @@ class ActionsDolimeet
                     </script>
                     <?php
                 }
+            }
+        }
+
+        if (strpos($parameters['context'], 'propalcard') !== false) {
+            global $object;
+
+            if ($object->array_options['options_trainingsession_type'] == 1) {
+                require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
+
+                $productIds = trainingsession_function_lib1();
+                $out = Form::selectarray('idprod', $productIds, '', 1, 0, 0, '', 0, 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                ?>
+                <script>
+                    $(document).ready(function() {
+                        $('#idprod').replaceWith(<?php echo json_encode($out); ?>);
+                    });
+                </script>
+                <?php
             }
         }
 

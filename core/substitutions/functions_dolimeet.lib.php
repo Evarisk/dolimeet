@@ -47,6 +47,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 
         // Load DoliMeet libraries
         require_once __DIR__ . '/../../class/session.class.php';
+        require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
 
         saturne_load_langs();
 
@@ -79,7 +80,18 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
             }
         }
 
-        $substitutionarray['__DOLIMEET_CONTRACT_LABEL__']                    = $object->array_options['options_label'];
+        $productIds = trainingsession_function_lib1();
+
+        $formationTitle = '';
+        foreach ($object->lines as $line) {
+            if (!in_array($line->fk_product, array_keys($productIds))) {
+                continue;
+            }
+
+            $formationTitle .= $line->product_label;
+        }
+
+        $substitutionarray['__DOLIMEET_CONTRACT_LABEL__']                    = $formationTitle;
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_TYPE__']     = $object->array_options['options_trainingsession_type'];
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_LOCATION__'] = $object->array_options['options_trainingsession_location'];
 

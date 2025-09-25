@@ -159,20 +159,18 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 break;
 
             case 'TRAININGSESSION_VALIDATE' :
-                if ($object->fk_project > 0 && $object->fk_contrat > 0) {
+                if ($object->fk_contrat > 0) {
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
-                    $project  = new Project($this->db);
                     $contract = new Contrat($this->db);
 
                     $contract->fetch($object->fk_contrat);
                     $contract->fetchObjectLinked(null, 'propal', $contract->id, 'contrat');
-                    if (isset($contract->linkedObjects['propal']) && !empty($contract->linkedObjects['propal']) && count($contract->linkedObjects['propal']) == 1) {
-                        $project->fetch($object->fk_project);
 
+                    if (!empty($contract->linkedObjects['propal']) && count($contract->linkedObjects['propal']) == 1) {
                         $propal = array_shift($contract->linkedObjects['propal']);
-                        set_public_note($contract, $project, $propal);
+                        set_public_note($contract, $propal);
                     }
                 }
                 break;
@@ -307,17 +305,30 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     if (isset($object->linked_objects['propal']) && !empty($object->linked_objects['propal'])) {
                         // Load DoliMeet libraries
                         require_once __DIR__ . '/../../class/trainingsession.class.php';
+                        require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
 
                         $trainingSession = new Trainingsession($this->db);
 
-                        $propal->fetch($object->linked_objects['propal']);
-                        if (strpos($propal->array_options['options_trainingsession_service'], ',') === false) {
-                            $propal->array_options['options_trainingsession_service'] = explode(',', $propal->array_options['options_trainingsession_service']);
+                        $productIds = trainingsession_function_lib1();
+                        if (!is_array($productIds) || empty($productIds)) {
+                            setEventMessages($langs->transnoentities('ErrorMissingFormationServiceConfig'), [], 'errors');
+                            return -1;
                         }
-                        foreach ($propal->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
-                            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $trainingSessionServiceId]);
-                            if (!is_array($trainingSessions) || empty($trainingSessions)) {
+
+                        $propal->fetch($object->linked_objects['propal']);
+                        if (!is_array($propal->lines) || empty($propal->lines)) {
+                            setEventMessages($langs->transnoentities('Error1'), [], 'errors');
+                            return -1;
+                        }
+                        foreach ($propal->lines as $line) {
+                            if (!in_array($line->fk_product, array_keys($productIds))) {
                                 continue;
+                            }
+
+                            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . $line->fk_product]);
+                            if (!is_array($trainingSessions) || empty($trainingSessions)) {
+                                setEventMessages($langs->transnoentities('Error2'), [], 'errors');
+                                return -1;
                             }
 
                             foreach ($trainingSessions as $trainingSession) {
@@ -332,12 +343,11 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $trainingSession->fk_project    = $object->fk_project;
                                 $trainingSession->fk_contrat    = $object->id;
 
-                               $trainingSession->create($user);
+                                $trainingSession->create($user);
                             }
                         }
 
-                        $project->fetch($object->fk_project);
-                        set_public_note($object, $project, $propal);
+                        set_public_note($object, $propal, 'CONTRACT_CREATE');
                     }
                 }
                 break;

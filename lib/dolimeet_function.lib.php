@@ -94,36 +94,83 @@ function get_formation_service(): array
  * Set public note on project/propal/contract
  *
  * @param CommonObject $object  Object
- * @param Project|null $project Project object (optional)
  * @param Propal|null  $propal  Propal object (optional)
  *
  * @throws Exception
  */
-function set_public_note(CommonObject $object, Project $project = null, Propal $propal = null)
+function set_public_note(CommonObject $object, Propal $propal = null, $triggerKey = '')
 {
     global $db, $langs;
 
+    require_once __DIR__ . '/../class/trainingsession.class.php';
+    require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
+
+    $trainingSession = new Trainingsession($db);
+
+    $productIds = trainingsession_function_lib1();
+    if (!is_array($productIds) || empty($productIds)) {
+        setEventMessages($langs->transnoentities('Error3'), [], 'errors');
+        return -1;
+    }
+
+    $object->fetch_lines();
+    if (!is_array($object->lines) || empty($object->lines)) {
+        setEventMessages($langs->transnoentities('Error1'), [], 'errors');
+        return -1;
+    }
+
+    $formationTitle  = '';
     $nbTrainees      = 0;
     $durations       = 0;
     $publicNotePart2 = '';
-    if (isset($project->array_options['options_trainingsession_service']) && !empty($project->array_options['options_trainingsession_service'])) {
-        // Load DoliMeet libraries
-        require_once __DIR__ . '/../class/trainingsession.class.php';
+    if ($triggerKey == 'CONTRACT_CREATE') {
+        foreach ($propal->lines as $line) {
+            if (!in_array($line->fk_product, array_keys($productIds))) {
+                continue;
+            }
 
-        $trainingSession = new Trainingsession($db);
-
-        $project->array_options['options_trainingsession_service'] = explode(',', $project->array_options['options_trainingsession_service']);
-        foreach ($project->array_options['options_trainingsession_service'] as $trainingSessionServiceId) {
             if ($object->element === 'contrat') {
-                $filter = 't.status = 1 AND t.fk_contrat = ' . $object->id;
+                $filter = 't.fk_contrat = ' . $object->id;
             } else {
-                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $trainingSessionServiceId;
+                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product;
             }
 
             $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
             if (!is_array($trainingSessions) || empty($trainingSessions)) {
                 continue;
             }
+
+            $formationTitle .= $line->product_label;
+
+            $nbTrainees += count($trainingSessions);
+            foreach ($trainingSessions as $trainingSession) {
+                $durations += $trainingSession->duration;
+                if ($object->element == 'contrat') {
+                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
+                } else {
+                    $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
+                }
+                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
+            }
+        }
+    } else {
+        foreach ($object->lines as $line) {
+            if (!in_array($line->fk_product, array_keys($productIds))) {
+                continue;
+            }
+
+            if ($object->element === 'contrat') {
+                $filter = 't.fk_contrat = ' . $object->id;
+            } else {
+                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product;
+            }
+
+            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
+            if (!is_array($trainingSessions) || empty($trainingSessions)) {
+                continue;
+            }
+
+            $formationTitle .= $line->label;
 
             $nbTrainees += count($trainingSessions);
             foreach ($trainingSessions as $trainingSession) {
@@ -140,17 +187,15 @@ function set_public_note(CommonObject $object, Project $project = null, Propal $
 
     // Part 1 - General information
     $object->note_public  = $langs->transnoentities('FormationInfoTitle') . '<br />';
-    $object->note_public .= $langs->transnoentities('FormationTitle') . ' : ' . $project->title . '<br />';
-    $object->note_public .= $langs->transnoentities('TrainingSessionType') . ' : ' . $langs->transnoentities(getDictionaryValue('c_trainingsession_type', 'ref', $project->array_options['options_trainingsession_type'])) . '<br />';
+    $object->note_public .= $langs->transnoentities('FormationTitle') . ' : ' . $formationTitle . '<br />';
+    $object->note_public .= $langs->transnoentities('TrainingSessionType') . ' : ' . $langs->transnoentities(getDictionaryValue('c_trainingsession_type', 'ref', $object->array_options['options_trainingsession_type'])) . '<br />';
     $object->note_public .= $langs->transnoentities('TrainingSessionDurations') . ' : <strong>' . convertSecondToTime($durations, 'allhourmin') . '</strong>' . ' ' . dol_strtolower($langs->transnoentities('Hours')) . '<br />';
-    $object->note_public .= $langs->transnoentities('TrainingSessionLocation') . ' : ' . (dol_strlen($project->array_options['options_trainingsession_location']) > 0  ? $project->array_options['options_trainingsession_location'] : $langs->transnoentities('NoData')) . '<br />';
+    $object->note_public .= $langs->transnoentities('TrainingSessionLocation') . ' : ' . (dol_strlen($object->array_options['options_trainingsession_location']) > 0  ? $object->array_options['options_trainingsession_location'] : $langs->transnoentities('NoData')) . '<br />';
 
     // Part 2 - Training sessions
-    if (isset($project->array_options['options_trainingsession_service']) && !empty($project->array_options['options_trainingsession_service'])) {
-        $object->note_public .= '<br />' . $langs->transnoentities('TrainingSessionTitle') . '<br />';
-        $object->note_public .= $langs->transnoentities('TrainingSessionsInclusiveWriting', $nbTrainees) . ' : ' . '<br />';
-        $object->note_public .= $publicNotePart2;
-    }
+    $object->note_public .= '<br />' . $langs->transnoentities('TrainingSessionTitle') . '<br />';
+    $object->note_public .= $langs->transnoentities('TrainingSessionsInclusiveWriting', $nbTrainees) . ' : ' . '<br />';
+    $object->note_public .= $publicNotePart2;
 
     // Part 3 - Trainee list
     $internalTrainee = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');

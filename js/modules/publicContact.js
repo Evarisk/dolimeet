@@ -53,6 +53,7 @@ window.dolimeet.publicContact.init = function init() {
 window.dolimeet.publicContact.event = function initializeEvents() {
   $(document).on('click', '#addContact', window.dolimeet.publicContact.addContactRow);
   $(document).on('click', '.remove-btn', window.dolimeet.publicContact.removeContactRow);
+  $(document).on('input', '.firstname, .lastname, .email', window.dolimeet.publicContact.updateButtonState);
 };
 
 /**
@@ -66,9 +67,9 @@ window.dolimeet.publicContact.event = function initializeEvents() {
 window.dolimeet.publicContact.addContactRow = function addContactRow() {
   const newRow = `
     <div class="contact-row">
-        <input type="text" name="firstname[]" placeholder="Prénom" required>
-        <input type="text" name="lastname[]" placeholder="Nom" required>
-        <input type="email" name="email[]" placeholder="Email" required>
+        <input type="text" class="firstname" name="firstname[]" placeholder="Prénom" required>
+        <input type="text" class="lastname" name="lastname[]" placeholder="Nom" required>
+        <input type="email" class="email" name="email[]" placeholder="Email" required>
         <button type="button" class="wpeo-button button-grey remove-btn"><i class="fas fa-times"></i></button>
     </div>`;
   $('#contactsList').append(newRow);
@@ -88,5 +89,38 @@ window.dolimeet.publicContact.removeContactRow = function removeContactRow() {
 
   if ($contactRow.length > 1) {
     $this.closest('.contact-row').remove();
+  }
+};
+
+/**
+ * Update modal risk assessment add/update button state for a given modal.
+ *
+ * @since   21.3.0
+ * @version 21.3.0
+ *
+ * @param  {jQuery} $modal The jQuery object of the modal to target.
+ * @return {void}
+ */
+window.dolimeet.publicContact.updateButtonState = function updateButtonState() {
+  let allLinesFilled = true;
+
+  // Pour chaque ligne de contact
+  $(".contact-row").each(function () {
+    let firstname = $.trim($(this).find('.firstname').val());
+    let lastname = $.trim($(this).find('.lastname').val());
+    let email = $.trim($(this).find('.email').val());
+
+    if (firstname === "" || lastname === "" || email === "") {
+      allLinesFilled = false;
+      return false; // stoppe la boucle si une ligne est incomplète
+    }
+  });
+
+  $(".btn-save").prop("disabled", !allLinesFilled);
+
+  if (allLinesFilled) {
+    $(".btn-save").removeClass('button-disable').prop('disabled', false);
+  } else {
+    $(".btn-save").addClass('button-disable').prop('disabled', true);
   }
 };
