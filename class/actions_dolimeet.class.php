@@ -338,7 +338,7 @@ class ActionsDolimeet
                 $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
-                $contactsCodeWanted = ['BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+                $contactsCodeWanted = ['SESSIONTRAINER', 'TRAINEE', 'CUSTOMER', 'BILLING'];
 
                 $object->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
 
@@ -358,7 +358,7 @@ class ActionsDolimeet
                                             $survey->fetch($surveyID);
                                             $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                            $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' - ' .  $signatory->getLibStatut(3);
+                                            $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $signatory->getLibStatut(3);
                                             $outputLine[$contact['rowid']] .= '</td>';
                                             break;
                                         } else {

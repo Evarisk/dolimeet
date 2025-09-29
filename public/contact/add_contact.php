@@ -57,7 +57,7 @@ require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
 // Global variables definitions
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs;
 
 // Load translation files required by the page
 saturne_load_langs(['users']);
@@ -69,6 +69,7 @@ $action = GETPOST('action', 'aZ09');
 // Initialize technical objects
 $object  = new Contrat($db);
 $contact = new Contact($db);
+$user    = new User($db);
 
 $object->fetch($id);
 $object->fetchProject();
@@ -88,7 +89,7 @@ if (empty($resHook)) {
         $error = 0;
 
         $firstNames = GETPOST('firstname', 'array');
-        $lastNames  = GETPOST('firstname', 'array');
+        $lastNames  = GETPOST('lastname', 'array');
         $emails     = GETPOST('email', 'array');
 
         $object->fetch($id);
@@ -104,7 +105,9 @@ if (empty($resHook)) {
 
             $result = $contact->create($user);
             if ($result > 0) {
-                $object->restrictiononfksoc = 0; // We disable the restriction on fk_soc to be able to add contact linked to third party of contract
+                $object->restrictiononfksoc                 = 0; // We disable the restriction on fk_soc to be able to add contact linked to third party of contract
+                $object->context['createformpubliccontact'] = 'createformpubliccontact';
+                $object->contact_id                         = $result;
                 $result = $object->add_contact($result, 'TRAINEE');
                 if ($result < 0) {
                     $error++;

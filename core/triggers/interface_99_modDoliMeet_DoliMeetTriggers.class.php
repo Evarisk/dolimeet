@@ -179,7 +179,12 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
 
-                    if (GETPOST('userid')) {
+                    $contactCode = '';
+                    if ($object->context['createformpubliccontact'] ?? '' === 'createformpubliccontact') {
+                        $contactID     = $object->contact_id;
+                        $contactSource = 'external';
+                        $contactCode   = 'TRAINEE';
+                    } elseif (GETPOST('userid')) {
                         $contactID     = GETPOST('userid');
                         $contactSource = 'internal';
                     } else {
@@ -187,11 +192,13 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         $contactSource = 'external';
                     }
 
-                    $contactTypeID = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
-                    $contactCode   = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
+                    if (empty($contactCode)) {
+                        $contactTypeID = (GETPOST('typecontact') ? GETPOST('typecontact') : GETPOST('type'));
+                        $contactCode   = dol_getIdFromCode($this->db, $contactTypeID, 'c_type_contact', 'rowid', 'code');
+                    }
 
                     if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
-                        $contactsCodeWanted = ['BILLING', 'TRAINEE', 'SESSIONTRAINER', 'OPCO'];
+                        $contactsCodeWanted = ['SESSIONTRAINER', 'TRAINEE', 'CUSTOMER', 'BILLING'];
                         if (in_array($contactCode, $contactsCodeWanted) && !empty($contactID)) {
                             set_satisfaction_survey($object, $contactCode, $contactID, $contactSource);
                         }

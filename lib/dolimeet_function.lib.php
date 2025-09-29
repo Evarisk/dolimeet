@@ -32,13 +32,14 @@
  */
 function set_satisfaction_survey(CommonObject $object, string $contactCode, int $contactID, string $contactSource)
 {
-    global $conf, $db, $user;
+    global $conf, $db;
 
     // Load DigiQuali libraries
     require_once __DIR__ . '/../../digiquali/class/survey.class.php';
     require_once __DIR__ . '/../../digiquali/lib/digiquali_sheet.lib.php';
 
     $survey = new Survey($db);
+    $user   = new User($db);
 
     $confName             = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
     $survey->fk_sheet     = $conf->global->$confName;
