@@ -24,6 +24,8 @@
  *       			TODO Rename into updatestatus.php
  */
 
+ob_start();
+
 if (!defined('NOTOKENRENEWAL')) {
     define('NOTOKENRENEWAL', '1'); // Disables token renewal
 }
@@ -55,6 +57,8 @@ $rowid = GETPOSTINT('rowid');
 /*
  * View
  */
+
+top_httphead();
 
 print '<!-- Ajax page called with url '.dol_escape_htmltag($_SERVER["PHP_SELF"]).'?'.dol_escape_htmltag($_SERVER["QUERY_STRING"]).' -->'."\n";
 
