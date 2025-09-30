@@ -273,7 +273,9 @@ CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en p
 
 
 # Public interface - Interface publique
-PublicAddContact = Contact - Page publique
+PublicAddContact     = Contact - Page publique
+ContactsAdded        = Contacts ajoutés
+ContactsAlreadyAdded = Contacts déjà ajoutés
 
 
 

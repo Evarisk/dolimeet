@@ -94,9 +94,26 @@ if (empty($resHook)) {
 
         $object->fetch($id);
 
-//        $contacts = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
-//        echo '<pre>'; print_r( $contacts ); echo '</pre>'; exit;
+        $nbContactsAlreadyAdded = 0;
+        $contactsAlreadyAdded   = $langs->trans('ContactsAlreadyAdded') . ' : <br>';
+        $contacts               = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
+        foreach ($contacts as $contactSingle) {
+            if (in_array($contactSingle['email'], $emails)) {
+                $key = array_search($contactSingle['email'], $emails);
+                unset($firstNames[$key]);
+                unset($lastNames[$key]);
+                unset($emails[$key]);
+                $nbContactsAlreadyAdded++;
+                $contactsAlreadyAdded .= $contactSingle['firstname'] . ' ' . $contactSingle['lastname'] . ' (' . $contactSingle['email'] . ')' . '<br>';
+            }
+        }
 
+        if ($nbContactsAlreadyAdded > 0) {
+            setEventMessages($contactsAlreadyAdded, null, 'warnings');
+        }
+
+        $nbContacts    = 0;
+        $contactsAdded = $langs->trans('ContactsAdded') . ' : <br>';
         for ($i = 0; $i < count($firstNames); $i++) {
             $contact->firstname = $firstNames[$i];
             $contact->lastname  = $lastNames[$i];
@@ -109,6 +126,8 @@ if (empty($resHook)) {
                 $object->context['createformpubliccontact'] = 'createformpubliccontact';
                 $object->contact_id                         = $result;
                 $result = $object->add_contact($result, 'TRAINEE');
+                $nbContacts++;
+                $contactsAdded .= $contact->firstname . ' ' . $contact->lastname . ' (' . $contact->email . ')' . '<br>';
                 if ($result < 0) {
                     $error++;
                     setEventMessages($object->error, $object->errors, 'errors');
@@ -119,8 +138,8 @@ if (empty($resHook)) {
             }
         }
 
-        if (empty($error)) {
-            setEventMessages('ContactsAdded', null);
+        if (empty($error) && $nbContacts > 0) {
+            setEventMessages($contactsAdded, null);
             header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id);
             exit;
         }
