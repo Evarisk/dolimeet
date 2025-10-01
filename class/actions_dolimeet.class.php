@@ -931,7 +931,7 @@ class ActionsDolimeet
                     }
                 }
 
-                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '" target="_blank"><button class="wpeo-button no-load">Interface Publique</button></a>';
+                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank"><button class="wpeo-button no-load">Interface Publique</button></a>';
 
                 $this->resprints = $moreHtmlStatus;
             }
