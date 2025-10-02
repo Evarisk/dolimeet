@@ -764,7 +764,7 @@ class ActionsDolimeet
             return 0;
         }
 
-        global $langs, $sourcefile, $online_sign_name, $upload_dir, $filename, $newpdffilename;
+        global $langs, $sourcefile, $online_sign_name, $upload_dir, $filename, $newpdffilename, $user;
 
         // We build the new PDF
         $pdf = pdf_getInstance();
@@ -838,6 +838,8 @@ class ActionsDolimeet
 
         // Index the new file and update the last_main_doc property of object.
         $object->indexFile($newpdffilename, 1);
+
+        $object->setSignedStatus($user, Contrat::$SIGNED_STATUSES['STATUS_SIGNED_ALL'], 0, 'CONTRACT_MODIFY');
 
         return 1; // or return 1 to replace standard code
     }
