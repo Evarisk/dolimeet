@@ -779,6 +779,13 @@ class ActionsDolimeet
         }
 
         //$pdf->Open();
+        $last_main_doc_file = $object->last_main_doc;
+
+        if (preg_match('/\.pdf/i', $last_main_doc_file)) {
+            $ref_pdf = pathinfo($last_main_doc_file, PATHINFO_FILENAME); // Retrieves the name of external or internal PDF
+            $sourcefile = $upload_dir . $ref_pdf . ".pdf";
+        }
+
         $pagecount = $pdf->setSourceFile($sourcefile);        // original PDF
 
         $param = array();
