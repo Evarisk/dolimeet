@@ -679,9 +679,9 @@ class modDoliMeet extends DolibarrModules
         ];
 
         $extraFieldsArrays = [
-            'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',                   'elementtype' => ['contrat', 'propal', 'projet'], 'position' => $this->numero . 20, 'params' => ['c_trainingsession_type:label:rowid::(active:=:1)' => NULL], 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'moreparams' => ['css' => 'minwidth100 maxwidth300']],
-            'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],                     'position' => $this->numero . 40,                                                                           'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'moreparams' => ['css' => 'minwidth100 maxwidth300']],
-            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',                   'elementtype' => ['contrat'],                     'position' => $this->numero . 50, 'alwayseditable' => 1,                                                    'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp'],
+            'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',                   'elementtype' => ['contrat', 'propal'], 'position' => $this->numero . 20, 'params' => ['c_trainingsession_type:label:rowid::(active:=:1)' => NULL], 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat'],           'position' => $this->numero . 40,                                                                           'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',                   'elementtype' => ['contrat'],           'position' => $this->numero . 50, 'alwayseditable' => 1,                                                    'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp'],
 
             'syllabus' => ['Label' => 'Syllabus', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 60, 'alwayseditable' => 1, 'list' => 4, 'help' => 'SyllabusHelp']
         ];
@@ -706,8 +706,10 @@ class modDoliMeet extends DolibarrModules
             dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
         } elseif (getDolGlobalInt('DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 1) {
             $extraFieldsArrays = [
-                'label'                     => ['elementtype' => ['contrat']],
-                'trainingsession_service'   => ['elementtype' => ['propal', 'projet']],
+                'label'                    => ['elementtype' => ['contrat']],
+                'trainingsession_service'  => ['elementtype' => ['propal', 'projet']],
+                'trainingsession_type'     => ['elementtype' => ['projet']],
+                'trainingsession_location' => ['elementtype' => ['projet']],
             ];
 
             require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
