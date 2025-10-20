@@ -454,6 +454,17 @@ if ($source == 'proposal') {
     print '<b>'.$object->thirdparty->name.'</b>';
     print '</td></tr>'."\n";
 
+//    require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+//
+//    $contact = new Contact($db);
+//    $contact->fetch($contactid);
+//    echo '<pre>'; print_r(  $contact); echo '</pre>'; exit;
+//    print '<tr class="CTableRow2"><td class="CTableRow2">'.$langs->trans("Contact");
+//    print '</td><td class="CTableRow2">';
+//    print img_picto('', 'company', 'class="pictofixedwidth"');
+//    print '<b>'.$contact->getNomUrl(1).'</b>';
+//    print '</td></tr>'."\n";
+
     // Object
     $text = '<b>'.$langs->trans("SignatureContractRef", $object->ref).'</b>';
     print '<tr class="CTableRow2"><td class="CTableRow2">'.$langs->trans("Designation");
@@ -751,10 +762,10 @@ if ($action == "dosign" && empty($cancel)) {
 				var name = document.getElementById("name").value;
 				$.ajax({
 					type: "POST",
-					url: \''.DOL_URL_ROOT.'/core/ajax/onlineSign.php\',
+					url: \''.DOL_URL_ROOT.'/custom/dolimeet/core/ajax/onlineSign2.php\',
 					dataType: "text",
 					data: {
-						"action" : \'importSignature\',
+						"action" : \'importSignature2\',
 						"token" : \''.newToken().'\',
 						"signaturebase64" : signature,
 						"onlinesignname" : name,
