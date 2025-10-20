@@ -347,11 +347,14 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $trainingSession->fk_contrat    = $object->id;
 
                                 $trainingSession->create($user);
+                                $trainingSession->validate($user);
                             }
                         }
 
                         set_public_note($object, $propal, 'CONTRACT_CREATE');
                     }
+
+                    $object->validate($user);
                 }
                 break;
         }

@@ -165,6 +165,14 @@ saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card'); ?>
             </div>
         </div>
 
+        <?php $contacts = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
+        foreach ($contacts as $contactSingle) : ?>
+            <div class="existing-contact">
+                <span class="contact-name"><?php echo img_picto('', 'contact', 'class="pictofixedwith paddingright"') . $contactSingle['firstname'] . ' ' . $contactSingle['lastname']; ?></span>
+                <span class="contact-email"><?php echo $contactSingle['email']; ?></span>
+            </div>
+        <?php endforeach; ?>
+
         <form id="contactsForm" method="POST" action="<?php echo $_SERVER['PHP_SELF'] . '?id=' . $id; ?>">
         <input type="hidden" name="token" value="<?php echo newToken(); ?>">
         <input type="hidden" name="action" value="add_contact">

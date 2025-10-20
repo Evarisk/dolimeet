@@ -897,10 +897,38 @@ class ActionsDolimeet
         if (preg_match('/contractcard|contractcontactcard/', $parameters['context'])) {
             if (!empty($object->array_options['options_trainingsession_type'])) {
                 $contactRoles = [
-                    'sessiontrainer' => ['source' => 'both',     'notice' => 'warning', 'picto' => 'user-tie',            'tradForNotFound' => 'ObjectNotFound'],
-                    'trainee'        => ['source' => 'both',     'notice' => 'warning', 'picto' => 'user-graduate',       'tradForNotFound' => 'ObjectNotFound'],
-                    'billing'        => ['source' => 'external', 'notice' => 'warning', 'picto' => 'file-invoice-dollar', 'tradForNotFound' => 'BillingTypeContactObjectNotFound'],
-                    'customer'       => ['source' => 'external', 'notice' => 'warning', 'picto' => 'building',            'tradForNotFound' => 'CustomerTypeContactObjectNotFound'],
+                    'sessiontrainer' => [
+                        'source'           => 'both',
+                        'notice'           => 'warning',
+                        'color'            => '#e9ad4f',
+                        'picto'            => 'user-tie',
+                        'tradForNotFound'  => 'ObjectNotFound',
+                        'numberOfContacts' => 0
+                    ],
+                    'trainee' => [
+                        'source'           => 'both',
+                        'notice'           => 'warning',
+                        'color'            => '#e9ad4f',
+                        'picto'            => 'user-graduate',
+                        'tradForNotFound'  => 'ObjectNotFound',
+                        'numberOfContacts' => 0
+                    ],
+                    'billing' => [
+                        'source'           => 'external',
+                        'notice'           => 'warning',
+                        'color'            => '#e9ad4f',
+                        'picto'            => 'file-invoice-dollar',
+                        'tradForNotFound'  => 'BillingTypeContactObjectNotFound',
+                        'numberOfContacts' => 0
+                    ],
+                    'customer' => [
+                        'source'           => 'external',
+                        'notice'           => 'warning',
+                        'color'            => '#e9ad4f',
+                        'picto'            => 'building',
+                        'tradForNotFound'  => 'CustomerTypeContactObjectNotFound',
+                        'numberOfContacts' => 0
+                    ],
                 ];
                 foreach ($contactRoles as $contactRole => $contactInfos) {
                     $contacts = [];
@@ -913,12 +941,14 @@ class ActionsDolimeet
                     } else {
                         $contacts = $object->liste_contact(-1, $contactInfos['source'], 0, dol_strtoupper($contactRole));
                     }
-                    if (is_array($contacts) && empty($contacts)) {
-                        if ($object->array_options['options_trainingsession_opco_financing'] == 1 && $contactRole == 'opco') {
-                            $contactInfos['notice'] = 'warning';
-                        }
-                        $contactsNoticeByRoles[$contactInfos['notice']][$contactRole] = $contactInfos;
+                    $contactInfos['numberOfContacts'] = is_array($contacts) ? count($contacts) : 0;
+                    if ($contactInfos['numberOfContacts'] > 0) {
+                        $contactInfos['color'] = '#47e58e';
                     }
+                    if ($object->array_options['options_trainingsession_opco_financing'] == 1 && $contactRole == 'opco') {
+                        $contactInfos['notice'] = 'warning';
+                    }
+                    $contactsNoticeByRoles[$contactInfos['notice']][$contactRole] = $contactInfos;
                 }
 
                 $form = new Form($this->db);
@@ -926,7 +956,7 @@ class ActionsDolimeet
                 $moreHtmlStatus = '';
                 if (!empty($contactsNoticeByRoles)) {
                     foreach ($contactsNoticeByRoles as $contactNoticeType => $contactRoles) {
-                        $moreHtmlStatus .= '<div class="wpeo-notice notice-' . $contactNoticeType . '">';
+                        $moreHtmlStatus .= '<div class="wpeo-notice">';
                         $moreHtmlStatus .= '<div class="notice-content">';
                         $moreHtmlStatus .= '<div class="notice-subtitle">';
                         foreach ($contactRoles as $contactRole => $role) {
@@ -934,7 +964,8 @@ class ActionsDolimeet
                                 $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
                                 continue;
                             }
-                            $moreHtmlStatus .= '<span class="marginrightonly">' . $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $role['picto'] . '_fas__2em'), $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole)))) . '</span>';
+                            $moreHtmlStatus .= '<span class="marginrightonly">' . $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $role['picto'] . '_fas_' . $role['color'] . '_2em' ), $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole)))) . '</span>';
+                            $moreHtmlStatus .= '<span class="">' . $role['numberOfContacts'] . '</span>';
                         }
                         $moreHtmlStatus .= '</div></div></div>';
                     }

@@ -65,7 +65,7 @@ function get_formation_service(): array
 {
     return [
         [
-            'position' => 10,
+            'position' => 1,
             'code'     => 'DOLIMEET_SERVICE_TRAINING_CONTRACT',
             'ref'      => 'FOR_ADM_CF1',
             'name'     => 'TrainingContract'
@@ -101,7 +101,7 @@ function get_formation_service(): array
  */
 function set_public_note(CommonObject $object, Propal $propal = null, $triggerKey = '')
 {
-    global $db, $langs;
+    global $conf, $db, $langs;
 
     require_once __DIR__ . '/../class/trainingsession.class.php';
     require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
@@ -222,6 +222,42 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
         $object->note_public .= '<li>' . $langs->transnoentities('AmountTTC') . ' : ' . price($propal->total_ttc, 0, '', 1, -1, -1, 'auto') . '</li></ul>';
     }
 
-    $object->setValueFrom('note_public', $object->note_public);
+    $result_update = $object->update_note(dol_html_entity_decode($object->note_public, ENT_QUOTES | ENT_HTML5, 'UTF-8', 1), '_public');
+
+    if ($result_update < 0) {
+        setEventMessages($object->error, $object->errors, 'errors');
+    } elseif (in_array($object->table_element, array('supplier_proposal', 'propal', 'commande_fournisseur', 'commande', 'facture_fourn', 'facture', 'contrat'))) {
+        // Define output language
+        if (!getDolGlobalString('MAIN_DISABLE_PDF_AUTOUPDATE')) {
+            $outputlangs = $langs;
+            $newlang = '';
+            if (getDolGlobalInt('MAIN_MULTILANGS') /* && empty($newlang) */ && GETPOST('lang_id', 'aZ09')) {
+                $newlang = GETPOST('lang_id', 'aZ09');
+            }
+            if (getDolGlobalInt('MAIN_MULTILANGS') && empty($newlang)) {
+                if (!is_object($object->thirdparty)) {
+                    $object->fetch_thirdparty();
+                }
+                $newlang = $object->thirdparty->default_lang;
+            }
+            if (!empty($newlang)) {
+                $outputlangs = new Translate("", $conf);
+                $outputlangs->setDefaultLang($newlang);
+            }
+            $model = $object->model_pdf;
+            $hidedetails = (GETPOSTINT('hidedetails') ? GETPOSTINT('hidedetails') : (getDolGlobalString('MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS') ? 1 : 0));
+            $hidedesc = (GETPOSTINT('hidedesc') ? GETPOSTINT('hidedesc') : (getDolGlobalString('MAIN_GENERATE_DOCUMENTS_HIDE_DESC') ? 1 : 0));
+            $hideref = (GETPOSTINT('hideref') ? GETPOSTINT('hideref') : (getDolGlobalString('MAIN_GENERATE_DOCUMENTS_HIDE_REF') ? 1 : 0));
+
+            //see #21072: Update a public note with a "document model not found" is not really a problem : the PDF is not created/updated
+            //but the note is saved, so just add a notification will be enough
+
+            $resultGenDoc = $object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
+
+            if ($resultGenDoc < 0) {
+                setEventMessages($object->error, $object->errors, 'warnings');
+            }
+        }
+    }
 }
 
