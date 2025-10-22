@@ -964,14 +964,16 @@ class ActionsDolimeet
                                 $moreHtmlStatus .= $langs->transnoentities('OpcoInfo', $langs->transnoentities(ucfirst($contactRole))) . '<br>';
                                 continue;
                             }
-                            $moreHtmlStatus .= '<span class="marginrightonly">' . $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $role['picto'] . '_fas_' . $role['color'] . '_2em' ), $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole)))) . '</span>';
-                            $moreHtmlStatus .= '<span class="">' . $role['numberOfContacts'] . '</span>';
+                            $moreHtmlStatus .= '<span class="marginrightonly" style="display: inline-block; position: relative;">';
+                            $moreHtmlStatus .= '<span>' . $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $role['picto'] . '_fas_' . $role['color'] . '_2em' ), $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole)))) . '</span>';
+                            $moreHtmlStatus .= '<span class="" style="position: absolute; top: -5px; right: 3px;">' . $role['numberOfContacts'] . '</span>';
+                            $moreHtmlStatus .= '</span>';
                         }
                         $moreHtmlStatus .= '</div></div></div>';
                     }
                 }
 
-                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank"><button class="wpeo-button no-load">Interface Publique</button></a>';
+                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
 
                 $this->resprints = $moreHtmlStatus;
             }
