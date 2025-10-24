@@ -903,6 +903,7 @@ class ActionsDolimeet
                         'color'            => '#e9ad4f',
                         'picto'            => 'user-tie',
                         'tradForNotFound'  => 'ObjectNotFound',
+                        'tradFound'        => 'TradFoundSessionTrainer',
                         'numberOfContacts' => 0
                     ],
                     'trainee' => [
@@ -911,6 +912,7 @@ class ActionsDolimeet
                         'color'            => '#e9ad4f',
                         'picto'            => 'user-graduate',
                         'tradForNotFound'  => 'ObjectNotFound',
+                        'tradFound'        => 'TradFoundTrainee',
                         'numberOfContacts' => 0
                     ],
                     'billing' => [
@@ -919,6 +921,7 @@ class ActionsDolimeet
                         'color'            => '#e9ad4f',
                         'picto'            => 'file-invoice-dollar',
                         'tradForNotFound'  => 'BillingTypeContactObjectNotFound',
+                        'tradFound'        => 'TradFoundBilling',
                         'numberOfContacts' => 0
                     ],
                     'customer' => [
@@ -927,6 +930,7 @@ class ActionsDolimeet
                         'color'            => '#e9ad4f',
                         'picto'            => 'building',
                         'tradForNotFound'  => 'CustomerTypeContactObjectNotFound',
+                        'tradFound'        => 'TradFoundCustomer',
                         'numberOfContacts' => 0
                     ],
                 ];
@@ -965,7 +969,7 @@ class ActionsDolimeet
                                 continue;
                             }
                             $moreHtmlStatus .= '<span class="marginrightonly" style="display: inline-block; position: relative;">';
-                            $moreHtmlStatus .= '<span>' . $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $role['picto'] . '_fas_' . $role['color'] . '_2em' ), $langs->transnoentities($role['tradForNotFound'], $langs->transnoentities(ucfirst($contactRole)))) . '</span>';
+                            $moreHtmlStatus .= '<span>' . $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $role['picto'] . '_fas_' . $role['color'] . '_2em' ), $langs->transnoentities(($role['numberOfContacts'] > 0 ? $role['tradFound'] : $role['tradForNotFound']), $langs->transnoentities(ucfirst($contactRole)))) . '</span>';
                             $moreHtmlStatus .= '<span class="" style="position: absolute; top: -5px; right: 3px;">' . $role['numberOfContacts'] . '</span>';
                             $moreHtmlStatus .= '</span>';
                         }

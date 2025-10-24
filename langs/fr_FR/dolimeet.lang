@@ -315,3 +315,7 @@ ServiceReadyToBeUsed              = Service prêt à être utilisé
 OpcoInfo                          = Voulez vous faire financer la formation par un OPCO ?
 BillingTypeContactObjectNotFound  = %s (Contact client facturation contrat) introuvable
 CustomerTypeContactObjectNotFound = %s (Contact client suivi contrat) introuvable
+TradFoundSessionTrainer           = Nombre de formateur(s) inscrits pour cette session de formation
+TradFoundTrainee                  = Nombre de stagiaire(s) inscrits pour cette session de formation
+TradFoundBilling                  = Le commanditaire correspond au rôle "Contact client facturation contrat" présent dans Dolibarr
+TradFoundCustomer                 = Le client correspond au rôle "Contact client suivi contrat" présent dans Dolibarr
