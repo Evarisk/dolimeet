@@ -131,6 +131,10 @@ foreach ($object->fields as $key => $val) {
         $search[$key . '_dtstart'] = dol_mktime(0, 0, 0, GETPOSTINT('search_' . $key . '_dtstartmonth'), GETPOSTINT('search_' . $key . '_dtstartday'), GETPOSTINT('search_' . $key . '_dtstartyear'));
         $search[$key . '_dtend']   = dol_mktime(23, 59, 59, GETPOSTINT('search_' . $key . '_dtendmonth'), GETPOSTINT('search_' . $key . '_dtendday'), GETPOSTINT('search_' . $key . '_dtendyear'));
     }
+    if (isset($val['type']) && $val['type'] == 'duration') {
+        $search[$key . '_dtstart'] = GETPOSTINT('search_' . $key . '_dtstarthour') * 3600 + GETPOSTINT('search_' . $key . '_dtstartmin') * 60;
+        $search[$key . '_dtend']   = GETPOSTINT('search_' . $key . '_dtendhour') * 3600 + GETPOSTINT('search_' . $key . '_dtendhour') * 60;
+    }
 }
 
 if (!empty($fromType)) {
@@ -225,7 +229,7 @@ if (empty($resHook)) {
     if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
         foreach ($object->fields as $key => $val) {
             $search[$key] = '';
-            if (isset($val['type']) && in_array($val['type'], ['date', 'datetime', 'timestamp'])) {
+            if (isset($val['type']) && in_array($val['type'], ['date', 'datetime', 'timestamp', 'duration'])) {
                 $search[$key.'_dtstart'] = '';
                 $search[$key.'_dtend']   = '';
             }
@@ -289,12 +293,6 @@ saturne_header(0,'', $title, $helpUrl, '', 0, 0, [], [], '', 'mod-' . $object->m
 //    $sql .= ' AND t.rowid = e.fk_object ';
 //}
 
-//if ($searchInternalAttendants > 0) {
-//    $sql .= ' AND t.rowid = search_internal_attendants.fk_object ';
-//}
-//if ($searchExternalAttendants > 0) {
-//    $sql .= ' AND t.rowid = search_external_attendants.fk_object ';
-//}
 //if ($searchSocietyAttendants > 0) {
 //    $sql .= ' AND t.rowid = search_society_attendants.fk_object ';
 //}
@@ -361,13 +359,6 @@ if ($object->element == 'session' || !empty($fromType) && $fromID > 0) {
 //                    print $form->select_company($searchSocietyAttendants, 'search_society_attendants', '', 1);
 //                    print '</td>';
 //                  }
-
-//        if ($key == 'ref') {
-//            $previousObjectElement = $object->element;
-//            $object->element       = $object->type;
-//            print $object->getNomUrl(1);
-//            $object->element = $previousObjectElement;
-//        }
 
 require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php';
 require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_header.tpl.php';
