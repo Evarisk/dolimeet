@@ -76,31 +76,58 @@ class ActionsDolimeet
                     'id'        => 436304001,
                     'code'      => 'meeting',
                     'obj_class' => 'Meeting',
-                    'obj_table' => 'dolimeet_session'
+                    'obj_table' => 'dolimeet_session',
+                    'label'     => 'Meeting'
                 ],
                 'trainingsession' => [
                     'id'          => 436304002,
                     'code'        => 'trainingsession',
                     'obj_class'   => 'Trainingsession',
-                    'obj_table'   => 'dolimeet_session'
+                    'obj_table'   => 'dolimeet_session',
+                    'label'       => 'TrainingSession'
                 ],
                 'audit'         => [
                     'id'        => 436304003,
                     'code'      => 'audit',
                     'obj_class' => 'Audit',
-                    'obj_table' => 'dolimeet_session'
+                    'obj_table' => 'dolimeet_session',
+                    'label'     => 'Audit'
                 ],
                 'session'       => [
                     'id'        => 436304004,
                     'code'      => 'session',
                     'obj_class' => 'Session',
-                    'obj_table' => 'dolimeet_session'
+                    'obj_table' => 'dolimeet_session',
+                    'label'     => 'Session'
                 ],
             ];
             $this->results = $tags;
         }
 
         return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the getElementProperties function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function getElementProperties(array $parameters): int
+    {
+        if (strpos($parameters['context'], 'category') !== false) {
+            $objectElements = ['meeting', 'trainingsession', 'audit', 'session'];
+            if (in_array($parameters['elementType'], $objectElements)) {
+                $out = [
+                    'module'        => 'dolimeet',
+                    'table_element' => 'dolimeet_session',
+                    'classpath'     => 'custom/dolimeet/class',
+                ];
+                $this->results = $out;
+            }
+        }
+
+        return 0;
     }
 
     /**
@@ -1159,11 +1186,14 @@ class ActionsDolimeet
         if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
             if (!empty($conf->cache['signatoriesInDictionary'])) {
                 $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'];
+                $signatoriesRoles        = array_column(array_map(fn($obj) => (array) $obj, $signatoriesInDictionary), 'ref');
+                if (!in_array($parameters['key'], $signatoriesRoles)) {
+                    return 0;
+                }
+
                 $sql = '';
-                foreach ($signatoriesInDictionary as $role) {
-                    if ($parameters['key'] == $role->ref && (int) $parameters['val'] > 0) {
-                        $sql = ' AND sos.role = "' . $parameters['key'] . '" AND sos.element_id = ' . $parameters['val'];
-                    }
+                if ((int) $parameters['val'] > 0) {
+                    $sql = ' AND sos.role = "' . $parameters['key'] . '" AND sos.element_id = ' . $parameters['val'];
                 }
                 $this->resprints = $sql;
                 $conf->global->MAIN_DISABLE_FULL_SCANLIST = 1;
