@@ -35,6 +35,11 @@ class Meeting extends Session
     public $element = 'meeting';
 
     /**
+     * @var string Parent element type of object
+     */
+    public string $parent_element = 'session';
+
+    /**
      * Constructor.
      *
      * @param DoliDb $db Database handler.
