@@ -1099,6 +1099,248 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the printFieldListFrom function : replacing the parent's function with the one below
+     *
+     * @param  array       $parameters Hook metadata (context, etc...)
+     * @param  object|null $object     Current object
+     * @return int                     0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
+    public function printFieldListFrom(array $parameters, ?object $object): int
+    {
+        global $conf;
+
+        if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
+//            $sql = ' LEFT JOIN ' . $this->db->prefix() . 'element_element AS ee ON (t.rowid = ee.fk_target AND ee.targettype = "' . $object->module . '_' . $object->element . '")';
+//            $this->resprints = $sql;
+
+//            if (dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray) && $fromType != 'product') {
+//                $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'element_element as e on (e.fk_source = ' . $fromID . ' AND e.sourcetype="' . $fromType . '" AND e.targettype = "saturne_' . $objectType . '")';
+//            }
+
+            //            if (!$user->rights->dolimeet->$objectType->read && $user->rights->dolimeet->assignedtome->$objectType) {
+//                if (!empty($user->contact_id)) {
+//                    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assignedtome on ((search_assignedtome.element_id = ' . $user->contact_id . ' AND search_assignedtome.element_type="socpeople") OR (search_assignedtome.element_id = ' . $user->id . ' AND search_assignedtome.element_type="user") AND search_assignedtome.status > 0)';
+//                } else {
+//                    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'saturne_object_signature as search_assignedtome on (search_assignedtome.element_id = ' . $user->id . ' AND search_assignedtome.element_type="user" AND search_assignedtome.status > 0)';
+//                }
+//            }
+
+            if (!empty($conf->cache['signatoriesInDictionary'])) {
+                $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'];
+                $sql = '';
+                foreach ($signatoriesInDictionary as $role) {
+                    if (!empty($parameters['search'][$role->ref])) {
+                        $sql = "
+                        LEFT JOIN " . $this->db->prefix() . "saturne_object_signature as sos
+                            ON sos.fk_object = t.rowid
+                            AND sos.status > 0
+                            AND sos.module_name = 'dolimeet'
+                            AND (sos.element_type = 'user' OR sos.element_type = 'socpeople')";
+                    }
+                }
+                $this->resprints = $sql;
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printFieldListWhere function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListSearch(array $parameters): int
+    {
+        global $conf;
+
+        if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
+            if (!empty($conf->cache['signatoriesInDictionary'])) {
+                $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'];
+                $sql = '';
+                foreach ($signatoriesInDictionary as $role) {
+                    if ($parameters['key'] == $role->ref && (int) $parameters['val'] > 0) {
+                        $sql = ' AND sos.role = "' . $parameters['key'] . '" AND sos.element_id = ' . $parameters['val'];
+                    }
+                }
+                $this->resprints = $sql;
+                $conf->global->MAIN_DISABLE_FULL_SCANLIST = 1;
+                return 1; // or return 1 to replace standard code
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printFieldListWhere function : replacing the parent's function with the one below
+     *
+     * @param  array       $parameters Hook metadata (context, etc...)
+     * @param  object|null $object     Current object
+     * @return int                     0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListWhere(array $parameters, ?object $object): int
+    {
+        if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
+            if (!empty($object) && $object instanceof Session && $object->element != 'session') {
+                $sql = " AND t.type = '" . $object->element . "'";
+                $this->resprints = $sql;
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the saturneSetVarsFromFetchObj function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @param  object $object    Current object
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function saturneSetVarsFromFetchObj(array $parameters, object $object): int
+    {
+        global $conf;
+
+        if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
+            // Load Saturne libraries
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
+
+            $filter      = ['customsql' => 'fk_object = ' . $object->id . ' AND status > 0 AND object_type = "' . $object->element . '"'];
+            $signatories = $signatory->fetchAll('', 'role', 0, 0, $filter);
+
+            $conf->cache['signatories'] = $signatories;
+            $conf->cache['contact']     = [];
+            $conf->cache['user']        = [];
+            $conf->cache['thirdparty']  = [];
+            if (is_array($signatories) && !empty($signatories)) {
+                foreach ($signatories as $signatory) {
+                    // fetch user or contact depending on the element type of the signatory
+                    $userTmp    = new User($this->db);
+                    $contact    = new Contact($this->db);
+                    $thirdparty = new Societe($this->db);
+                    if ($signatory->element_type == 'user') {
+                        $userTmp->fetch($signatory->element_id);
+                        // fetch contact if user has one linked
+                        if ($userTmp->contact_id > 0) {
+                            $contact->fetch($userTmp->contact_id);
+                        }
+                        $conf->cache['user'][$signatory->role][$signatory->id] = $userTmp;
+                    } elseif ($signatory->element_type == 'socpeople') {
+                        $contact->fetch($signatory->element_id);
+                    }
+                    if (!empty($contact->fk_soc)) {
+                        $thirdparty->fetch($contact->fk_soc);
+                        $conf->cache['contact'][$signatory->role][$signatory->id] = $contact;
+                        $conf->cache['thirdparty'][$signatory->id]                = $thirdparty;
+                    }
+                }
+            }
+        }
+
+        if (strpos($parameters['context'], 'sessionlist') !== false) {
+            switch ($object->type) {
+                case 'meeting':
+                    $object->picto  = 'fontawesome_fa-comments_fas_#d35968';
+                    break;
+                case 'trainingsession':
+                    $object->picto  = 'fontawesome_fa-people-arrows_fas_#d35968';
+                    break;
+                case 'audit':
+                    $object->picto  = 'fontawesome_fa-tasks_fas_#d35968';
+                    break;
+                default :
+                    $object->picto  = 'dolimeet_color@dolimeet';
+                    break;
+            }
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the saturnePrintFieldListLoopObject function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @param  object $object    Current object
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
+    public function saturnePrintFieldListLoopObject(array $parameters, object $object): int
+    {
+        global $conf, $langs;
+
+        if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
+            $out = [];
+
+            $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'];
+            if (is_array($signatoriesInDictionary) && !empty($signatoriesInDictionary)) {
+                $users       = $conf->cache['user'];
+                $contacts    = $conf->cache['contact'];
+                $signatories = $conf->cache['signatories'];
+                foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+                    if ($parameters['key'] == $signatoryInDictionary->ref) {
+                        if (is_array($signatories) && !empty($signatories)) {
+                            $out[$parameters['key']] = '';
+                            foreach ($signatories as $signatory) {
+                                if ($signatory->role != $signatoryInDictionary->ref) {
+                                    continue;
+                                }
+                                switch ($signatory->attendance) {
+                                    case 1:
+                                        break;
+                                        $cssButton = '#0d8aff';
+                                        $userIcon  = 'fa-user-clock';
+                                        break;
+                                    case 2:
+                                        $cssButton = '#e05353';
+                                        $userIcon  = 'fa-user-slash';
+                                        break;
+                                    default:
+                                        $cssButton = '#47e58e';
+                                        $userIcon  = 'fa-user';
+                                        break;
+                                }
+                                if (is_array($users[$signatory->role]) && !empty($users[$signatory->role]) && $users[$signatory->role][$signatory->id] instanceof User) {
+                                    $out[$parameters['key']] .= $users[$signatory->role][$signatory->id]->getNomUrl(1, '', 0, 0, 24, 1);
+                                }
+                                if (is_array($contacts[$signatory->role]) && !empty($contacts[$signatory->role]) && $contacts[$signatory->role][$signatory->id] instanceof Contact) {
+                                    $out[$parameters['key']] .= $contacts[$signatory->role][$signatory->id]->getNomUrl(1);
+                                }
+                                if ((is_array($users[$signatory->role]) && !empty($users[$signatory->role])) || (is_array($contacts[$signatory->role]) && !empty($contacts[$signatory->role]))) {
+                                    $out[$parameters['key']] .= ' ' . $signatory->getLibStatut(3);
+                                    $out[$parameters['key']] .= ' <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . '"></i><br>';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($parameters['key'] == 'society_attendants') {
+                $thirdparties = $conf->cache['thirdparty'];
+                if (is_array($thirdparties) && !empty($thirdparties)) {
+                    $alreadyAddedThirdParties = [];
+                    foreach ($thirdparties as $thirdparty) {
+                        if (!empty($thirdparty->id) && !in_array($thirdparty->id, $alreadyAddedThirdParties)) {
+                            $out[$parameters['key']] .= $thirdparty->getNomUrl(1) . '<br>';
+                        }
+                        $alreadyAddedThirdParties[] = $thirdparty->id;
+                    }
+                }
+            }
+
+            $this->results = $out;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the saturneIndex function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadata (context, etc...)
