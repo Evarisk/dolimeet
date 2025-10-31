@@ -1220,6 +1220,13 @@ class ActionsDolimeet
             }
         }
 
+        if (preg_match('/trainingsessionlist/', $parameters['context'])) {
+            if (!empty($object) && $object instanceof Session && $object->element != 'session' && GETPOST('fromtype') == 'product' && GETPOSTINT('fromid') > 0) {
+                $sql = " AND t.fk_element = " . GETPOSTINT('fromid') . " AND t.element_type = 'service'";
+                $this->resprints = $sql;
+            }
+        }
+
         return 0; // or return 1 to replace standard code
     }
 

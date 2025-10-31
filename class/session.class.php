@@ -301,7 +301,7 @@ class Session extends SaturneObject
 
         if (!$this->model) {
             unset($this->fields['element_type']);
-            unset($this->fields['fk_element']);
+            //unset($this->fields['fk_element']);
             unset($this->fields['position']);
         }
     }
