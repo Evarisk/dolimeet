@@ -150,7 +150,7 @@ class modDoliMeet extends DolibarrModules
                 'ajaxonlinesign',
                 'onlinesign',
                 'contractnote',
-                'document'
+                'elementproperties'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
