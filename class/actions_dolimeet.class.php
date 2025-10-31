@@ -115,7 +115,7 @@ class ActionsDolimeet
      */
     public function getElementProperties(array $parameters): int
     {
-        if (strpos($parameters['context'], 'category') !== false) {
+        if (preg_match('/elementproperties|category/', $parameters['context'])) {
             $objectElements = ['meeting', 'trainingsession', 'audit', 'session'];
             if (in_array($parameters['elementType'], $objectElements)) {
                 $out = [
