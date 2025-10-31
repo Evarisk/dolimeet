@@ -161,7 +161,7 @@ if (!empty($fromType)) {
             $search['search_internal_attendants'] = $fromID;
             break;
         case 'product' :
-            $object->fields['fk_element']['enabled'] = 0;
+            //$object->fields['fk_element']['enabled'] = 1;
             $object->fields['fk_contrat']['enabled'] = 0;
             $object->fields['fk_soc']['enabled']     = 0;
             $object->fields['position']['enabled']   = 1;
@@ -285,8 +285,6 @@ saturne_header(0,'', $title, $helpUrl, '', 0, 0, [], [], '', 'mod-' . $object->m
 //}
 
 //
-//if ($fromType == 'product') {
-//    $sql .= ' AND t.fk_element = ' . $fromID . ' AND t.element_type = "service"';
 //} elseif (is_array($signatoryObjectsArray) && dol_strlen($fromType) > 0 && !in_array($fromType, $linkedObjectsArray) && !in_array($fromType, $signatoryObjectsArray)) {
 //    $sql .= ' AND t.rowid = e.fk_target ';
 //} elseif (is_array($signatoryObjectsArray) && in_array($fromType, $signatoryObjectsArray)) {
