@@ -26,6 +26,10 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 # Config page - Page d'administration
 #
 
+# Public interface - Interface publique
+ContactPublicInterfaceEnabled             = Activer l'interface publique d'ajout de contact au contrat
+ContactPublicInterfaceEnabledDescription  = Permet aux contacts externes d'être ajoutés aux contrats via une interface publique sécurisée
+
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
