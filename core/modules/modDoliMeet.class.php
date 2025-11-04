@@ -150,7 +150,8 @@ class modDoliMeet extends DolibarrModules
                 'ajaxonlinesign',
                 'onlinesign',
                 'contractnote',
-                'elementproperties'
+                'elementproperties',
+                'dolimeetpublicinterfaceadmin'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
@@ -237,6 +238,7 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR', 'chaine', '18:00', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_LOCATION', 'chaine', 'TrainingSessionLocationOther', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_ABSENCE_RATE', 'integer', 20, '', 0, 'current'],
+            $i++ => ['DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED', 'integer', 1, '', 0, 'current'],
 
             // CONST GENERAL CONST.
             $i++ => ['CONTACT_SHOW_EMAIL_PHONE_TOWN_SELECTLIST', 'integer', 1, '', 0, 'current'],

@@ -74,6 +74,18 @@ $user    = new User($db);
 $object->fetch($id);
 $object->fetchProject();
 
+$publicInterfaceUserId = getDolGlobalInt('DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER');
+if ($publicInterfaceUserId > 0) {
+    $user->fetch($publicInterfaceUserId);
+    $user->loadRights();
+    $permissionToCreateContact = $user->hasRight('societe', 'contact', 'creer');
+    if ($permissionToCreateContact == 0) {
+        die('User defined to manage public interface has no right to create contacts. Please contact site administrator.');
+    }
+} else {
+    die('No user defined to manage public interface. Please contact site administrator.');
+}
+
 /*
  * Actions
  */
@@ -85,7 +97,7 @@ if ($resHook < 0) {
 }
 
 if (empty($resHook)) {
-    if ($action == 'add_contact') {
+    if ($action == 'add_contact' && $permissionToCreateContact) {
         $error = 0;
 
         $firstNames = GETPOST('firstname', 'array');
@@ -120,7 +132,7 @@ if (empty($resHook)) {
             $contact->email     = $emails[$i];
             $contact->socid     = $object->socid;
 
-            $result = $contact->create($user);
+            $result = $contact->create($publicInterfaceUser);
             if ($result > 0) {
                 $object->restrictiononfksoc                 = 0; // We disable the restriction on fk_soc to be able to add contact linked to third party of contract
                 $object->context['createformpubliccontact'] = 'createformpubliccontact';
@@ -158,7 +170,7 @@ $conf->dol_hide_leftmenu = 1;
 saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card'); ?>
 
 <div class="public-card__container" data-public-interface="true">
-    <?php if (getDolGlobalInt('SATURNE_ENABLE_PUBLIC_INTERFACE')) : ?>
+    <?php if (getDolGlobalInt('DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED')) : ?>
         <div class="public-card__header">
             <div class="header-information">
                 <div class="information-title">Convention de formation <?php echo $object->ref . ' - ' . $object->project->ref . ' - ' . $object->project->title; ?></div>

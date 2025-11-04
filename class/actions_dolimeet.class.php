@@ -1004,7 +1004,9 @@ class ActionsDolimeet
                     }
                 }
 
-                $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
+                if (getDolGlobalInt('DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED') > 0) {
+                    $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
+                }
 
                 $this->resprints = $moreHtmlStatus;
             }
@@ -1395,7 +1397,8 @@ class ActionsDolimeet
                     'DOLIMEET_SERVICE_WELCOME_BOOKLET',
                     'DOLIMEET_SERVICE_RULES_OF_PROCEDURE',
                     'DOLIMEET_FORMATION_MAIN_CATEGORY',
-                    'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT'
+                    'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT',
+                    'DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER'
                 ],
                 'chaine' => [
                     'DOLIMEET_TRAININGSESSION_MORNING_START_HOUR',
@@ -1515,14 +1518,13 @@ class ActionsDolimeet
     }
 
     /**
-     * Overloading the saturneAdminObjectConst function : replacing the parent's function with the one below.
+     * Overloading the saturneAdminObjectConst function : replacing the parent's function with the one below
      *
-     * @param  array $parameters Hook metadatas (context, etc...).
-     * @return int               0 < on error, 0 on success, 1 to replace standard code.
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
      */
     public function saturneAdminObjectConst(array $parameters): int
     {
-        // Do something only for the current context.
         if ($parameters['currentcontext'] == 'dolimeetadmindocuments') {
             $constArray['dolimeet'] = [
                 'attendancesheetdocument' => [
@@ -1535,7 +1537,19 @@ class ActionsDolimeet
             return 1;
         }
 
-        return 0; // or return 1 to replace standard code.
+        if ($parameters['currentcontext'] == 'dolimeetpublicinterfaceadmin') {
+            $constArray['dolimeet'] = [
+                'ContactPublicInterfaceEnabled' => [
+                    'name'        => 'ContactPublicInterfaceEnabled',
+                    'description' => 'ContactPublicInterfaceEnabledDescription',
+                    'code'        => 'DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED'
+                ]
+            ];
+            $this->results = $constArray;
+            return 1;
+        }
+
+        return 0; // or return 1 to replace standard code
     }
 
     /**
