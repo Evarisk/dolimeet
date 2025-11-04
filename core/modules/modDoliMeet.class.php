@@ -598,7 +598,6 @@ class modDoliMeet extends DolibarrModules
         delDocumentModel('attendance_sheet_document', 'trainingsessiondocument');
 
         addDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH');
-        addDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('attendance_sheet_document', 'trainingsessiondocument', $langs->transnoentities('AttendanceSheetDocumentPDFDescription'));
 
