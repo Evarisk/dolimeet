@@ -40,7 +40,7 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
 
     $survey = new Survey($db);
 
-    $survey->getNextNumRef();
+    $survey->ref          = $survey->getNextNumRef();
     $confName             = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
     $survey->fk_sheet     = $conf->global->$confName;
     $_POST['fk_contract'] = $object->id;
