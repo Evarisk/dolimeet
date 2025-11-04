@@ -355,6 +355,12 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     }
 
                     $object->validate($user);
+
+                    $contactSingle = $object->liste_contact(-1, 'internal', 0, 'SALESREPSIGN');
+
+                    $contact = new Contact($this->db);
+                    $contact->fetch($contactSingle[0]['rowid']);
+                    $contact->setValueFrom('mandatory_signature', 1, 'element_contact', $contactSingle[0]['rowid'], 'int', '', $user, '', '');
                 }
                 break;
         }
