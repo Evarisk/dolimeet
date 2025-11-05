@@ -411,6 +411,7 @@ class pdf_attendance_sheet_document {
                     }
                     $index++;
                 }
+
             }
         } else {
             $pdf->SetX($startX);
