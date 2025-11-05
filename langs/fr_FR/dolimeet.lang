@@ -187,6 +187,7 @@ TypeContact_contrat_external_TRAINEE        = Stagiaire
 AttendanceSheetDocument                       = Feuille de présence
 AttendanceSheetDocuments                      = feuilles de présence
 attendancesheetdocument                       = feuille de presence
+AttendanceSheetDocumentPDFDescription         = Feuille de présence en PDF
 attendancesheetdocument.odt                   = Feuille de présence
 DisplayAttendanceAbsentInSignature            = Affiche la présence absent dans le champ signature de la feuille de présence
 DisplayAttendanceAbsentInSignatureDescription = Affiche la présence absent si la personne est absente et qu'elle n'a pas signé
