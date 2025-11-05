@@ -158,15 +158,6 @@ if (empty($resHook)) {
         }
     }
 
-    if ($action == 'builddoc' && GETPOST('model') == 'attendance_sheet_document') {
-        require_once __DIR__ . './../../class/dolimeetdocuments/attendancesheetdocument.class.php';
-        $document = new AttendancesheetDocument($db);
-
-        $moduleNameLowerCase      = 'dolimeet';
-        $moreParams['modulePart'] = 'dolimeet';
-        require __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
-    }
-    
     // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen.
     require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 

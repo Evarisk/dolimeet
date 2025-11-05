@@ -28,7 +28,7 @@
 
 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
-class pdf_attendance_sheet_document {
+class pdf_attendancesheetdocument {
     /**
      * @var DoliDb Database handler
      */
@@ -116,7 +116,7 @@ class pdf_attendance_sheet_document {
     /**
      * @var string Document type
      */
-    public string $document_type = 'pdf_attendance_sheet_document';
+    public string $document_type = 'pdf_attendancesheetdocument';
 
     /**
      *	Constructor
@@ -128,9 +128,9 @@ class pdf_attendance_sheet_document {
         global $langs;
 
         $this->db           = $db;
-        $this->name         = 'attendance_sheet_document';
+        $this->name         = 'attendancesheetdocument';
         $this->description  = $langs->trans("AttendanceSheetDocumentPDFDescription");
-        $this->type         = 'pdf_attendance_sheet_document';
+        $this->type         = 'pdf_attendancesheetdocument';
         $this->format       = 'A4';
         $this->orientation  = 'P';
         $this->marge_gauche = 5;
