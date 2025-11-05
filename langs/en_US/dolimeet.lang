@@ -142,6 +142,7 @@ AttendanceSheetDocument                       = Attendance sheet
 AttendanceSheetDocuments                      = attendance sheets
 attendancesheetdocument                       = attendance sheet
 attendancesheetdocument.odt                   = Attendance sheet
+AttendanceSheetDocumentPDFDescription         = Attendance sheet PDF
 DisplayAttendanceAbsentInSignature            = Displays the absent presence in the signature field of the attendance sheet
 DisplayAttendanceAbsentInSignatureDescription = Displays the absent presence if the person is absent and has not signed
 CompletionCertificateDocument                 = Certificate of completion

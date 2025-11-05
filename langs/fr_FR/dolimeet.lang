@@ -192,6 +192,7 @@ AttendanceSheetDocument                       = Feuille de présence
 AttendanceSheetDocuments                      = feuilles de présence
 attendancesheetdocument                       = feuille de presence
 attendancesheetdocument.odt                   = Feuille de présence
+AttendanceSheetDocumentPDFDescription         = Feuille de présence en PDF
 DisplayAttendanceAbsentInSignature            = Affiche la présence absent dans le champ signature de la feuille de présence
 DisplayAttendanceAbsentInSignatureDescription = Affiche la présence absent si la personne est absente et qu'elle n'a pas signé
 CompletionCertificateDocument                 = Certificat de réalisation
