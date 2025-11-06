@@ -298,6 +298,7 @@ saturne_header(0,'', $title, $helpUrl, '', 0, 0, [], [], '', 'mod-' . $object->m
 //    $sql .= ' AND t.rowid = search_assignedtome.fk_object ';
 //}
 
+$moreUrlParameters = '';
 if (!empty($fromType) && $fromID > 0) {
     saturne_get_fiche_head($objectLinked, 'sessionList', $langs->trans($object->element));
 
@@ -317,7 +318,8 @@ if (!empty($fromType) && $fromID > 0) {
     $statusMode = 3;
 }
 if ($object->element != 'session') {
-    $formMoreParams = ['object_type' => $object->element];
+    $formMoreParams     = ['object_type' => $object->element];
+    $moreUrlParameters .= '&object_type=' . urlencode($object->element);
 } ?>
 
 <script>
@@ -339,8 +341,7 @@ if ($object->element == 'session' || !empty($fromType) && $fromID > 0) {
     $newCardButton = $form->selectarray('object_type_select', $objectTypes, $object->element, ($fromType != 'contrat' ? $langs->trans('SelectSessionType') : ''));
 }
 //$helpText = ($objectType != 'session' ? '' : $langs->trans('SelectSessionType'));
-//$url      = dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $moreUrlParameters;
-//$moreUrlParameters .= '&object_type=' . urlencode($object->element);
+$createUrl = dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $moreUrlParameters;
 //$status  = ($objectType != 'session' ? $permissiontoadd : -2);
 
 ////                if ($resource['label'] == 'InternalAttendants') {
