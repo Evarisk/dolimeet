@@ -213,7 +213,7 @@ if ($action == 'create') {
 
     print '<table class="border centpercent tableforfieldcreate">';
 
-    $now = dol_getdate(dol_now());
+    $now = dol_getdate(dol_now('tzuser'));
 
     if (GETPOST('model') == 'on' || GETPOST('model') == 1) {
         // Set default fields
@@ -303,8 +303,6 @@ if ($action == 'create') {
                 break;
         }
     }
-
-    $conf->tzuserinputkey = 'tzuser';
 
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';

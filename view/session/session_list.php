@@ -165,7 +165,7 @@ if (!empty($fromType)) {
             $object->fields['fk_contrat']['enabled'] = 0;
             $object->fields['fk_soc']['enabled']     = 0;
             $object->fields['position']['enabled']   = 1;
-            $object->fields['position']['visible']  = 1;
+            $object->fields['position']['visible']   = 1;
             $search['model']                         = 1;
             $sortfield = 't.position';
             $sortorder = 'ASC';
