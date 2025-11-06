@@ -1430,8 +1430,12 @@ class ActionsDolimeet
             if ($error > 0) {
                 $out  = '<div class="wpeo-notice notice-error">';
                 $out .= '<div class="notice-content">';
-                $out .= '<div class="notice-title"><strong>' . $langs->trans('SetupDefaultDataNotCreated', $moduleName) . '</strong></div>';
-                $out .= '<div class="notice-subtitle"><strong>' . $langs->trans('HowToSetupDefaultData', $moduleName) . ' <a href="admin/setup.php">' . $langs->trans('ConfigDefaultData', $moduleName) . '</a></strong></div>';
+                $out .= '<div class="notice-title"><strong>' . $langs->trans('MissingConfigData') . '</strong></div>';
+                $out .= '<div class="notice-subtitle"><strong>' . $langs->trans('HowToSetupMissingConfigData') . '</strong><br>';
+                $out .= '<a href="admin/setup.php">' . $langs->trans('MissingSettingConfig') . '</a><br>';
+                $out .= '<a href="../saturne/admin/publicinterface.php?module_name=' . $moduleName . '">' . $langs->trans('MissingPublicInterfaceConfig') . '</a>';
+                $out .= '<div class="notice-subtitle"><em>' . $langs->trans('InitializationWarningConfig') . '</em></div>';
+                $out .= '</div>';
                 $out .= '</div>';
                 $out .= '</div>';
 
