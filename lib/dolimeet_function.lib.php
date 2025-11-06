@@ -32,7 +32,7 @@
  */
 function set_satisfaction_survey(CommonObject $object, string $contactCode, int $contactID, string $contactSource)
 {
-    global $conf, $db, $user;
+    global $db, $user;
 
     // Load DigiQuali libraries
     require_once __DIR__ . '/../../digiquali/class/survey.class.php';
@@ -40,9 +40,15 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
 
     $survey = new Survey($db);
 
+    $confName                  = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
+    $satisfactionSurveySheetId = getDolGlobalInt($confName);
+    if ($satisfactionSurveySheetId <= 0) {
+        setEventMessages('MissingSatisfactionSurveyConfig', [], 'errors');
+        return;
+    }
+
     $survey->ref          = $survey->getNextNumRef();
-    $confName             = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
-    $survey->fk_sheet     = $conf->global->$confName;
+    $survey->fk_sheet     = $satisfactionSurveySheetId;
     $_POST['fk_contract'] = $object->id;
 
     $surveyID = $survey->create($user);

@@ -294,7 +294,7 @@ if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_V
 
     $sheet = new Sheet($db);
 
-    print load_fiche_titre($langs->trans('SatisfactionSurvey'), '', '');
+    print load_fiche_titre($langs->trans('SatisfactionSurvey'), '', '', 0, 'satisfaction_survey');
 
     print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';

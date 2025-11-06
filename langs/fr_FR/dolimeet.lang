@@ -278,10 +278,10 @@ CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en p
 
 
 # Public interface - Interface publique
-PublicAddContact     = Contact - Page publique
-ContactsAdded        = Contacts ajoutés
-ContactsAlreadyAdded = Contacts déjà ajoutés
-
+PublicAddContact                = Contact - Page publique
+ContactsAdded                   = Contacts ajoutés
+ContactsAlreadyAdded            = Contacts déjà ajoutés
+MissingSatisfactionSurveyConfig = Erreur : configuration manquante de l'enquête de satisfaction<br><a href="../../admin/setup.php#satisfaction_survey">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
 
 
 #

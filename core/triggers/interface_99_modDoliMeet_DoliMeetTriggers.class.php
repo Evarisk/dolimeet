@@ -335,7 +335,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             }
 
                             foreach ($trainingSessions as $trainingSession) {
-                                $trainingSession->ref           = '';
+                                $trainingSession->ref           = $trainingSession->getNextNumRef();
                                 $trainingSession->date_creation = dol_now();
                                 $trainingSession->status        = Session::STATUS_DRAFT;
                                 $trainingSession->element_type  = null;
@@ -347,7 +347,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $trainingSession->fk_contrat    = $object->id;
 
                                 $trainingSession->create($user);
-                                $trainingSession->validate($user);
                             }
                         }
 
