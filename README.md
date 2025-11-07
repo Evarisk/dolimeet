@@ -11,10 +11,10 @@
 
 ## Version
 
-- Version : 1.3.0
+- Version : 21.0.0
 - PHP : 7.4.33
-- Compatibilité : Dolibarr 16.0.0 - 18.0.5
-- Saturne framework : 1.3.0
+- Compatibilité : Dolibarr 20.0.0 - 22.0.2
+- Saturne framework : 21.2.0
 
 ## Liens
 
