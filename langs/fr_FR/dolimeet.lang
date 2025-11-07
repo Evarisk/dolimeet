@@ -26,18 +26,39 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 # Config page - Page d'administration
 #
 
+# Public interface - Interface publique
+ContactPublicInterfaceEnabled             = Activer l'interface publique d'ajout de contact au contrat
+ContactPublicInterfaceEnabledDescription  = Permet aux contacts externes d'être ajoutés aux contrats via une interface publique sécurisée
+
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
-CustomerSatisfactionSurvey                  = Enquête de satisfaction client
-CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
-BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire
-BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire
-TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
-TraineeSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction stagiaire
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
 SessiontrainerSatisfactionSurveyDescription = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction formateur
-OpcoSatisfactionSurvey                      = Enquête de satisfaction OPCO
-OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction OPCO
+TraineeSatisfactionSurvey                   = Enquête de satisfaction stagiaire
+TraineeSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction stagiaire
+CustomerSatisfactionSurvey                  = Enquête de satisfaction client
+CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
+BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire/OPCO
+BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire/OPCO
+
+# Formation - Formation
+TrainingContract                    = Convention de formation
+PracticalGuide                      = Guide pratique
+WelcomeBooklet                      = Livret d'accueil
+RulesOfProcedure                    = Réglement intérieur
+FormationServiceMainCategory        = Catégorie principale des services de formation
+FormationVariousServiceMainCategory = Catégorie principale des services divers de formation
+TrainingSessionTemplates            = Modèles de sessions de formation
+TrainingSessionDurations            = Durée de la formation
+MorningStartHour                    = Heure de début de matinée
+MorningEndHour                      = Heure de fin de matinée
+AfternoonStartHour                  = Heure de début d'après-midi
+AfternoonEndHour                    = Heure de fin d'après-midi
+TrainingSessionLocationCompany      = Lieu de formation (société)
+TrainingSessionLocationThirdParty   = Lieu de formation (tiers)
+TrainingSessionLocationOther        = Autre lieu de formation par défaut
+TrainingSessionAbsenceRate          = Taux d'absence acceptable aux sessions de formation
+VariousFormation                    = Divers formation
 
 
 
@@ -46,7 +67,7 @@ OpcoSatisfactionSurveyDescription           = Définit le modèle utilisé par d
 #
 
 # Data - Donnée
-EnableDoliMeet = Veuillez activer le module DoliMeet pour accéder à cette page
+EnableDolimeet = Veuillez activer le module DoliMeet pour accéder à cette page
 
 
 
@@ -106,17 +127,12 @@ OfTrainingsession                     = de la session de formation
 TrainingsessionList                   = Liste des sessions de formation
 TrainingSessionList                   = Liste des sessions de formation
 TrainingSessionCreate                 = Créer une session de formation
-Contract                              = Contrat
 NewTrainingsession                    = Nouvelle session de formation
 ModifyTrainingsession                 = Modifier une session de formation
-TrainingSessionStart                  = Date de début de la formation
-TrainingSessionEnd                    = Date de fin de la formation
 ActionFormation                       = Action de formation
 ActionFormationApprentissage          = Action de formation par apprentissage
 ActionVAE                             = Action de VAE
 BilanCompetences                      = Bilan de compétences
-TrainingSessionType                   = Type de formation
-TrainingSessionLocation               = Lieu de la formation
 TrainingsessionsCategoriesArea        = Espace des tags/catégories des sessions de formations
 DontForgotAddSessionTrainerAndTrainee = N'oubliez pas d'ajouter au moins un formateur et un stagiaire au contrat de formation.
 AttendantsFromContract                = Participants du contrat
@@ -127,16 +143,37 @@ LinkDolimeet_trainsess                = Activer le lien avec les sessions de for
 LinkDolimeet_trainsessDescription     = Permet la liaison entre les sessions de formations et les modèles
 TrainingSessionStartErrorMatchingDate = <strong> Erreur : cohérence des dates de début de la formation. </strong><br> La date de début de la formation du contrat n'est pas égale à la date début de la première session de formation %s.
 TrainingSessionEndErrorMatchingDate   = <strong> Erreur : cohérence des dates de fin de la formation. </strong><br> La date de fin de la formation du contrat n'est pas égale à la date fin de la dernière session de formation %s.
-TrainingSessionDurations              = Durée des sessions de formation
-TrainingSessionStartHelp              = Date de début de la première session de formation du contrat
-TrainingSessionEndHelp                = Date de fin de la dernière session de formation du contrat
-TrainingSessionTypeHelp               = Type de formation liée au contrat
-TrainingSessionLocationHelp           = Lieu où s'est réalisé la formation liée au contrat
-TrainingSessionDurationHelp           = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
 CalculatedTotalSessionDuration        = Durée totale calculée :
 TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
-NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à toute les sessions.
+NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à au moins une session.
+ErrorMissingTrainingSessionProjectInfo = Attention : information du projet de formation manquante
 
+# Extrafields - Attributs supplémentaires
+TrainingSessionType              = Type de formation
+TrainingSessionTypeHelp          = Veuillez sélectionner un tiers pour créer un projet de formation
+TrainingSessionService           = Services de formation
+TrainingSessionServiceHelp       = Les services de formation sont identifiés par le Tags/catégories que vous avez choisi dans les réglages, la valeur par défaut est "Formation".<br>Si la liste est vide cela vient sûrement du fait que vous n'avez aucun service associé à ce Tags.
+SeeTrainingSessionModel          = Voir le/les modèle(s) de session de formation
+TrainingSessionLocation          = Lieu de la formation
+TrainingSessionLocationHelp      = Lieu où s'est réalisé la formation liée au contrat
+TrainingSessionStart             = Date de début de la formation
+TrainingSessionStartHelp         = Date de début de la première session de formation du contrat
+TrainingSessionEnd               = Date de fin de la formation
+TrainingSessionEndHelp           = Date de fin de la dernière session de formation du contrat
+TrainingSessionDurationHelp      = Durée totale des sessions HH:MM (ex: 60:30) <br> La durée affichée sur le certificat correspond aux heures additionnées des sessions où un stagiaire a été présent.
+TrainingSessionOpcoFinancing     = Financement avec un OPCO
+TrainingSessionOpcoFinancingHelp = Cocher la case si vous voulez un financement avec un OPCO
+TrainingSessionNbTrainees        = Nombre de stagiaires
+TrainingSessionNbTraineesHelp    = Nombre de stagiaires participant à la session de formation (vide si non renseigné)
+SyllabusHelp                     = Programme de la formation
+
+# Public note - Note publique
+FormationInfoTitle               = <strong>1 - Objet, nature et durée de la formation</strong>
+FormationTitle                   = Objet de la formation
+TrainingSessionTitle             = <strong>2 - Session de formation</strong>
+TrainingSessionsInclusiveWriting = Détails des %d session(s) de formation
+PublicNoteTraineeList            = <strong>3 - Liste des stagiaires </strong>
+FormationPublicNoteTraineeList   = <strong>3 - Liste des stagiaires en attente </strong><ul><li>Nom, Prénom, Email, Titre</li></ul>
 
 # Attendant role - Rôle participant
 SessionTrainer                              = Formateur
@@ -157,6 +194,7 @@ AttendanceSheetDocument                       = Feuille de présence
 AttendanceSheetDocuments                      = feuilles de présence
 attendancesheetdocument                       = feuille de presence
 attendancesheetdocument.odt                   = Feuille de présence
+AttendanceSheetDocumentPDFDescription         = Feuille de présence en PDF
 DisplayAttendanceAbsentInSignature            = Affiche la présence absent dans le champ signature de la feuille de présence
 DisplayAttendanceAbsentInSignatureDescription = Affiche la présence absent si la personne est absente et qu'elle n'a pas signé
 CompletionCertificateDocument                 = Certificat de réalisation
@@ -221,15 +259,40 @@ NbAuditors                           = Nombre d'auditeurs
 AttendancePresentAuditRate           = Taux de présence aux audits
 AttendanceDelayAuditRate             = Taux de retard aux audits
 AttendanceAbsentAuditRate            = Taux d'absence aux audits
+ActivityMonitoring                   = Suivi des activités
+AverageDurationByActivity            = Durées moyennes par activité
+MeetingAttendance                    = Participation aux réunions
+TrainingSessionAttendance            = Participation aux sessions de formations
+AuditAttendance                      = Participation aux audits
 
 #
 # Email - Email
 #
 
 # Data - Donnée
-SatisfactionSurveyLabel   = Questionnaire_Satisfaction_%s
-SatisfactionSurveyTopic   = [__[MAIN_INFO_SOCIETE_NOM]__] Remise des liens de questionnaire de satisfaction %s pour la convention de formation __REF__
-SatisfactionSurveyContent = Bonjour,<br/><br/>Nous vous envoyons ce mail afin de vous mettre au courant des questionnaires de satisfaction %s liées avec votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br/>Ci-dessous, vous trouverez un aperçu des questionnaires, incluant les détails pertinents :<br/><br/>__DOLIMEET_CONTRACT_SURVEY_INFOS__<br/><br/>Nous vous prions de bien vouloir transmettre ces liens aux parties concernées.<br/>Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br/><br/>__USER_FULLNAME__<br/>__USER_EMAIL__<br/>__MYCOMPANY_NAME__<br/>__MYCOMPANY_FULLADDRESS__<br/>__MYCOMPANY_EMAIL__
+SatisfactionSurveyLabel              = DLM_Questionnaire_Satisfaction_%s
+SatisfactionSurveyTopic              = [__[MAIN_INFO_SOCIETE_NOM]__] Remise des liens de questionnaire de satisfaction %s pour la convention de formation __REF__
+SatisfactionSurveyContent            = Bonjour,<br /><br />Nous vous envoyons ce mail afin de vous mettre au courant des questionnaires de satisfaction %s liées avec votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br />Ci-dessous, vous trouverez un aperçu des questionnaires, incluant les détails pertinents :<br /><br />__DOLIMEET_CONTRACT_SURVEY_INFOS__<br /><br />Nous vous prions de bien vouloir transmettre ces liens aux parties concernées.<br />Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
+CompletionCertificateDocumentLabel   = DLM_Certificat_Réalisation
+CompletionCertificateDocumentTopic   = [__[MAIN_INFO_SOCIETE_NOM]__] Remise du certificat de réalisation pour la convention de formation __REF__
+CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en pièce jointe le certificat de réalisation lié à votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br><br />Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
+
+
+
+# Public interface - Interface publique
+PublicAddContact                              = Contact - Page publique
+ContactsAdded                                 = Contacts ajoutés
+ContactsAlreadyAdded                          = Contacts déjà ajoutés
+MissingSatisfactionSurveyConfig               = Erreur : configuration manquante de l'enquête de satisfaction<br><a href="../../admin/setup.php#satisfaction_survey">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+MissingDefaultUserPublicInterfaceRightsConfig = L’utilisateur défini pour gérer l’interface publique n’a pas le droit de créer des contacts. Veuillez contacter l’administrateur du site.
+MissingDefaultUserPublicInterfaceConfig       = Aucun utilisateur n’est défini pour gérer l’interface publique. Veuillez contacter l’administrateur du site.
+
+#
+# Error - Erreur
+#
+
+# Data - Donnée
+ErrorMissingFormationServiceConfig = Erreur : configuration des services de formation manquantes<br><a href="../../custom/dolimeet/admin/setup.php#formation">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
 
 
 
@@ -241,7 +304,6 @@ SatisfactionSurveyContent = Bonjour,<br/><br/>Nous vous envoyons ce mail afin de
 TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
 TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
-SetContrat                        = Définir contrat
 DateAndTime                       = Date et horaire
 SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
 SetSatisfactionSurvey             = Créer enquête de satisfaction
@@ -251,3 +313,17 @@ FillSatisfactionSurvey            = Remplir l'enquête de satisfaction %s
 Sessiontrainer                    = Formateur
 Billing                           = Commanditaire
 Customer                          = Client
+HourEnd                           = Heure de fin
+ToBePlanned                       = à planifier
+ErrorDuration                     = Erreur : durée du service manquante
+ErrorSyllabus                     = Erreur : programme de la formation manquant
+ErrorStatus                       = Erreur : statut de la session de formation invalide : %s
+ErrrorDurationNotMatching         = Erreur : incohérence sur la durée du service <br> La durée du service n'est pas égale à la durée calculée de l'ensemble des sessions de formation
+ServiceReadyToBeUsed              = Service prêt à être utilisé
+OpcoInfo                          = Voulez vous faire financer la formation par un OPCO ?
+BillingTypeContactObjectNotFound  = %s (Contact client facturation contrat) introuvable
+CustomerTypeContactObjectNotFound = %s (Contact client suivi contrat) introuvable
+TradFoundSessionTrainer           = Nombre de formateur(s) inscrits pour cette session de formation
+TradFoundTrainee                  = Nombre de stagiaire(s) inscrits pour cette session de formation
+TradFoundBilling                  = Le commanditaire correspond au rôle "Contact client facturation contrat" présent dans Dolibarr
+TradFoundCustomer                 = Le client correspond au rôle "Contact client suivi contrat" présent dans Dolibarr

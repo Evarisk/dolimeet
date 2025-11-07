@@ -35,6 +35,11 @@ class Audit extends Session
     public $element = 'audit';
 
     /**
+     * @var string Parent element type of object
+     */
+    public string $parent_element = 'session';
+
+    /**
      * Constructor.
      *
      * @param DoliDb $db Database handler.

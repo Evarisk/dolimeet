@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class Session extends SaturneObject
     /**
      * @var int Does object support extrafields ? 0 = No, 1 = Yes.
      */
-    public int $isextrafieldmanaged = 1;
+    public $isextrafieldmanaged = 1;
 
     /**
      * @var string Name of icon for session. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'session@dolimeet' if picto is file 'img/object_session.png'.
@@ -112,24 +112,28 @@ class Session extends SaturneObject
     public $fields = [
         'rowid'          => ['type' => 'integer',      'label' => 'TechnicalID',      'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => 'Id'],
         'ref'            => ['type' => 'varchar(128)', 'label' => 'Ref',              'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'validate' => 1, 'comment' => 'Reference of object'],
-        'ref_ext'        => ['type' => 'varchar(128)', 'label' => 'RefExt',           'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0],
-        'entity'         => ['type' => 'integer',      'label' => 'Entity',           'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0, 'index' => 1],
+        'ref_ext'        => ['type' => 'varchar(128)', 'label' => 'RefExt',           'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => -2],
+        'entity'         => ['type' => 'integer',      'label' => 'Entity',           'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => -2, 'index' => 1],
         'date_creation'  => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2],
-        'tms'            => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 1, 'visible' => 0],
-        'import_key'     => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
-        'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived']],
+        'tms'            => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => 1, 'position' => 50,  'notnull' => 1, 'visible' => -2],
+        'import_key'     => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => -2, 'index' => 0],
+        'status'         => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 2, 'searchmulti' => 1, 'default' => 0, 'index' => 1, 'validate' => 1, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'ValidatePendingSignature', 2 => 'Locked', 3 => 'Archived']],
         'label'          => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1, 'autofocusoncreate' => 1],
-        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 110, 'notnull' => 1, 'visible' => 1],
-        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 1],
-        'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 3, 'validate' => 1],
-        'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => 0],
-        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1],
+        'date_start'     => ['type' => 'datetime',     'label' => 'DateStart',        'enabled' => 1, 'position' => 41,  'notnull' => 0, 'visible' => 1, 'contenteditable' => 1],
+        'date_end'       => ['type' => 'datetime',     'label' => 'DateEnd',          'enabled' => 1, 'position' => 42,  'notnull' => 0, 'visible' => 1, 'contenteditable' => 1],
+        'content'        => ['type' => 'html',         'label' => 'Content',          'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 3, 'validate' => 1],
+        'type'           => ['type' => 'varchar(128)', 'label' => 'Type',             'enabled' => 1, 'position' => 120, 'notnull' => 1, 'visible' => -2],
+        'element_type'   => ['type' => 'select',       'label' => 'ElementType',      'enabled' => 1, 'position' => 91,  'notnull' => 0, 'visible' => 3, 'css' => 'maxwidth150 widthcentpercentminusxx'],
+        'fk_element'     => ['type' => 'integer',      'label' => 'FkElement',        'enabled' => 1, 'position' => 92,  'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'csslist' => 'left'],
+        'model'          => ['type' => 'boolean',      'label' => 'Template',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 1],
+        'position'       => ['type' => 'integer',      'label' => 'Position',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 3],
+        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 43, 'notnull' => 0, 'visible' => 1, 'isameasure' => 1, 'csslist' => 'right'],
         'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
-        'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',     'enabled' => 1,                         'position' => 170, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-        'fk_user_modif'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserModif',  'picto' => 'user',     'enabled' => 1,                         'position' => 180, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+        'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',     'enabled' => 1,                         'position' => 170, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid'],
+        'fk_user_modif'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserModif',  'picto' => 'user',     'enabled' => 1,                         'position' => 180, 'notnull' => 0, 'visible' => -2, 'foreignkey' => 'user.rowid'],
         'fk_soc'         => ['type' => 'integer:Societe:societe/class/societe.class.php',   'label' => 'ThirdParty', 'picto' => 'company',  'enabled' => '$conf->societe->enabled', 'position' => 80,  'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'societe.rowid'],
-        'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php',    'label' => 'Project',    'picto' => 'project',  'enabled' => '$conf->project->enabled', 'position' => 90,  'notnull' => 0,  'visible'=> 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
+        'fk_project'     => ['type' => 'integer:Project:projet/class/project.class.php',    'label' => 'Project',    'picto' => 'project',  'enabled' => '$conf->project->enabled', 'position' => 90,  'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
         'fk_contrat'     => ['type' => 'integer:Contrat:contrat/class/contrat.class.php',   'label' => 'Contract',   'picto' => 'contract', 'enabled' => '$conf->contrat->enabled', 'position' => 100, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'contrat.rowid']
     ];
 
@@ -199,6 +203,26 @@ class Session extends SaturneObject
     public string $type;
 
     /**
+     * @var string|null Element type
+     */
+    public ?string $element_type = '';
+
+    /**
+     * @var int|string Element ID
+     */
+    public $fk_element;
+
+    /**
+     * @var bool Model
+     */
+    public bool $model = false;
+
+    /**
+     * @var int|null Position
+     */
+    public ?int $position;
+
+    /**
      * @var int|null|string Duration.
      */
     public $duration;
@@ -216,12 +240,12 @@ class Session extends SaturneObject
     /**
      * @var int User ID.
      */
-    public int $fk_user_creat;
+    public $fk_user_creat;
 
     /**
      * @var int|null User ID.
      */
-    public ?int $fk_user_modif;
+    public $fk_user_modif;
 
     /**
      * @var int|string  ThirdParty ID.
@@ -246,6 +270,8 @@ class Session extends SaturneObject
      */
     public function __construct(DoliDB $db, string $objectType = 'session')
     {
+        global $conf;
+
         $this->type = $objectType;
 
         parent::__construct($db, $this->module, $objectType);
@@ -253,20 +279,30 @@ class Session extends SaturneObject
         switch ($objectType) {
             case 'trainingsession':
                 $this->picto = 'fontawesome_fa-people-arrows_fas_#d35968';
-                $this->fields['fk_project']['notnull'] = 1;
                 $this->fields['fk_contrat']['notnull'] = 1;
+                $this->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:((fk_product_type:=:1) AND (entity:=:' . $conf->entity . '))';
                 break;
             case 'meeting':
                 $this->picto = 'fontawesome_fa-comments_fas_#d35968';
                 unset($this->fields['duration']);
+                unset($this->fields['model']);
+                unset($this->fields['fk_contrat']);
                 break;
             case 'audit':
                 $this->picto = 'fontawesome_fa-tasks_fas_#d35968';
                 unset($this->fields['duration']);
+                unset($this->fields['model']);
+                unset($this->fields['fk_contrat']);
                 break;
             default :
                 $this->picto = 'dolimeet_color@dolimeet';
                 break;
+        }
+
+        if (!$this->model) {
+            //unset($this->fields['element_type']);
+            //unset($this->fields['fk_element']);
+            //unset($this->fields['position']);
         }
     }
 
@@ -547,6 +583,41 @@ class Session extends SaturneObject
     }
 
     /**
+     * Return HTML string to put an input field into a page
+     * Code very similar with showInputField of extra fields
+     *
+     * @param  string          $key         Key of attribute
+     * @param  string|string[] $value       Preselected value to show (for date type it must be in timestamp format, for amount or price it must be a php numeric value, for array type must be array)
+     * @param  string          $moreparam   To add more parameters on html input tag
+     * @param  string          $keysuffix   Suffix string to add into name and id of field (can be used to avoid duplicate names)
+     * @param  string          $keyprefix   Prefix string to add into name and id of field (can be used to avoid duplicate names)
+     * @param  string|int      $morecss     Value for css to define style/length of field. May also be a numeric
+     * @param  int<0,1>        $nonewbutton Force to not show the new button on field that are links to object
+     * @return string          $out         HTML string to put an input field into a page
+     * @throws Exception
+     */
+    public function showInputField($val, $key, $value, $moreparam = '', $keysuffix = '', $keyprefix = '', $morecss = 0, $nonewbutton = 0): string
+    {
+        if ($key == 'fk_element') {
+            if (GETPOSTISSET('element_type') || GETPOST('element_type') != '0') {
+                $out     = '';
+                $valInfo = explode(':', $val['type']);
+                if (count($valInfo) >= 5) {
+                    require_once DOL_DOCUMENT_ROOT . '/' . $valInfo[2];
+
+                    $objects = saturne_fetch_all_object_type($valInfo[1], '', '', 0, 0, ['customsql' => $valInfo[4]]);
+                    if (is_array($objects) && !empty($objects)) {
+                        $objects = array_column($objects, 'ref', 'id');
+                        $out     = Form::selectarray($keyprefix . $key . $keysuffix, $objects, $value, 1, 0, 0, '', 0, 0, 0, '', !empty($val['css']) ? $val['css'] : 'minwidth200 maxwidth300 widthcentpercentminusx');
+                    }
+                }
+                return $out;
+            }
+        }
+        return parent::showInputField($val, $key, $value, $moreparam, $keysuffix, $keyprefix, $morecss, $nonewbutton);
+    }
+
+    /**
      * Load dashboard info
      *
      * @return array
@@ -554,24 +625,29 @@ class Session extends SaturneObject
      */
     public function loadDashboard(): array
     {
+        global $langs;
+
         $getSessionInfos   = self::getSessionInfos();
         $getAttendantInfos = self::getAttendantInfos();
 
         $array['widgets'] = [
             0 => [
-                'label'      => [$getSessionInfos['meeting']['label'] ?? '', $getSessionInfos['trainingsession']['label'] ?? '', $getSessionInfos['audit']['label'] ?? ''],
-                'content'    => [$getSessionInfos['meeting']['content'] ?? 0, $getSessionInfos['trainingsession']['content'] ?? 0, $getSessionInfos['audit']['content'] ?? 0],
-                'picto'      => $getSessionInfos['picto'],
-                'widgetName' => $getSessionInfos['widgetName']
+                'title'         => $langs->transnoentities('ActivityMonitoring'),
+                'label'         => [$langs->transnoentities('NbMeetings'), $langs->transnoentities('NbTrainingsessions'), $langs->transnoentities('NbAudits')],
+                'content'       => [$getSessionInfos['meeting']['content'] ?? 0, $getSessionInfos['trainingsession']['content'] ?? 0, $getSessionInfos['audit']['content'] ?? 0],
+                'picto'         => $getSessionInfos['picto'],
+                'widgetName'    => $getSessionInfos['widgetName']
             ],
             1 => [
-                'label'      => [$getSessionInfos['meeting']['moyenneDuration']['label'] ?? '', $getSessionInfos['trainingsession']['moyenneDuration']['label'] ?? '', $getSessionInfos['audit']['moyenneDuration']['label'] ?? ''],
+                'title'      => $langs->transnoentities('AverageDurationByActivity'),
+                'label'      => [$langs->transnoentities('MoyenneDurationMeetings'), $langs->transnoentities('MoyenneDurationTrainingsessions'), $langs->transnoentities('MoyenneDurationAudits')],
                 'content'    => [$getSessionInfos['meeting']['moyenneDuration']['content'] ?? 0, $getSessionInfos['trainingsession']['moyenneDuration']['content'] ?? 0, $getSessionInfos['audit']['moyenneDuration']['content'] ?? 0],
                 'picto'      => $getSessionInfos['picto'],
                 'widgetName' => $getSessionInfos['widgetName2']
             ]
         ];
         $attendantMeetingInfos = [
+            'title'      => $langs->transnoentities('MeetingAttendance'),
             'label'      => [$getAttendantInfos['meeting']['label'] ?? '', $getAttendantInfos['meeting']['contributor']['label'] ?? '', $getAttendantInfos['meeting']['responsible']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['present']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['delay']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['absent']['label'] ?? ''],
             'content'    => [$getAttendantInfos['meeting']['content'] ?? 0, $getAttendantInfos['meeting']['contributor']['content'] ?? 0, $getAttendantInfos['meeting']['responsible']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['absent']['content'] ?? 0],
             'picto'      => $getAttendantInfos['meeting']['picto'],
@@ -581,6 +657,7 @@ class Session extends SaturneObject
             $array['widgets'][] = $attendantMeetingInfos;
         }
         $attendantTrainingsessionInfos = [
+            'title'      => $langs->transnoentities('TrainingSessionAttendance'),
             'label'      => [$getAttendantInfos['trainingsession']['label'] ?? '', $getAttendantInfos['trainingsession']['trainee']['label'] ?? '', $getAttendantInfos['trainingsession']['sessionTrainer']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['present']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['delay']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['absent']['label'] ?? ''],
             'content'    => [$getAttendantInfos['trainingsession']['content'] ?? 0, $getAttendantInfos['trainingsession']['trainee']['content'] ?? 0, $getAttendantInfos['trainingsession']['sessionTrainer']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['absent']['content'] ?? 0],
             'picto'      => $getAttendantInfos['trainingsession']['picto'],
@@ -590,6 +667,7 @@ class Session extends SaturneObject
             $array['widgets'][] = $attendantTrainingsessionInfos;
         }
         $attendantAuditInfos = [
+            'title'      => $langs->transnoentities('AuditAttendance'),
             'label'      => [$getAttendantInfos['audit']['label'] ?? '', $getAttendantInfos['audit']['auditee']['label'] ?? '', $getAttendantInfos['audit']['auditor']['label'] ?? '', $getAttendantInfos['audit']['attendance']['present']['label'] ?? '', $getAttendantInfos['audit']['attendance']['delay']['label'] ?? '', $getAttendantInfos['audit']['attendance']['absent']['label'] ?? ''],
             'content'    => [$getAttendantInfos['audit']['content'] ?? 0, $getAttendantInfos['audit']['auditee']['content'] ?? 0, $getAttendantInfos['audit']['auditor']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['absent']['content'] ?? 0],
             'picto'      => $getAttendantInfos['audit']['picto'],
@@ -622,27 +700,21 @@ class Session extends SaturneObject
             foreach ($sessions as $session) {
                 switch ($session->type) {
                     case 'meeting' :
-                        $array['meeting']['label'] = $langs->transnoentities('NbMeetings');
                         $array['meeting']['content']++;
                         if (!empty($session->date_start) && !empty($session->date_end)) {
-                            $array['meeting']['moyenneDuration']['label'] = $langs->transnoentities('MoyenneDurationMeetings');
-                            $array['meeting']['duration']['content']     += $session->date_end - $session->date_start;
+                            $array['meeting']['duration']['content'] += $session->date_end - $session->date_start;
                         }
                         break;
                     case 'trainingsession' :
-                        $array['trainingsession']['label'] = $langs->transnoentities('NbTrainingsessions');
                         $array['trainingsession']['content']++;
                         if (!empty($session->duration)) {
-                            $array['trainingsession']['moyenneDuration']['label'] = $langs->transnoentities('MoyenneDurationTrainingsessions');
-                            $array['trainingsession']['duration']['content']     += $session->duration;
+                            $array['trainingsession']['duration']['content'] += $session->duration;
                         }
                         break;
                     case 'audit' :
-                        $array['audit']['label'] = $langs->transnoentities('NbAudits');
                         $array['audit']['content']++;
                         if (!empty($session->date_start) && !empty($session->date_end)) {
-                            $array['audit']['moyenneDuration']['label'] = $langs->transnoentities('MoyenneDurationAudits');
-                            $array['audit']['duration']['content']     += $session->date_end - $session->date_start;
+                            $array['audit']['duration']['content'] += $session->date_end - $session->date_start;
                         }
                         break;
                 }
@@ -820,4 +892,3 @@ class SessionDocument extends SaturneDocuments
         parent::__construct($db, $this->module, $objectType);
     }
 }
-

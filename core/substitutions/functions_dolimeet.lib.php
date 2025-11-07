@@ -36,6 +36,10 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 {
     global $conf, $db, $user;
 
+    if (!is_object($object)) {
+        return;
+    }
+
     if ($object->element == 'contrat') {
         // Load Saturne libraries
         require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
@@ -43,6 +47,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 
         // Load DoliMeet libraries
         require_once __DIR__ . '/../../class/session.class.php';
+        require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
 
         saturne_load_langs();
 
@@ -75,9 +80,18 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
             }
         }
 
-        $substitutionarray['__DOLIMEET_CONTRACT_LABEL__']                    = $object->array_options['options_label'];
-        $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_START__']    = $object->array_options['options_trainingsession_start'];
-        $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_END__']      = $object->array_options['options_trainingsession_end'];
+        $productIds = trainingsession_function_lib1();
+
+        $formationTitle = '';
+        foreach ($object->lines as $line) {
+            if (!in_array($line->fk_product, array_keys($productIds))) {
+                continue;
+            }
+
+            $formationTitle .= $line->product_label;
+        }
+
+        $substitutionarray['__DOLIMEET_CONTRACT_LABEL__']                    = $formationTitle;
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_TYPE__']     = $object->array_options['options_trainingsession_type'];
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_LOCATION__'] = $object->array_options['options_trainingsession_location'];
 
@@ -126,4 +140,6 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
             }
         }
     }
+
+    $substitutionarray['__DOLIMEET_PUBLIC_INTERFACE_CONTACT_URL__'] = dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id;
 }

@@ -35,6 +35,11 @@ class Trainingsession extends Session
     public $element = 'trainingsession';
 
     /**
+     * @var string Parent element type of object
+     */
+    public string $parent_element = 'session';
+
+    /**
      * Constructor.
      *
      * @param DoliDb $db Database handler.

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ class modDoliMeet extends DolibarrModules
         $this->editor_url  = 'https://evarisk.com';
 
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'.
-        $this->version = '1.4.0';
+        $this->version = '21.0.0';
 
         // Url to the file with your last numberversion of this module.
         //$this->url_last_version = 'http://www.example.com/versionmodule.txt';
@@ -143,7 +143,15 @@ class modDoliMeet extends DolibarrModules
                 'meetinglist',
                 'trainingsessionlist',
                 'auditlist',
-                'contractlist'
+                'contractlist',
+                'propalcard',
+                'productcard',
+                'productservicelist',
+                'ajaxonlinesign',
+                'onlinesign',
+                'contractnote',
+                'elementproperties',
+                'dolimeetpublicinterfaceadmin'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
@@ -161,7 +169,7 @@ class modDoliMeet extends DolibarrModules
         $this->hidden = false;
 
         // List of module class names as string that must be enabled if this module is enabled. Example: array('always1'=>'modModuleToEnable1','always2'=>'modModuleToEnable2', 'FR1'=>'modModuleToEnableFR'...).
-        $this->depends      = ['modCategorie', 'modContrat', 'modProjet', 'modFckeditor', 'modSaturne', 'modAgenda'];
+        $this->depends      = ['modCategorie', 'modContrat', 'modProjet', 'modFckeditor', 'modSaturne', 'modAgenda', 'modProduct', 'modService', 'modPropale'];
         $this->requiredby   = []; // List of module class names as string to disable if this one is disabled. Example: array('modModuleToDisable1', ...).
         $this->conflictwith = []; // List of module class names as string this module is in conflict with. Example: array('modModuleToDisable1', ...).
 
@@ -224,9 +232,20 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SET', 'integer', 0, '', 0, 'current'],
             $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_MORNING_START_HOUR', 'chaine', '09:00', '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_MORNING_END_HOUR', 'chaine', '12:00', '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR', 'chaine', '14:00', '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR', 'chaine', '18:00', '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_LOCATION', 'chaine', 'TrainingSessionLocationOther', '', 0, 'current'],
+            $i++ => ['DOLIMEET_TRAININGSESSION_ABSENCE_RATE', 'integer', 20, '', 0, 'current'],
+            $i++ => ['DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED', 'integer', 1, '', 0, 'current'],
 
             // CONST GENERAL CONST.
             $i++ => ['CONTACT_SHOW_EMAIL_PHONE_TOWN_SELECTLIST', 'integer', 1, '', 0, 'current'],
+            $i++ => ['FCKEDITOR_ENABLE_NOTE_PUBLIC', 'integer', 1, '', 0, 'current'],
+            $i++ => ['CONTRACT_SHOW_SIGNATURE_STATUS_WITH_SERVICE_STATUS', 'chaine', 1, '', 0, 'current'],
+            $i++ => ['CONTRACT_ALLOW_ONLINESIGN', 'integer', 1, '', 0, 'current'],
+            $i++ => ['CONTRACT_ALLOW_EXTERNAL_DOWNLOAD', 'integer', 1, '', 0, 'current'],
             $i   => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current']
         ];
 
@@ -250,6 +269,7 @@ class modDoliMeet extends DolibarrModules
         $this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'];                            // To add a new tab identified by code tabname1.
         $this->tabs[] = ['data' => 'project:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'];                              // To add a new tab identified by code tabname1.
         $this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'product:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=product&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
         $this->tabs[] = ['data' => 'contract:+schedules:'. $picto . $langs->trans('Schedules') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/saturne/view/saturne_schedules.php?module_name=DoliMeet&element_type=contrat&id=__ID__'];     // To add a new tab identified by code tabname1.
         // Example:
         // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@dolimeet:$user->rights->othermodule->read:/dolimeet/mynewtab2.php?id=__ID__', // To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
@@ -577,19 +597,19 @@ class modDoliMeet extends DolibarrModules
         delDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument');
         delDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument');
         delDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument');
+        delDocumentModel('attendancesheetdocument', 'trainingsessiondocument');
 
         addDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH');
-        addDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
-        addDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('attendancesheetdocument', 'trainingsessiondocument', $langs->transnoentities('AttendanceSheetDocumentPDFDescription'));
+
+        // Load Saturne libraries
+        require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
+        $saturneMail = new SaturneMail($this->db, 'contrat');
 
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
-            // Load Saturne libraries
-            require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
-
-            $saturneMail = new SaturneMail($this->db, 'contrat');
-
             $position = 100;
-            $satisfactionSurveys = ['customer', 'billing', 'trainee', 'sessiontrainer', 'opco'];
+            $satisfactionSurveys = ['billing', 'trainee', 'sessiontrainer', 'opco'];
             foreach ($satisfactionSurveys as $satisfactionSurvey) {
                 $saturneMail->entity        = 0;
                 $saturneMail->type_template = 'contract';
@@ -599,7 +619,7 @@ class modDoliMeet extends DolibarrModules
                 $saturneMail->position      = $position;
                 $saturneMail->enabled       = "isModEnabled('contrat')";
                 $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyTopic', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
-                $saturneMail->joinfiles     = 1;
+                $saturneMail->joinfiles     = 0;
                 $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyContent', dol_strtolower($langs->transnoentities(ucfirst($satisfactionSurvey))));
 
                 $emailTemplateSatisfactionSurvey[$satisfactionSurvey] = $saturneMail->create($user);
@@ -609,28 +629,104 @@ class modDoliMeet extends DolibarrModules
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', json_encode($emailTemplateSatisfactionSurvey), 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 1, 'integer', 0, '', $conf->entity);
         }
+        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') <= 1) {
+            $saturneMail->entity        = 0;
+            $saturneMail->type_template = 'contract';
+            $saturneMail->lang          = 'fr_FR';
+            $saturneMail->datec         = $this->db->idate(dol_now());
+            $saturneMail->label         = $langs->transnoentities('CompletionCertificateDocumentLabel');
+            $saturneMail->position      = 100;
+            $saturneMail->enabled       = "isModEnabled('dolimeet')";
+            $saturneMail->topic         = $langs->transnoentities('CompletionCertificateDocumentTopic');
+            $saturneMail->joinfiles     = 0;
+            $saturneMail->content       = $langs->transnoentities('CompletionCertificateDocumentContent');
 
-        // Create extrafields during init.
-        require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
-        $extraFields = new ExtraFields($this->db);
+            $emailTemplateID = $saturneMail->create($user);
 
-        $extraFields->update('label', 'Label', 'varchar', 255, 'contrat', 0, 0, $this->numero . 1, '', '', '', 1, '', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
-        $extraFields->addExtraField('label', 'Label', 'varchar', $this->numero . 1, 255, 'contrat', 0, 0, '', '', '', '', 1, '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $emailTemplateID, 'chaine', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 2, 'integer', 0, '', $conf->entity);
+        }
 
-        $extraFields->update('trainingsession_type', 'TrainingSessionType', 'sellist', '', 'contrat', 0, 0, $this->numero . 10, 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
-        $extraFields->addExtraField('trainingsession_type', 'TrainingSessionType', 'sellist', $this->numero . 10, '', 'contrat', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:34:"c_trainingsession_type:label:rowid";N;}}', '', '', 1, 'TrainingSessionTypeHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_UPDATED') == 0) {
+            $emailTemplateSatisfactionSurveys = json_decode(dolibarr_get_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'), true);
+            if (is_array($emailTemplateSatisfactionSurveys) && !empty($emailTemplateSatisfactionSurveys)) {
+                foreach ($emailTemplateSatisfactionSurveys as $emailTemplateSatisfactionSurvey) {
+                    $saturneMail->fetch($emailTemplateSatisfactionSurvey);
+                    $saturneMail->joinfiles = 0;
+                    $saturneMail->setValueFrom('joinfiles', $saturneMail->joinfiles, '', '', 'int', '', $user);
+                }
+            }
 
-        $extraFields->update('trainingsession_location', 'TrainingSessionLocation', 'varchar', 255, 'contrat', 0, 0, $this->numero . 20, '', '', '', 1, 'TrainingSessionLocationHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
-        $extraFields->addExtraField('trainingsession_location', 'TrainingSessionLocation', 'varchar', $this->numero . 20, 255, 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionLocationHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_UPDATED', 1, 'integer', 0, '', $conf->entity);
+        }
 
-        $extraFields->update('trainingsession_start', 'TrainingSessionStart', 'datetime', '', 'contrat', 0, 0, $this->numero . 30, '', '', '', 1, 'TrainingSessionStartHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
-        $extraFields->addExtraField('trainingsession_start', 'TrainingSessionStart', 'datetime', $this->numero . 30, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionStartHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')", 0, 0, ['css' => 'minwidth100 maxwidth300 widthcentpercentminusxx']);
+        if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') == 0 && isModEnabled('project')) {
+            require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
-        $extraFields->update('trainingsession_end', 'TrainingSessionEnd', 'datetime', '', 'contrat', 0, 0, $this->numero . 40, '', '', '', 1, 'TrainingSessionEndHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
-        $extraFields->addExtraField('trainingsession_end', 'TrainingSessionEnd', 'datetime', $this->numero . 40, '', 'contrat', 0, 0, '', '', '', '', 'TrainingSessionEndHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+            $numberingModules  = ['project' => getDolGlobalString('PROJECT_ADDON')];
+            list ($projectRef) = saturne_require_objects_mod($numberingModules);
 
-        $extraFields->update('trainingsession_durations', 'TrainingSessionDurations', 'int', '', 'contrat', 0, 0, $this->numero . 50, '', '', '', 1, 'TrainingSessionDurationHelp', '', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
-        $extraFields->addExtraField('trainingsession_durations', 'TrainingSessionDurations', 'int', $this->numero . 50, '', 'contrat', 0, 0, '', '', '', '', 1, 'TrainingSessionDurationHelp', '', 0, 'dolimeet@dolimeet', "isModEnabled('dolimeet') && isModEnabled('contrat')");
+            $project = new Project($this->db);
+
+            $project->ref    = $projectRef->getNextValue('', $project);
+            $project->title  = $langs->transnoentities('TrainingSessionTemplates');
+            $project->date_c = dol_now();
+            $project->statut = Project::STATUS_VALIDATED;
+
+            $projectID = $project->create($user);
+
+            dolibarr_set_const($this->db, 'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT', $projectID, 'integer', 0, '', $conf->entity);
+        }
+
+        // Create extrafields during init
+        $commonExtraFieldsValue = [
+            'entity' => 0, 'langfile' => 'dolimeet@dolimeet', 'enabled' => "isModEnabled('dolimeet')"
+        ];
+
+        $extraFieldsArrays = [
+            'trainingsession_type'           => ['Label' => 'TrainingSessionType',          'type' => 'sellist',                   'elementtype' => ['contrat', 'propal'], 'position' => $this->numero . 20, 'params' => ['c_trainingsession_type:label:rowid::(active:=:1)' => NULL], 'list' => 1, 'help' => ['contrat' => '', 'propal' => '', 'projet' => 'TrainingSessionTypeHelp'], 'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_location'       => ['Label' => 'TrainingSessionLocation',      'type' => 'varchar',  'length' => 255, 'elementtype' => ['contrat', 'propal'], 'position' => $this->numero . 40,                                                                           'list' => 1, 'help' => 'TrainingSessionLocationHelp',                                            'moreparams' => ['css' => 'minwidth100 maxwidth300']],
+            'trainingsession_opco_financing' => ['Label' => 'TrainingSessionOpcoFinancing', 'type' => 'boolean',                   'elementtype' => ['contrat'],           'position' => $this->numero . 50, 'alwayseditable' => 1,                                                    'list' => 5, 'help' => 'TrainingSessionOpcoFinancingHelp'],
+
+            'syllabus' => ['Label' => 'Syllabus', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 60, 'alwayseditable' => 1, 'list' => 4, 'help' => 'SyllabusHelp']
+        ];
+
+        saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
+
+        if (getDolGlobalInt('DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 0) {
+            $extraFieldsArrays = [
+                'trainingsession_start'     => ['elementtype' => ['contrat']],
+                'trainingsession_end'       => ['elementtype' => ['contrat']],
+                'trainingsession_durations' => ['elementtype' => ['contrat']]
+            ];
+
+            require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+            $extraFields = new ExtraFields($this->db);
+
+            foreach ($extraFieldsArrays as $key => $extraField) {
+                foreach ($extraField['elementtype'] as $extraFieldElementType) {
+                    $extraFields->delete($key, $extraFieldElementType);
+                }
+            }
+            dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+        } elseif (getDolGlobalInt('DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 1) {
+            $extraFieldsArrays = [
+                'label'                    => ['elementtype' => ['contrat']],
+                'trainingsession_service'  => ['elementtype' => ['propal', 'projet']],
+                'trainingsession_type'     => ['elementtype' => ['projet']],
+                'trainingsession_location' => ['elementtype' => ['projet']],
+            ];
+
+            require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+            $extraFields = new ExtraFields($this->db);
+
+            foreach ($extraFieldsArrays as $key => $extraField) {
+                foreach ($extraField['elementtype'] as $extraFieldElementType) {
+                    $extraFields->delete($key, $extraFieldElementType);
+                }
+            }
+            dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 2, 'integer', 0, '', $conf->entity);
+        }
 
         return $this->_init($sql, $options);
     }

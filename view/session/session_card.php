@@ -142,8 +142,6 @@ if (empty($resHook)) {
         }
     }
 
-    // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen.
-
     if ($action == 'add' && $permissiontoadd) {
         $durationHour = GETPOST('durationhour');
         $durationMin  = GETPOST('durationmin');
@@ -153,11 +151,17 @@ if (empty($resHook)) {
         if (empty($durationMin)) {
             $_POST['durationmin'] = 0;
         }
+
+        if (GETPOST('model') == 1) {
+            unset($object->fields['fk_soc']);
+            unset($object->fields['fk_contrat']);
+        }
     }
 
+    // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen.
     require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
-    // Actions set_thirdparty, set_project
+    // Actions set_thirdparty, set_project, set_contract
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 
     // Actions builddoc, forcebuilddoc, remove_file.
@@ -209,27 +213,67 @@ if ($action == 'create') {
 
     print '<table class="border centpercent tableforfieldcreate">';
 
-    $now = dol_getdate(dol_now());
+    $now = dol_getdate(dol_now('tzuser'));
 
-    if ($_POST['fk_soc'] == -1) {
-        $_POST['fk_soc'] = 0;
+    if (GETPOST('model') == 'on' || GETPOST('model') == 1) {
+        // Set default fields
+        unset($object->fields['fk_soc']);
+        unset($object->fields['fk_contrat']);
+
+        $object->fields['position']['enabled']     = 1;
+        $object->fields['position']['notnull']     = 1;
+        $object->fields['position']['default']     = 1;
+        $object->fields['element_type']['enabled'] = 1;
+        $object->fields['fk_element']['enabled']   = 1;
+        $_POST['model']                           = 'on';
+
+        // Set service fields
+        if (isModEnabled('service')) {
+            $object->fields['element_type']['arrayofkeyval']['service'] = $langs->trans('Service');
+        }
+
+        if (GETPOST('element_type') == 'service') {
+            $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:fk_product_type = 1 AND entity = ' . $conf->entity;
+            $object->fields['fk_element']['picto']   = 'service';
+            $object->fields['fk_element']['label']   = $langs->trans('Service');
+            $object->fields['element_type']['picto'] = 'service';
+        } else {
+            if (GETPOSTISSET('fk_element')) {
+                $_GET['fk_element'] = '';
+            }
+        }
+
+        $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR'));
+        $_POST['date_starthour']  = $time[0];
+        $_POST['date_startmin']   = $time[1];
+
+        $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR'));
+        $_POST['date_endhour']  = $time[0];
+        $_POST['date_endmin']   = $time[1];
+
+        $timeToSecond = convertTime2Seconds($_POST['date_endhour'], $_POST['date_endmin']) - convertTime2Seconds($_POST['date_starthour'], $_POST['date_startmin']);
+        $_POST['duration'] = $timeToSecond;
+    } else {
+        $_POST['date_starthour'] = $now['hours'];
+        $_POST['date_startmin']  = $now['minutes'];
+
+        if ($object->element == 'meeting') {
+            $_POST['date_endhour'] = $now['hours'] + 1;
+            $_POST['date_endmin']  = $now['minutes'];
+        }
+
+        if ($_POST['fk_soc'] == -1) {
+            $_POST['fk_soc'] = 0;
+        }
     }
 
-    if (!GETPOSTISSET('date_start')) {
-        $_POST['date_startyear']  = $now['year'];
-        $_POST['date_startmonth'] = $now['mon'];
-        $_POST['date_startday']   = $now['mday'];
-        $_POST['date_starthour']  = $now['hours'];
-        $_POST['date_startmin']   = $now['minutes'];
-    }
+    $_POST['date_startyear']  = $now['year'];
+    $_POST['date_startmonth'] = $now['mon'];
+    $_POST['date_startday']   = $now['mday'];
 
-    if ($object->element == 'meeting' && !GETPOSTISSET('date_end')) {
-        $_POST['date_endyear']  = $now['year'];
-        $_POST['date_endmonth'] = $now['mon'];
-        $_POST['date_endday']   = $now['mday'];
-        $_POST['date_endhour']  = $now['hours'] + 1;
-        $_POST['date_endmin']   = $now['minutes'];
-    }
+    $_POST['date_endyear']  = $now['year'];
+    $_POST['date_endmonth'] = $now['mon'];
+    $_POST['date_endday']   = $now['mday'];
 
     $fromType = GETPOSTISSET('fromtype') ? GETPOST('fromtype', 'alpha') : ''; // element type.
     $fromID   = GETPOSTISSET('fromid') ? GETPOST('fromid', 'int') : 0;        //element id.
@@ -237,7 +281,6 @@ if ($action == 'create') {
     if (GETPOST('fk_soc')) {
         $object->fields['fk_project']['type'] = 'integer:Project:projet/class/project.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
         $object->fields['fk_contrat']['type'] = 'integer:Contrat:contrat/class/contrat.class.php:0:(fk_soc:=:' . GETPOST('fk_soc') . ')';
-
     }
 
     if (!empty($fromType)) {
@@ -260,8 +303,6 @@ if ($action == 'create') {
                 break;
         }
     }
-
-    $conf->tzuserinputkey = 'tzuser';
 
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
@@ -304,6 +345,27 @@ if (($id || $ref) && $action == 'edit') {
     print dol_get_fiche_head();
 
     print '<table class="border centpercent tableforfieldedit">';
+
+    if ($object->model == 1) {
+        $object->fields['position']['enabled']     = 1;
+        $object->fields['element_type']['enabled'] = 1;
+        $object->fields['fk_element']['enabled']   = 1;
+
+        unset($object->fields['fk_soc']);
+        unset($object->fields['fk_contrat']);
+        unset($object->fields['fk_project']);
+
+        if (isModEnabled('service')) {
+            $object->fields['element_type']['arrayofkeyval']['service'] = $langs->trans('Service');
+        }
+
+        if ($object->element_type == 'service') {
+            $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:fk_product_type = 1 AND entity = ' . $conf->entity;
+            $object->fields['fk_element']['picto']   = 'service';
+            $object->fields['fk_element']['label']   = $langs->trans('Service');
+            $object->fields['element_type']['picto'] = 'service';
+        }
+    }
 
     if ($_POST['fk_soc'] == -1) {
         $_POST['fk_soc'] = 0;
@@ -378,7 +440,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         // Define confirmation messages.
         $formQuestionClone = [
-            ['type' => 'text',  'name' => 'clone_label',      'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
+            ['type' => 'text',  'name' => 'clone_label',      'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $object->label, 'size' => 24],
             ['type' => 'radio', 'name' => 'clone_attendants', 'label' => $langs->trans('CloneAttendants'), 'values' => [0 => $langs->trans('Attendants'), 1 => $langs->trans('AttendantsFromContract'), 2 => $langs->trans('None')], 'default' => 0]
         ];
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element)), $object->ref), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);
@@ -407,14 +469,17 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         $onPhone = 0;
     }
 
+    $attendantsRole = [];
     switch ($object->element) {
         case 'meeting' :
             $attendantsRole = ['Contributor', 'Responsible'];
             $documentType   = 'MeetingDocument';
             break;
         case 'trainingsession' :
-            $attendantsRole = ['Trainee', 'SessionTrainer'];
-            $documentType   = 'AttendanceSheetDocument';
+            if ($object->model == 0) {
+                $attendantsRole = ['Trainee', 'SessionTrainer'];
+            }
+            $documentType = 'AttendanceSheetDocument';
             break;
         case 'audit' :
             $attendantsRole = ['Auditee', 'Auditor'];
@@ -458,6 +523,22 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     unset($object->fields['fk_project']); // Hide field already shown in banner.
     unset($object->fields['fk_soc']);     // Hide field already shown in banner.
     unset($object->fields['fk_contrat']); // Hide field already shown in banner.
+
+    if ($object->model == 1) {
+        $object->fields['element_type']['enabled'] = 1;
+        $object->fields['fk_element']['enabled']   = 1;
+
+        if (isModEnabled('service')) {
+            $object->fields['element_type']['arrayofkeyval']['service'] = $langs->trans('Service');
+        }
+
+        if ($object->element_type == 'service') {
+            $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:(fk_product_type:=:1)';
+            $object->fields['fk_element']['picto']   = 'service';
+            $object->fields['fk_element']['label']   = $langs->trans('Service');
+            $object->fields['element_type']['picto'] = 'service';
+        }
+    }
 
     // Common attributes.
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
@@ -515,65 +596,67 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
 
-            // Sign
-            $displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
-            if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-                print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element . '&document_type=' . $documentType . '&attendant_table_mode=simple', 3) . '">' . $displayButton . '</a>';
-            } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
-            }
-
-            // Lock.
-            $displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
-            if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element) && $nbAttendants > 0) {
-                print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
-            } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', $langs->transnoentities('The' . ucfirst($object->element))) . '<br>' . $mesg) . '">' . $displayButton . '</span>';
-            }
-
-            // Send mail.
-            $displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
-            if ($object->status == $object::STATUS_LOCKED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-                $signatoriesArray = $signatory->fetchSignatory('Trainee', $object->id, $object->type);
-                if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
-                    $nbTrainee = count($signatoriesArray);
+            if ($object->model == 0) {
+                // Sign
+                $displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
+                if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+                    print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element . '&document_type=' . $documentType . '&attendant_table_mode=simple', 3) . '">' . $displayButton . '</a>';
                 } else {
-                    $nbTrainee = 0;
+                    print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
                 }
-                $fileList = [];
-                foreach ($documentTypeArray as $documentTypeName) {
-                    $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC));
+
+                // Lock.
+                $displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
+                if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element) && $nbAttendants > 0) {
+                    print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
+                } else {
+                    print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', $langs->transnoentities('The' . ucfirst($object->element))) . '<br>' . $mesg) . '">' . $displayButton . '</span>';
                 }
-                if (!empty($fileList)) {
-                    $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
-                    foreach ($fileList as $file) {
-                        if (!strstr($file['name'], 'specimen')) {
-                            if (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('attendancesheetdocument'))) && $fileType['attendancesheetdocument'] == 0) {
-                                $fileType['attendancesheetdocument'] = 1;
-                            } elseif (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('completioncertificatedocument'))) && $fileType['completioncertificatedocument'] < $nbTrainee) {
-                                $fileType['completioncertificatedocument']++;
+
+                // Send mail.
+                $displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
+                if ($object->status == $object::STATUS_LOCKED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+                    $signatoriesArray = $signatory->fetchSignatory('Trainee', $object->id, $object->type);
+                    if (is_array($signatoriesArray) && !empty($signatoriesArray)) {
+                        $nbTrainee = count($signatoriesArray);
+                    } else {
+                        $nbTrainee = 0;
+                    }
+                    $fileList = [];
+                    foreach ($documentTypeArray as $documentTypeName) {
+                        $fileList = array_merge($fileList, dol_dir_list($upload_dir . '/' . $documentTypeName . 'document' . '/' . $object->ref, 'files', 0, '', '', 'date', SORT_DESC));
+                    }
+                    if (!empty($fileList)) {
+                        $fileType = ['attendancesheetdocument' => 0, 'completioncertificatedocument' => 0];
+                        foreach ($fileList as $file) {
+                            if (!strstr($file['name'], 'specimen')) {
+                                if (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('attendancesheetdocument'))) && $fileType['attendancesheetdocument'] == 0) {
+                                    $fileType['attendancesheetdocument'] = 1;
+                                } elseif (strstr($file['name'], str_replace(' ', '_', $langs->transnoentities('completioncertificatedocument'))) && $fileType['completioncertificatedocument'] < $nbTrainee) {
+                                    $fileType['completioncertificatedocument']++;
+                                }
                             }
                         }
-                    }
-                    if ($fileType['attendancesheetdocument'] == 1 && $fileType['completioncertificatedocument'] == $nbTrainee) {
-                        $forceBuildDoc = 0;
+                        if ($fileType['attendancesheetdocument'] == 1 && $fileType['completioncertificatedocument'] == $nbTrainee) {
+                            $forceBuildDoc = 0;
+                        } else {
+                            $forceBuildDoc = 1;
+                        }
                     } else {
                         $forceBuildDoc = 1;
                     }
+                    print '<a class="butAction" id="actionButtonSign" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=presend&forcebuilddoc=' . $forceBuildDoc . '&mode=init#formmailbeforetitle' . '">' .  $displayButton . '</a>';
                 } else {
-                    $forceBuildDoc = 1;
+                    print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
                 }
-                print '<a class="butAction" id="actionButtonSign" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=presend&forcebuilddoc=' . $forceBuildDoc . '&mode=init#formmailbeforetitle' . '">' .  $displayButton . '</a>';
-            } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
-            }
 
-            // Archive.
-            $displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
-            if ($object->status == $object::STATUS_LOCKED) {
-                print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=confirm_archive&token=' . newToken() . '">' . $displayButton . '</a>';
-            } else {
-                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+                // Archive.
+                $displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
+                if ($object->status == $object::STATUS_LOCKED) {
+                    print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=confirm_archive&token=' . newToken() . '">' . $displayButton . '</a>';
+                } else {
+                    print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+                }
             }
 
             // Clone.
@@ -588,7 +671,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     }
 
     if ($action != 'presend') {
-        if ($object->element == 'trainingsession') {
+        if ($object->element == 'trainingsession' && $object->model == 0) {
             print '<div class="fichecenter"><div class="fichehalfleft">';
             print '<a href="#builddoc"></a>'; // ancre.
 
@@ -613,7 +696,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
         // List of actions on element.
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
         $formActions = new FormActions($db);
-        $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
+        $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '&object_type=' . $object->element, $moreHtmlCenter);
 
         print '</div></div>';
     }

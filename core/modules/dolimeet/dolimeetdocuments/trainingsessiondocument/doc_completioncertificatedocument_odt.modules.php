@@ -27,6 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+include_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/lib/saturne_functions.lib.php';
@@ -41,17 +42,6 @@ require_once __DIR__ . '/../completioncertificatedocument/mod_completioncertific
  */
 class doc_completioncertificatedocument_odt extends SaturneDocumentModel
 {
-    /**
-     * @var array Minimum version of PHP required by module.
-     * e.g.: PHP ≥ 5.5 = array(5, 5)
-     */
-    public $phpmin = [7, 4];
-
-    /**
-     * @var string Dolibarr version of the loaded document.
-     */
-    public string $version = 'dolibarr';
-
     /**
      * @var string Module.
      */

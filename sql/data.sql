@@ -1,4 +1,4 @@
--- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+-- Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
 
 -- 1.0.0
 INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'ActionFormation', 'ActionFormation', '', 1, 1);
-INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'BilanCompetences', 'BilanCompetences', '', 1, 10);
-INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'ActionVAE', 'ActionVAE', '', 1, 20);
-INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(4, 0, 'ActionFormationApprentissage', 'ActionFormationApprentissage', '', 1, 30);
+INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'BilanCompetences', 'BilanCompetences', '', 0, 10);
+INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'ActionVAE', 'ActionVAE', '', 0, 20);
+INSERT INTO `llx_c_trainingsession_type` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(4, 0, 'ActionFormationApprentissage', 'ActionFormationApprentissage', '', 0, 30);
 
 -- 1.1.0
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'internal', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
@@ -34,7 +34,21 @@ INSERT INTO `llx_c_audit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `d
 INSERT INTO `llx_c_audit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Auditor', 'Auditor', '', 1, 10);
 
 -- 1.3.0
-INSERT INTO llx_c_email_templates (entity, module, type_template, lang, private, fk_user, datec, label, position, enabled, active, topic, joinfiles, content, content_lines) VALUES (0, 'contrat', 'contract', '', 0, null, null, 'Signature_Feuille_Présence', 10, '$conf->contrat->enabled', 1, '[__[MAIN_INFO_SOCIETE_NOM]__] Remise des liens de signature pour la convention de formation __REF__', 1, 'Bonjour,<br /><br />Nous vous envoyons ce mail afin de vous mettre au courant des sessions de formation li&eacute;es avec votre convention de formation &quot; __REF__&quot;&nbsp; -&nbsp; &quot;__DOLIMEET_CONTRACT_LABEL__&quot;.<br />Ci-dessous, vous trouverez un aper&ccedil;u des sessions, incluant les d&eacute;tails pertinents :<br /><br />__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__<br /><br />Nous vous prions de bien vouloir transmettre ces liens aux parties concern&eacute;es.<br />Nous restons &agrave; votre disposition pour toute information suppl&eacute;mentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__</p>', null);
+INSERT INTO llx_c_email_templates (entity, module, type_template, lang, private, fk_user, datec, label, position, enabled, active, topic, joinfiles, content, content_lines) VALUES (0, 'contrat', 'contract', '', 0, null, null, 'Signature_Feuille_Présence', 10, '$conf->contrat->enabled', 1, '[__[MAIN_INFO_SOCIETE_NOM]__] Remise des liens de signature pour la convention de formation __REF__', 0, 'Bonjour,<br /><br />Nous vous envoyons ce mail afin de vous mettre au courant des sessions de formation li&eacute;es avec votre convention de formation &quot; __REF__&quot;&nbsp; -&nbsp; &quot;__DOLIMEET_CONTRACT_LABEL__&quot;.<br />Ci-dessous, vous trouverez un aper&ccedil;u des sessions, incluant les d&eacute;tails pertinents :<br /><br />__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__<br /><br />Nous vous prions de bien vouloir transmettre ces liens aux parties concern&eacute;es.<br />Nous restons &agrave; votre disposition pour toute information suppl&eacute;mentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__</p>', null);
 
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'internal', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
 INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('contrat', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+
+-- 1.5.0
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'internal', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'internal', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'internal', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('propal', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'internal', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'internal', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'internal', 'OPCO', 'OPCO', 1, 'dolimeet', 20);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'TRAINEE', 'Trainee', 1, 'dolimeet', 1);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'SESSIONTRAINER', 'SessionTrainer', 1, 'dolimeet', 10);
+INSERT INTO `llx_c_type_contact` (`element`, `source`, `code`, `libelle`, `active`, `module`, `position`) VALUES('project', 'external', 'OPCO', 'OPCO', 1, 'dolimeet', 20);

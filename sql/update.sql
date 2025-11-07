@@ -1,4 +1,4 @@
--- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+-- Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -25,3 +25,34 @@ ALTER TABLE `llx_saturne_object_signature` ADD `attendance` SMALLINT NULL AFTER 
 ALTER TABLE `llx_c_trainingsession_type` CHANGE `active` `active` TINYINT(4) NULL DEFAULT '1';
 ALTER TABLE `llx_c_trainingsession_type` ADD `position` INT NULL DEFAULT '0' AFTER `active`;
 ALTER TABLE `llx_dolimeet_session` DROP `model_pdf`, DROP `last_main_doc`, DROP `document_url`;
+
+-- 1.5.0
+UPDATE llx_c_email_templates SET joinfiles = '0' WHERE label = 'Signature_Feuille_Présence';
+ALTER TABLE `llx_dolimeet_session` ADD `element_type` VARCHAR(128) NULL AFTER `type`;
+ALTER TABLE `llx_dolimeet_session` ADD `model` BOOLEAN NULL DEFAULT FALSE AFTER `element_type`;
+ALTER TABLE `llx_dolimeet_session` ADD `position` TINYINT(4) NULL AFTER `model`;
+ALTER TABLE `llx_dolimeet_session` ADD `fk_element` INT NULL AFTER `fk_soc`;
+ALTER TABLE `llx_dolimeet_session` CHANGE `date_start` `date_start` DATETIME NULL;
+ALTER TABLE `llx_dolimeet_session` CHANGE `date_end` `date_end` DATETIME NULL;
+
+-- 21.0.0
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
+
+UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'BilanCompetences';
+UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionVAE';
+UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionFormationApprentissage';
+
+ALTER TABLE llx_element_contact ADD mandatory_signature TINYINT AFTER element_id;

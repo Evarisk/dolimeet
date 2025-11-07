@@ -30,8 +30,6 @@ DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 
 # Setup
 SatisfactionSurvey                          = Satisfaction survey
-CustomerSatisfactionSurvey                  = Customer satisfaction survey
-CustomerSatisfactionSurveyDescription       = Defines the model used by default for customer satisfaction surveys
 BillingSatisfactionSurvey                   = Billing satisfaction survey
 BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
 TraineeSatisfactionSurvey                   = Trainee satisfaction survey
@@ -122,7 +120,7 @@ TrainingSessionLocationHelp           = Place where the training session linked 
 TrainingSessionDurationHelp           = Total duration of the sessions HH:MM (ex: 60:30) <br> The duration shown on the certificate corresponds to the total number of hours of sessions attended by a trainee.
 CalculatedTotalSessionDuration        = Total calculated duration time:
 TrainingSessionDurationErrorMatching  = <strong> Error: consistency of training session duration. </strong><br> The total duration of the sessions indicated in the contract is different from the calculated duration of all the sessions linked to the contract.
-NoCertificateBecauseAbsent            = No certificate was generated for <b> %s %s </b> because it was absent from all sessions.
+NoCertificateBecauseAbsent            = No certificate was generated for <b> %s %s </b> because it was absent from at least one session.
 
 
 # Attendant role
@@ -144,6 +142,7 @@ AttendanceSheetDocument                       = Attendance sheet
 AttendanceSheetDocuments                      = attendance sheets
 attendancesheetdocument                       = attendance sheet
 attendancesheetdocument.odt                   = Attendance sheet
+AttendanceSheetDocumentPDFDescription         = Attendance sheet PDF
 DisplayAttendanceAbsentInSignature            = Displays the absent presence in the signature field of the attendance sheet
 DisplayAttendanceAbsentInSignatureDescription = Displays the absent presence if the person is absent and has not signed
 CompletionCertificateDocument                 = Certificate of completion
@@ -208,7 +207,11 @@ NbAuditors                           = Number of auditors
 AttendancePresentAuditRate           = Audit attendance rate
 AttendanceDelayAuditRate             = Late audit rate
 AttendanceAbsentAuditRate            = Absence rate from audits
-
+ActivityMonitoring                   = Activity monitoring
+AverageDurationByActivity            = Average duration by activity
+MeetingAttendance                    = Meeting attendance
+TrainingSessionAttendance            = Training session attendance
+AuditAttendance                      = Audit attendance
 
 
 #

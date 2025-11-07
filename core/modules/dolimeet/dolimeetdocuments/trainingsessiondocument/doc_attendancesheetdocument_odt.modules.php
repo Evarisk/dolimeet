@@ -41,17 +41,6 @@ require_once __DIR__ . '/../attendancesheetdocument/mod_attendancesheetdocument_
 class doc_attendancesheetdocument_odt extends SaturneDocumentModel
 {
     /**
-     * @var array Minimum version of PHP required by module.
-     * e.g.: PHP ≥ 5.5 = array(5, 5)
-     */
-    public $phpmin = [7, 4];
-
-    /**
-     * @var string Dolibarr version of the loaded document.
-     */
-    public string $version = 'dolibarr';
-
-    /**
      * @var string Module.
      */
     public string $module = 'dolimeet';
@@ -98,26 +87,23 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
      */
     public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
     {
-        global $conf, $langs;
-
         $object = $moreParam['object'];
 
         $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
-        $tmpArray['declaration_number'] = $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER;
+        $tmpArray['declaration_number'] = getDolGlobalString('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER');
 
         if (!empty($object->fk_contrat)) {
             require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+            require_once __DIR__ . '/../../../../../lib/dolimeet_function.lib.php';
             $contract = new Contrat($this->db);
             $contract->fetch($object->fk_contrat);
             $contract->fetch_optionals();
-            if (!empty($contract->array_options['options_label'])) {
-                $tmpArray['contract_label'] = $contract->array_options['options_label'];
-            } else {
-                $tmpArray['contract_label'] = $contract->ref;
-            }
-            $tmpArray['contract_trainingsession_location'] = $contract->array_options['trainingsession_location'];
+            $tmpArray['contract_ref_label']                = $contract->ref;
+            $tmpArray['contract_label']                    = get_formation_label($contract);
+            $tmpArray['contract_trainingsession_location'] = $contract->array_options['options_trainingsession_location'];
         } else {
+            $tmpArray['contract_ref_label']                = '';
             $tmpArray['contract_label']                    = '';
             $tmpArray['contract_trainingsession_location'] = '';
         }
