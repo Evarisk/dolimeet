@@ -49,6 +49,7 @@ function trainingsession_function_lib1()
     require_once __DIR__ . '/../../saturne/lib/object.lib.php';
 
     if (!getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') ||
+        !getDolGlobalInt('DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY') ||
         !getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')) {
         return -1;
     }
@@ -77,9 +78,29 @@ function trainingsession_function_lib1()
     ];
 
     $products = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filter);
-    if (is_array($products) && !empty($products)) {
-        return array_column($products, 'label', 'id');
-    } else {
+    if (!is_array($products) || empty($products)) {
         return [];
     }
+
+    $productIds = array_column($products, 'label', 'id');
+
+    $filter = [
+        'customsql' =>
+            'fk_product_type = 1 AND entity = ' . $conf->entity .
+            ' AND rowid IN (
+                SELECT cp.fk_product
+                FROM ' . MAIN_DB_PREFIX . 'categorie_product cp
+                LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid
+                WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY') .
+            ')'
+    ];
+
+    $products = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filter);
+    if (!is_array($products) || empty($products)) {
+        return [];
+    }
+
+    $variousProductIds = array_column($products, 'label', 'id');
+
+    return array_merge($productIds, $variousProductIds);
 }

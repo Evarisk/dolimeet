@@ -42,21 +42,23 @@ BillingSatisfactionSurvey                   = Enquête de satisfaction commandit
 BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire/OPCO
 
 # Formation - Formation
-TrainingContract                  = Convention de formation
-PracticalGuide                    = Guide pratique
-WelcomeBooklet                    = Livret d'accueil
-RulesOfProcedure                  = Réglement intérieur
-FormationServiceMainCategory      = Catégorie principale des services de formation
-TrainingSessionTemplates          = Modèles de sessions de formation
-TrainingSessionDurations          = Durée de la formation
-MorningStartHour                  = Heure de début de matinée
-MorningEndHour                    = Heure de fin de matinée
-AfternoonStartHour                = Heure de début d'après-midi
-AfternoonEndHour                  = Heure de fin d'après-midi
-TrainingSessionLocationCompany    = Lieu de formation (société)
-TrainingSessionLocationThirdParty = Lieu de formation (tiers)
-TrainingSessionLocationOther      = Autre lieu de formation par défaut
-TrainingSessionAbsenceRate        = Taux d'absence acceptable aux sessions de formation
+TrainingContract                    = Convention de formation
+PracticalGuide                      = Guide pratique
+WelcomeBooklet                      = Livret d'accueil
+RulesOfProcedure                    = Réglement intérieur
+FormationServiceMainCategory        = Catégorie principale des services de formation
+FormationVariousServiceMainCategory = Catégorie principale des services divers de formation
+TrainingSessionTemplates            = Modèles de sessions de formation
+TrainingSessionDurations            = Durée de la formation
+MorningStartHour                    = Heure de début de matinée
+MorningEndHour                      = Heure de fin de matinée
+AfternoonStartHour                  = Heure de début d'après-midi
+AfternoonEndHour                    = Heure de fin d'après-midi
+TrainingSessionLocationCompany      = Lieu de formation (société)
+TrainingSessionLocationThirdParty   = Lieu de formation (tiers)
+TrainingSessionLocationOther        = Autre lieu de formation par défaut
+TrainingSessionAbsenceRate          = Taux d'absence acceptable aux sessions de formation
+VariousFormation                    = Divers formation
 
 
 

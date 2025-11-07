@@ -1397,6 +1397,7 @@ class ActionsDolimeet
                     'DOLIMEET_SERVICE_WELCOME_BOOKLET',
                     'DOLIMEET_SERVICE_RULES_OF_PROCEDURE',
                     'DOLIMEET_FORMATION_MAIN_CATEGORY',
+                    'DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY',
                     'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT',
                     'DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER'
                 ],
