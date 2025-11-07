@@ -265,6 +265,8 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         }
                     }
 
+                    set_public_note($object, $object, 'PROPAL_CREATE');
+
                     if ($error > 0) {
                         setEventMessages('ErrorMissingFormationServiceConfig', [], 'errors');
                         return -1;
