@@ -80,10 +80,10 @@ if ($publicInterfaceUserId > 0) {
     $user->loadRights();
     $permissionToCreateContact = $user->hasRight('societe', 'contact', 'creer');
     if ($permissionToCreateContact == 0) {
-        die('User defined to manage public interface has no right to create contacts. Please contact site administrator.');
+        die($langs->transnoentities('MissingDefaultUserPublicInterfaceRightsConfig'));
     }
 } else {
-    die('No user defined to manage public interface. Please contact site administrator.');
+    die($langs->transnoentities('MissingDefaultUserPublicInterfaceConfig'));
 }
 
 /*

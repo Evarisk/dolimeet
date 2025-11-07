@@ -278,11 +278,12 @@ CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en p
 
 
 # Public interface - Interface publique
-PublicAddContact                = Contact - Page publique
-ContactsAdded                   = Contacts ajoutés
-ContactsAlreadyAdded            = Contacts déjà ajoutés
-MissingSatisfactionSurveyConfig = Erreur : configuration manquante de l'enquête de satisfaction<br><a href="../../admin/setup.php#satisfaction_survey">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
-
+PublicAddContact                              = Contact - Page publique
+ContactsAdded                                 = Contacts ajoutés
+ContactsAlreadyAdded                          = Contacts déjà ajoutés
+MissingSatisfactionSurveyConfig               = Erreur : configuration manquante de l'enquête de satisfaction<br><a href="../../admin/setup.php#satisfaction_survey">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+MissingDefaultUserPublicInterfaceRightsConfig = L’utilisateur défini pour gérer l’interface publique n’a pas le droit de créer des contacts. Veuillez contacter l’administrateur du site.
+MissingDefaultUserPublicInterfaceConfig       = Aucun utilisateur n’est défini pour gérer l’interface publique. Veuillez contacter l’administrateur du site.
 
 #
 # Error - Erreur
