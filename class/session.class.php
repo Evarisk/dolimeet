@@ -127,7 +127,7 @@ class Session extends SaturneObject
         'fk_element'     => ['type' => 'integer',      'label' => 'FkElement',        'enabled' => 1, 'position' => 92,  'notnull' => 0, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'csslist' => 'left'],
         'model'          => ['type' => 'boolean',      'label' => 'Template',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 1],
         'position'       => ['type' => 'integer',      'label' => 'Position',         'enabled' => 1, 'position' => 61,  'notnull' => 0, 'visible' => 3],
-        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1, 'isameasure' => 1, 'csslist' => 'right'],
+        'duration'       => ['type' => 'duration',     'label' => 'Duration',         'enabled' => 1, 'position' => 43, 'notnull' => 0, 'visible' => 1, 'isameasure' => 1, 'csslist' => 'right'],
         'note_public'    => ['type' => 'html',         'label' => 'NotePublic',       'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'note_private'   => ['type' => 'html',         'label' => 'NotePrivate',      'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 0, 'cssview' => 'wordbreak', 'validate' => 1],
         'fk_user_creat'  => ['type' => 'integer:User:user/class/user.class.php',            'label' => 'UserAuthor', 'picto' => 'user',     'enabled' => 1,                         'position' => 170, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid'],
