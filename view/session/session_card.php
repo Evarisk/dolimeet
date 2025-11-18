@@ -145,6 +145,9 @@ if (empty($resHook)) {
     if ($action == 'add' && $permissiontoadd) {
         $durationHour = GETPOST('durationhour');
         $durationMin  = GETPOST('durationmin');
+        if (empty(GETPOST('position'))) {
+            $_POST['position'] = 0;
+        }
         if (empty($durationHour)) {
             $_POST['durationhour'] = 0;
         }
