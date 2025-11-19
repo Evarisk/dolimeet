@@ -271,6 +271,8 @@ function get_formation_label(CommonObject $object): string
 {
     global $langs;
 
+    require_once __DIR__ . '/dolimeet_trainingsession.lib.php';
+
     $formationLabel = '';
 
     $productIds = trainingsession_function_lib1();
