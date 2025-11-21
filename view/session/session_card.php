@@ -174,7 +174,7 @@ if (empty($resHook)) {
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
     // Action confirm_lock, confirm_archive.
-    require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/object_workflow_actions.tpl.php';
 
     // Actions to send emails.
     $triggersendname = strtoupper($object->element) . '_SENTBYMAIL';
@@ -438,6 +438,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
     }
+    // Archive confirmation
+    if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&forcebuilddoc=true', $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
+    }
 
     // Clone confirmation.
     if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
@@ -656,7 +660,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                 // Archive.
                 $displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
                 if ($object->status == $object::STATUS_LOCKED) {
-                    print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=confirm_archive&token=' . newToken() . '">' . $displayButton . '</a>';
+                    print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element . '&action=confirm_archive&token=' . newToken() . '">' . $displayButton . '</span>';
                 } else {
                     print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
                 }
