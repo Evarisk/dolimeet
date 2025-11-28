@@ -38,20 +38,19 @@ function dolimeet_admin_prepare_head(): array
     $h    = 0;
     $head = [];
 
-    $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=meeting';
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-comments pictofixedwidth"></i>' . $langs->trans('Meeting') : '<i class="fas fa-comments"></i>';
-    $head[$h][2] = 'meeting';
-    $h++;
+    $sessionObjectTypes = ['meeting' => 'comments', 'trainingsession' => 'people-arrows', 'audit' => 'tasks'];
+    foreach ($sessionObjectTypes as $sessionObjectType => $picto) {
+        if (!getDolGlobalInt('DOLIMEET_' . dol_strtoupper($sessionObjectType) . '_MENU_ENABLED')) {
+            continue;
+        }
 
-    $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=trainingsession';
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-people-arrows pictofixedwidth"></i>' . $langs->trans('Trainingsession') : '<i class="fas fa-people-arrows"></i>';
-    $head[$h][2] = 'trainingsession';
-    $h++;
+        $imgPicto = img_picto('', 'fontawesome_' . $picto . '_fas', 'class="pictofixedwidth"');
 
-    $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=audit';
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('Audit') : '<i class="fas fa-tasks"></i>';
-    $head[$h][2] = 'audit';
-    $h++;
+        $head[$h][0] = dol_buildpath('/saturne/admin/object.php', 1) . '?module_name=DoliMeet&object_type=' . $sessionObjectType;
+        $head[$h][1] = $conf->browser->layout == 'classic' ? $imgPicto . $langs->transnoentities(dol_ucfirst($sessionObjectType)) : $imgPicto;
+        $head[$h][2] = $sessionObjectType;
+        $h++;
+    }
 
     $head[$h][0] = dol_buildpath('saturne/admin/publicinterface.php', 1) . '?module_name=DoliMeet';
     $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-globe pictofixedwidth"></i>' . $langs->trans('PublicInterface') : '<i class="fas fa-globe"></i>';

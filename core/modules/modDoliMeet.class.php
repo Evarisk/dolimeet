@@ -356,11 +356,6 @@ class modDoliMeet extends DolibarrModules
         $r = 0;
 
         /* DOLIMEET PERMISSIONS */
-        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used).
-        $this->rights[$r][1] = $langs->trans('LireModule', 'DoliMeet');   // Permission label.
-        $this->rights[$r][4] = 'lire';                                                // In php code, permission will be checked by test if ($user->rights->dolimeet->session->read).
-        $this->rights[$r][5] = 1;
-        $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
         $this->rights[$r][1] = $langs->trans('ReadModule', 'DoliMeet');
         $this->rights[$r][4] = 'read';
@@ -382,8 +377,8 @@ class modDoliMeet extends DolibarrModules
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->transnoentities('Meetings'));
-        $this->rights[$r][4] = 'assignedtome';
-        $this->rights[$r][5] = 'meeting';
+        $this->rights[$r][4] = 'meeting';
+        $this->rights[$r][5] = 'assignedtome';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
         $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('Meetings'));
@@ -404,8 +399,8 @@ class modDoliMeet extends DolibarrModules
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Trainingsessions'));
-        $this->rights[$r][4] = 'assignedtome';
-        $this->rights[$r][5] = 'trainingsession';
+        $this->rights[$r][4] = 'trainingsession';
+        $this->rights[$r][5] = 'assignedtome';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
         $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->trans('Trainingsessions'));
@@ -426,8 +421,8 @@ class modDoliMeet extends DolibarrModules
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
         $this->rights[$r][1] = $langs->transnoentities('ReadMyObject', $langs->trans('Audits'));
-        $this->rights[$r][4] = 'assignedtome';
-        $this->rights[$r][5] = 'audit';
+        $this->rights[$r][4] = 'audit';
+        $this->rights[$r][5] = 'assignedtome';
         $r++;
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
         $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->trans('Audits'));
@@ -452,113 +447,55 @@ class modDoliMeet extends DolibarrModules
 
         // Add here entries to declare new menus.
         $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet',                        // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-            'type'     => 'top',                                         // This is a Top menu entry
+            'fk_menu'  => '',                                      // Will be stored into mainmenu + leftmenu. Use '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'type'     => 'top',                                   // This is a Top menu entry
             'titre'    => 'DoliMeet',
-            'prefix'   => '<i class="fas fa-home pictofixedwidth"></i>',
+            'prefix'   => img_picto('', $this->picto, 'class="pictofixedwidth"'),
             'mainmenu' => 'dolimeet',
             'leftmenu' => '',
-            'url'      => '/dolimeet/dolimeetindex.php',                 // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'url'      => '/dolimeet/dolimeetindex.php',             // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled',                    // Define condition to show or hide menu entry. Use '$conf->dolimeet->enabled' if entry must be visible if module is enabled.
-            'perms'    => '$user->rights->dolimeet->lire',               // Use 'perms'=>'$user->rights->dolimeet->myobject->read' if you want your menu with a permission rules
+            'enabled'  => 'isModEnabled(\'dolimeet\')',              // Define condition to show or hide menu entry. Use 'isModEnabled(\'dolimeet\')' if entry must be visible if module is enabled (those quote marks are importants).
+            'perms'    => '$user->hasRight(\'dolimeet\', \'read\')', // Use 'perms'=>'$user->hasRight("dolimeet", "myobject", "read")' if you want your menu with a permission rules
             'target'   => '',
-            'user'     => 2,                                             // 0=Menu for internal users, 1=external users, 2=both
+            'user'     => 2,                                         // 0=Menu for internal users, 1=external users, 2=both
         ];
 
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=dolimeet',
             'type'     => 'left',
-            'titre'    => $langs->trans('Meeting'),
-            'prefix'   => '<i class="fas fa-comments pictofixedwidth"></i>',
+            'titre'    => 'DoliMeet',
+            'prefix'   => img_picto('', 'fontawesome_fa-home_fas', 'class="pictofixedwidth"'),
             'mainmenu' => 'dolimeet',
-            'leftmenu' => 'meeting_list',
-            'url'      => '/dolimeet/view/session/session_list.php?object_type=meeting',
+            'leftmenu' => 'dolimeet_index',
+            'url'      => '/dolimeet/dolimeetindex.php',
             'langs'    => 'dolimeet@dolimeet',
             'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->meeting->read || $user->rights->dolimeet->assignedtome->meeting',
+            'enabled'  => 'isModEnabled(\'dolimeet\')',
+            'perms'    => '$user->hasRight(\'dolimeet\', \'read\')',
             'target'   => '',
             'user'     => 2,
         ];
 
-        $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=meeting_list',
-            'type'     => 'left',
-            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
-            'mainmenu' => 'dolimeet',
-            'leftmenu' => 'meeting_tags',
-            'url'      => '/categories/index.php?type=meeting',
-            'langs'    => 'dolimeet@dolimeet',
-            'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_MEETING_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->meeting->read',
-            'target'   => '',
-            'user'     => 0,
-        ];
-
-        $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet',
-            'type'     => 'left',
-            'titre'    => $langs->trans('TrainingSession'),
-            'prefix'   => '<i class="fas fa-people-arrows pictofixedwidth"></i>',
-            'mainmenu' => 'dolimeet',
-            'leftmenu' => 'trainingsession_list',
-            'url'      => '/dolimeet/view/session/session_list.php?object_type=trainingsession',
-            'langs'    => 'dolimeet@dolimeet',
-            'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->trainingsession->read || $user->rights->dolimeet->assignedtome->trainingsession',
-            'target'   => '',
-            'user'     => 2,
-        ];
-
-        $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=trainingsession_list',
-            'type'     => 'left',
-            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
-            'mainmenu' => 'dolimeet',
-            'leftmenu' => 'trainingsession_tags',
-            'url'      => '/categories/index.php?type=trainingsession',
-            'langs'    => 'dolimeet@dolimeet',
-            'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_TRAININGSESSION_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->trainingsession->read',
-            'target'   => '',
-            'user'     => 0,
-        ];
-
-        $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet',
-            'type'     => 'left',
-            'titre'    => $langs->trans('AuditReport'),
-            'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>',
-            'mainmenu' => 'dolimeet',
-            'leftmenu' => 'audit_list',
-            'url'      => '/dolimeet/view/session/session_list.php?object_type=audit',
-            'langs'    => 'dolimeet@dolimeet',
-            'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->audit->read || $user->rights->dolimeet->assignedtome->audit',
-            'target'   => '',
-            'user'     => 2,
-        ];
-
-        $this->menu[$r++] = [
-            'fk_menu'  => 'fk_mainmenu=dolimeet,fk_leftmenu=audit_list',
-            'type'     => 'left',
-            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
-            'mainmenu' => 'dolimeet',
-            'leftmenu' => 'audit_tags',
-            'url'      => '/categories/index.php?type=audit',
-            'langs'    => 'dolimeet@dolimeet',
-            'position' => 1000 + $r,
-            'enabled'  => '$conf->dolimeet->enabled && $conf->categorie->enabled && $conf->global->DOLIMEET_AUDIT_MENU_ENABLED',
-            'perms'    => '$user->rights->dolimeet->audit->read',
-            'target'   => '',
-            'user'     => 0,
-        ];
+        $sessionObjectTypes = ['meeting' => 'comments', 'trainingsession' => 'people-arrows', 'audit' => 'tasks'];
+        foreach ($sessionObjectTypes as $sessionObjectType => $picto) {
+            $this->menu[$r++] = [
+                'fk_menu'  => 'fk_mainmenu=dolimeet',
+                'type'     => 'left',
+                'titre'    => $langs->transnoentities(dol_ucfirst($sessionObjectType)),
+                'prefix'   => img_picto('', 'fontawesome_' . $picto . '_fas', 'class="pictofixedwidth"'),
+                'mainmenu' => 'dolimeet',
+                'leftmenu' => 'dolimeet_' . $sessionObjectType . '_list',
+                'url'      => '/dolimeet/view/session/session_list.php?object_type=' . $sessionObjectType,
+                'langs'    => 'dolimeet@dolimeet',
+                'position' => 1000 + $r,
+                'enabled'  => 'isModEnabled(\'dolimeet\') && getDolGlobalInt(\'DOLIMEET_' . dol_strtoupper($sessionObjectType) . '_MENU_ENABLED\')',
+                'perms'    => '$user->hasRight(\'dolimeet\', ' . $sessionObjectType . ', \'read\') || $user->hasRight(\'dolimeet\', ' . $sessionObjectType . ', \'assignedtome\')',
+                'target'   => '',
+                'user'     => 2,
+            ];
+        }
     }
 
     /**
