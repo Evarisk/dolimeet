@@ -176,7 +176,7 @@ print $langs->trans('EnableObjectDescription', $langs->transnoentities('Meeting'
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DOLIMEET_MEETING_MENU_ENABLED');
+print ajax_constantonoff('DOLIMEET_MEETING_MENU_ENABLED',  [], null, 0, 0, 1);
 print '</td>';
 print '</tr>';
 
@@ -198,7 +198,7 @@ print $langs->trans('EnableObjectDescription', $langs->trans('Audit'));
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DOLIMEET_AUDIT_MENU_ENABLED');
+print ajax_constantonoff('DOLIMEET_AUDIT_MENU_ENABLED',  [], null, 0, 0, 1);
 print '</td>';
 print '</tr>';
 
