@@ -114,31 +114,34 @@ if ($action == 'update_formation_datas') {
         dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT', $trainingSessionTemplatesProject, 'integer', 0, '', $conf->entity);
     }
 
-    $timePeriods = [
-        'morning_start_hour'   => 'DOLIMEET_TRAININGSESSION_MORNING_START_HOUR',
-        'morning_end_hour'     => 'DOLIMEET_TRAININGSESSION_MORNING_END_HOUR',
-        'afternoon_start_hour' => 'DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR',
-        'afternoon_end_hour'   => 'DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR'
-    ];
-    foreach ($timePeriods as $postKey => $globalKey) {
-        $timeInSeconds = GETPOST($postKey);
-        if ($timeInSeconds != getDolGlobalString($globalKey)) {
-            dolibarr_set_const($db, $globalKey, $timeInSeconds, 'chaine', 0, '', $conf->entity);
+    $createFromBackToPage = GETPOST('create_from_backtopage', 'int');
+    if ($createFromBackToPage == 0) {
+        $timePeriods = [
+            'morning_start_hour'   => 'DOLIMEET_TRAININGSESSION_MORNING_START_HOUR',
+            'morning_end_hour'     => 'DOLIMEET_TRAININGSESSION_MORNING_END_HOUR',
+            'afternoon_start_hour' => 'DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR',
+            'afternoon_end_hour'   => 'DOLIMEET_TRAININGSESSION_AFTERNOON_END_HOUR'
+        ];
+        foreach ($timePeriods as $postKey => $globalKey) {
+            $timeInSeconds = GETPOST($postKey);
+            if ($timeInSeconds != getDolGlobalString($globalKey)) {
+                dolibarr_set_const($db, $globalKey, $timeInSeconds, 'chaine', 0, '', $conf->entity);
+            }
+        }
+
+        $trainingSessionLocation = GETPOST('training_session_location');
+        if ($trainingSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
+            dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $trainingSessionLocation, 'chaine', 0, '', $conf->entity);
+        }
+
+        $trainingSessionAbsenceRate = GETPOST('training_session_absence_rate', 'int');
+        if ($trainingSessionAbsenceRate != getDolGlobalInt('DOLIMEET_TRAININGSESSION_ABSENCE_RATE')) {
+            dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_ABSENCE_RATE', $trainingSessionAbsenceRate, 'integer', 0, '', $conf->entity);
         }
     }
 
-    $trainingSessionLocation = GETPOST('training_session_location');
-    if ($trainingSessionLocation != getDolGlobalString('DOLIMEET_TRAININGSESSION_LOCATION')) {
-        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_LOCATION', $trainingSessionLocation, 'chaine', 0, '', $conf->entity);
-    }
-
-    $trainingSessionAbsenceRate = GETPOST('training_session_absence_rate', 'int');
-    if ($trainingSessionAbsenceRate != getDolGlobalInt('DOLIMEET_TRAININGSESSION_ABSENCE_RATE')) {
-        dolibarr_set_const($db, 'DOLIMEET_TRAININGSESSION_ABSENCE_RATE', $trainingSessionAbsenceRate, 'integer', 0, '', $conf->entity);
-    }
-
     setEventMessage('SavedConfig');
-    header('Location: ' . $_SERVER['PHP_SELF']);
+    header('Location: ' . $_SERVER['PHP_SELF'] . '#formation');
     exit;
 }
 
@@ -223,7 +226,7 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
         print img_picto('', 'service', 'class="pictofixedwidth"');
         $formationServiceCode = $formationService['code'];
         $form->select_produits((GETPOSTISSET($formationService['name']) ? GETPOST($formationService['name'], 'int') : getDolGlobalInt($formationServiceCode)), $formationService['name'], 1, 0, 1, -1, 2, '', '', '', '', '1', 0, 'minwidth300 maxwidth400 widthcentpercentminusxx', 1);
-        print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&type=1&ref=' . $formationService['ref'] . '&label=' . $langs->transnoentities($formationService['name']) . '&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?' . $formationService['name'] . '=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
+        print ' <a href="' . DOL_URL_ROOT . '/product/card.php?action=create&type=1&ref=' . $formationService['ref'] . '&label=' . $langs->transnoentities($formationService['name']) . '&statut_buy=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?' . $formationService['name'] . '=&#95;&#95;ID&#95;&#95;&action=update_formation_datas&create_from_backtopage=1') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProduct') . '"></span></a>';
         print '</td></tr>';
     }
 
@@ -231,21 +234,21 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
     print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationServiceMainCategory') . '</td><td>';
     print img_picto('', 'category', 'class="pictofixedwidth"');
     print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY'), 'formation_main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
-    print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&label=' . $langs->transnoentities('Formation') . '&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
+    print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&label=' . $langs->transnoentities('Formation') . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?formation_main_category=&#95;&#95;ID&#95;&#95;&action=update_formation_datas&create_from_backtopage=1') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
     print '</td></tr>';
 
     // Set default various main category
     print '<tr class="oddeven"><td>' . $langs->transnoentities('FormationVariousServiceMainCategory') . '</td><td>';
     print img_picto('', 'category', 'class="pictofixedwidth"');
     print $formOther->select_categories('product', getDolGlobalInt('DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY'), 'formation_various_main_category', 0, 1, 'minwidth300 maxwidth400 widthcentpercentminusx');
-    print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&label=' . $langs->transnoentities('VariousFormation') . '&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
+    print ' <a href="' . DOL_URL_ROOT . '/categories/card.php?action=create&type=product&label=' . $langs->transnoentities('VariousFormation') . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?formation_various_main_category=&#95;&#95;ID&#95;&#95;&action=update_formation_datas&create_from_backtopage=1') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('CreateCat') . '"></span></a>';
     print '</td></tr>';
 
     // Training session templates project
     print '<tr class="oddeven"><td>' . $langs->transnoentities('TrainingSessionTemplates') . '</td><td>';
     print img_picto('', 'project', 'class="pictofixedwidth"');
     $formProjects->select_projects(-1, (GETPOSTISSET('training_session_templates_project') ? GETPOST('training_session_templates_project', 'int') : getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT')), 'training_session_templates_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'minwidth300 maxwidth400 widthcentpercentminusxx');
-    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?training_session_templates_project=&#95;&#95;ID&#95;&#95;') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProject') . '"></span></a>';
+    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?training_session_templates_project=&#95;&#95;ID&#95;&#95;&action=update_formation_datas&create_from_backtopage=1') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities('AddProject') . '"></span></a>';
     print '</td></tr>';
 
     // Training session durations
