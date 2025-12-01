@@ -300,9 +300,9 @@ class Session extends SaturneObject
         }
 
         if (!$this->model) {
-            //unset($this->fields['element_type']);
-            //unset($this->fields['fk_element']);
-            //unset($this->fields['position']);
+            $this->fields['element_type']['enabled'] = 0;
+            $this->fields['fk_element']['enabled']   = 0;
+            $this->fields['position']['enabled']     = 0;
         }
     }
 

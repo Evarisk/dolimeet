@@ -349,7 +349,7 @@ if (($id || $ref) && $action == 'edit') {
 
     print '<table class="border centpercent tableforfieldedit">';
 
-    if ($object->model == 1) {
+    if ($object->model == 1 || GETPOST('model') == 'on') {
         $object->fields['position']['enabled']     = 1;
         $object->fields['element_type']['enabled'] = 1;
         $object->fields['fk_element']['enabled']   = 1;
@@ -362,7 +362,7 @@ if (($id || $ref) && $action == 'edit') {
             $object->fields['element_type']['arrayofkeyval']['service'] = $langs->trans('Service');
         }
 
-        if ($object->element_type == 'service') {
+        if ($object->element_type == 'service' || GETPOST('element_type') == 'service') {
             $object->fields['fk_element']['type']    = 'integer:Product:product/class/product.class.php:0:fk_product_type = 1 AND entity = ' . $conf->entity;
             $object->fields['fk_element']['picto']   = 'service';
             $object->fields['fk_element']['label']   = $langs->trans('Service');
