@@ -386,6 +386,10 @@ class ActionsDolimeet
                                             $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
                                             $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $signatory->getLibStatut(3);
+
+                                            $outputLine[$contact['rowid']] .= ' <a href="?' . http_build_query($_GET + ['action' => 'send_email', 'survey_id' => $survey->id]) . '" class="wpeo-button button-blue"><i class="fas fa-paper-plane" style="color: #fff;"></i></a>';
+                                            $outputLine[$contact['rowid']] .= ' <a href="' . dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3) . '" class="wpeo-button button-blue" target="_blank"><i class="fas fa-external-link-alt" style="color: #fff; opacity: 1;"></i></a>';
+
                                             $outputLine[$contact['rowid']] .= '</td>';
                                             break;
                                         } else {
@@ -701,7 +705,7 @@ class ActionsDolimeet
      */
     public function doActions(array $parameters, $object, string $action): int
     {
-        global $conf, $langs, $user;
+        global $conf, $langs, $user, $db;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'admincompany') {
@@ -752,6 +756,86 @@ class ActionsDolimeet
                 header('Location: ' . $urlToRedirect);
                 exit;
             }
+        }
+
+        if (preg_match('/contractcontactcard/', $parameters['context']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+
+            if ($action == 'send_email') {
+                require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+                require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+                require_once __DIR__ . '/../../saturne/class/saturnemail.class.php';
+                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+
+                saturne_load_langs();
+
+                $survey_id = GETPOST('survey_id');
+
+                $survey = new Survey($db);
+                $survey->fetch($survey_id);
+
+                $signatory   = new SaturneSignature($db);
+                $saturneMail = new SaturneMail($db);
+                $signatories = $signatory->fetchSignatory('', $survey_id, 'survey');
+
+                if (!empty($signatories['Attendant'])) {
+                    $attendant = current($signatories['Attendant']);
+
+                    if (!empty($attendant->email)) {
+                        $sendto = $attendant->email;
+
+                        require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+
+                        $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
+
+                        // Make substitution in email content
+                        $substitutionarray                       = getCommonSubstitutionArray($langs, 0, null, $survey);
+                        $substitutionarray['__OBJECT_ELEMENT__'] = dol_strtolower($langs->transnoentities(ucfirst($survey->element)));
+                        $substitutionarray['__DOLIMEET_SATIFACTION_SURVEY_LINK'] = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3);
+                        complete_substitutions_array($substitutionarray, $langs, $survey, $parameters);
+
+                        $result  = $saturneMail->fetch(getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE'));
+                        $subject = $result > 0 ? $saturneMail->topic : $langs->transnoentities('SatisfactionSurveyUniqueTopic');
+                        $message = $result > 0 ? $saturneMail->content : $langs->transnoentities('SatisfactionSurveyUniqueContent');
+
+                        $subject = make_substitutions($subject, $substitutionarray);
+                        $message = make_substitutions($message, $substitutionarray);
+
+                        // Create form survey
+                        // Send mail (substitutionarray must be done just before this)
+                        $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
+                        if ($mailfile->error) {
+                            setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+                        } elseif (!empty($conf->global->MAIN_MAIL_SMTPS_ID) || $conf->global->SATURNE_USE_ALL_EMAIL_MODE > 0) {
+                            $result = $mailfile->sendfile();
+                            if ($result) {
+                                $attendant->last_email_sent_date = dol_now();
+                                $attendant->update($user, true);
+                                setEventMessages($langs->trans('SendEmailAt', $attendant->email), []);
+                                // Prevent form reloading page
+                                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . GETPOST('id'));
+                                exit;
+                            } else {
+                                $langs->load('other');
+                                $errorMessage = '<div class="error">';
+                                $errorMessage .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                                if ($mailfile->error) {
+                                    $errorMessage .= '<br>' . $mailfile->error;
+                                }
+                                $errorMessage .= '</div>';
+                                setEventMessages($errorMessage, [], 'warnings');
+                            }
+                        } else {
+                            $url = '<a href="' . dol_buildpath('/admin/mails.php', 1) . '" target="_blank">' . $langs->trans('ConfigEmail') . '</a>';
+                            setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $url, [], 'warnings');
+                        }
+
+                    } else {
+                    }
+                } else {
+                }
+
+            }
+
         }
 
         return 0; // or return 1 to replace standard code
