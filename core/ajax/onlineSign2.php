@@ -54,6 +54,7 @@ if (is_numeric($entity)) {
     define("DOLENTITY", $entity);
 }
 require '../../../../main.inc.php';
+require '../../../../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 /**
  * @var Conf $conf
