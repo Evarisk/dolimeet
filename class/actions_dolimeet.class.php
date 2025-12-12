@@ -385,7 +385,7 @@ class ActionsDolimeet
                                             $survey->fetch($surveyID);
                                             $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                            $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $signatory->getLibStatut(3);
+                                            $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $survey->getStatus();
 
                                             $outputLine[$contact['rowid']] .= ' <a href="?' . http_build_query($_GET + ['action' => 'send_email', 'survey_id' => $survey->id]) . '" class="wpeo-button button-blue"><i class="fas fa-paper-plane" style="color: #fff;"></i></a>';
                                             $outputLine[$contact['rowid']] .= ' <a href="' . dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3) . '" class="wpeo-button button-blue" target="_blank"><i class="fas fa-external-link-alt" style="color: #fff; opacity: 1;"></i></a>';
