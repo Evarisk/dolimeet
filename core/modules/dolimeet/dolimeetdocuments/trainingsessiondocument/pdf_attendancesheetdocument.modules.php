@@ -27,6 +27,8 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
 
 class pdf_attendancesheetdocument {
     /**
@@ -138,6 +140,102 @@ class pdf_attendancesheetdocument {
         $this->marge_haute  = 5;
         $this->marge_basse  = 5;
     }
+    function pdfSignatureTable($pdf, $title, $signatures, $role, $cellHeight)
+    {
+        $pdf->Ln(6);
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->SetTextColor(0, 150, 135);
+        $pdf->Cell(0, $cellHeight, $title, 0, 1);
+
+        $headers = ['N°', 'Nom', 'Prénom', 'Présence', 'Signature'];
+        $widths  = [10, 45, 45, 30, 60];
+
+        // Header
+        $pdf->SetFillColor(0, 150, 135);
+        $pdf->SetTextColor(255,255,255);
+        $pdf->SetFont('', 'B', 9);
+
+        foreach ($headers as $i => $header) {
+            $pdf->Cell($widths[$i], $cellHeight, $header, 1, 0, 'C', true);
+        }
+        $pdf->Ln();
+
+        // Rows
+        $pdf->SetFont('', '', 9);
+        $pdf->SetTextColor(0,0,0);
+
+        $index = 1;
+        foreach ($signatures as $signature) {
+            if ($signature->role !== $role) continue;
+
+            $pdf->SetFillColor(240, 253, 250);
+            $pdf->Cell(10, $cellHeight, $index++, 1, 0, 'C', true);
+
+            $pdf->SetFillColor(255,255,255);
+            $pdf->Cell(45, $cellHeight, strtoupper($signature->lastname), 1, 0, 'C');
+            $pdf->Cell(45, $cellHeight, ucfirst($signature->firstname), 1, 0, 'C');
+            $pdf->Cell(30, $cellHeight, 'présent', 1, 0, 'C');
+
+            if (!empty($signature->signature)) {
+                $img = base64_decode(explode(',', $signature->signature)[1]);
+                $pdf->Image('@'.$img, $pdf->GetX(), $pdf->GetY(), 60, $cellHeight, 'PNG');
+                $pdf->Cell(60, $cellHeight, '', 1, 1);
+            } else {
+                $pdf->Cell(60, $cellHeight, 'N/A', 1, 1, 'C');
+            }
+        }
+    }
+
+    function pdfKeyValueGrid($pdf, array $table, $cellHeight, $maxWidth = 190)
+    {
+        foreach ($table as $row) {
+
+            // 1. Calculs
+            $totalLabelWidth = 0;
+            $totalSpan = 0;
+
+            foreach ($row as $cell) {
+                $totalLabelWidth += $cell['width'];
+                $totalSpan += $cell['span'];
+            }
+
+            $remainingWidth = $maxWidth - $totalLabelWidth;
+            $unitValueWidth = $remainingWidth / max(1, $totalSpan);
+
+            // 2. Rendu
+            foreach ($row as $cell) {
+
+                // Label
+                $pdf->SetFont('', 'B', 9);
+                $pdf->SetFillColor(240, 253, 250);
+                $pdf->SetDrawColor(98, 187, 179);
+                $pdf->Cell(
+                    $cell['width'],
+                    $cellHeight,
+                    $cell['label'],
+                    1,
+                    0,
+                    'C',
+                    true
+                );
+
+                // Valeur
+                $pdf->SetFont('', '', 9);
+                $pdf->SetFillColor(255, 255, 255);
+                $pdf->Cell(
+                    $unitValueWidth * $cell['span'],
+                    $cellHeight,
+                    $cell['value'],
+                    1,
+                    0,
+                    'C',
+                    true
+                );
+            }
+
+            $pdf->Ln();
+        }
+    }
 
     /**
      * Function to build a document on disk using the generic pdf module.
@@ -159,12 +257,16 @@ class pdf_attendancesheetdocument {
         require_once DOL_DOCUMENT_ROOT . '/includes/tecnickcom/tcpdf/tcpdf.php';
 
         $pdf              = new TCPDF();
-        $object           = new Trainingsession ($this->db);
+        $object           = new Trainingsession($this->db);
         $contract         = new Contrat($this->db);
         $saturneSignature = new SaturneSignature($this->db);
+        $thirdParty       = new Societe($this->db);
+        $project          = new Project($this->db);
 
         $object->fetch(GETPOST('id'));
         $contract->fetch($object->fk_contrat);
+        $thirdParty->fetch($object->fk_soc);
+        $project->fetch($object->fk_project);
         $signatures = $saturneSignature->fetchSignatories($object->id, $object->element);
 
         $diroutput = $conf->dolimeet->dir_output ?? '';
@@ -184,238 +286,129 @@ class pdf_attendancesheetdocument {
         $file_name = dol_sanitizeFileName($date . "-" . $object->ref . '-' . $sha . "-feuille-de-presence") . ".pdf";
         $file      = $dir . "/" . $file_name;
 
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Industrie standard');
-        $pdf->SetTitle('Feuille de présence');
         $pdf->AddPage();
+        $pdf->SetMargins(15, 15, 15);
+        $cellHeight = 8;
 
-        $titleColor  = [102, 153, 153];
-        $borderColor = [120, 170, 170];
-        $fillColor   = [230, 245, 240];
+        /* =========================
+           HEADER
+        ========================= */
 
-        $pdf->SetTextColor($titleColor[0], $titleColor[1], $titleColor[2]);
-        $pdf->SetFont('helvetica', 'B', 20);
-        $pdf->Cell(0, 10, 'FEUILLE DE PRÉSENCE ÉTABLIE PAR', 0, 1, 'C');
-        $pdf->SetFont('helvetica', 'B', 18);
-        $pdf->Cell(0, 10, $mysoc->name, 0, 1, 'C');
-        $pdf->Ln(5);
+        $pdf->SetXY(15, 12);
+        $logo = DOL_DATA_ROOT . '/mycompany/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO');
+        $pdf->Image($logo, $pdf->GetX(), $pdf->GetY(), 50, 10, 'PNG');
 
+        // Title on the right
+        $pdf->SetXY(130, 12);
         $pdf->SetFont('helvetica', 'B', 14);
-        $pdf->Cell(0, 10, 'Organisme de Formation (OF)', 0, 1, 'L');
-        $pdf->Ln(5);
-
-        $pdf->SetFont('helvetica', '', 11);
-        $pdf->SetFillColor($fillColor[0], $fillColor[1], $fillColor[2]);
-        $pdf->SetDrawColor($borderColor[0], $borderColor[1], $borderColor[2]);
-
-        $cellHeight = 10;
-        $labelWidth = 40;
-        $valueWidth = 150;
-
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->Cell($labelWidth, $cellHeight, 'Adresse', 1, 0, 'C');
-        $pdf->Cell($valueWidth, $cellHeight, $mysoc->address . ' ' . $mysoc->zip . ' ' . $mysoc->town, 1, 1, 'C', true);
+        $pdf->Cell(60, 6, 'FEUILLE DE PRÉSENCE', 0, 2, 'R');
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->Cell(60, 5, 'Réf projet : ' . $project->ref, 0, 2, 'R');
+        $pdf->Cell(60, 5, 'Date : ' . dol_print_date(dol_now(), 'day'), 0, 2, 'R');
 
-        $pdf->SetFont('helvetica', 'B', 8);
-        $pdf->Cell($labelWidth, $cellHeight, 'N° de déclaration (NDA)', 1, 0, 'C');
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->Cell(55, $cellHeight, !empty($conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER) ? $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER : $langs->transnoentities('NA'), 1, 0, 'C', true);
+        /* =========================
+           BLOCS ADRESSES
+        ========================= */
 
-        $pdf->Cell($labelWidth, $cellHeight, 'Siret', 1, 0, 'C');
-        $pdf->Cell(55, $cellHeight, $mysoc->idprof2, 1, 1, 'C', true);
+        // Company
+        $pdf->SetXY(15, 30);
+        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->Cell(80, 6, 'Émetteur');
+        $pdf->Ln(6);
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->MultiCell(80, 5,
+            $mysoc->name . "\n" .
+            $mysoc->address . "\n" .
+            $mysoc->zip . " " . $mysoc->town . "\n" .
+            "Tél : " . $mysoc->phone . "\n" .
+            "Email : " . $mysoc->email . "\n" .
+            "Site : ". $mysoc->url . "\n" .
+            "Numéro de déclaration (NDA) : " . ($conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER ?? 'N/A') . "\n"
+        );
 
-        $pdf->Cell($labelWidth, $cellHeight, 'Tel', 1, 0, 'C');
-        $pdf->Cell(55, $cellHeight, $mysoc->phone, 1, 0, 'C', true);
+        // Third party
+        $pdf->Rect(115, 30, 80, 40);
+        $pdf->SetXY(118, 32);
+        $pdf->SetFont('helvetica', 'B', 9);
+        $pdf->Cell(70, 6, 'Adressé à');
+        $pdf->Ln(6);
+        $pdf->SetX(118);
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->MultiCell(70, 5,
+            $thirdParty->name . "\n" .
+            $thirdParty->address . "\n" .
+            $thirdParty->zip . " " . $thirdParty->town . "\n" .
+            "SIRET : " . $thirdParty->idprof2 . "\n"
+        );
 
-        $pdf->Cell($labelWidth, $cellHeight, 'E-mail', 1, 0, 'C');
-        $pdf->Cell(55, $cellHeight, $mysoc->email, 1, 1, 'C', true);
+        $pdf->SetY(80);
 
-        $pdf->Cell($labelWidth, $cellHeight, 'Website', 1, 0, 'C');
-        $pdf->SetTextColor($titleColor[0], $titleColor[1], $titleColor[2]);
-        $pdf->Cell($valueWidth, $cellHeight, 'www.societedemosite.fr', 1, 1, 'C', true);
-
-        $cellHeight = 10;
-        $col1       = 40;
-        $col2       = 60;
-        $col3       = 40;
-        $col4       = 50;
-        $tableWidth = $col1 + $col2 + $col3 + $col4;
-
-        $pageWidth   = $pdf->GetPageWidth();
-        $margins     = $pdf->GetMargins();
-        $usableWidth = $pageWidth - $margins['left'] - $margins['right'];
-        $startX      = $margins['left'] + (($usableWidth - $tableWidth) / 2);
-        $pdf->SetX($startX);
-
-        $pdf->SetFont('helvetica', 'B', 16);
-        $pdf->Ln(5);
-        $pdf->Cell($tableWidth, 12, 'Formation', 0, 1, 'L');
-        $pdf->Ln(3);
-
-        $pdf->SetFont('helvetica', 'B', 11);
+        /* =========================
+           BLOC FORMATION
+        ========================= */
+        $formationData = [
+            [
+                [
+                    'label' => 'Réf Convention',
+                    'value' => $contract->ref,
+                    'span'  => 1,
+                    'width' => 30,
+                ],
+                [
+                    'label' => 'Formation',
+                    'value' => $object->label,
+                    'span'  => 2,
+                    'width' => 30,
+                ],
+            ],
+            [
+                [
+                    'label' => 'Session',
+                    'value' =>
+                        dol_print_date($object->date_start, 'dayhour') . ' - ' .
+                        dol_print_date($object->date_end, 'dayhour'),
+                    'span'  => 1,
+                    'width' => 30,
+                ],
+                [
+                    'label' => 'Durée',
+                    'value' => convertSecondToTime($object->duration),
+                    'span'  => 1,
+                    'width' => 30,
+                ],
+            ],
+            [
+                [
+                    'label' => 'Lieu',
+                    'value' => $object->position ?: 'N/A',
+                    'span'  => 3,
+                    'width' => 30,
+                ],
+            ],
+        ];
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->SetTextColor(0, 150, 135);
+        $pdf->Cell(0, $cellHeight, 'Formation', 0, 1);
         $pdf->SetTextColor(0, 0, 0);
 
-        $pdf->SetX($startX);
-        $pdf->Cell($col1, $cellHeight, 'Réf Convention', 1, 0, 'L');
-        $pdf->SetFont('helvetica', '', 11);
-        $pdf->Cell($col2, $cellHeight, $contract->ref, 1, 0, 'C', true);
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->Cell($col3, $cellHeight, 'Formation', 1, 0, 'L');
+        $this->pdfKeyValueGrid($pdf, $formationData, $cellHeight);
+
+        $this->pdfSignatureTable($pdf, 'Liste des formateurs', $signatures, 'SessionTrainer', $cellHeight);
+        $this->pdfSignatureTable($pdf, 'Liste des stagiaires', $signatures, 'Trainee', $cellHeight);
+
+
+        $pdf->SetY(255);
         $pdf->SetFont('helvetica', '', 8);
-        $pdf->Cell($col4, $cellHeight, $object->label, 1, 1, 'C', true);
-
-        $pdf->SetX($startX);
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->Cell($col1, $cellHeight, 'Session', 1, 0, 'L');
+        $pdf->SetTextColor(128, 128, 128);
+        $pdf->MultiCell(190, 3, "La signature des propositions commerciales, commandes, contrats, paiement partiel vaut pour acceptation des CGV ". $mysoc->name, 0, 'C', 0, 1);
+        $pdf->SetFont('helvetica', '', 7);
+        $pdf->MultiCell(190, 3, "Siège social: " . $mysoc->name . " - " . $mysoc->address . " - " . $mysoc->zip . " " . $mysoc->town . " , " . $mysoc->country, 0, 'C', 0, 1);
+        $pdf->MultiCell(190, 3, "Téléphone: " . $mysoc->phone . " - " . $mysoc->url . " - " . $mysoc->email, 0, 'C', 0, 1);
+        $pdf->MultiCell(190, 3, $conf->global->SOCIETE_TYPE . " - Capital de " . $mysoc->capital . " € - SIRET: " . $mysoc->idprof2, 0, 'C', 0, 1);
+        $pdf->MultiCell(190, 3, "NAF-APE: " . $mysoc->idprof3 . " - RCS/RM: " . $mysoc->idprof4 . " - Numéro TVA: " . $mysoc->tva_intra, 0, 'C', 0, 1);
         $pdf->SetFont('helvetica', '', 8);
-        $pdf->Cell($col2, $cellHeight, dol_print_date($object->date_start, 'dayhour') . ' - ' . dol_print_date($object->date_end, 'dayhour'), 1, 0, 'C', true);
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->Cell($col3, $cellHeight, 'Durée', 1, 0, 'L');
-        $pdf->SetFont('helvetica', '', 11);
-        $pdf->Cell($col4, $cellHeight, convertSecondToTime($object->duration), 1, 1, 'C', true);
-
-        $pdf->SetX($startX);
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->Cell($col1, $cellHeight, 'Lieu', 1, 0, 'L');
-        $pdf->SetFont('helvetica', '', 11);
-        $pdf->Cell($col2 + $col3 + $col4, $cellHeight, 'N/A', 1, 1, 'C', true);
-
-        $pdf->SetTextColor($titleColor[0], $titleColor[1], $titleColor[2]);
-        $pdf->Ln(5);
-        $pdf->SetFont('helvetica', 'B', 16);
-        $pdf->Cell(0, 10, 'Liste des formateurs', 0, 1, 'L');
-        $pdf->Ln(3);
-
-        $headerColor = [80, 147, 138];
-        $borderColor = [120, 170, 170];
-        $fillColor   = [230, 245, 240];
-
-        $pdf->SetDrawColor($borderColor[0], $borderColor[1], $borderColor[2]);
-        $pdf->SetFillColor($headerColor[0], $headerColor[1], $headerColor[2]);
-        $pdf->SetTextColor(0, 70, 60);
-        $pdf->SetLineWidth(0.3);
-
-        $colNum      = 15;
-        $colNom      = 50;
-        $colPrenom   = 50;
-        $colPresence = 30;
-        $colSign     = 45;
-        $totalWidth  = $colNum + $colNom + $colPrenom + $colPresence + $colSign;
-
-        $pageWidth = $pdf->GetPageWidth();
-        $margins   = $pdf->GetMargins();
-
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->Cell($colNum, 10, 'N°', 1, 0, 'C', true);
-        $pdf->Cell($colNom, 10, 'Nom', 1, 0, 'C', true);
-        $pdf->Cell($colPrenom, 10, 'Prénom', 1, 0, 'C', true);
-        $pdf->Cell($colPresence, 10, 'Présence', 1, 0, 'C', true);
-        $pdf->Cell($colSign, 10, 'Signature', 1, 1, 'C', true);
-
-        $pdf->SetFont('helvetica', '', 11);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetFillColor($fillColor[0], $fillColor[1], $fillColor[2]);
-
-        if (!empty($signatures)) {
-            $index = 1;
-            foreach ($signatures as $signature) {
-                if ($signature->role == 'SessionTrainer') {
-                    $y = $pdf->GetY();
-
-                    $pdf->Cell($colNum, 10, $index, 1, 0, 'C', false);
-                    $pdf->SetFont('helvetica', 'B', 11);
-                    $pdf->Cell($colNom, 10, strtoupper($signature->lastname), 1, 0, 'C', true);
-                    $pdf->SetFont('helvetica', '', 11);
-                    $pdf->Cell($colPrenom, 10, ucfirst($signature->firstname), 1, 0, 'C', true);
-
-                    $presence = $signature->attendance == 1 | $signature->attendance == 0 ? 'présent' : 'absent';
-                    $pdf->Cell($colPresence, 10, $presence, 1, 0, 'C', true);
-
-                    if (!empty($signature->signature)) {
-                        $encoded_image  = explode(",", $signature->signature)[1];
-                        $signatureImage = base64_decode($encoded_image);
-                        $pdf->Image('@' . $signatureImage, $pdf->GetX(), $y, $colSign, 10, 'PNG');
-                        $pdf->Cell($colSign, 10, '', 1, 1, 'C');
-                    } else {
-                        $pdf->Cell($colSign, 10, 'N/A', 1, 1, 'C', true);
-                    }
-                    $index++;
-                }
-            }
-        } else {
-            $pdf->SetX($startX);
-            $pdf->Cell($totalWidth, 10, 'Aucun formateur associé', 1, 1, 'C');
-        }
-
-        $pdf->SetTextColor($titleColor[0], $titleColor[1], $titleColor[2]);
-        $pdf->Ln(5);
-        $pdf->SetFont('helvetica', 'B', 16);
-        $pdf->Cell(0, 10, 'Liste des stagiaires', 0, 1, 'L');
-        $pdf->Ln(3);
-
-        $headerColor = [80, 147, 138];
-        $borderColor = [120, 170, 170];
-        $fillColor   = [230, 245, 240];
-
-        $pdf->SetDrawColor($borderColor[0], $borderColor[1], $borderColor[2]);
-        $pdf->SetFillColor($headerColor[0], $headerColor[1], $headerColor[2]);
-        $pdf->SetTextColor(0, 70, 60);
-        $pdf->SetLineWidth(0.3);
-
-        $colNum      = 15;
-        $colNom      = 50;
-        $colPrenom   = 50;
-        $colPresence = 30;
-        $colSign     = 45;
-        $totalWidth  = $colNum + $colNom + $colPrenom + $colPresence + $colSign;
-
-        $pageWidth = $pdf->GetPageWidth();
-        $margins   = $pdf->GetMargins();
-
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->Cell($colNum, 10, 'N°', 1, 0, 'C', true);
-        $pdf->Cell($colNom, 10, 'Nom', 1, 0, 'C', true);
-        $pdf->Cell($colPrenom, 10, 'Prénom', 1, 0, 'C', true);
-        $pdf->Cell($colPresence, 10, 'Présence', 1, 0, 'C', true);
-        $pdf->Cell($colSign, 10, 'Signature', 1, 1, 'C', true);
-
-        $pdf->SetFont('helvetica', '', 11);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetFillColor($fillColor[0], $fillColor[1], $fillColor[2]);
-
-        if (!empty($signatures)) {
-            $index = 1;
-            foreach ($signatures as $signature) {
-                if ($signature->role == 'Trainee') {
-                    $y = $pdf->GetY();
-
-                    $pdf->Cell($colNum, 10, $index, 1, 0, 'C', false);
-                    $pdf->SetFont('helvetica', 'B', 11);
-                    $pdf->Cell($colNom, 10, strtoupper($signature->lastname), 1, 0, 'C', true);
-                    $pdf->SetFont('helvetica', '', 11);
-                    $pdf->Cell($colPrenom, 10, ucfirst($signature->firstname), 1, 0, 'C', true);
-
-                    $presence = $signature->attendance == 1 | $signature->attendance == 0 ? 'présent' : 'absent';
-                    $pdf->Cell($colPresence, 10, $presence, 1, 0, 'C', true);
-
-                    if (!empty($signature->signature)) {
-                        $encoded_image  = explode(",", $signature->signature)[1];
-                        $signatureImage = base64_decode($encoded_image);
-                        $pdf->Image('@' . $signatureImage, $pdf->GetX(), $y, $colSign, 10, 'PNG');
-                        $pdf->Cell($colSign, 10, '', 1, 1, 'C');
-                    } else {
-                        $pdf->Cell($colSign, 10, 'N/A', 1, 1, 'C', true);
-                    }
-                    $index++;
-                }
-            }
-        } else {
-            $pdf->SetX($startX);
-            $pdf->Cell($totalWidth, 10, 'Aucun formateur associé', 1, 1, 'C');
-        }
+        $pdf->Cell(190, 3, "1 / 1", 0, 1, 'R');
 
         try {
             $pdf->Output($file, 'F');
@@ -439,7 +432,6 @@ class pdf_attendancesheetdocument {
         if (!empty($conf->global->MAIN_UMASK)) {
             @chmod($file, octdec($conf->global->MAIN_UMASK));
         }
-
         $this->result = ['fullpath' => $file];
         return 1;
     }
