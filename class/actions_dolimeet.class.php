@@ -732,7 +732,7 @@ class ActionsDolimeet
         }
 
         if (strpos($parameters['context'], 'contractcard') !== false) {
-            if ($action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument_odt')) {
+            if ($action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument_odt') || $action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument')) {
                 require_once __DIR__ . '/dolimeetdocuments/completioncertificatedocument.class.php';
 
                 $document = new CompletioncertificateDocument($this->db);
