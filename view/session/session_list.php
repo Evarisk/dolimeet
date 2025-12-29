@@ -132,8 +132,14 @@ foreach ($object->fields as $key => $val) {
         $search[$key . '_dtend']   = dol_mktime(23, 59, 59, GETPOSTINT('search_' . $key . '_dtendmonth'), GETPOSTINT('search_' . $key . '_dtendday'), GETPOSTINT('search_' . $key . '_dtendyear'));
     }
     if (isset($val['type']) && $val['type'] == 'duration') {
-        $search[$key . '_dtstart'] = GETPOSTINT('search_' . $key . '_dtstarthour') * 3600 + GETPOSTINT('search_' . $key . '_dtstartmin') * 60;
-        $search[$key . '_dtend']   = GETPOSTINT('search_' . $key . '_dtendhour') * 3600 + GETPOSTINT('search_' . $key . '_dtendhour') * 60;
+        $durationStartHour = GETPOSTINT('search_' . $key . '_dtstarthour') * 3600 + GETPOSTINT('search_' . $key . '_dtstartmin') * 60;
+        if ($durationStartHour > 0) {
+            $search[$key . '_dtstart'] = $durationStartHour;
+        }
+        $durationEndHour = GETPOSTINT('search_' . $key . '_dtendhour') * 3600 + GETPOSTINT('search_' . $key . '_dtendmin') * 60;
+        if ($durationEndHour > 0) {
+            $search[$key . '_dtend'] = $durationEndHour;
+        }
     }
 }
 
