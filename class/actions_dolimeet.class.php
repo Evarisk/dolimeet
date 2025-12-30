@@ -445,7 +445,9 @@ class ActionsDolimeet
         if (preg_match('/contacttpl/', $parameters['context'])) {
             global $object;
 
-            $contacts = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
+            require_once __DIR__ . '/../lib/dolibarr_lib.php';
+
+            $contacts = array_merge(listeContact($object, -1, 'internal'), listeContact($object, -1));
             if (!empty($contacts)) {
                 $outputLine = [];
                 foreach ($contacts as $contact) {
@@ -610,7 +612,7 @@ class ActionsDolimeet
             if ($object->statut != Contrat::STATUS_DRAFT && getDolGlobalString('CONTRACT_ALLOW_ONLINESIGN')) {
                 require_once __DIR__ . '/../lib/dolibarr_lib.php';
 
-                $contacts = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
+                $contacts = array_merge(listeContact($object, -1, 'internal'), listeContact($object, -1));
                 if (!empty($contacts)) {
                     $outputLine = '';
                     foreach ($contacts as $contact) {
@@ -633,7 +635,8 @@ class ActionsDolimeet
         if (strpos($parameters['context'], 'propalcard') !== false) {
             global $object;
 
-            if ($object->array_options['options_trainingsession_type'] == 1) {
+            $trainingSessionType = $object->array_options['options_trainingsession_type'] ?? 0;
+            if ($trainingSessionType == 1) {
                 require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
 
                 $productIds        = trainingsession_function_lib1();

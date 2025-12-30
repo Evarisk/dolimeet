@@ -311,6 +311,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         // Load DoliMeet libraries
                         require_once __DIR__ . '/../../class/trainingsession.class.php';
                         require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
+                        require_once __DIR__ . '/../../lib/dolibarr_lib.php';
 
                         $trainingSession = new Trainingsession($this->db);
 
@@ -357,7 +358,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                     $object->validate($user);
 
-                    $contactSingle = $object->liste_contact(-1, 'internal', 0, 'SALESREPSIGN');
+                    $contactSingle = listeContact($object, -1, 'internal', 0, 'SALESREPSIGN');
 
                     $contact = new Contact($this->db);
                     $contact->fetch($contactSingle[0]['rowid']);
