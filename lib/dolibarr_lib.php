@@ -22,7 +22,12 @@ function showOnlineSignatureUrl2($type, $ref, $obj = null, $mode = '', $contact 
     if ($mode != 'short') {
         $out .= img_picto('', 'globe', 'class="pictofixedwidth"');
     }
-    $contactObject = new Contact($obj->db);
+    $contactObject = null;
+    if ($contact['source'] == 'internal') {
+        $contactObject = new User($obj->db);
+    } elseif ($contact['source'] == 'external') {
+        $contactObject = new Contact($obj->db);
+    }
     $contactObject->fetch($contact['id']);
     $out .= '<span class="opacitymedium">'.$langs->trans("ToOfferALinkForOnlineSignature", $servicename) . '</span>' . ' - ' . $contactObject->getNomUrl(1) . '<br>';
     $url = getOnlineSignatureUrl2(0, $type, $ref, 1, $obj, $contact);
