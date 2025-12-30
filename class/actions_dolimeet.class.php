@@ -636,8 +636,9 @@ class ActionsDolimeet
             if ($object->array_options['options_trainingsession_type'] == 1) {
                 require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
 
-                $productIds = trainingsession_function_lib1();
-                $out = Form::selectarray('idprod', $productIds, '', 1, 0, 0, '', 0, 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $productIds        = trainingsession_function_lib1();
+                $variousProductIds = trainingsession_function_lib2();
+                $out = Form::selectarray('idprod', $productIds + $variousProductIds, '', 1, 0, 0, '', 0, 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 ?>
                 <script>
                     $(document).ready(function() {

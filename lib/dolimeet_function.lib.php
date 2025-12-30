@@ -266,28 +266,3 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
         }
     }
 }
-
-function get_formation_label(CommonObject $object): string
-{
-    global $langs;
-
-    require_once __DIR__ . '/dolimeet_trainingsession.lib.php';
-
-    $formationLabel = '';
-
-    $productIds = trainingsession_function_lib1();
-    if (!is_array($productIds) || empty($productIds)) {
-        setEventMessages($langs->transnoentities('Error3'), [], 'errors');
-        return -1;
-    }
-
-    foreach ($object->lines as $line) {
-        if (!in_array($line->fk_product, array_keys($productIds))) {
-            continue;
-        }
-
-        $formationLabel .= $line->product_label;
-    }
-
-    return $formationLabel;
-}
