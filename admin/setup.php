@@ -77,7 +77,7 @@ if ($action == 'set_session_trainer_responsible') {
 }
 
 if ($action == 'set_satisfaction_survey') {
-    $satisfactionSurveys = ['billing', 'trainee', 'sessiontrainer', 'opco'];
+    $satisfactionSurveys = ['sessiontrainer', 'trainee', 'customer', 'billing'];
     foreach ($satisfactionSurveys as $satisfactionSurvey) {
         $satisfactionSurveyID = GETPOST($satisfactionSurvey . '_satisfaction_survey_model');
         $confName             = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
