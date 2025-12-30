@@ -379,9 +379,9 @@ class ActionsDolimeet
                                 arsort($surveyIDs);
                                 foreach ($surveyIDs as $surveyID) {
                                     $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
-                                    $filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
+                                    //$filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
                                     if (getDolGlobalInt($confName) > 0) {
-                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
+                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', '')) {
                                             $survey->fetch($surveyID);
                                             $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
