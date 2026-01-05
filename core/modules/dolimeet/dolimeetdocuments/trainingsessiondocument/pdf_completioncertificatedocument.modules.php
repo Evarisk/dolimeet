@@ -31,6 +31,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once __DIR__ . '/../../../../../../saturne/lib/saturne_functions.lib.php';
 require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../../../../../lib/dolimeet_function.lib.php';
 
 /**
  * Class pdf_completioncertificatedocument.
@@ -60,7 +61,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
     /**
      * @var string Document type
      */
-    public string $document_type = 'pdf_attendancesheetdocument';
+    public string $document_type = 'completioncertificatedocument';
 
     public function __construct($db)
     {
@@ -130,10 +131,6 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $pdf    = new TCPDF();
         $object = $moreParam['object'];
 
-        $contract = new Contrat($this->db);
-        $contract->fetch($object->fk_contrat);
-        $contract->fetch_optionals();
-
         $userTmp   = new User($this->db);
         $signatory = new SaturneSignature($this->db, 'dolimeet');
         $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
@@ -143,24 +140,28 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $trainingSessionDict = saturne_fetch_dictionary('c_trainingsession_type');
 
         // Certificate variables
-        $beneficiaryName = $moreParam['attendant']->firstname . ' ' . $moreParam['attendant']->lastname;
-        $companyName     = $mysoc->name;
-        $contractLabel   = $contract->array_options['options_label'];
-        $trainingStart   = dol_print_date($object->date_start, 'day', 'tzuser');
-        $trainingEnd     = dol_print_date($object->date_end, 'day', 'tzuser');
-        $totalHours      = convertSecondToTime($object->duration, 'allhourmin');
-        $actionName      = $langs->trans($trainingSessionDict[$contract->array_options['options_trainingsession_type']]->label);
-        $issuerName      = $userTmp->firstname . ' ' . $userTmp->lastname;
-        $logoPath        = DOL_DOCUMENT_ROOT . '/custom/dolimeet/img/ministere_du_travail.png';
+        $attendantFullname = dol_strtoupper($moreParam['attendant']->lastname) . ' ' . dol_ucfirst($moreParam['attendant']->firstname);
+        $companyName       = $mysoc->name;
+        $formationLabel    = $object->formationLabel;
+        $contractRef       = $object->ref;
+        $trainingStart     = dol_print_date($object->date_start, 'day', 'tzuser');
+        $trainingEnd       = dol_print_date($object->date_end, 'day', 'tzuser');
+        $totalHours        = convertSecondToTime($object->duration, 'allhourmin');
+        $actionName        = $langs->trans($trainingSessionDict[$object->array_options['options_trainingsession_type']]->label);
+        $issuerName        = $userTmp->firstname . ' ' . $userTmp->lastname;
+        $logoPath          = DOL_DOCUMENT_ROOT . '/custom/dolimeet/img/ministere_du_travail.png';
 
         if ($moreParam['attendant']->element_type == 'user') {
             $attendantCompany = $companyName;
         } else {
-            $contact    = new Contact($this->db);
             $thirdparty = new Societe($this->db);
-            $contact->fetch($moreParam['attendant']->element_id);
-            $thirdparty->fetch($contact->fk_soc);
+            $thirdparty->fetch($moreParam['attendant']->socid);
             $attendantCompany = $thirdparty->name;
+        }
+        if (!empty($moreParam['attendant'])) {
+            $moreParam['documentName'] = strtoupper($moreParam['attendant']->lastname) . '_' . ucfirst($moreParam['attendant']->firstname) . '_';
+        } else {
+            $moreParam['documentName'] = '';
         }
 
         // PDF view page
@@ -195,16 +196,15 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $pdf->SetTextColor(0, 51, 153);
         $pdf->Write(6, $langs->transnoentities('BeneficiaryNameExplaination') . ' ');
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $langs->transnoentities('BeneficiaryName', $beneficiaryName) . ' ');
+        $pdf->Write(6, $langs->transnoentities('BeneficiaryName', $attendantFullname) . ' ');
         $pdf->SetTextColor(0, 51, 153);
         $pdf->Write(6, $langs->transnoentities('AttendantCompanyExplaination') . ' ');
         $pdf->SetTextColor(0, 0, 0);
         $pdf->Write(6, $langs->transnoentities('AttendantCompany', $attendantCompany) . ' ');
         $pdf->SetTextColor(0, 51, 153);
-        $pdf->Write(6, $langs->transnoentities('Labelled', $contractLabel));
+        $pdf->Write(6, $langs->transnoentities('Labelled', $contractRef . ' - ' . $formationLabel));
         $pdf->SetTextColor(0, 0, 0);
         $pdf->Ln(10);
-
         $pdf->SetFont('helvetica', 'B', 11);
         $pdf->SetTextColor(0, 51, 153);
         $pdf->Write(6, $langs->transnoentities('NatureActionType'));
@@ -233,26 +233,17 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         // SIGNATURE
         $tab_top           = $pdf->GetY();
         $heightforinfotot  = 50;
-        $heightforfreetext = getDolGlobalInt('MAIN_PDF_FREETEXT_HEIGHT', 5);
         $heightforfooter   = $this->marge_basse + 8;
-        $this->tabSignature($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforfooter, $langs, $signatory, $userTmp);
+        $this->tabSignature($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfooter, $langs, $signatory, $userTmp);
 
-        $diroutput = $conf->dolimeet->multidir_output[$object->entity] ?? '';
-        if (empty($diroutput)) {
-            $this->error = "Configuration manquante: conf->digiquali->dir_output";
+        $uploadDir = getMultidirOutput($object, $this->module);
+        if (!$uploadDir) {
+            $this->error = $langs->transnoentities('ErrorCanNotCreateDir');
             return -1;
         }
-        $dir = $diroutput . "/completioncertificatedocument/" . $object->ref;
-        if (!file_exists($dir)) {
-            if (dol_mkdir($dir) < 0) {
-                $this->error = "Impossible de créer le répertoire: $dir";
-                return -1;
-            }
-        }
 
-        $file_name = dol_sanitizeFileName(dol_print_date(dol_now(), "dayxcard") . "_" . $contract->ref . "-" . rand(1000, 4000) . '_' . $beneficiaryName . "_certificat-realisation") . ".pdf";
-        $file = $dir . '/' . $file_name;
-        $objectDocument->setValueFrom("last_main_doc", $file_name, '', null, '', '', $user);
+        $moreParam['hideTemplateName'] = 1;
+        $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $uploadDir, $moreParam);
 
         try {
             $pdf->Output($file, 'F');
@@ -260,23 +251,9 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
             $this->error = "Erreur lors de la création du PDF : " . $exception->getMessage();
             return -1;
         }
-        if (!file_exists($file)) {
-            $this->error = "PDF non généré (fichier introuvable après Output) : $file";
-            return -1;
-        }
 
-        if (is_object($objectDocument) && method_exists($objectDocument, "setValueFrom")) {
-            $res = $objectDocument->setValueFrom("last_main_doc", $file_name, '', null, '', '', $user, '', '');
-            if ($res <= 0 && !empty($objectDocument->error)) {
-                $this->error = $objectDocument->error;
-                return -1;
-            }
-        }
-
-        if (!empty($conf->global->MAIN_UMASK)) {
-            @chmod($file, octdec($conf->global->MAIN_UMASK));
-        }
         $this->result = ['fullpath' => $file];
+
         return 1;
     }
 }

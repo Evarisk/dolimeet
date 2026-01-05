@@ -1735,21 +1735,24 @@ class ActionsDolimeet
                     }
 
                     if (!empty($contactList)) {
+                        require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
                         $document                              = new CompletioncertificateDocument($this->db);
                         $parameters['moreparams']['attendant'] = new stdClass();
 
-                        $parameters['moreparams']['object']             = $object;
-                        $parameters['moreparams']['object']->element    = 'trainingsession';
-                        $parameters['moreparams']['object']->fk_contrat = $object->id;
-                        $parameters['moreparams']['object']->date_start = current($sessions)->date_start;
-                        $parameters['moreparams']['object']->date_end   = end($sessions)->date_end;
-                        $parameters['moreparams']['object']->duration   = $durations;
+                        $parameters['moreparams']['object']                 = $object;
+                        $parameters['moreparams']['object']->element        = 'trainingsession';
+                        $parameters['moreparams']['object']->formationLabel = get_formation_label($object);
+                        $parameters['moreparams']['object']->fk_contrat     = $object->id;
+                        $parameters['moreparams']['object']->date_start     = current($sessions)->date_start;
+                        $parameters['moreparams']['object']->date_end       = end($sessions)->date_end;
+                        $parameters['moreparams']['object']->duration       = $durations;
                         foreach ($contactList as $contactType) {
                             foreach($contactType as $contact) {
                                 $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
                                 $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
                                 $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
                                 $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                                $parameters['moreparams']['attendant']->socid        = $contact['socid'];
 
                                 $document->element = 'trainingsessiondocument';
 
