@@ -231,13 +231,13 @@ Auditee = Audité
 
 # Data - Donnée
 SessionInfos                         = Informations sur les sessions
-MoyenneDurationSessionInfos          = Informations sur les durées moyenne des sessions
+AverageDurationsSessionInfos         = Informations sur les durées moyenne des sessions
 NbMeetings                           = Nombre de réunions
-MoyenneDurationMeetings              = Durée moyenne des réunions
+AverageDurationMeetings              = Durée moyenne des réunions
 NbTrainingsessions                   = Nombre de sessions de formation
-MoyenneDurationTrainingsessions      = Durée moyenne des sessions de formation
+AverageDurationTrainingsessions      = Durée moyenne des sessions de formation
 NbAudits                             = Nombre d'audits
-MoyenneDurationAudits                = Durée moyenne des audits
+AverageDurationAudits                = Durée moyenne des audits
 AttendantMeetingInfos                = Informations sur les participants aux réunions
 NbAttendantMeetings                  = Nombre de participants aux réunions
 NbContributors                       = Nombre de contributeurs
@@ -259,10 +259,10 @@ NbAuditors                           = Nombre d'auditeurs
 AttendancePresentAuditRate           = Taux de présence aux audits
 AttendanceDelayAuditRate             = Taux de retard aux audits
 AttendanceAbsentAuditRate            = Taux d'absence aux audits
-ActivityMonitoring                   = Suivi des activités
-AverageDurationByActivity            = Durées moyennes par activité
+SessionTypeMonitorings               = Suivi des type de sessions
+AverageDurationsBySessionType        = Durées moyennes par type de session
 MeetingAttendance                    = Participation aux réunions
-TrainingSessionAttendance            = Participation aux sessions de formations
+TrainingsessionAttendance            = Participation aux sessions de formations
 AuditAttendance                      = Participation aux audits
 
 #

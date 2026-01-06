@@ -263,6 +263,21 @@ class Session extends SaturneObject
     public $fk_contrat;
 
     /**
+     * @var array Session types
+     */
+    public array $sessionTypes = [
+        'meeting' => [
+            'picto' => 'fas fa-comments'
+        ],
+        'trainingsession' => [
+            'picto' => 'fas fa-people-arrows'
+        ],
+        'audit' => [
+            'picto' => 'fas fa-tasks'
+        ]
+    ];
+
+    /**
      * Constructor.
      *
      * @param DoliDb $db         Database handler.
@@ -275,6 +290,12 @@ class Session extends SaturneObject
         $this->type = $objectType;
 
         parent::__construct($db, $this->module, $objectType);
+
+        foreach (array_keys($this->sessionTypes) as $sessionType) {
+            if (!getDolGlobalInt(dol_strtoupper($this->module) . '_' . dol_strtoupper($sessionType) . '_MENU_ENABLED')) {
+                unset($this->sessionTypes[$sessionType]);
+            }
+        }
 
         switch ($objectType) {
             case 'trainingsession':
@@ -627,54 +648,82 @@ class Session extends SaturneObject
     {
         global $langs;
 
-        $getSessionInfos   = self::getSessionInfos();
-        $getAttendantInfos = self::getAttendantInfos();
+        $getSessionInfos                  = $this->getSessionInfos();
+        $getSessionTypeMonitorings        = $this->getSessionTypeMonitorings($getSessionInfos);
+        $getAverageDurationsBySessionType = $this->getAverageDurationsBySessionType($getSessionInfos);
+        $getSignatoryInfos                = $this->getSignatoryInfos();
 
-        $array['widgets'] = [
-            0 => [
-                'title'         => $langs->transnoentities('ActivityMonitoring'),
-                'label'         => [$langs->transnoentities('NbMeetings'), $langs->transnoentities('NbTrainingsessions'), $langs->transnoentities('NbAudits')],
-                'content'       => [$getSessionInfos['meeting']['content'] ?? 0, $getSessionInfos['trainingsession']['content'] ?? 0, $getSessionInfos['audit']['content'] ?? 0],
-                'picto'         => $getSessionInfos['picto'],
-                'widgetName'    => $getSessionInfos['widgetName']
-            ],
-            1 => [
-                'title'      => $langs->transnoentities('AverageDurationByActivity'),
-                'label'      => [$langs->transnoentities('MoyenneDurationMeetings'), $langs->transnoentities('MoyenneDurationTrainingsessions'), $langs->transnoentities('MoyenneDurationAudits')],
-                'content'    => [$getSessionInfos['meeting']['moyenneDuration']['content'] ?? 0, $getSessionInfos['trainingsession']['moyenneDuration']['content'] ?? 0, $getSessionInfos['audit']['moyenneDuration']['content'] ?? 0],
-                'picto'      => $getSessionInfos['picto'],
-                'widgetName' => $getSessionInfos['widgetName2']
-            ]
-        ];
-        $attendantMeetingInfos = [
-            'title'      => $langs->transnoentities('MeetingAttendance'),
-            'label'      => [$getAttendantInfos['meeting']['label'] ?? '', $getAttendantInfos['meeting']['contributor']['label'] ?? '', $getAttendantInfos['meeting']['responsible']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['present']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['delay']['label'] ?? '', $getAttendantInfos['meeting']['attendance']['absent']['label'] ?? ''],
-            'content'    => [$getAttendantInfos['meeting']['content'] ?? 0, $getAttendantInfos['meeting']['contributor']['content'] ?? 0, $getAttendantInfos['meeting']['responsible']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['meeting']['attendanceRate']['absent']['content'] ?? 0],
-            'picto'      => $getAttendantInfos['meeting']['picto'],
-            'widgetName' => $getAttendantInfos['meeting']['widgetName']
-        ];
-        if (isset($getAttendantInfos['meeting'])) {
-            $array['widgets'][] = $attendantMeetingInfos;
+        $array['widgets'][] = $getSessionTypeMonitorings;
+        $array['widgets'][] = $getAverageDurationsBySessionType;
+
+        foreach (array_keys($this->sessionTypes) as $sessionType) {
+            $ucFirstSessionType                 = dol_ucfirst($sessionType);
+            $signatoryWidgetInfos[$sessionType] = [
+                'picto'      => $getSignatoryInfos[$sessionType]['picto'],
+                'title'      => $langs->transnoentities($ucFirstSessionType . 'Attendance'),
+                'widgetName' => $getSignatoryInfos[$sessionType]['widgetName'],
+                'label'      => $getSignatoryInfos[$sessionType]['labels'],
+                'content'    => [
+                    $getSignatoryInfos[$sessionType]['data']['nbSession'],
+                ]
+            ];
+            foreach ($getSignatoryInfos[$sessionType]['data']['attendance'] as $attendanceData) {
+                $signatoryWidgetInfos[$sessionType]['content'][] = $attendanceData['attendanceRate'];
+            }
+            foreach ($getSignatoryInfos[$sessionType]['data']['roles'] as $roleData) {
+                $signatoryWidgetInfos[$sessionType]['content'][] = $roleData['nbSignatory'];
+            }
+            $array['widgets'][] = $signatoryWidgetInfos[$sessionType];
         }
-        $attendantTrainingsessionInfos = [
-            'title'      => $langs->transnoentities('TrainingSessionAttendance'),
-            'label'      => [$getAttendantInfos['trainingsession']['label'] ?? '', $getAttendantInfos['trainingsession']['trainee']['label'] ?? '', $getAttendantInfos['trainingsession']['sessionTrainer']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['present']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['delay']['label'] ?? '', $getAttendantInfos['trainingsession']['attendance']['absent']['label'] ?? ''],
-            'content'    => [$getAttendantInfos['trainingsession']['content'] ?? 0, $getAttendantInfos['trainingsession']['trainee']['content'] ?? 0, $getAttendantInfos['trainingsession']['sessionTrainer']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['trainingsession']['attendanceRate']['absent']['content'] ?? 0],
-            'picto'      => $getAttendantInfos['trainingsession']['picto'],
-            'widgetName' => $getAttendantInfos['trainingsession']['widgetName']
-        ];
-        if (isset($getAttendantInfos['trainingsession'])) {
-            $array['widgets'][] = $attendantTrainingsessionInfos;
+
+        return $array;
+    }
+
+    /**
+     * Get session type monitorings
+     *
+     * @param  array     $sessionInfos Session infos
+     * @return array                   Widget datas label/content
+     * @throws Exception
+     */
+    public function getSessionTypeMonitorings(array $sessionInfos): array
+    {
+        global $langs;
+
+        // Widget parameters
+        $array['picto']      = 'fas fa-info';
+        $array['title']      = $langs->transnoentities('SessionTypeMonitorings');
+        $array['widgetName'] = $langs->transnoentities('SessionInfos');
+
+        foreach (array_keys($this->sessionTypes) as $sessionType) {
+            $ucFirstSessionType = dol_ucfirst($sessionType);
+            $array['label'][]   = $langs->transnoentities('Nb' . $ucFirstSessionType . 's');
+            $array['content'][] = $sessionInfos[$sessionType]['nbSession'];
         }
-        $attendantAuditInfos = [
-            'title'      => $langs->transnoentities('AuditAttendance'),
-            'label'      => [$getAttendantInfos['audit']['label'] ?? '', $getAttendantInfos['audit']['auditee']['label'] ?? '', $getAttendantInfos['audit']['auditor']['label'] ?? '', $getAttendantInfos['audit']['attendance']['present']['label'] ?? '', $getAttendantInfos['audit']['attendance']['delay']['label'] ?? '', $getAttendantInfos['audit']['attendance']['absent']['label'] ?? ''],
-            'content'    => [$getAttendantInfos['audit']['content'] ?? 0, $getAttendantInfos['audit']['auditee']['content'] ?? 0, $getAttendantInfos['audit']['auditor']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['present']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['delay']['content'] ?? 0, $getAttendantInfos['audit']['attendanceRate']['absent']['content'] ?? 0],
-            'picto'      => $getAttendantInfos['audit']['picto'],
-            'widgetName' => $getAttendantInfos['audit']['widgetName']
-        ];
-        if (isset($getAttendantInfos['audit'])) {
-            $array['widgets'][] = $attendantAuditInfos;
+
+        return $array;
+    }
+
+    /**
+     * Get average duration by session type
+     *
+     * @param  array     $sessionInfos Session infos
+     * @return array                   Widget datas label/content
+     * @throws Exception
+     */
+    public function getAverageDurationsBySessionType(array $sessionInfos): array
+    {
+        global $langs;
+
+        // Widget parameters
+        $array['picto']      = 'fas fa-info';
+        $array['title']      = $langs->transnoentities('AverageDurationsBySessionType');
+        $array['widgetName'] = $langs->transnoentities('AverageDurationsSessionInfos');
+
+        foreach (array_keys($this->sessionTypes) as $sessionType) {
+            $ucFirstSessionType = dol_ucfirst($sessionType);
+            $array['label'][]   = $langs->transnoentities('AverageDuration' . $ucFirstSessionType . 's');
+            $array['content'][] = $sessionInfos[$sessionType]['AverageDuration'];
         }
 
         return $array;
@@ -683,179 +732,123 @@ class Session extends SaturneObject
     /**
      * Get all session infos
      *
-     * @return array     Widget datas label/content
+     * @return int|array     Widget datas label/content
      * @throws Exception
      */
-    public function getSessionInfos(): array
+    public function getSessionInfos()
     {
-        global $langs;
+        $sessions = $this->fetchAll();
+        if (!is_array($sessions) || empty($sessions)) {
+            $this->error = 'NoSessionFound';
+            return -1;
+        }
 
-        // Widget parameters
-        $array['picto']       = 'fas fa-info';
-        $array['widgetName']  = $langs->transnoentities('SessionInfos');
-        $array['widgetName2'] = $langs->transnoentities('MoyenneDurationSessionInfos');
+        $sessionDatas = [];
+        foreach (array_keys($this->sessionTypes) as $sessionType) {
+            $sessionDatas[$sessionType] = [
+                'nbSession'       => 0,
+                'duration'        => 0,
+                'AverageDuration' => 0,
+            ];
+        }
 
-        $sessions = self::fetchAll();
-        if (is_array($sessions) && !empty($sessions)) {
-            foreach ($sessions as $session) {
-                switch ($session->type) {
-                    case 'meeting' :
-                        $array['meeting']['content']++;
-                        if (!empty($session->date_start) && !empty($session->date_end)) {
-                            $array['meeting']['duration']['content'] += $session->date_end - $session->date_start;
-                        }
-                        break;
-                    case 'trainingsession' :
-                        $array['trainingsession']['content']++;
-                        if (!empty($session->duration)) {
-                            $array['trainingsession']['duration']['content'] += $session->duration;
-                        }
-                        break;
-                    case 'audit' :
-                        $array['audit']['content']++;
-                        if (!empty($session->date_start) && !empty($session->date_end)) {
-                            $array['audit']['duration']['content'] += $session->date_end - $session->date_start;
-                        }
-                        break;
-                }
+        foreach ($sessions as $session) {
+            if (empty($session->type) || !isset($sessionDatas[$session->type])) {
+                continue;
             }
-            if ($array['meeting']['content'] > 0) {
-                $array['meeting']['moyenneDuration']['content'] = convertSecondToTime($array['meeting']['duration']['content'] / $array['meeting']['content']);
-            }
-            if ($array['trainingsession']['content'] > 0) {
-                $array['trainingsession']['moyenneDuration']['content'] = convertSecondToTime($array['trainingsession']['duration']['content'] / $array['trainingsession']['content']);
-            }
-            if ($array['audit']['content'] > 0) {
-                $array['audit']['moyenneDuration']['content'] = convertSecondToTime($array['audit']['duration']['content'] / $array['audit']['content']);
+
+            $sessionDatas[$session->type]['nbSession']++;
+
+            if (!empty($session->duration) && $session->type == 'trainingsession') {
+                $sessionDatas[$session->type]['duration'] += $session->duration;
+            } else if (!empty($session->date_start) && !empty($session->date_end) && in_array($session->type, ['meeting', 'audit'])) {
+                $sessionDatas[$session->type]['duration'] += ($session->date_end - $session->date_start);
             }
         }
 
-        return $array;
+        foreach (array_keys($this->sessionTypes) as $sessionType) {
+            if ($sessionDatas[$sessionType]['nbSession'] > 0) {
+                $sessionDatas[$sessionType]['AverageDuration'] = convertSecondToTime($sessionDatas[$sessionType]['duration'] / $sessionDatas[$sessionType]['nbSession']);
+            }
+        }
+
+        return $sessionDatas;
     }
 
     /**
-     * Get all attendant infos
+     * Get all signatory infos
      *
-     * @return array     Widget datas label/content
+     * @return int|array     Widget datas label/content
      * @throws Exception
      */
-    public function getAttendantInfos(): array
+    public function getSignatoryInfos()
     {
         global $langs;
 
         $signatory = new SaturneSignature($this->db);
 
-        $array       = [];
-        $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => 't.module_name = "dolimeet" AND status > 0']);
-        if (is_array($signatories) && !empty($signatories)) {
-            foreach ($signatories as $signatory) {
-                switch ($signatory->object_type) {
-                    case 'meeting' :
-                        $array['meeting']['picto']      = 'fas fa-comments';
-                        $array['meeting']['widgetName'] = $langs->transnoentities('AttendantMeetingInfos');
-                        $array['meeting']['label']      = $langs->transnoentities('NbAttendantMeetings');
-                        $array['meeting']['content']++;
-                        switch ($signatory->role) {
-                            case 'Contributor' :
-                                $array['meeting']['contributor']['label'] = $langs->transnoentities('NbContributors');
-                                $array['meeting']['contributor']['content']++;
-                                break;
-                            case 'Responsible' :
-                                $array['meeting']['responsible']['label'] = $langs->transnoentities('NbResponsibles');
-                                $array['meeting']['responsible']['content']++;
-                                break;
-                        }
-                        switch ($signatory->attendance) {
-                            case $signatory::ATTENDANCE_PRESENT :
-                                $array['meeting']['attendance']['present']['label'] = $langs->transnoentities('AttendancePresentMeetingRate');
-                                $array['meeting']['attendance']['present']['content']++;
-                                break;
-                            case $signatory::ATTENDANCE_DELAY :
-                                $array['meeting']['attendance']['delay']['label'] = $langs->transnoentities('AttendanceDelayMeetingRate');
-                                $array['meeting']['attendance']['delay']['content']++;
-                                break;
-                            case $signatory::ATTENDANCE_ABSENT :
-                                $array['meeting']['attendance']['absent']['label'] = $langs->transnoentities('AttendanceAbsentMeetingRate');
-                                $array['meeting']['attendance']['absent']['content']++;
-                                break;
-                        }
-                        break;
-                    case 'trainingsession' :
-                        $array['trainingsession']['picto']      = 'fas fa-people-arrows';
-                        $array['trainingsession']['widgetName'] = $langs->transnoentities('AttendantTrainingsessionInfos');
-                        $array['trainingsession']['label']      = $langs->transnoentities('NbAttendantTrainingsessions');
-                        $array['trainingsession']['content']++;
-                        switch ($signatory->role) {
-                            case 'Trainee' :
-                                $array['trainingsession']['trainee']['label'] = $langs->transnoentities('NbTrainees');
-                                $array['trainingsession']['trainee']['content']++;
-                                break;
-                            case 'SessionTrainer' :
-                                $array['trainingsession']['sessionTrainer']['label'] = $langs->transnoentities('NbSessionTrainers');
-                                $array['trainingsession']['sessionTrainer']['content']++;
-                                break;
-                        }
-                        switch ($signatory->attendance) {
-                            case $signatory::ATTENDANCE_PRESENT :
-                                $array['trainingsession']['attendance']['present']['label'] = $langs->transnoentities('AttendancePresentTrainingsessionRate');
-                                $array['trainingsession']['attendance']['present']['content']++;
-                                break;
-                            case $signatory::ATTENDANCE_DELAY :
-                                $array['trainingsession']['attendance']['delay']['label'] = $langs->transnoentities('AttendanceDelayTrainingsessionRate');
-                                $array['trainingsession']['attendance']['delay']['content']++;
-                                break;
-                            case $signatory::ATTENDANCE_ABSENT :
-                                $array['trainingsession']['attendance']['absent']['label'] = $langs->transnoentities('AttendanceAbsentTrainingsessionRate');
-                                $array['trainingsession']['attendance']['absent']['content']++;
-                                break;
-                        }
-                        break;
-                    case 'audit' :
-                        $array['audit']['picto']      = 'fas fa-tasks';
-                        $array['audit']['widgetName'] = $langs->transnoentities('AttendantAuditInfos');
-                        $array['audit']['label']      = $langs->transnoentities('NbAttendantAudits');
-                        $array['audit']['content']++;
-                        switch ($signatory->role) {
-                            case 'Auditee' :
-                                $array['audit']['auditee']['label'] = $langs->transnoentities('NbAuditees');
-                                $array['audit']['auditee']['content']++;
-                                break;
-                            case 'Auditor' :
-                                $array['audit']['auditor']['label'] = $langs->transnoentities('NbAuditors');
-                                $array['audit']['auditor']['content']++;
-                                break;
-                        }
-                        switch ($signatory->attendance) {
-                            case $signatory::ATTENDANCE_PRESENT :
-                                $array['audit']['attendance']['present']['label'] = $langs->transnoentities('AttendancePresentAuditRate');
-                                $array['audit']['attendance']['present']['content']++;
-                                break;
-                            case $signatory::ATTENDANCE_DELAY :
-                                $array['audit']['attendance']['delay']['label'] = $langs->transnoentities('AttendanceDelayAuditRate');
-                                $array['audit']['attendance']['delay']['content']++;
-                                break;
-                            case $signatory::ATTENDANCE_ABSENT :
-                                $array['audit']['attendance']['absent']['label'] = $langs->transnoentities('AttendanceAbsentAuditRate');
-                                $array['audit']['attendance']['absent']['content']++;
-                                break;
-                        }
-                        break;
+        $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => 't.module_name = \'dolimeet\' AND status > 0']);
+        if (!is_array($signatories) || empty($signatories)) {
+            $this->error = 'NoSignatoryFound';
+            return -1;
+        }
+
+        $array           = [];
+        $attendanceTypes = ['present', 'delay', 'absent'];
+        foreach ($this->sessionTypes as $sessionType => $sessionTypeInfos) {
+            $ucFirstSessionType  = dol_ucfirst($sessionType);
+            $array[$sessionType] = [
+                'picto'      => $sessionTypeInfos['picto'],
+                'widgetName' => $langs->transnoentities('Attendant' . $ucFirstSessionType . 'Infos'),
+
+                'labels' => [$langs->transnoentities('NbAttendant' . $ucFirstSessionType . 's')],
+
+                'data' => [
+                    'nbSession'  => 0,
+                    'attendance' => [],
+                    'roles'      => [],
+                ]
+            ];
+
+            foreach ($attendanceTypes as $attendanceKey => $attendanceType) {
+                $array[$sessionType]['labels'][] = $langs->transnoentities('Attendance' . dol_ucfirst($attendanceType) . $ucFirstSessionType . 'Rate');
+
+                $array[$sessionType]['data']['attendance'][$attendanceKey] = [
+                    'nbAttendance'   => 0,
+                    'attendanceRate' => 0
+                ];
+            }
+
+            $signatoriesInDictionary = saturne_fetch_dictionary('c_' . $sessionType . '_attendants_role');
+            if (!is_array($signatoriesInDictionary) || empty($signatoriesInDictionary)) {
+                $this->error = 'NoSignatoryInDictionaryFound';
+                return -1;
+            }
+
+            foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+                $array[$sessionType]['labels'][] = $langs->transnoentities('Nb' . $signatoryInDictionary->ref .'s');
+
+                $array[$sessionType]['data']['roles'][$signatoryInDictionary->ref] = [
+                    'nbSignatory' => 0
+                ];
+            }
+        }
+
+        foreach ($signatories as $signatory) {
+            if (empty($signatory->object_type) || !isset($array[$signatory->object_type])) {
+                continue;
+            }
+
+            $array[$signatory->object_type]['data']['nbSession']++;
+            $array[$signatory->object_type]['data']['attendance'][$signatory->attendance]['nbAttendance']++;
+            $array[$signatory->object_type]['data']['roles'][$signatory->role]['nbSignatory']++;
+        }
+
+        foreach (array_keys($this->sessionTypes) as $sessionType) {
+            if ($array[$sessionType]['data']['nbSession'] > 0) {
+                foreach ($attendanceTypes as $attendanceKey => $attendanceType) {
+                    $array[$sessionType]['data']['attendance'][$attendanceKey]['attendanceRate'] = price2num(($array[$sessionType]['data']['attendance'][$attendanceKey]['nbAttendance'] / $array[$sessionType]['data']['nbSession']) * 100, 'MT') . ' %';
                 }
-            }
-            if ($array['meeting']['content'] > 0) {
-                $array['meeting']['attendanceRate']['present']['content'] = price2num(($array['meeting']['attendance']['present']['content'] / $array['meeting']['content']) * 100, 'MT') . ' %';
-                $array['meeting']['attendanceRate']['delay']['content']   = price2num(($array['meeting']['attendance']['delay']['content'] / $array['meeting']['content']) * 100, 'MT') . ' %';
-                $array['meeting']['attendanceRate']['absent']['content']  = price2num(($array['meeting']['attendance']['absent']['content'] / $array['meeting']['content']) * 100, 'MT') . ' %';
-            }
-            if ($array['trainingsession']['content'] > 0) {
-                $array['trainingsession']['attendanceRate']['present']['content'] = price2num(($array['trainingsession']['attendance']['present']['content'] / $array['trainingsession']['content']) * 100, 'MT') . ' %';
-                $array['trainingsession']['attendanceRate']['delay']['content']   = price2num(($array['trainingsession']['attendance']['delay']['content'] / $array['trainingsession']['content']) * 100, 'MT') . ' %';
-                $array['trainingsession']['attendanceRate']['absent']['content']  = price2num(($array['trainingsession']['attendance']['absent']['content'] / $array['trainingsession']['content']) * 100, 'MT') . ' %';
-            }
-            if ($array['audit']['content'] > 0) {
-                $array['audit']['attendanceRate']['present']['content'] = price2num(($array['audit']['attendance']['present']['content'] / $array['audit']['content']) * 100, 'MT') . ' %';
-                $array['audit']['attendanceRate']['delay']['content']   = price2num(($array['audit']['attendance']['delay']['content'] / $array['audit']['content']) * 100, 'MT') . ' %';
-                $array['audit']['attendanceRate']['absent']['content']  = price2num(($array['audit']['attendance']['absent']['content'] / $array['audit']['content']) * 100, 'MT') . ' %';
             }
         }
 
