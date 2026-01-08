@@ -535,10 +535,12 @@ class modDoliMeet extends DolibarrModules
         delDocumentModel('completioncertificatedocument_odt', 'trainingsessiondocument');
         delDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument');
         delDocumentModel('attendancesheetdocument', 'trainingsessiondocument');
+        delDocumentModel('completioncertificatedocument', 'completioncertificatedocument');
 
         addDocumentModel('attendancesheetdocument_odt', 'trainingsessiondocument', 'ODT templates', 'DOLIMEET_ATTENDANCESHEETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('completioncertificatedocument_odt', 'completioncertificatedocument', 'ODT templates', 'DOLIMEET_COMPLETIONCERTIFICATEDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('attendancesheetdocument', 'trainingsessiondocument', $langs->transnoentities('AttendanceSheetDocumentPDFDescription'));
+        addDocumentModel('completioncertificatedocument', 'completioncertificatedocument', $langs->transnoentities('CompletionCertificateDocumentPDF'));
 
         // Load Saturne libraries
         require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
