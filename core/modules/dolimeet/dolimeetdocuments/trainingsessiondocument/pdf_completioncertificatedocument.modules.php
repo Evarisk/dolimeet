@@ -69,7 +69,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
 
         $this->db           = $db;
         $this->name         = 'completioncertificatedocument';
-        $this->description  = $langs->trans("AttendanceSheetDocumentPDFDescription");
+        $this->description  = $langs->trans("CompletionCertificateDocumentPDF");
         $this->type         = 'pdf';
         $this->marge_gauche = 15;
         $this->marge_droite = 15;
@@ -94,7 +94,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
 
         $pdf->SetDrawColor(128, 128, 128);
         $posmiddle = $this->marge_gauche + round(($this->page_largeur - $this->marge_gauche - $this->marge_droite) / 2);
-        $posy = $tab_top + $tab_height;
+        $posy = $tab_top + $tab_height - 20;
         $posX = $pdf->getPageWidth() - $this->marge_droite - 100;
 
         $pdf->SetXY($this->marge_droite - 5, $posy);
@@ -103,23 +103,31 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $pdf->Cell(0, 6, $langs->transnoentities('The') . ' : ' . dol_print_date(dol_now(), 'dayhour', 'tzuser'), 0, 1);
 
         $pdf->SetXY($posX, $posy + 5);
+        $signatureStartY = $pdf->GetY();
         $pdf->SetFont('helvetica', '', 10);
-        $pdf->Cell(0, 6, $langs->transnoentities('FormationSignature'), 0, 1);
-        $pdf->SetX($posX);
-        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 6, $signatory->firstname . ' ' . $signatory->lastname . ' ' . $userTmp->job . ', ' . $outputlangs->trans('The') . ' ' . dol_print_date($signatory->signature_date), 0, 'L', 0);
-        if (!empty($signatory->signature)) {
-            $img = base64_decode(explode(',', $signatory->signature)[1]);
-            $pdf->Image('@' . $img, $posX, $pdf->GetY(), 60, 8, 'PNG');
-            $pdf->SetX($posX);
-            $pdf->Cell(60, 8, '', 1, 1);
-        } else {
-            $pdf->Cell(60, 8, 'N/A', 1, 1, 'C');
-        }
+        $pdf->Cell(0, 6, $langs->transnoentities('FormationSignature'), 0, 1, 'C');
 
+        $pdf->SetX($posX);
+        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 6, $signatory->firstname . ' ' . $signatory->lastname . ' ' . $userTmp->job, 0, 'C', 0);
+        $rectWidth = 115;
+        $imageX    = $posX - 10 + ($rectWidth - 60) / 2;
+        if (!empty($signatory->signature)) {
+            $img  = base64_decode(explode(',', $signatory->signature)[1]);
+            $imgY = $pdf->GetY();
+            $pdf->Image('@' . $img, $imageX, $imgY, 60, 8, 'PNG', '', 'C');
+            $pdf->SetY($imgY + 8);
+        } else {
+            $pdf->Cell(60, 8, 'N/A', 0, 1, 'C');
+        }
+        $pdf->SetX($posX);
         $pdf->SetFont('helvetica', 'B', 7);
+        $pdf->SetX($posX);
+        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 6, $mysoc->nom . "\n" . $mysoc->address . ' ' . $mysoc->zip . ' ' . $mysoc->town . "\n" . 'SIRET : ' . $mysoc->idprof2 . "\n" . 'NDA : ' . getDolGlobalString('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 0, 'L');
+        $signatureEndY = $pdf->GetY() + 5;
+        $pdf->Rect($posX - 7, $signatureStartY, $rectWidth, $signatureEndY - $signatureStartY);
         $pdf->Ln(10);
-        $pdf->Cell(0, 6, $langs->transnoentities('FirstRealisationCertificateFooter'), 0, 1);
-        $pdf->Cell(0, 6, $langs->transnoentities('SecondRealisationCertificateFooter'), 0, 1);
+        $pdf->writeHTML('<sup>1</sup><bold>' . $langs->transnoentities('FirstRealisationCertificateFooter') . '</bold>', true, false, true, false, '');
+        $pdf->writeHTML('<sup>2</sup><bold>' . $langs->transnoentities('SecondRealisationCertificateFooter') . '</bold>', true, false, true, false, '');
     }
 
     public function write_file($objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
@@ -128,11 +136,12 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
 
         require_once DOL_DOCUMENT_ROOT . '/includes/tecnickcom/tcpdf/tcpdf.php';
 
-        $pdf    = new TCPDF();
         $object = $moreParam['object'];
 
+        $pdf       = new TCPDF();
         $userTmp   = new User($this->db);
         $signatory = new SaturneSignature($this->db, 'dolimeet');
+
         $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
         $signatory = array_shift($signatory);
         $userTmp->fetch($signatory->element_id);
@@ -150,6 +159,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $actionName        = $langs->trans($trainingSessionDict[$object->array_options['options_trainingsession_type']]->label);
         $issuerName        = $userTmp->firstname . ' ' . $userTmp->lastname;
         $logoPath          = DOL_DOCUMENT_ROOT . '/custom/dolimeet/img/ministere_du_travail.png';
+        $logo              = DOL_DATA_ROOT . '/mycompany/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO');
 
         if ($moreParam['attendant']->element_type == 'user') {
             $attendantCompany = $companyName;
@@ -159,17 +169,26 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
             $attendantCompany = $thirdparty->name;
         }
         if (!empty($moreParam['attendant'])) {
-            $moreParam['documentName'] = strtoupper($moreParam['attendant']->lastname) . '_' . ucfirst($moreParam['attendant']->firstname) . '_';
+            $moreParam['documentName'] = $attendantFullname . '_';
         } else {
             $moreParam['documentName'] = '';
         }
 
         // PDF view page
+        $pdf->SetTitle($outputLangs->convToOutputCharset($object->ref));
+        $pdf->SetSubject($outputLangs->transnoentities("Contract"));
+        $pdf->SetCreator("Dolibarr ".DOL_VERSION);
+        $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
         $pdf->AddPage();
         $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
 
+        // pdf header
         if (file_exists($logoPath)) {
-            $pdf->Image($logoPath, 10, 10, 40);
+            $pdf->Image($logoPath, 10, 15, 40);
+        }
+        if (file_exists($logo)) {
+            $posX = $pdf->getPageWidth() - $this->marge_droite - 40;
+            $pdf->Image($logo, $posX, 15, 40);
         }
         $pdf->Ln(30);
 
@@ -179,55 +198,70 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $pdf->Ln(10);
 
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetFont('helvetica', '', 11);
+        $pdf->SetFont('helvetica', 'B', 12);
 
         $pdf->Write(6, $langs->transnoentities('IntroductionRealisationCertificate') . ' ');
-        $pdf->SetTextColor(0, 51, 153);
-        $pdf->Write(6, $langs->transnoentities('FirstnameLastname') . ' ');
+        $pdf->SetFont('helvetica', '', 12);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $langs->transnoentities('LegalRepresentativePresentation', $issuerName) . ' ');
-        $pdf->SetTextColor(0, 51, 153);
-        $pdf->Write(6, $langs->transnoentities('FormationRepresentativeExplaination'));
+        $pdf->Write(6, $issuerName);
+        $pdf->Ln(6);
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Write(6, $langs->transnoentities('LegalRepresentativePresentation') . ' ');
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->Ln(6);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $langs->transnoentities('AttestsThat', $companyName) . ' ');
-        $pdf->Ln(8);
+        $pdf->Write(6, $companyName . ', ');
+        $pdf->Ln(6);
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Write(6, $langs->transnoentities('AttestsThat') . ' ');
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->Ln(12);
 
         $pdf->Write(6, $langs->transnoentities('CivilityMMEShort') . '/' . $langs->transnoentities('CivilityMRShort') . ' ');
-        $pdf->SetTextColor(0, 51, 153);
-        $pdf->Write(6, $langs->transnoentities('BeneficiaryNameExplaination') . ' ');
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $langs->transnoentities('BeneficiaryName', $attendantFullname) . ' ');
-        $pdf->SetTextColor(0, 51, 153);
-        $pdf->Write(6, $langs->transnoentities('AttendantCompanyExplaination') . ' ');
+        $pdf->Write(6, $attendantFullname);
+        $pdf->Ln(6);
+        $pdf->Write(6, $langs->transnoentities('BeneficiaryName'));
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $langs->transnoentities('AttendantCompany', $attendantCompany) . ' ');
-        $pdf->SetTextColor(0, 51, 153);
+        $pdf->Write(6, $attendantCompany);
+        $pdf->Ln(6);
+        $pdf->Write(6, $langs->transnoentities('AttendantCompany'));
         $pdf->Write(6, $langs->transnoentities('Labelled', $contractRef . ' - ' . $formationLabel));
         $pdf->SetTextColor(0, 0, 0);
         $pdf->Ln(10);
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->SetTextColor(0, 51, 153);
+        $pdf->SetFont('helvetica', 'I', 11);
         $pdf->Write(6, $langs->transnoentities('NatureActionType'));
         $pdf->Ln(8);
 
+        $actions = [
+            'action de formation',
+            'bilan de compétences',
+            'action de VAE',
+            'action de formation par apprentissage'
+        ];
+
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('helvetica', '', 11);
-        $pdf->Cell(0, 5, $actionName, 0, 1);
+
+        foreach ($actions as $action) {
+            $checkbox = (dol_ucfirst($action) == $actionName) ? '[X]' : '[ ]';
+            if ($actionName == dol_ucfirst($action)[0]) {
+                $pdf->writeHTML('<sup>1</sup><bold>' . $langs->transnoentities('FirstRealisationCertificateFooter') . '</bold>', true, false, true, false, '');
+            }
+            $pdf->Cell(0, 6, $checkbox . ' ' . $action, 0, 1);
+        }
 
         $pdf->Ln(6);
 
         $pdf->Write(6, $langs->transnoentities('LastFrom') . ' ');
-        $pdf->SetTextColor(0, 51, 153);
-        $pdf->Write(6, $langs->transnoentities('FormationDateRange') . ' ');
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $langs->transnoentities('TrainingStart', $trainingStart) . ' ' . $langs->transnoentities('TrainingEnd', $trainingEnd) . ' ' . $langs->transnoentities('LastHours', $totalHours));
-        $pdf->SetTextColor(0, 51, 153);
-        $pdf->Ln(5);
-        $pdf->Write(6, $langs->transnoentities('FormationRealizedHours'));
-        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Write(6, $langs->transnoentities('TrainingStart', $trainingStart) . ' ' . $langs->transnoentities('TrainingEnd', $trainingEnd) . ' ');
         $pdf->Ln(6);
-        $pdf->Write(6, $langs->transnoentities('FormationLegalText'));
+        $pdf->write(6, $langs->transnoentities('LastHours', $totalHours) . ' ');
+        $pdf->SetTextColor(0, 0, 0);
         $pdf->Ln(10);
+        $pdf->Write(6, $langs->transnoentities('FormationLegalText'));
+        $pdf->Ln(2);
 
 
         // SIGNATURE

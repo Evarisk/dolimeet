@@ -1736,6 +1736,7 @@ class ActionsDolimeet
 
                     if (!empty($contactList)) {
                         require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+                        require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
                         $document                              = new CompletioncertificateDocument($this->db);
                         $parameters['moreparams']['attendant'] = new stdClass();
 
