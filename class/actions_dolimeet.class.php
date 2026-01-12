@@ -1064,7 +1064,7 @@ class ActionsDolimeet
                     if ($contactInfos['numberOfContacts'] > 0) {
                         $contactInfos['color'] = '#47e58e';
                     }
-                    if ($object->array_options['options_trainingsession_opco_financing'] == 1 && $contactRole == 'opco') {
+                    if (!empty($object->array_options['options_trainingsession_opco_financing']) && $contactRole == 'opco') {
                         $contactInfos['notice'] = 'warning';
                     }
                     $contactsNoticeByRoles[$contactInfos['notice']][$contactRole] = $contactInfos;
