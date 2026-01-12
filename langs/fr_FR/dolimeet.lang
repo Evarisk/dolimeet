@@ -336,11 +336,10 @@ TradFoundCustomer                 = Le client correspond au rôle "Contact clien
 # PDF
 #
 
-RealisationCertificate              = certificat de realisation
 MadeAt                              = Fait à
 FormationSignature                  = Cachet et signature du responsable du dispensateur de formation
-FirstRealisationCertificateFooter   = Lorsque l’action est mise en oeuvre dans le cadre d’un projet de transition professionnelle, le certificat de réalisation doit être transmis mensuellement.
-SecondRealisationCertificateFooter  = Dans le cadre des formations à distance prendre en compte la réalisation des activités pédagogiques et le temps estimé pour les réaliser.
+FirstRealisationCertificateFooter   = <sup>1</sup> Lorsque l’action est mise en oeuvre dans le cadre d’un projet de transition professionnelle, le certificat de réalisation doit être transmis mensuellement.
+SecondRealisationCertificateFooter  = <sup>2</sup> Dans le cadre des formations à distance prendre en compte la réalisation des activités pédagogiques et le temps estimé pour les réaliser.
 IntroductionRealisationCertificate  = Je soussigné(e)
 FirstnameLastname                   = (prénom et nom)
 LegalRepresentativePresentation     = représentant légal du dispensateur de l’action concourant au développement des compétences
@@ -356,7 +355,7 @@ FormationDateRange                  = (dates)
 FormationDate                       = %s au %s pour une durée de %s heure(s)
 TrainingStart                       = %s
 TrainingEnd                         = au %s
-LastHours                           = pour une durée de %s heure(s)
+LastHours                           = pour une durée de %s heure(s) <sup>2</sup>
 CivilityMRShort                     = Mr.
 FormationRealizedHours              = (nombre d’heures réalisées ou, s’agissant d’une formation par apprentissage, nombre de mois réalisés)
 FormationLegalText                  = Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m’engage à conserver l’ensemble des pièces justificatives qui ont permis d’établir le présent certificat pendant une durée de 3 ans à compter de la fin de l’année du dernier paiement. En cas de cofinancement des fonds européens la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.

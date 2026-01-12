@@ -65,16 +65,15 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
 
     public function __construct($db)
     {
-        global $langs;
+        global $langs, $mysoc;
 
-        $this->db           = $db;
-        $this->name         = 'completioncertificatedocument';
-        $this->description  = $langs->trans("CompletionCertificateDocumentPDF");
-        $this->type         = 'pdf';
-        $this->marge_gauche = 15;
-        $this->marge_droite = 15;
-        $this->marge_haute  = 15;
-        $this->marge_basse  = 15;
+        parent::__construct($db, $this->module, $this->document_type);
+
+        $this->name        = 'completioncertificatedocument';
+        $this->description = $langs->trans('CompletionCertificateDocumentPDF');
+        $this->type        = 'pdf';
+
+        $this->emetteur = $mysoc;
     }
 
     /**
@@ -83,12 +82,12 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
      * @param TCPDF $pdf Object PDF
      * @param int $tab_top tab height position
      * @param float $tab_height tab height
-     * @param Translate $outputlangs Object language for output
+     * @param Translate $outputLangs Object language for output
      * @param SaturneSignature $signatory Object signatory
      * @param User $userTmp Object user
      * @return void
      */
-    protected function tabSignature(&$pdf, $tab_top, $tab_height, $outputlangs, $signatory, $userTmp)
+    protected function tabSignature(&$pdf, $tab_top, $tab_height, $outputLangs, $signatory, $userTmp)
     {
         global $mysoc, $langs;
 
@@ -126,19 +125,115 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $signatureEndY = $pdf->GetY() + 5;
         $pdf->Rect($posX - 7, $signatureStartY, $rectWidth, $signatureEndY - $signatureStartY);
         $pdf->Ln(10);
-        $pdf->writeHTML('<sup>1</sup><bold>' . $langs->transnoentities('FirstRealisationCertificateFooter') . '</bold>', true, false, true, false, '');
-        $pdf->writeHTML('<sup>2</sup><bold>' . $langs->transnoentities('SecondRealisationCertificateFooter') . '</bold>', true, false, true, false, '');
+        $pdf->SetFont('helvetica', '', 7);
+        $pdf->writeHTML($langs->transnoentities('FirstRealisationCertificateFooter'));
+        $pdf->writeHTML($langs->transnoentities('SecondRealisationCertificateFooter'));
+    }
+
+    /**
+     *  Show top header of page
+     *
+     *  @param	TCPDF		$pdf     		Object PDF
+     *  @param  Contrat		$object     	Object to show
+     *  @param  Translate	$outputlangs	Object lang for output
+     *  @return	float|int                   Return topshift value
+     */
+    protected function _pagehead(&$pdf, $object, $outputLangs, $defaultFontSize)
+    {
+        $top_shift = 0;
+        $width     = 40;
+        $posX      = $this->marge_gauche;
+        $posY      = $this->marge_haute;
+
+        $logoPath = DOL_DOCUMENT_ROOT . '/custom/dolimeet/img/ministere_du_travail.png';
+        if (file_exists($logoPath)) {
+            $height = pdf_getHeightForLogo($logoPath);
+            $pdf->SetXY($posX, $posY);
+            $pdf->Image($logoPath, $posX, $posY, 0, $height);
+        }
+
+        // Logo
+        if (!getDolGlobalString('PDF_DISABLE_MYCOMPANY_LOGO')) {
+            if ($this->emetteur->logo) {
+                $logoDir = '';
+                if (getMultidirOutput($object, 'mycompany')) {
+                    $logoDir = getMultidirOutput($object, 'mycompany');
+                }
+                if (!getDolGlobalString('MAIN_PDF_USE_LARGE_LOGO')) {
+                    $logo = $logoDir . '/logos/thumbs/' . $this->emetteur->logo_small;
+                } else {
+                    $logo = $logoDir . '/logos/' . $this->emetteur->logo;
+                }
+                if (is_readable($logo)) {
+                    $height = pdf_getHeightForLogo($logo);
+                    $posX   = $this->page_largeur - $this->marge_droite - $width;
+                    $pdf->SetX($posX);
+                    $pdf->Image($logo, $posX, $posY, 0, $height); // width=0 (auto)
+                } else {
+                    $width = 100;
+                    $pdf->SetTextColor(200, 0, 0);
+                    $pdf->SetFont('', 'B', $defaultFontSize);
+                    $pdf->MultiCell($width, 3, $outputLangs->transnoentities('ErrorLogoFileNotFound', $logo), 0, 'L');
+                    $pdf->MultiCell($width, 3, $outputLangs->transnoentities('ErrorGoToGlobalSetup'), 0, 'L');
+                }
+            }
+        }
+
+        return $top_shift;
     }
 
     public function write_file($objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
     {
-        global $conf, $langs, $mysoc, $user;
-
-        require_once DOL_DOCUMENT_ROOT . '/includes/tecnickcom/tcpdf/tcpdf.php';
+        global $action, $conf, $hookmanager, $langs, $mysoc, $user;
 
         $object = $moreParam['object'];
 
-        $pdf       = new TCPDF();
+        $uploadDir = getMultidirOutput($object, $this->module);
+        if (!$uploadDir) {
+            $this->error = $langs->transnoentities('ErrorCanNotCreateDir');
+            return -1;
+        }
+
+        $attendantFullname = dol_strtoupper($moreParam['attendant']->lastname) . ' ' . dol_ucfirst($moreParam['attendant']->firstname);
+        if (!empty($moreParam['attendant'])) {
+            $moreParam['documentName'] = $attendantFullname . '_';
+        } else {
+            $moreParam['documentName'] = '';
+        }
+
+        $moreParam['hideTemplateName'] = 1;
+        $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $uploadDir, $moreParam);
+        if ($file < 0) {
+            $this->error = $langs->transnoentities('ErrorFileNameCanNotBeBuilt');
+            return -1;
+        }
+
+        $hookmanager->initHooks(['pdfgeneration']);
+        $parameters = ['file' => $file, 'object' => $object, 'outputlangs' => $outputLangs];
+        $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+
+        // Create pdf instance
+        $pdf              = pdf_getInstance($this->format);
+        $defaultFontSize  = pdf_getPDFFontSize($outputLangs); // Must be after pdf_getInstance
+        $defaultFontSize += 2;
+
+        if (class_exists('TCPDF')) {
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+        }
+        $pdf->SetFont(pdf_getPDFFont($outputLangs));
+
+        $pdf->Open();
+        $pdf->SetDrawColor(128, 128, 128);
+
+        $pdf->SetTitle($outputLangs->convToOutputCharset($this->document_type));
+        $pdf->SetSubject($outputLangs->transnoentities($this->document_type));
+        $pdf->SetCreator('Dolibarr ' . DOL_VERSION);
+        $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
+        $pdf->SetKeyWords($outputLangs->convToOutputCharset($object->ref) . ' ' . $outputLangs->transnoentities($this->document_type));
+
+        $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite); // Left, Top, Right
+
         $userTmp   = new User($this->db);
         $signatory = new SaturneSignature($this->db, 'dolimeet');
 
@@ -146,20 +241,17 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $signatory = array_shift($signatory);
         $userTmp->fetch($signatory->element_id);
 
-        $trainingSessionDict = saturne_fetch_dictionary('c_trainingsession_type');
+        $trainingSessionDicts = saturne_fetch_dictionary('c_trainingsession_type');
 
         // Certificate variables
-        $attendantFullname = dol_strtoupper($moreParam['attendant']->lastname) . ' ' . dol_ucfirst($moreParam['attendant']->firstname);
-        $companyName       = $mysoc->name;
-        $formationLabel    = $object->formationLabel;
-        $contractRef       = $object->ref;
-        $trainingStart     = dol_print_date($object->date_start, 'day', 'tzuser');
-        $trainingEnd       = dol_print_date($object->date_end, 'day', 'tzuser');
-        $totalHours        = convertSecondToTime($object->duration, 'allhourmin');
-        $actionName        = $langs->trans($trainingSessionDict[$object->array_options['options_trainingsession_type']]->label);
-        $issuerName        = $userTmp->firstname . ' ' . $userTmp->lastname;
-        $logoPath          = DOL_DOCUMENT_ROOT . '/custom/dolimeet/img/ministere_du_travail.png';
-        $logo              = DOL_DATA_ROOT . '/mycompany/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO');
+        $companyName    = $mysoc->name;
+        $formationLabel = $object->formationLabel;
+        $contractRef    = $object->ref;
+        $trainingStart  = dol_print_date($object->date_start, 'day', 'tzuser');
+        $trainingEnd    = dol_print_date($object->date_end, 'day', 'tzuser');
+        $totalHours     = convertSecondToTime($object->duration, 'allhourmin');
+        $actionName     = $langs->trans($trainingSessionDicts[$object->array_options['options_trainingsession_type']]->label);
+        $issuerName     = $userTmp->firstname . ' ' . $userTmp->lastname;
 
         if ($moreParam['attendant']->element_type == 'user') {
             $attendantCompany = $companyName;
@@ -168,116 +260,136 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
             $thirdparty->fetch($moreParam['attendant']->socid);
             $attendantCompany = $thirdparty->name;
         }
-        if (!empty($moreParam['attendant'])) {
-            $moreParam['documentName'] = $attendantFullname . '_';
-        } else {
-            $moreParam['documentName'] = '';
-        }
+
+        $defaultHeightCell = 6;
+
+        $data = [
+            'row1' => [
+                'fontWeight' => 'B',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('IntroductionRealisationCertificate'),
+                'Ln'         => 0
+            ],
+            'row2' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => ' ' . $issuerName,
+                'Ln'         => 6
+            ],
+            'row3' => [
+                'fontWeight' => 'B',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('LegalRepresentativePresentation'),
+                'Ln'         => 0
+            ],
+            'row4' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => ' ' . $companyName . ', ',
+                'Ln'         => 6
+            ],
+            'row5' => [
+                'fontWeight' => 'B',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('AttestsThat'),
+                'Ln'         => 12
+            ],
+            'row6' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('CivilityMMEShort') . '/' . $langs->transnoentities('CivilityMRShort') . ' ' . $attendantFullname,
+                'Ln'         => 6
+            ],
+            'row7' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('BeneficiaryName') . ' ' . $attendantCompany,
+                'Ln'         => 6
+            ],
+            'row8' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('AttendantCompany') . ' ' . $langs->transnoentities('Labelled', $contractRef . ' - ' . $formationLabel),
+                'Ln'         => 10
+            ],
+            'row9' => [
+                'fontWeight' => 'I',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('NatureActionType'),
+                'Ln'         => 8
+            ],
+        ];
 
         // PDF view page
-        $pdf->SetTitle($outputLangs->convToOutputCharset($object->ref));
-        $pdf->SetSubject($outputLangs->transnoentities("Contract"));
-        $pdf->SetCreator("Dolibarr ".DOL_VERSION);
-        $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
         $pdf->AddPage();
-        $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
 
         // pdf header
-        if (file_exists($logoPath)) {
-            $pdf->Image($logoPath, 10, 15, 40);
-        }
-        if (file_exists($logo)) {
-            $posX = $pdf->getPageWidth() - $this->marge_droite - 40;
-            $pdf->Image($logo, $posX, 15, 40);
-        }
+        $this->_pagehead($pdf, $object, $outputLangs, $defaultFontSize);
         $pdf->Ln(30);
 
         $pdf->SetFont('helvetica', 'B', 16);
         $pdf->SetTextColor(0, 51, 153);
-        $pdf->Cell(0, 10, strtoupper($langs->transnoentities('RealisationCertificate')), 0, 1, 'C');
+        $pdf->Cell(0, 10, dol_strtoupper($langs->transnoentities($this->document_type)), 0, 1, 'C');
         $pdf->Ln(10);
 
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 12);
-
-        $pdf->Write(6, $langs->transnoentities('IntroductionRealisationCertificate') . ' ');
-        $pdf->SetFont('helvetica', '', 12);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $issuerName);
-        $pdf->Ln(6);
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Write(6, $langs->transnoentities('LegalRepresentativePresentation') . ' ');
-        $pdf->SetFont('helvetica', '', 12);
-        $pdf->Ln(6);
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $companyName . ', ');
-        $pdf->Ln(6);
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Write(6, $langs->transnoentities('AttestsThat') . ' ');
-        $pdf->SetFont('helvetica', '', 12);
-        $pdf->Ln(12);
-
-        $pdf->Write(6, $langs->transnoentities('CivilityMMEShort') . '/' . $langs->transnoentities('CivilityMRShort') . ' ');
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $attendantFullname);
-        $pdf->Ln(6);
-        $pdf->Write(6, $langs->transnoentities('BeneficiaryName'));
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $attendantCompany);
-        $pdf->Ln(6);
-        $pdf->Write(6, $langs->transnoentities('AttendantCompany'));
-        $pdf->Write(6, $langs->transnoentities('Labelled', $contractRef . ' - ' . $formationLabel));
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Ln(10);
-        $pdf->SetFont('helvetica', 'I', 11);
-        $pdf->Write(6, $langs->transnoentities('NatureActionType'));
-        $pdf->Ln(8);
-
-        $actions = [
-            'action de formation',
-            'bilan de compétences',
-            'action de VAE',
-            'action de formation par apprentissage'
-        ];
-
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetFont('helvetica', '', 11);
-
-        foreach ($actions as $action) {
-            $checkbox = (dol_ucfirst($action) == $actionName) ? '[X]' : '[ ]';
-            if ($actionName == dol_ucfirst($action)[0]) {
-                $pdf->writeHTML('<sup>1</sup><bold>' . $langs->transnoentities('FirstRealisationCertificateFooter') . '</bold>', true, false, true, false, '');
+        foreach ($data as $row) {
+            $pdf->SetFont('helvetica', $row['fontWeight'], $defaultFontSize);
+            $pdf->Write($row['height'], $row['label']);
+            if ($row['Ln'] > 0) {
+                $pdf->Ln($row['Ln']);
             }
-            $pdf->Cell(0, 6, $checkbox . ' ' . $action, 0, 1);
         }
 
+        $pdf->SetFont('helvetica', '', $defaultFontSize);
+        foreach ($trainingSessionDicts as $trainingSessionDictKey => $trainingSessionDict) {
+            $checkBox = ($trainingSessionDictKey == $object->array_options['options_trainingsession_type'] ? '[X]' : '[ ]');
+            $sup      = '';
+            if ($trainingSessionDictKey == 1) {
+                $sup = '<sup>1</sup>';
+            }
+            $pdf->writeHTML('&nbsp;&nbsp;&nbsp;&nbsp;' . $checkBox . ' ' . $langs->transnoentities($trainingSessionDict->label) . $sup);
+        }
         $pdf->Ln(6);
 
-        $pdf->Write(6, $langs->transnoentities('LastFrom') . ' ');
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(6, $langs->transnoentities('TrainingStart', $trainingStart) . ' ' . $langs->transnoentities('TrainingEnd', $trainingEnd) . ' ');
-        $pdf->Ln(6);
-        $pdf->write(6, $langs->transnoentities('LastHours', $totalHours) . ' ');
-        $pdf->SetTextColor(0, 0, 0);
-        $pdf->Ln(10);
-        $pdf->Write(6, $langs->transnoentities('FormationLegalText'));
-        $pdf->Ln(2);
-
+        $data = [
+            'row1' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('LastFrom') . ' ' . $langs->transnoentities('TrainingStart', $trainingStart) . ' ' . $langs->transnoentities('TrainingEnd', $trainingEnd),
+                'Ln'         => 6
+            ],
+            'row2' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('LastHours', $totalHours),
+                'Ln'         => 10,
+                'html'       => 1,
+            ],
+            'row3' => [
+                'fontWeight' => '',
+                'height'     => $defaultHeightCell,
+                'label'      => $langs->transnoentities('FormationLegalText'),
+                'Ln'         => 2
+            ],
+        ];
+        foreach ($data as $row) {
+            $pdf->SetFont('helvetica', $row['fontWeight'], $defaultFontSize);
+            if (!empty($row['html'])) {
+                $pdf->writeHTML($row['label']);
+            } else {
+                $pdf->Write($row['height'], $row['label']);
+            }
+            if ($row['Ln'] > 0) {
+                $pdf->Ln($row['Ln']);
+            }
+        }
 
         // SIGNATURE
         $tab_top           = $pdf->GetY();
         $heightforinfotot  = 50;
         $heightforfooter   = $this->marge_basse + 8;
         $this->tabSignature($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfooter, $langs, $signatory, $userTmp);
-
-        $uploadDir = getMultidirOutput($object, $this->module);
-        if (!$uploadDir) {
-            $this->error = $langs->transnoentities('ErrorCanNotCreateDir');
-            return -1;
-        }
-
-        $moreParam['hideTemplateName'] = 1;
-        $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $uploadDir, $moreParam);
 
         try {
             $pdf->Output($file, 'F');
