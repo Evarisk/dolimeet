@@ -104,24 +104,23 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $pdf->SetXY($posX, $posy + 5);
         $signatureStartY = $pdf->GetY();
         $pdf->SetFont('helvetica', '', 10);
-        $pdf->Cell(0, 6, $langs->transnoentities('FormationSignature'), 0, 1, 'C');
+        $pdf->MultiCell(0, 6, $langs->transnoentities('TrainingSignature') . "\n" . $langs->transnoentities('TrainingSignatureResponsible'), 0, 'C',);
 
         $pdf->SetX($posX);
-        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 6, $signatory->firstname . ' ' . $signatory->lastname . ' ' . $userTmp->job, 0, 'C', 0);
+        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 6, $signatory->firstname . ' ' . $signatory->lastname . ' , ' . $userTmp->job, 0, 'C', 0);
         $rectWidth = 115;
-        $imageX    = $posX - 10 + ($rectWidth - 60) / 2;
+        $imageX    = $posX + 50;
         if (!empty($signatory->signature)) {
             $img  = base64_decode(explode(',', $signatory->signature)[1]);
-            $imgY = $pdf->GetY();
+            $imgY = $pdf->GetY() + 5;
             $pdf->Image('@' . $img, $imageX, $imgY, 60, 8, 'PNG', '', 'C');
-            $pdf->SetY($imgY + 8);
         } else {
             $pdf->Cell(60, 8, 'N/A', 0, 1, 'C');
         }
         $pdf->SetX($posX);
         $pdf->SetFont('helvetica', 'B', 7);
         $pdf->SetX($posX);
-        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 6, $mysoc->nom . "\n" . $mysoc->address . ' ' . $mysoc->zip . ' ' . $mysoc->town . "\n" . 'SIRET : ' . $mysoc->idprof2 . "\n" . 'NDA : ' . getDolGlobalString('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 0, 'L');
+        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 6, $mysoc->nom . "\n" . $mysoc->address . "\n" . $mysoc->zip . ' ' . $mysoc->town . "\n" . 'SIRET : ' . $mysoc->idprof2 . "\n" . 'NDA : ' . getDolGlobalString('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 0, 'L');
         $signatureEndY = $pdf->GetY() + 5;
         $pdf->Rect($posX - 7, $signatureStartY, $rectWidth, $signatureEndY - $signatureStartY);
         $pdf->Ln(10);
@@ -291,7 +290,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
             'row5' => [
                 'fontWeight' => 'B',
                 'height'     => $defaultHeightCell,
-                'label'      => $langs->transnoentities('AttestsThat'),
+                'label'      => $langs->transnoentities('AttestationStatement'),
                 'Ln'         => 12
             ],
             'row6' => [
@@ -303,13 +302,13 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
             'row7' => [
                 'fontWeight' => '',
                 'height'     => $defaultHeightCell,
-                'label'      => $langs->transnoentities('BeneficiaryName') . ' ' . $attendantCompany,
+                'label'      => $langs->transnoentities('BeneficiaryDescription') . ' ' . $attendantCompany,
                 'Ln'         => 6
             ],
             'row8' => [
                 'fontWeight' => '',
                 'height'     => $defaultHeightCell,
-                'label'      => $langs->transnoentities('AttendantCompany') . ' ' . $langs->transnoentities('Labelled', $contractRef . ' - ' . $formationLabel),
+                'label'      => $langs->transnoentities('TrainingAttendanceStatement') . ' ' . $langs->transnoentities('TrainingLabel', $contractRef . ' - ' . $formationLabel),
                 'Ln'         => 10
             ],
             'row9' => [
@@ -356,20 +355,20 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
             'row1' => [
                 'fontWeight' => '',
                 'height'     => $defaultHeightCell,
-                'label'      => $langs->transnoentities('LastFrom') . ' ' . $langs->transnoentities('TrainingStart', $trainingStart) . ' ' . $langs->transnoentities('TrainingEnd', $trainingEnd),
+                'label'      => $langs->transnoentities('TrainingPeriodIntro') . ' ' . $langs->transnoentities('TrainingStart', $trainingStart) . ' ' . $langs->transnoentities('TrainingEnd', $trainingEnd),
                 'Ln'         => 6
             ],
             'row2' => [
                 'fontWeight' => '',
                 'height'     => $defaultHeightCell,
-                'label'      => $langs->transnoentities('LastHours', $totalHours),
+                'label'      => $langs->transnoentities('TrainingDuration', $totalHours),
                 'Ln'         => 10,
                 'html'       => 1,
             ],
             'row3' => [
                 'fontWeight' => '',
                 'height'     => $defaultHeightCell,
-                'label'      => $langs->transnoentities('FormationLegalText'),
+                'label'      => $langs->transnoentities('TrainingLegalNotice'),
                 'Ln'         => 2
             ],
         ];
