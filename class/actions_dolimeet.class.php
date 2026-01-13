@@ -764,6 +764,8 @@ class ActionsDolimeet
 
         if (preg_match('/contractcontactcard/', $parameters['context']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
 
+            global $moduleNameLowerCase;
+
             if ($action == 'send_email') {
                 require_once __DIR__ . '/../../digiquali/class/survey.class.php';
                 require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
@@ -815,6 +817,11 @@ class ActionsDolimeet
                                 $attendant->last_email_sent_date = dol_now();
                                 $attendant->update($user, true);
                                 setEventMessages($langs->trans('SendEmailAt', $attendant->email), []);
+
+                                $moduleNameLowerCase = 'digiquali';
+                                $survey->call_trigger('SATURNE_SIGNATURE_SEND_BY_MAIL', $user);
+                                $moduleNameLowerCase = 'dolimeet';
+
                                 // Prevent form reloading page
                                 header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . GETPOST('id'));
                                 exit;
