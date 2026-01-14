@@ -591,12 +591,12 @@ class modDoliMeet extends DolibarrModules
             $saturneMail->type_template = 'contract';
             $saturneMail->lang          = 'fr_FR';
             $saturneMail->datec         = $this->db->idate(dol_now());
-            $saturneMail->label         = $langs->transnoentities('SatisfactionSurveyLabel');
+            $saturneMail->label         = $langs->transnoentities('SatisfactionSurveyUniqueLabel');
             $saturneMail->position      = 100;
             $saturneMail->enabled       = "isModEnabled('dolimeet')";
-            $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyTopic');
+            $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyUniqueTopic');
             $saturneMail->joinfiles     = 0;
-            $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyContent');
+            $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyUniqueContent');
 
             $emailTemplateID = $saturneMail->create($user);
 
