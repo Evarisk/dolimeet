@@ -662,6 +662,56 @@ class ActionsDolimeet
             }
         }
 
+
+        if (strpos($parameters['context'], 'thirdpartycontact')) {
+
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $signatory   = new SaturneSignature($db);
+
+            $sql = "SELECT t.rowid";
+            $sql .= " FROM ".MAIN_DB_PREFIX."socpeople as t";
+            $sql .= " WHERE t.fk_soc = ".GETPOSTINT('socid');
+            $result = $db->query($sql);
+            $num = $db->num_rows($result);
+
+            $contactIds = [];
+            $i = 0;
+            while ($i < $num) {
+			    $obj = $db->fetch_object($result);
+                $filter = ['customsql' => 'status > 0 AND object_type="trainingsession" AND element_type="socpeople" AND element_id='.$obj->rowid];
+                $signatories = $signatory->fetchAll('', '', 0, 0, $filter);
+                $contactIds[$obj->rowid] = count($signatories);
+                $i++;
+            }
+
+            ?>
+            <script>
+
+                const contactIds = <?php echo json_encode($contactIds); ?>;
+
+                $table = $('.div-table-responsive')
+                $listTitle = $table.find('tr.liste_titre').last()
+                $tableLines = $table.find('tr.oddeven')
+
+                $table.find('tr.liste_titre').first().find('td').eq(1).after('<td class="liste_titre"></td>')
+                $listTitle.find('th').eq(1).after('<th><?= $langs->trans('Formations') ?></th>')
+
+                $tableLines.each(function() {
+                    $this = $(this)
+                    let url = new URL($this.find('td a').eq(1)[0].href)
+                    let id = url.searchParams.get('id')
+
+                    let nb = contactIds[id] !== undefined ? contactIds[id] : 0
+
+                    $this.find('td').eq(1).after('<td class="tdoverflowmax150 ">'+ nb +'</td>')
+                    console.log(nb)
+                });
+
+            </script>
+            <?php
+        }
+
         return 0; // or return 1 to replace standard code.
     }
 
