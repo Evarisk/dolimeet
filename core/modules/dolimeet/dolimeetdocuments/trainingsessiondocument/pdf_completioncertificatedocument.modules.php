@@ -187,12 +187,6 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
 
         $object = $moreParam['object'];
 
-        $uploadDir = getMultidirOutput($object, $this->module);
-        if (!$uploadDir) {
-            $this->error = $langs->transnoentities('ErrorCanNotCreateDir');
-            return -1;
-        }
-
         $attendantFullname = dol_strtoupper($moreParam['attendant']->lastname) . ' ' . dol_ucfirst($moreParam['attendant']->firstname);
         if (!empty($moreParam['attendant'])) {
             $moreParam['documentName'] = $attendantFullname . '_';
@@ -201,7 +195,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         }
 
         $moreParam['hideTemplateName'] = 1;
-        $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $uploadDir, $moreParam);
+        $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $moreParam);
         if ($file < 0) {
             $this->error = $langs->transnoentities('ErrorFileNameCanNotBeBuilt');
             return -1;
