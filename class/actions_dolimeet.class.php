@@ -166,9 +166,14 @@ class ActionsDolimeet
     {
         global $conf, $extrafields, $form, $langs;
 
-        require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+        if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
+            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            $objectsMetadata                = saturne_get_objects_metadata();
+            $conf->cache['objectsMetadata'] = $objectsMetadata;
+        } else {
+            $objectsMetadata = $conf->cache['objectsMetadata'];
+        }
 
-        $objectsMetadata = saturne_get_objects_metadata();
         foreach($objectsMetadata as $objectMetadata) {
             if ($objectMetadata['link_name'] != $object->element) {
                 continue;
@@ -230,11 +235,16 @@ class ActionsDolimeet
      */
     public function printFieldListOption(array $parameters): int
     {
-        global $extrafields, $langs, $object;
+        global $conf, $extrafields, $langs, $object;
 
-        require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+        if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
+            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            $objectsMetadata                = saturne_get_objects_metadata();
+            $conf->cache['objectsMetadata'] = $objectsMetadata;
+        } else {
+            $objectsMetadata = $conf->cache['objectsMetadata'];
+        }
 
-        $objectsMetadata = saturne_get_objects_metadata();
         foreach($objectsMetadata as $objectMetadata) {
             if ($objectMetadata['link_name'] != $object->element) {
                 continue;
@@ -1406,65 +1416,90 @@ class ActionsDolimeet
      */
     public function saturnePrintFieldListLoopObject(array $parameters, object $object): int
     {
-        global $conf, $langs;
+        global $conf;
 
         if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
-            $out = [];
+            $out       = [];
+            $key       = $parameters['key'];
+            $out[$key] = '';
 
-            $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'];
-            if (is_array($signatoriesInDictionary) && !empty($signatoriesInDictionary)) {
-                $users       = $conf->cache['user'];
-                $contacts    = $conf->cache['contact'];
-                $signatories = $conf->cache['signatories'];
-                foreach ($signatoriesInDictionary as $signatoryInDictionary) {
-                    if ($parameters['key'] == $signatoryInDictionary->ref) {
-                        if (is_array($signatories) && !empty($signatories)) {
-                            $out[$parameters['key']] = '';
-                            foreach ($signatories as $signatory) {
-                                if ($signatory->role != $signatoryInDictionary->ref) {
-                                    continue;
-                                }
-                                switch ($signatory->attendance) {
-                                    case 1:
-                                        break;
-                                        $cssButton = '#0d8aff';
-                                        $userIcon  = 'fa-user-clock';
-                                        break;
-                                    case 2:
-                                        $cssButton = '#e05353';
-                                        $userIcon  = 'fa-user-slash';
-                                        break;
-                                    default:
-                                        $cssButton = '#47e58e';
-                                        $userIcon  = 'fa-user';
-                                        break;
-                                }
-                                if (is_array($users[$signatory->role]) && !empty($users[$signatory->role]) && $users[$signatory->role][$signatory->id] instanceof User) {
-                                    $out[$parameters['key']] .= $users[$signatory->role][$signatory->id]->getNomUrl(1, '', 0, 0, 24, 1);
-                                }
-                                if (is_array($contacts[$signatory->role]) && !empty($contacts[$signatory->role]) && $contacts[$signatory->role][$signatory->id] instanceof Contact) {
-                                    $out[$parameters['key']] .= $contacts[$signatory->role][$signatory->id]->getNomUrl(1);
-                                }
-                                if ((is_array($users[$signatory->role]) && !empty($users[$signatory->role])) || (is_array($contacts[$signatory->role]) && !empty($contacts[$signatory->role]))) {
-                                    $out[$parameters['key']] .= ' ' . $signatory->getLibStatut(3);
-                                    $out[$parameters['key']] .= ' <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . '"></i><br>';
-                                }
-                            }
-                        }
-                    }
+            $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'] ?? [];
+            $isSignatoryColumn       = false;
+
+            foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+                if ($signatoryInDictionary->ref === $key) {
+                    $isSignatoryColumn = true;
+                    break;
                 }
             }
 
-            if ($parameters['key'] == 'society_attendants') {
-                $thirdparties = $conf->cache['thirdparty'];
-                if (is_array($thirdparties) && !empty($thirdparties)) {
-                    $alreadyAddedThirdParties = [];
-                    foreach ($thirdparties as $thirdparty) {
-                        if (!empty($thirdparty->id) && !in_array($thirdparty->id, $alreadyAddedThirdParties)) {
-                            $out[$parameters['key']] .= $thirdparty->getNomUrl(1) . '<br>';
-                        }
-                        $alreadyAddedThirdParties[] = $thirdparty->id;
+            if (!$isSignatoryColumn && $key !== 'society_attendants') {
+                return 0;
+            }
+
+            if ($isSignatoryColumn) {
+                $signatories = $conf->cache['signatories'] ?? [];
+                $users       = $conf->cache['user'] ?? [];
+                $contacts    = $conf->cache['contact'] ?? [];
+
+                foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+                    if ($signatoryInDictionary->ref !== $key) {
+                        continue;
                     }
+
+                    foreach ($signatories as $signatory) {
+                        if ($signatory->role != $signatoryInDictionary->ref) {
+                            continue;
+                        }
+
+                        $role    = $signatory->role;
+                        $user    = $users[$role][$signatory->id] ?? null;
+                        $contact = $contacts[$role][$signatory->id] ?? null;
+
+                        if (!$user instanceof User && !$contact instanceof Contact) {
+                            continue;
+                        }
+
+                        if ($user instanceof User) {
+                            $out[$key] .= $user->getNomUrl(1, '', 0, 0, 24, 1);
+                        }
+                        if ($contact instanceof Contact) {
+                            $out[$key] .= $contact->getNomUrl(1);
+                        }
+
+                        switch ((int) $signatory->attendance) {
+                            case 1:
+                                $cssButton = '#0d8aff';
+                                $userIcon = 'fa-user-clock';
+                                break;
+                            case 2:
+                                $cssButton = '#e05353';
+                                $userIcon = 'fa-user-slash';
+                                break;
+                            default:
+                                $cssButton = '#47e58e';
+                                $userIcon = 'fa-user';
+                        }
+
+                        $out[$key] .= ' ' . $signatory->getLibStatut(3);
+                        $out[$key] .= ' <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . '"></i><br>';
+                    }
+
+                    break;
+                }
+            }
+
+            if ($key === 'society_attendants') {
+                $thirdParties = $conf->cache['thirdparty'] ?? [];
+                $alreadyAdded = [];
+
+                foreach ($thirdParties as $thirdParty) {
+                    if (empty($thirdParty->id) || isset($alreadyAdded[$thirdParty->id])) {
+                        continue;
+                    }
+
+                    $out[$key] .= $thirdParty->getNomUrl(1) . '<br>';
+                    $alreadyAdded[$thirdParty->id] = true;
                 }
             }
 

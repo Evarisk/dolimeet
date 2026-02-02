@@ -156,7 +156,6 @@ if (!empty($fromType)) {
             $search['search_external_attendants'] = $fromID;
             break;
         case 'contrat' :
-            $objectLinked->element = 'contract';
             $search['fk_contrat']  = $fromID;
             if ($object->element == 'trainingsession') {
                 $sortfield = 't.date_start';
