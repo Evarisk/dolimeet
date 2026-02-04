@@ -698,9 +698,7 @@ class ActionsDolimeet
 
             ?>
             <script>
-
                 window.dolimeet.contactList.insertData(<?php echo json_encode($contactIds); ?>, '<?= $langs->trans('Formations') ?>');
-
             </script>
             <?php
         }
