@@ -152,6 +152,17 @@ class ActionsDolimeet
             $this->resprints = $out;
         }
 
+        if (preg_match('/thirdpartycontact/', $parameters['context'])) {
+            $resourcesRequired = [
+                'js'  => '/custom/dolimeet/js/dolimeet.min.js'
+            ];
+
+            $out .= '<!-- Includes JS added by module saturne -->';
+            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+
+            $this->resprints = $out;
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -688,25 +699,7 @@ class ActionsDolimeet
             ?>
             <script>
 
-                const contactIds = <?php echo json_encode($contactIds); ?>;
-
-                $table = $('.div-table-responsive')
-                $listTitle = $table.find('tr.liste_titre').last()
-                $tableLines = $table.find('tr.oddeven')
-
-                $table.find('tr.liste_titre').first().find('td').eq(1).after('<td class="liste_titre"></td>')
-                $listTitle.find('th').eq(1).after('<th><?= $langs->trans('Formations') ?></th>')
-
-                $tableLines.each(function() {
-                    $this = $(this)
-                    let url = new URL($this.find('td a').eq(1)[0].href)
-                    let id = url.searchParams.get('id')
-
-                    let nb = contactIds[id] !== undefined ? contactIds[id] : 0
-
-                    $this.find('td').eq(1).after('<td class="tdoverflowmax150 ">'+ nb +'</td>')
-                    console.log(nb)
-                });
+                window.dolimeet.contactList.insertData(<?php echo json_encode($contactIds); ?>, '<?= $langs->trans('Formations') ?>');
 
             </script>
             <?php
