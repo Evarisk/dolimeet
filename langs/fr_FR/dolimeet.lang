@@ -331,6 +331,7 @@ TradFoundSessionTrainer           = Nombre de formateur(s) inscrits pour cette s
 TradFoundTrainee                  = Nombre de stagiaire(s) inscrits pour cette session de formation
 TradFoundBilling                  = Le commanditaire correspond au rôle "Contact client facturation contrat" présent dans Dolibarr
 TradFoundCustomer                 = Le client correspond au rôle "Contact client suivi contrat" présent dans Dolibarr
+MandatorySignature                = Signature obligatoire
 
 #
 # PDF
