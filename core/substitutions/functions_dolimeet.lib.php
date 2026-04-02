@@ -40,7 +40,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
         return;
     }
 
-    if ($object->element == 'contrat') {
+    if ($object->element == 'contrat' && !empty($object->array_options)) {
         // Load Saturne libraries
         require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
         require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
