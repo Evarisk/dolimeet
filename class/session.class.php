@@ -424,19 +424,18 @@ class Session extends SaturneObject
     }
 
     /**
-     * Set draft status.
+     * Set draft status
      *
-     * @param  User      $user      Object user that modify.
-     * @param  int       $notrigger 1 = Does not execute triggers, 0 = Execute triggers.
-     * @return int                  0 < if KO, >0 if OK.
-     * @throws Exception
+     * @param  User      $user      Object user that modify
+     * @param  int<0,1>  $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,1>            Return integer 0 < if KO, > 0 if OK
      */
-    public function setDraft(User $user, int $notrigger = 0): int
+    public function setDraft(User $user, int $noTrigger = 0): int
     {
         $signatory = new SaturneSignature($this->db, 'dolimeet', $this->type);
         $signatory->deleteSignatoriesSignatures($this->id, $this->type);
 
-        return parent::setDraft($user, $notrigger);
+        return parent::setDraft($user, $noTrigger);
     }
 
     /**
@@ -479,21 +478,6 @@ class Session extends SaturneObject
         }
 
         return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-    }
-
-    /**
-     * Sets object to supplied categories
-     *
-     * Deletes object from existing categories not supplied
-     * Adds it to non-existing supplied categories
-     * Existing categories are left untouched
-     *
-     * @param  int|int[] $categories Category or categories IDs
-     * @return int                   0 < if KO, >0 if OK
-     */
-    public function setCategories($categories): int
-    {
-        return parent::setCategoriesCommon($categories, 'session');
     }
 
     /**
