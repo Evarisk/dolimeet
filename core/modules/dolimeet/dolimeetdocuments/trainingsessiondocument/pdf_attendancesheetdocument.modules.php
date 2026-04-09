@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 class pdf_attendancesheetdocument {
     /**
-     * @var DoliDb Database handler
+     * @var DoliDB Database handler
      */
     public $db;
 

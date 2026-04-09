@@ -39,7 +39,7 @@ require_once __DIR__ . '/../../../../../lib/dolimeet_function.lib.php';
 class pdf_completioncertificatedocument extends SaturneDocumentModel
 {
     /**
-     * @var DoliDb Database handler
+     * @var DoliDB Database handler
      */
     public $db;
 

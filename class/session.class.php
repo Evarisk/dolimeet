@@ -280,7 +280,7 @@ class Session extends SaturneObject
     /**
      * Constructor.
      *
-     * @param DoliDb $db         Database handler.
+     * @param DoliDB $db         Database handler.
      * @param string $objectType Object element type.
      */
     public function __construct(DoliDB $db, string $objectType = 'session')
@@ -858,7 +858,7 @@ class SessionDocument extends SaturneDocuments
     /**
      * Constructor.
      *
-     * @param DoliDb $db Database handler.
+     * @param DoliDB $db Database handler.
      * @param string $objectType Object element type.
      */
     public function __construct(DoliDB $db, string $objectType = 'sessiondocument')
