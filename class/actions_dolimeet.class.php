@@ -286,7 +286,7 @@ class ActionsDolimeet
             $session = new Session($db, 'session');
             $project = new Project($db);
 
-            $project->fetch(GETPOST('id'), GETPOST('ref'));
+            $project->fetch(GETPOSTINT('id'), GETPOST('ref', 'alpha'));
             $linkedSessions = $session->fetchAll('','',0,0, ['fk_project' => $project->id]);
 
             saturne_load_langs();
@@ -732,7 +732,7 @@ class ActionsDolimeet
             if ($action == 'set_satisfaction_survey' && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
                 require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 
-                $object->fetch(GETPOST('id'));
+                $object->fetch(GETPOSTINT('id'));
 
                 set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
 

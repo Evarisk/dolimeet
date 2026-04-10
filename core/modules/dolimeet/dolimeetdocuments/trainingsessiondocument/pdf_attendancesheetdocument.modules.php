@@ -263,7 +263,7 @@ class pdf_attendancesheetdocument {
         $thirdParty       = new Societe($this->db);
         $project          = new Project($this->db);
 
-        $object->fetch(GETPOST('id'));
+        $object->fetch(GETPOSTINT('id'));
         $contract->fetch($object->fk_contrat);
         $thirdParty->fetch($object->fk_soc);
         $project->fetch($object->fk_project);
