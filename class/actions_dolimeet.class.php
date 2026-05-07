@@ -166,9 +166,14 @@ class ActionsDolimeet
     {
         global $conf, $extrafields, $form, $langs;
 
-        require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+        if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
+            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            $objectsMetadata                = saturne_get_objects_metadata();
+            $conf->cache['objectsMetadata'] = $objectsMetadata;
+        } else {
+            $objectsMetadata = $conf->cache['objectsMetadata'];
+        }
 
-        $objectsMetadata = saturne_get_objects_metadata();
         foreach($objectsMetadata as $objectMetadata) {
             if ($objectMetadata['link_name'] != $object->element) {
                 continue;
@@ -230,11 +235,16 @@ class ActionsDolimeet
      */
     public function printFieldListOption(array $parameters): int
     {
-        global $extrafields, $langs, $object;
+        global $conf, $extrafields, $langs, $object;
 
-        require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+        if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
+            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            $objectsMetadata                = saturne_get_objects_metadata();
+            $conf->cache['objectsMetadata'] = $objectsMetadata;
+        } else {
+            $objectsMetadata = $conf->cache['objectsMetadata'];
+        }
 
-        $objectsMetadata = saturne_get_objects_metadata();
         foreach($objectsMetadata as $objectMetadata) {
             if ($objectMetadata['link_name'] != $object->element) {
                 continue;
@@ -276,7 +286,7 @@ class ActionsDolimeet
             $session = new Session($db, 'session');
             $project = new Project($db);
 
-            $project->fetch(GETPOST('id'), GETPOST('ref'));
+            $project->fetch(GETPOSTINT('id'), GETPOST('ref', 'alpha'));
             $linkedSessions = $session->fetchAll('','',0,0, ['fk_project' => $project->id]);
 
             saturne_load_langs();
@@ -379,13 +389,17 @@ class ActionsDolimeet
                                 arsort($surveyIDs);
                                 foreach ($surveyIDs as $surveyID) {
                                     $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
-                                    $filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
+                                    //$filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
                                     if (getDolGlobalInt($confName) > 0) {
-                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
+                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', '')) {
                                             $survey->fetch($surveyID);
                                             $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                            $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $signatory->getLibStatut(3);
+                                            $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $survey->getStatus();
+
+                                            $outputLine[$contact['rowid']] .= ' <a href="?' . http_build_query($_GET + ['action' => 'send_email', 'survey_id' => $survey->id]) . '" class="wpeo-button button-blue"><i class="fas fa-paper-plane" style="color: #fff;"></i></a>';
+                                            $outputLine[$contact['rowid']] .= ' <a href="' . dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3) . '" class="wpeo-button button-blue" target="_blank"><i class="fas fa-external-link-alt" style="color: #fff; opacity: 1;"></i></a>';
+
                                             $outputLine[$contact['rowid']] .= '</td>';
                                             break;
                                         } else {
@@ -441,7 +455,9 @@ class ActionsDolimeet
         if (preg_match('/contacttpl/', $parameters['context'])) {
             global $object;
 
-            $contacts = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
+            require_once __DIR__ . '/../lib/dolibarr_lib.php';
+
+            $contacts = array_merge(listeContact($object, -1, 'internal'), listeContact($object, -1));
             if (!empty($contacts)) {
                 $outputLine = [];
                 foreach ($contacts as $contact) {
@@ -606,7 +622,7 @@ class ActionsDolimeet
             if ($object->statut != Contrat::STATUS_DRAFT && getDolGlobalString('CONTRACT_ALLOW_ONLINESIGN')) {
                 require_once __DIR__ . '/../lib/dolibarr_lib.php';
 
-                $contacts = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
+                $contacts = array_merge(listeContact($object, -1, 'internal'), listeContact($object, -1));
                 if (!empty($contacts)) {
                     $outputLine = '';
                     foreach ($contacts as $contact) {
@@ -629,11 +645,13 @@ class ActionsDolimeet
         if (strpos($parameters['context'], 'propalcard') !== false) {
             global $object;
 
-            if ($object->array_options['options_trainingsession_type'] == 1) {
+            $trainingSessionType = $object->array_options['options_trainingsession_type'] ?? 0;
+            if ($trainingSessionType == 1) {
                 require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
 
-                $productIds = trainingsession_function_lib1();
-                $out = Form::selectarray('idprod', $productIds, '', 1, 0, 0, '', 0, 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $productIds        = trainingsession_function_lib1();
+                $variousProductIds = trainingsession_function_lib2();
+                $out = Form::selectarray('idprod', $productIds + $variousProductIds, '', 1, 0, 0, '', 0, 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 ?>
                 <script>
                     $(document).ready(function() {
@@ -701,7 +719,7 @@ class ActionsDolimeet
      */
     public function doActions(array $parameters, $object, string $action): int
     {
-        global $conf, $langs, $user;
+        global $conf, $langs, $user, $db;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'admincompany') {
@@ -714,7 +732,7 @@ class ActionsDolimeet
             if ($action == 'set_satisfaction_survey' && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
                 require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
 
-                $object->fetch(GETPOST('id'));
+                $object->fetch(GETPOSTINT('id'));
 
                 set_satisfaction_survey($object, GETPOST('contact_code'), GETPOST('contact_id'), GETPOST('contact_source'));
 
@@ -724,7 +742,7 @@ class ActionsDolimeet
         }
 
         if (strpos($parameters['context'], 'contractcard') !== false) {
-            if ($action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument_odt')) {
+            if ($action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument_odt') || $action == 'builddoc' && strstr(GETPOST('model'), 'completioncertificatedocument')) {
                 require_once __DIR__ . '/dolimeetdocuments/completioncertificatedocument.class.php';
 
                 $document = new CompletioncertificateDocument($this->db);
@@ -752,6 +770,93 @@ class ActionsDolimeet
                 header('Location: ' . $urlToRedirect);
                 exit;
             }
+        }
+
+        if (preg_match('/contractcontactcard/', $parameters['context']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+
+            global $moduleNameLowerCase;
+
+            if ($action == 'send_email') {
+                require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+                require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+                require_once __DIR__ . '/../../saturne/class/saturnemail.class.php';
+                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+
+                saturne_load_langs();
+
+                $survey_id = GETPOST('survey_id');
+
+                $survey = new Survey($db);
+                $survey->fetch($survey_id);
+
+                $signatory   = new SaturneSignature($db);
+                $saturneMail = new SaturneMail($db);
+                $signatories = $signatory->fetchSignatory('', $survey_id, 'survey');
+
+                if (!empty($signatories['Attendant'])) {
+                    $attendant = current($signatories['Attendant']);
+
+                    if (!empty($attendant->email)) {
+                        $sendto = $attendant->email;
+
+                        require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+
+                        $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
+
+                        // Make substitution in email content
+                        $substitutionarray                       = getCommonSubstitutionArray($langs, 0, null, $survey);
+                        $substitutionarray['__OBJECT_ELEMENT__'] = dol_strtolower($langs->transnoentities(ucfirst($survey->element)));
+                        $substitutionarray['__DOLIMEET_SATIFACTION_SURVEY_LINK'] = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3);
+                        complete_substitutions_array($substitutionarray, $langs, $survey, $parameters);
+
+                        $result  = $saturneMail->fetch(getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE'));
+                        $subject = $result > 0 ? $saturneMail->topic : $langs->transnoentities('SatisfactionSurveyUniqueTopic');
+                        $message = $result > 0 ? $saturneMail->content : $langs->transnoentities('SatisfactionSurveyUniqueContent');
+
+                        $subject = make_substitutions($subject, $substitutionarray);
+                        $message = make_substitutions($message, $substitutionarray);
+
+                        // Create form survey
+                        // Send mail (substitutionarray must be done just before this)
+                        $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
+                        if ($mailfile->error) {
+                            setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+                        } elseif (!empty($conf->global->MAIN_MAIL_SMTPS_ID) || $conf->global->SATURNE_USE_ALL_EMAIL_MODE > 0) {
+                            $result = $mailfile->sendfile();
+                            if ($result) {
+                                $attendant->last_email_sent_date = dol_now();
+                                $attendant->update($user, true);
+                                setEventMessages($langs->trans('SendEmailAt', $attendant->email), []);
+
+                                $moduleNameLowerCase = 'digiquali';
+                                $survey->call_trigger('SATURNE_SIGNATURE_SEND_BY_MAIL', $user);
+                                $moduleNameLowerCase = 'dolimeet';
+
+                                // Prevent form reloading page
+                                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . GETPOST('id'));
+                                exit;
+                            } else {
+                                $langs->load('other');
+                                $errorMessage = '<div class="error">';
+                                $errorMessage .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                                if ($mailfile->error) {
+                                    $errorMessage .= '<br>' . $mailfile->error;
+                                }
+                                $errorMessage .= '</div>';
+                                setEventMessages($errorMessage, [], 'warnings');
+                            }
+                        } else {
+                            $url = '<a href="' . dol_buildpath('/admin/mails.php', 1) . '" target="_blank">' . $langs->trans('ConfigEmail') . '</a>';
+                            setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $url, [], 'warnings');
+                        }
+
+                    } else {
+                    }
+                } else {
+                }
+
+            }
+
         }
 
         return 0; // or return 1 to replace standard code
@@ -976,7 +1081,7 @@ class ActionsDolimeet
                     if ($contactInfos['numberOfContacts'] > 0) {
                         $contactInfos['color'] = '#47e58e';
                     }
-                    if ($object->array_options['options_trainingsession_opco_financing'] == 1 && $contactRole == 'opco') {
+                    if (!empty($object->array_options['options_trainingsession_opco_financing']) && $contactRole == 'opco') {
                         $contactInfos['notice'] = 'warning';
                     }
                     $contactsNoticeByRoles[$contactInfos['notice']][$contactRole] = $contactInfos;
@@ -1311,65 +1416,90 @@ class ActionsDolimeet
      */
     public function saturnePrintFieldListLoopObject(array $parameters, object $object): int
     {
-        global $conf, $langs;
+        global $conf;
 
         if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
-            $out = [];
+            $out       = [];
+            $key       = $parameters['key'];
+            $out[$key] = '';
 
-            $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'];
-            if (is_array($signatoriesInDictionary) && !empty($signatoriesInDictionary)) {
-                $users       = $conf->cache['user'];
-                $contacts    = $conf->cache['contact'];
-                $signatories = $conf->cache['signatories'];
-                foreach ($signatoriesInDictionary as $signatoryInDictionary) {
-                    if ($parameters['key'] == $signatoryInDictionary->ref) {
-                        if (is_array($signatories) && !empty($signatories)) {
-                            $out[$parameters['key']] = '';
-                            foreach ($signatories as $signatory) {
-                                if ($signatory->role != $signatoryInDictionary->ref) {
-                                    continue;
-                                }
-                                switch ($signatory->attendance) {
-                                    case 1:
-                                        break;
-                                        $cssButton = '#0d8aff';
-                                        $userIcon  = 'fa-user-clock';
-                                        break;
-                                    case 2:
-                                        $cssButton = '#e05353';
-                                        $userIcon  = 'fa-user-slash';
-                                        break;
-                                    default:
-                                        $cssButton = '#47e58e';
-                                        $userIcon  = 'fa-user';
-                                        break;
-                                }
-                                if (is_array($users[$signatory->role]) && !empty($users[$signatory->role]) && $users[$signatory->role][$signatory->id] instanceof User) {
-                                    $out[$parameters['key']] .= $users[$signatory->role][$signatory->id]->getNomUrl(1, '', 0, 0, 24, 1);
-                                }
-                                if (is_array($contacts[$signatory->role]) && !empty($contacts[$signatory->role]) && $contacts[$signatory->role][$signatory->id] instanceof Contact) {
-                                    $out[$parameters['key']] .= $contacts[$signatory->role][$signatory->id]->getNomUrl(1);
-                                }
-                                if ((is_array($users[$signatory->role]) && !empty($users[$signatory->role])) || (is_array($contacts[$signatory->role]) && !empty($contacts[$signatory->role]))) {
-                                    $out[$parameters['key']] .= ' ' . $signatory->getLibStatut(3);
-                                    $out[$parameters['key']] .= ' <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . '"></i><br>';
-                                }
-                            }
-                        }
-                    }
+            $signatoriesInDictionary = $conf->cache['signatoriesInDictionary'] ?? [];
+            $isSignatoryColumn       = false;
+
+            foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+                if ($signatoryInDictionary->ref === $key) {
+                    $isSignatoryColumn = true;
+                    break;
                 }
             }
 
-            if ($parameters['key'] == 'society_attendants') {
-                $thirdparties = $conf->cache['thirdparty'];
-                if (is_array($thirdparties) && !empty($thirdparties)) {
-                    $alreadyAddedThirdParties = [];
-                    foreach ($thirdparties as $thirdparty) {
-                        if (!empty($thirdparty->id) && !in_array($thirdparty->id, $alreadyAddedThirdParties)) {
-                            $out[$parameters['key']] .= $thirdparty->getNomUrl(1) . '<br>';
-                        }
-                        $alreadyAddedThirdParties[] = $thirdparty->id;
+            if (!$isSignatoryColumn && $key !== 'society_attendants') {
+                return 0;
+            }
+
+            if ($isSignatoryColumn) {
+                $signatories = $conf->cache['signatories'] ?? [];
+                $users       = $conf->cache['user'] ?? [];
+                $contacts    = $conf->cache['contact'] ?? [];
+
+                foreach ($signatoriesInDictionary as $signatoryInDictionary) {
+                    if ($signatoryInDictionary->ref !== $key) {
+                        continue;
                     }
+
+                    foreach ($signatories as $signatory) {
+                        if ($signatory->role != $signatoryInDictionary->ref) {
+                            continue;
+                        }
+
+                        $role    = $signatory->role;
+                        $user    = $users[$role][$signatory->id] ?? null;
+                        $contact = $contacts[$role][$signatory->id] ?? null;
+
+                        if (!$user instanceof User && !$contact instanceof Contact) {
+                            continue;
+                        }
+
+                        if ($user instanceof User) {
+                            $out[$key] .= $user->getNomUrl(1, '', 0, 0, 24, 1);
+                        }
+                        if ($contact instanceof Contact) {
+                            $out[$key] .= $contact->getNomUrl(1);
+                        }
+
+                        switch ((int) $signatory->attendance) {
+                            case 1:
+                                $cssButton = '#0d8aff';
+                                $userIcon = 'fa-user-clock';
+                                break;
+                            case 2:
+                                $cssButton = '#e05353';
+                                $userIcon = 'fa-user-slash';
+                                break;
+                            default:
+                                $cssButton = '#47e58e';
+                                $userIcon = 'fa-user';
+                        }
+
+                        $out[$key] .= ' ' . $signatory->getLibStatut(3);
+                        $out[$key] .= ' <i class="fas ' . $userIcon . '" style="color: ' . $cssButton . '"></i><br>';
+                    }
+
+                    break;
+                }
+            }
+
+            if ($key === 'society_attendants') {
+                $thirdParties = $conf->cache['thirdparty'] ?? [];
+                $alreadyAdded = [];
+
+                foreach ($thirdParties as $thirdParty) {
+                    if (empty($thirdParty->id) || isset($alreadyAdded[$thirdParty->id])) {
+                        continue;
+                    }
+
+                    $out[$key] .= $thirdParty->getNomUrl(1) . '<br>';
+                    $alreadyAdded[$thirdParty->id] = true;
                 }
             }
 
@@ -1647,21 +1777,25 @@ class ActionsDolimeet
                     }
 
                     if (!empty($contactList)) {
+                        require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+                        require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
                         $document                              = new CompletioncertificateDocument($this->db);
                         $parameters['moreparams']['attendant'] = new stdClass();
 
-                        $parameters['moreparams']['object']             = $object;
-                        $parameters['moreparams']['object']->element    = 'trainingsession';
-                        $parameters['moreparams']['object']->fk_contrat = $object->id;
-                        $parameters['moreparams']['object']->date_start = current($sessions)->date_start;
-                        $parameters['moreparams']['object']->date_end   = end($sessions)->date_end;
-                        $parameters['moreparams']['object']->duration   = $durations;
+                        $parameters['moreparams']['object']                 = $object;
+                        $parameters['moreparams']['object']->element        = 'trainingsession';
+                        $parameters['moreparams']['object']->formationLabel = get_formation_label($object);
+                        $parameters['moreparams']['object']->fk_contrat     = $object->id;
+                        $parameters['moreparams']['object']->date_start     = current($sessions)->date_start;
+                        $parameters['moreparams']['object']->date_end       = end($sessions)->date_end;
+                        $parameters['moreparams']['object']->duration       = $durations;
                         foreach ($contactList as $contactType) {
                             foreach($contactType as $contact) {
                                 $parameters['moreparams']['attendant']->firstname    = $contact['firstname'];
                                 $parameters['moreparams']['attendant']->lastname     = $contact['lastname'];
                                 $parameters['moreparams']['attendant']->element_type = ($contact['source'] == 'external' ? 'socpeople' : 'user');
                                 $parameters['moreparams']['attendant']->element_id   = $contact['id'];
+                                $parameters['moreparams']['attendant']->socid        = $contact['socid'];
 
                                 $document->element = 'trainingsessiondocument';
 

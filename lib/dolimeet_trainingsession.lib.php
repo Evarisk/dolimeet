@@ -42,16 +42,16 @@ function trainingsession_prepare_head(Trainingsession $object): array
 
 function trainingsession_function_lib1()
 {
-    global $conf;
+    global $conf, $langs;
 
     require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
     require_once __DIR__ . '/../../saturne/lib/object.lib.php';
 
     $mainCategory      = getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY');
-    $variousCategory   = getDolGlobalInt('DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY');
     $templateProjectId = getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT');
 
-    if (empty($mainCategory) || empty($variousCategory) || empty($templateProjectId)) {
+    if (empty($mainCategory) || empty($templateProjectId)) {
+        setEventMessages($langs->transnoentities('Error3.1'), [], 'errors');
         return -1;
     }
 
@@ -79,6 +79,23 @@ function trainingsession_function_lib1()
     ];
     $products = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filterMain) ?: [];
 
+    return array_column($products, 'label', 'id');
+}
+
+function trainingsession_function_lib2()
+{
+    global $conf, $langs;
+
+    require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+    require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+
+    $variousCategory = getDolGlobalInt('DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY');
+
+    if (empty($variousCategory)) {
+        setEventMessages($langs->transnoentities('Error3.1'), [], 'errors');
+        return -1;
+    }
+
     $filterVarious = [
         'customsql' =>
             'fk_product_type = 1 AND entity = ' . $conf->entity .
@@ -89,11 +106,29 @@ function trainingsession_function_lib1()
                 WHERE cp.fk_categorie = ' . $variousCategory .
             ')'
     ];
-
     $variousProducts = saturne_fetch_all_object_type('Product', 'ASC', 'label', 0, 0, $filterVarious) ?: [];
 
-    $productIds        = array_column($products, 'label', 'id');
-    $variousProductIds = array_column($variousProducts, 'label', 'id');
+    return array_column($variousProducts, 'label', 'id');
+}
 
-    return $productIds + $variousProductIds;
+function get_formation_label(CommonObject $object): string
+{
+    global $langs;
+
+    $formationLabel = '';
+    $productIds     = trainingsession_function_lib1();
+    if (!is_array($productIds) || empty($productIds)) {
+        setEventMessages($langs->transnoentities('Error3'), [], 'errors');
+        return -1;
+    }
+
+    foreach ($object->lines as $line) {
+        if (!in_array($line->fk_product, array_keys($productIds))) {
+            continue;
+        }
+
+        $formationLabel .= $line->product_label;
+    }
+
+    return $formationLabel;
 }

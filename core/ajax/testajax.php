@@ -43,7 +43,13 @@ if (!defined('NOREQUIRESOC')) {
 }
 
 // Load Dolibarr environment
-require '../../../../main.inc.php';
+if (file_exists('../../../../main.inc.php')) {
+    require '../../../../main.inc.php';
+} elseif (file_exists('../../../../../main.inc.php')) {
+    require '../../../../../main.inc.php';
+} else {
+    die('Include of dolimeet main fails');
+}
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
 global $db, $user;

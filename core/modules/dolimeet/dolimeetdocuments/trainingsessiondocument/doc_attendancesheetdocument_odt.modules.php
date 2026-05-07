@@ -95,7 +95,7 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
 
         if (!empty($object->fk_contrat)) {
             require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
-            require_once __DIR__ . '/../../../../../lib/dolimeet_function.lib.php';
+            require_once __DIR__ . '/../../../../../lib/dolimeet_trainingsession.lib.php';
             $contract = new Contrat($this->db);
             $contract->fetch($object->fk_contrat);
             $contract->fetch_optionals();

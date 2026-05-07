@@ -198,6 +198,7 @@ AttendanceSheetDocumentPDFDescription         = Feuille de présence en PDF
 DisplayAttendanceAbsentInSignature            = Affiche la présence absent dans le champ signature de la feuille de présence
 DisplayAttendanceAbsentInSignatureDescription = Affiche la présence absent si la personne est absente et qu'elle n'a pas signé
 CompletionCertificateDocument                 = Certificat de réalisation
+CompletionCertificateDocumentPDF              = Certificat de réalisation en PDF
 CompletionCertificateDocuments                = certificats de réalisation
 completioncertificatedocument                 = certificat de realisation
 completioncertificatedocument.odt             = Certificat de réalisation
@@ -231,13 +232,13 @@ Auditee = Audité
 
 # Data - Donnée
 SessionInfos                         = Informations sur les sessions
-MoyenneDurationSessionInfos          = Informations sur les durées moyenne des sessions
+AverageDurationsSessionInfos         = Informations sur les durées moyenne des sessions
 NbMeetings                           = Nombre de réunions
-MoyenneDurationMeetings              = Durée moyenne des réunions
+AverageDurationMeetings              = Durée moyenne des réunions
 NbTrainingsessions                   = Nombre de sessions de formation
-MoyenneDurationTrainingsessions      = Durée moyenne des sessions de formation
+AverageDurationTrainingsessions      = Durée moyenne des sessions de formation
 NbAudits                             = Nombre d'audits
-MoyenneDurationAudits                = Durée moyenne des audits
+AverageDurationAudits                = Durée moyenne des audits
 AttendantMeetingInfos                = Informations sur les participants aux réunions
 NbAttendantMeetings                  = Nombre de participants aux réunions
 NbContributors                       = Nombre de contributeurs
@@ -259,10 +260,10 @@ NbAuditors                           = Nombre d'auditeurs
 AttendancePresentAuditRate           = Taux de présence aux audits
 AttendanceDelayAuditRate             = Taux de retard aux audits
 AttendanceAbsentAuditRate            = Taux d'absence aux audits
-ActivityMonitoring                   = Suivi des activités
-AverageDurationByActivity            = Durées moyennes par activité
+SessionTypeMonitorings               = Suivi des type de sessions
+AverageDurationsBySessionType        = Durées moyennes par type de session
 MeetingAttendance                    = Participation aux réunions
-TrainingSessionAttendance            = Participation aux sessions de formations
+TrainingsessionAttendance            = Participation aux sessions de formations
 AuditAttendance                      = Participation aux audits
 
 #
@@ -277,6 +278,9 @@ CompletionCertificateDocumentLabel   = DLM_Certificat_Réalisation
 CompletionCertificateDocumentTopic   = [__[MAIN_INFO_SOCIETE_NOM]__] Remise du certificat de réalisation pour la convention de formation __REF__
 CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en pièce jointe le certificat de réalisation lié à votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br><br />Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
 
+SatisfactionSurveyUniqueLabel        = DLM_Questionnaire_Unique_Satisfaction
+SatisfactionSurveyUniqueTopic        = [__[MAIN_INFO_SOCIETE_NOM]__] Formulaire de satisfaction __REF__
+SatisfactionSurveyUniqueContent      = Bonjour,<br /><br />Afin d’améliorer continuellement la qualité de nos services, nous vous serions reconnaissants de prendre quelques minutes pour répondre à notre formulaire de satisfaction. __DOLIMEET_SATIFACTION_SURVEY_LINK
 
 
 # Public interface - Interface publique
@@ -327,3 +331,26 @@ TradFoundSessionTrainer           = Nombre de formateur(s) inscrits pour cette s
 TradFoundTrainee                  = Nombre de stagiaire(s) inscrits pour cette session de formation
 TradFoundBilling                  = Le commanditaire correspond au rôle "Contact client facturation contrat" présent dans Dolibarr
 TradFoundCustomer                 = Le client correspond au rôle "Contact client suivi contrat" présent dans Dolibarr
+MandatorySignature                = Signature obligatoire
+
+#
+# PDF
+#
+
+MadeAt                              = Fait à
+TrainingSignature                   = Cachet et signature
+TrainingSignatureResponsible        = du responsable du dispensateur de formation
+FirstRealisationCertificateFooter   = <sup>1</sup> Lorsque l’action est mise en oeuvre dans le cadre d’un projet de transition professionnelle, le certificat de réalisation doit être transmis mensuellement.
+SecondRealisationCertificateFooter  = <sup>2</sup> Dans le cadre des formations à distance prendre en compte la réalisation des activités pédagogiques et le temps estimé pour les réaliser.
+IntroductionRealisationCertificate  = Je soussigné(e)
+LegalRepresentativePresentation     = représentant légal du dispensateur de l’action concourant au développement des compétences
+AttestationStatement                = atteste que :
+BeneficiaryDescription              = salarié(e) de l’entreprise
+TrainingAttendanceStatement         = a suivi l’action
+TrainingLabel                       = %s
+NatureActionType                    = Nature de l’action concourant au développement des compétences :
+TrainingPeriodIntro                 = qui s'est déroulée du
+TrainingStart                       = %s
+TrainingEnd                         = au %s
+TrainingDuration                    = pour une durée de %s heure(s) <sup>2</sup>
+TrainingLegalNotice                 = Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m’engage à conserver l’ensemble des pièces justificatives qui ont permis d’établir le présent certificat pendant une durée de 3 ans à compter de la fin de l’année du dernier paiement. En cas de cofinancement des fonds européens la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.

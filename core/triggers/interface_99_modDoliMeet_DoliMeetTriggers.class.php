@@ -47,7 +47,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $this->name        = preg_replace('/^Interface/i', '', get_class($this));
         $this->family      = 'demo';
         $this->description = 'DoliMeet triggers.';
-        $this->version     = '21.0.0';
+        $this->version     = '23.0.0';
         $this->picto       = 'dolimeet@dolimeet';
     }
 
@@ -108,8 +108,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $actionComm->userownerid = $user->id;
         $actionComm->percentage  = -1;
 
-        if (getDolGlobalInt('DOLIMEET_ADVANCED_TRIGGER') && !empty($object->fields)) {
-            $actionComm->note_private = method_exists($object, 'getTriggerDescription') ? $object->getTriggerDescription($object) : '';
+        if (getDolGlobalInt('DOLIMEET_ADVANCED_TRIGGER') === 1 &&
+            method_exists($object, 'getTriggerDescription') &&
+            !empty($object->fields)) {
+            $actionComm->note_private = $object->getTriggerDescription();
         }
 
         $objects      = ['MEETING', 'TRAININGSESSION', 'AUDIT'];
@@ -311,6 +313,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         // Load DoliMeet libraries
                         require_once __DIR__ . '/../../class/trainingsession.class.php';
                         require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
+                        require_once __DIR__ . '/../../lib/dolibarr_lib.php';
 
                         $trainingSession = new Trainingsession($this->db);
 
@@ -357,7 +360,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                     $object->validate($user);
 
-                    $contactSingle = $object->liste_contact(-1, 'internal', 0, 'SALESREPSIGN');
+                    $contactSingle = listeContact($object, -1, 'internal', 0, 'SALESREPSIGN');
 
                     $contact = new Contact($this->db);
                     $contact->fetch($contactSingle[0]['rowid']);

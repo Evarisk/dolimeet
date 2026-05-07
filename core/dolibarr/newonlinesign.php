@@ -51,7 +51,13 @@ if (is_numeric($entity)) {
 }
 
 // Load Dolibarr environment
-require '../../../../main.inc.php';
+if (file_exists('../../../../main.inc.php')) {
+    require '../../../../main.inc.php';
+} elseif (file_exists('../../../../../main.inc.php')) {
+    require '../../../../../main.inc.php';
+} else {
+    die('Include of dolimeet main fails');
+}
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2023-2025 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,13 +34,13 @@
  */
 function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate $langs, $object)
 {
-    global $conf, $db, $user;
+    global $conf, $db;
 
     if (!is_object($object)) {
         return;
     }
 
-    if ($object->element == 'contrat') {
+    if ($object->element == 'contrat' && !empty($object->array_options)) {
         // Load Saturne libraries
         require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
         require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
@@ -80,18 +80,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
             }
         }
 
-        $productIds = trainingsession_function_lib1();
-
-        $formationTitle = '';
-        foreach ($object->lines as $line) {
-            if (!in_array($line->fk_product, array_keys($productIds))) {
-                continue;
-            }
-
-            $formationTitle .= $line->product_label;
-        }
-
-        $substitutionarray['__DOLIMEET_CONTRACT_LABEL__']                    = $formationTitle;
+        $substitutionarray['__DOLIMEET_CONTRACT_LABEL__']                    = get_formation_label($object);
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_TYPE__']     = $object->array_options['options_trainingsession_type'];
         $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_LOCATION__'] = $object->array_options['options_trainingsession_location'];
 
