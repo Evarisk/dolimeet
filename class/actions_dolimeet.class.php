@@ -640,6 +640,10 @@ class ActionsDolimeet
 
                 $productIds        = trainingsession_function_lib1();
                 $variousProductIds = trainingsession_function_lib2();
+                // lib1/lib2 return -1 (int) when their required global config is missing;
+                // coerce to [] so the array union below doesn't fatal on PHP 8 (array + int)
+                $productIds        = is_array($productIds) ? $productIds : [];
+                $variousProductIds = is_array($variousProductIds) ? $variousProductIds : [];
                 $out = Form::selectarray('idprod', $productIds + $variousProductIds, '', 1, 0, 0, '', 0, 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 ?>
                 <script>
