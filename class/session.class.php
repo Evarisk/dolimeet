@@ -424,6 +424,22 @@ class Session extends SaturneObject
     }
 
     /**
+     * Force category type to 'session' for all session subtypes (trainingsession, meeting, audit).
+     * Dolibarr core (actions_addupdatedelete.inc.php) calls setCategories() without a type, and
+     * SaturneObject falls back to $this->element. The only category link table is llx_categorie_session,
+     * so anything else (e.g. llx_categorie_trainingsession) doesn't exist and fatals.
+     *
+     * @param  int[]|int $categories     Category ID or array of Categories IDs
+     * @param  string    $typeCateg      Category type — defaults to 'session' for this hierarchy
+     * @param  bool      $removeExisting True : remove existing categories not supplied in $categories
+     * @return int                       <0 if KO, >0 if OK
+     */
+    public function setCategories($categories, string $typeCateg = '', bool $removeExisting = false): int
+    {
+        return parent::setCategories($categories, $typeCateg ?: 'session', $removeExisting);
+    }
+
+    /**
      * Set draft status
      *
      * @param  User      $user      Object user that modify
