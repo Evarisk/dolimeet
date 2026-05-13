@@ -31,7 +31,8 @@ ContactPublicInterfaceEnabled             = Activer l'interface publique d'ajout
 ContactPublicInterfaceEnabledDescription  = Permet aux contacts externes d'être ajoutés aux contrats via une interface publique sécurisée
 
 # Financial and pedagogical report - Bilan pédagogique et financier
-FinancialAndPedagogicalReport = Bilan pédagogique et financier
+FinancialAndPedagogicalReport        = Bilan pédagogique et financier
+FinancialAndPedagogicalReportInitial = BPF
 
 # Tags - catégories
 BPFTagC     = BPF
@@ -313,16 +314,23 @@ TrainingsessionAttendance            = Participation aux sessions de formations
 AuditAttendance                      = Participation aux audits
 
 # Financial and pedagogical report - Bilan pédagogique et financier
-BPFTitlePartA = A. IDENTIFICATION DE L'ORGANISME DE FORMATION
-BPFTitlePartB = B. INFORMATIONS GÉNÉRALES
+BPFTitlePartA     = A. IDENTIFICATION DE L'ORGANISME DE FORMATION
+BPFAddressPublic  = Acceptez-vous que cette adresse soit rendue publique
+BPFTitlePartB     = B. INFORMATIONS GÉNÉRALES
+BPFRemoteTraining = Avez-vous mis en œuvre, durant cette période, une (des) action(s) de formation en tout ou partie à distance (classes virtuelles, Elearning, etc.)
 
 BPFTitlePartC       = C. BILAN FINANCIER HORS TAXES : ORIGINE DES PRODUITS DE L’ORGANISME
 BPFTagC2Description = <b>2</b>  - Total des produits provenant des organismes gestionnaires des fonds de la formation (total des lignes a à h)
 BPFTotalPartC       = TOTAL DES PRODUITS RÉALISÉS AU TITRE DE LA FORMATION PROFESSIONNELLE (total des lignes 1 à 11)
 BPFCAPartC          = Part du chiffre d'affaires global réalisée dans le domaine de la formation professionnelle (en %%)
 
-BPFTitlePartD = D. BILAN FINANCIER HORS TAXES : CHARGES DE L’ORGANISME
-BPFTitlePartE = E. PERSONNES DISPENSANT DES HEURES DE FORMATION
+BPFTitlePartD   = D. BILAN FINANCIER HORS TAXES : CHARGES DE L’ORGANISME
+BPFLabelPartD1  = Total des charges de l'organisme liées à l'activité de formation
+BPFLabelPartD1a = dont Salaires des formateurs
+BPFLabelPartD1b = dont Achats de prestation de formation et honoraires de formation
+BPFTitlePartE         = E. PERSONNES DISPENSANT DES HEURES DE FORMATION
+BPFLabelPartEInternal = Personnes de votre organisme (formateurs salariés, bénévoles, indépendants)
+BPFLabelPartEExternal = Personnes extérieures à votre organisme (sous-traitance, prestation, honoraires)
 
 BPFTitlePartF   = F. BILAN PÉDAGOGIQUE : STAGIAIRES BÉNÉFICIANT D’UNE FORMATION DISPENSÉE PAR L’ORGANISME ET APPRENTIS EN FORMATION
 BPFTitlePartF1  = F - 1. TYPE DE STAGIAIRES DE L’ORGANISME
@@ -336,9 +344,25 @@ BPFLabelPartF1  = <b>1</b> - TOTAL (a + b + c + d + e)
 BPFTitlePartF2 = F - 2. DONT ACTIVITÉ SOUS-TRAITÉE DE L’ORGANISME
 BPFLabelPartF2 = Stagiaires ou apprentis dont l’action a été confiée par votre organisme à un autre organisme
 
-BPFTitlePartF3 = F - 3. OBJECTIF GÉNÉRAL DES PRESTATIONS DISPENSÉES
+BPFTitlePartF3        = F - 3. OBJECTIF GÉNÉRAL DES PRESTATIONS DISPENSÉES
+BPFLabelPartF3a       = <b>a</b> - Formations visant un diplôme, un titre à finalité professionnelle ou un CQP enregistré au RNCP
+BPFLabelPartF3aLevel68 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 6 à 8 (Licence, Master, diplôme d'ingénieur, Doctorat...)
+BPFLabelPartF3aLevel5 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 5 (BTS, DUT, écoles de formation sanitaire et sociale...)
+BPFLabelPartF3aLevel4 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 4 (BAC professionnel, BT, BP, BM...)
+BPFLabelPartF3aLevel3 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 3 (BEP, CAP...)
+BPFLabelPartF3aLevel2 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 2
+BPFLabelPartF3aCQP    = &nbsp;&nbsp;&nbsp;&nbsp;- dont certificat de qualification professionnelle (CQP) sans niveau de qualification
+BPFLabelPartF3b       = <b>b</b> - Formations visant une certification (dont CQP) ou une habilitation enregistrée au répertoire spécifique (RS)
+BPFLabelPartF3c       = <b>c</b> - Formations visant un CQP non enregistré au RNCP ou au RS
+BPFLabelPartF3d       = <b>d</b> - Autres formations professionnelles
+BPFLabelPartF3e       = <b>e</b> - Bilans de compétences
+BPFLabelPartF3f       = <b>f</b> - Actions d'accompagnement à la VAE
+BPFLabelPartF3        = <b>3</b> - TOTAL (a + b + c + d + e + f)
 
-BPFTitlePartF4 = F - 4. SPÉCIALITÉS DE FORMATION
+BPFTitlePartF4         = F - 4. SPÉCIALITÉS DE FORMATION
+BPFLabelPartF4Specialty = Spécialité %s
+BPFLabelPartF4Other    = Autres spécialités
+BPFLabelPartF4         = <b>4</b> - TOTAL
 
 # Dictionary - Dictionnaire
 GeneralTraining                 = Formations générales
@@ -437,11 +461,13 @@ FamilyLife                      = Vie familiale, vie sociale et autres formation
 BPFTitlePartG  = G. BILAN PÉDAGOGIQUE : STAGIAIRES DONT LA FORMATION A ÉTÉ CONFIÉE A VOTRE ORGANISME PAR UN AUTRE ORGANISME DE FORMATION
 BPFLabelPartG5 = Formations confiées à votre organisme par un autre organisme de formation
 
-BPFTitlePartH    = H. PERSONNE AYANT LA QUALITÉ DE DIRIGEANT
-NameAndFirstName = Nom et prénom
-ManagementStatus = Qualité
+BPFTitlePartH     = H. PERSONNE AYANT LA QUALITÉ DE DIRIGEANT
+BPFManagerStatus  = Qualité du dirigeant (Président, Gérant, Directeur, etc.)
+NameAndFirstName  = Nom et prénom
+ManagementStatus  = Qualité
 
 BPFTitlePartFooter         = PIED DE PAGE DU BILAN PÉDAGOGIQUE ET FINANCIER
+GeneratePDF                = Générer le PDF Cerfa
 NameAndPositionOfSignatory = Nom et qualité du signataire
 
 #
@@ -484,7 +510,6 @@ ErrorMissingFormationServiceConfig = Erreur : configuration des services de form
 
 # Data - Donnée
 TrainingOrganizationNumber        = Numéro de déclaration de l'organisme de formation
-TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
 SocietyAttendants                 = Tiers des participants externe
 DateAndTime                       = Date et horaire
 SignAttendanceSheetOnline         = Signer la feuille de présence en ligne

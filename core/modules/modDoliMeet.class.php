@@ -225,6 +225,9 @@ class modDoliMeet extends DolibarrModules
 
             // CONST CONFIGURATION.
             $i++ => ['MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', 'chaine', '', '', 0, 'current'],
+            $i++ => ['DOLIMEET_BPF_ADDRESS_PUBLIC', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_BPF_REMOTE_TRAINING', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_BPF_MANAGER_STATUS', 'chaine', '', '', 0, 'current'],
 
             // CONST MODULE.
             $i++ => ['DOLIMEET_VERSION','chaine', $this->version, '', 0, 'current'],
@@ -509,8 +512,8 @@ class modDoliMeet extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=dolimeet',
             'type'     => 'left',
-            'titre'    => $langs->transnoentities('FinancialAndPedagogicalReport'),
-            'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>',
+            'titre'    => $langs->transnoentities('FinancialAndPedagogicalReportInitial'),
+            'prefix'   => '<i class="fas fa-file-alt pictofixedwidth"></i>',
             'mainmenu' => 'dolimeet',
             'leftmenu' => 'financial_and_pedagogical_report',
             'url'      => '/dolimeet/view/financial_and_pedagogical_report/financial_and_pedagogical_report.php',

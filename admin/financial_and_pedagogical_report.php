@@ -22,10 +22,13 @@
  */
 
 // Load DoliMeet environment
-if (!file_exists('../dolimeet.main.inc.php')) {
+if (file_exists('../dolimeet.main.inc.php')) {
+    require_once __DIR__ . '/../dolimeet.main.inc.php';
+} elseif (file_exists('../../dolimeet.main.inc.php')) {
+    require_once __DIR__ . '/../../dolimeet.main.inc.php';
+} else {
     die('Include of dolimeet main fails');
 }
-require_once __DIR__ . '/../dolimeet.main.inc.php';
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
@@ -77,6 +80,44 @@ if ($action == 'generate_categories') {
     exit;
 }
 
+if ($action == 'update_organization_identification') {
+    $trainingOrganizationNumber = GETPOST('training_organization_number', 'alpha');
+    if ($trainingOrganizationNumber != getDolGlobalString('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER')) {
+        dolibarr_set_const($db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', $trainingOrganizationNumber, 'chaine', 0, '', $conf->entity);
+    }
+
+    $bpfAddressPublic = GETPOST('bpf_address_public', 'int');
+    if ($bpfAddressPublic != getDolGlobalInt('DOLIMEET_BPF_ADDRESS_PUBLIC')) {
+        dolibarr_set_const($db, 'DOLIMEET_BPF_ADDRESS_PUBLIC', $bpfAddressPublic, 'integer', 0, '', $conf->entity);
+    }
+
+    setEventMessages('SavedConfig', []);
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($action == 'update_general_information') {
+    $bpfRemoteTraining = GETPOST('bpf_remote_training', 'int');
+    if ($bpfRemoteTraining != getDolGlobalInt('DOLIMEET_BPF_REMOTE_TRAINING')) {
+        dolibarr_set_const($db, 'DOLIMEET_BPF_REMOTE_TRAINING', $bpfRemoteTraining, 'integer', 0, '', $conf->entity);
+    }
+
+    setEventMessages('SavedConfig', []);
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($action == 'update_manager') {
+    $bpfManagerStatus = GETPOST('bpf_manager_status', 'alpha');
+    if ($bpfManagerStatus != getDolGlobalString('DOLIMEET_BPF_MANAGER_STATUS')) {
+        dolibarr_set_const($db, 'DOLIMEET_BPF_MANAGER_STATUS', $bpfManagerStatus, 'chaine', 0, '', $conf->entity);
+    }
+
+    setEventMessages('SavedConfig', []);
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 /*
  * View
  */
@@ -92,7 +133,7 @@ print load_fiche_titre($title, $linkBack, 'title_setup');
 
 // Configuration header
 $head = dolimeet_admin_prepare_head();
-print dol_get_fiche_head($head, 'settings', $title, -1, 'dolimeet_color@dolimeet');
+print dol_get_fiche_head($head, 'financial_and_pedagogical_report', $title, -1, 'dolimeet_color@dolimeet');
 
 // Generate categories.
 print load_fiche_titre($langs->trans('Config'), '', '');
@@ -114,6 +155,79 @@ print '</td></tr>';
 
 print '</form>';
 print '</table>';
+
+// Organization identification (BPF Part A)
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="update_organization_identification">';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('TrainingOrganizationNumber');
+print '</td>';
+print '<td class="minwidth400 maxwidth500">';
+print '<input type="text" name="training_organization_number" value="' . dol_escape_htmltag(getDolGlobalString('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER')) . '" class="minwidth300"/>';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('BPFAddressPublic');
+print '</td>';
+print '<td class="minwidth400 maxwidth500">';
+print $form->selectyesno('bpf_address_public', getDolGlobalInt('DOLIMEET_BPF_ADDRESS_PUBLIC'), 1);
+print '</td></tr>';
+
+print '</table>';
+print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+print '</form>';
+
+// General information (BPF Part B)
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="update_general_information">';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('BPFRemoteTraining');
+print '</td>';
+print '<td class="minwidth400 maxwidth500">';
+print $form->selectyesno('bpf_remote_training', getDolGlobalInt('DOLIMEET_BPF_REMOTE_TRAINING'), 1);
+print '</td></tr>';
+
+print '</table>';
+print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+print '</form>';
+
+// Manager (BPF Part H)
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="update_manager">';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('BPFManagerStatus');
+print '</td>';
+print '<td class="minwidth400 maxwidth500">';
+print '<input type="text" name="bpf_manager_status" value="' . dol_escape_htmltag(getDolGlobalString('DOLIMEET_BPF_MANAGER_STATUS')) . '" class="minwidth300"/>';
+print '</td></tr>';
+
+print '</table>';
+print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
+print '</form>';
 
 // Page end
 llxFooter();

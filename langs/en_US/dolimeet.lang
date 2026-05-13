@@ -220,7 +220,6 @@ AuditAttendance                      = Audit attendance
 
 # Data
 TrainingOrganizationNumber        = Declaration number of the training organisation
-TrainingOrganizationNumberTooltip = Enter your registration number here if you are recognised as a training organisation
 SocietyAttendants                 = Third party external attendants
 SetContrat                        = Define contract
 DateAndTime                       = Date and time

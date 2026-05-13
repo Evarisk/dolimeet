@@ -346,23 +346,6 @@ class ActionsDolimeet
             <?php
         }
 
-        // Do something only for the current context.
-        if ($parameters['currentcontext'] == 'admincompany') {
-            $form      = new Form($db);
-            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-            $trainingOrganizationNumberInput = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="' . getDolGlobalString('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER') . '">';
-            ?>
-            <script>
-                let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $picto . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
-                trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($trainingOrganizationNumberInput) ; ?> + '</td></tr>');
-
-                let element = $('table:nth-child(1) .oddeven:last-child');
-                element.after(trainingOrganizationNumberInput);
-            </script>
-            <?php
-        }
-
         // Do something only for the current context
         if (preg_match('/contacttpl/', $parameters['context']) && preg_match('/contractcontactcard/', $parameters['context']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             global $object;
