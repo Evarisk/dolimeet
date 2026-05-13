@@ -762,6 +762,36 @@ class ActionsDolimeet
             }
         }
 
+        if ($parameters['currentcontext'] == 'dolimeetpublicinterfaceadmin') {
+            if ($action == 'set_default_public_interface_user') {
+                $this->ensurePublicInterfaceUserHasContactCreerRight(GETPOSTINT('default_public_interface_user_id'));
+                // Let saturne's publicinterface.php save the const itself.
+            } elseif ($action == 'create_default_public_interface_user') {
+                // Take over saturne's flow so we can grant the right to the newly created user.
+                require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
+                $userTmp           = new User($this->db);
+                $userTmp->lastname = $langs->transnoentities('DefaultPublicInterfaceUserLastName');
+                $userTmp->login    = 'default_public_interface_user';
+                $userTmp->entity   = 0;
+                $userTmp->employee = 0;
+                $userTmp->setPassword($user);
+
+                $newUserId = $userTmp->create($user);
+                if ($newUserId > 0) {
+                    $this->ensurePublicInterfaceUserHasContactCreerRight($newUserId);
+                    dolibarr_set_const($this->db, 'DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER', $newUserId, 'integer', 0, '', $conf->entity);
+                    dolibarr_set_const($this->db, 'DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER_CREATED', $newUserId, 'integer', 0, '', $conf->entity);
+                    setEventMessage($langs->trans('SavedConfig'));
+                } else {
+                    setEventMessages($userTmp->error, $userTmp->errors, 'errors');
+                }
+
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?module_name=DoliMeet');
+                exit;
+            }
+        }
+
         if (strpos($parameters['context'], 'contractcontactcard') !== false) {
             if ($action == 'set_satisfaction_survey' && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
                 require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
@@ -1864,5 +1894,44 @@ class ActionsDolimeet
         }
 
         return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Grant societe.contact.creer to the public interface user so it can create contacts
+     * from public/contact/add_contact.php. Idempotent — User::addrights is a no-op when the
+     * permission is already present.
+     *
+     * @param int $userId User to grant the right to.
+     */
+    private function ensurePublicInterfaceUserHasContactCreerRight(int $userId): void
+    {
+        global $conf;
+
+        if ($userId <= 0) {
+            return;
+        }
+
+        $sql  = 'SELECT id FROM ' . MAIN_DB_PREFIX . 'rights_def';
+        $sql .= " WHERE module = 'societe' AND perms = 'contact' AND subperms = 'creer'";
+        $sql .= ' AND entity = ' . ((int) $conf->entity);
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            return;
+        }
+
+        $row = $this->db->fetch_object($resql);
+        if (!$row) {
+            return;
+        }
+
+        require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
+        $publicUser = new User($this->db);
+        if ($publicUser->fetch($userId) <= 0) {
+            return;
+        }
+
+        $publicUser->addrights((int) $row->id);
     }
 }
