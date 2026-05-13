@@ -44,16 +44,21 @@ class DolimeetDashboard
     /**
      * Load dashboard info
      *
-     * @return array
+     * @param  array     $moreParams    Parameters for load dashboard info
+     * @return array     $dashboardData Return all dashboardData after load info
      * @throws Exception
      */
-    public function load_dashboard(): array
+    public function load_dashboard(array $moreParams = []): array
     {
-        require_once __DIR__ . '/session.class.php';
-
-        $session = new Session($this->db);
-
-        $array['session'] = $session->loadDashboard();
+        $dashboardDatas = [
+            ['type' => 'Session',                               'classPath' => '/session.class.php'],
+            ['type' => 'FinancialAndPedagogicalReportDocument', 'classPath' => '/dolimeetdocuments/financialandpedagogicalreportdocument.class.php']
+        ];
+        foreach ($dashboardDatas as $dashboardData) {
+            require_once __DIR__ . $dashboardData['classPath'];
+            $className = new $dashboardData['type']($this->db);
+            $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) && $moreParams['Load' . $dashboardData['type']] ? $className->loadDashboard($moreParams) : [];
+        }
 
         return $array;
     }

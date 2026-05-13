@@ -191,6 +191,10 @@ class ActionsDolimeet
         }
 
         if (strpos($parameters['context'], 'propalcard') !== false) {
+            $extrafields->attributes['propal']['label']['trainingsession_type']     = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
+            $extrafields->attributes['propal']['label']['trainingsession_service']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
+            $extrafields->attributes['propal']['label']['trainingsession_location'] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
+
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
             } ?>
@@ -210,6 +214,8 @@ class ActionsDolimeet
 
         if (strpos($parameters['context'], 'productcard')) {
             global $extrafields, $object;
+
+            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
 
             if ($object->type == $object::TYPE_PRODUCT) {
                 $extrafields->attributes['product']['list']['syllabus'] = 0;
@@ -336,23 +342,6 @@ class ActionsDolimeet
             ?>
             <script>
                 jQuery('.fiche').append(<?php echo json_encode($outputLine); ?>)
-            </script>
-            <?php
-        }
-
-        // Do something only for the current context.
-        if ($parameters['currentcontext'] == 'admincompany') {
-            $form      = new Form($db);
-            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-            $trainingOrganizationNumberInput = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
-            ?>
-            <script>
-                let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $picto . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
-                trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($trainingOrganizationNumberInput) ; ?> + '</td></tr>');
-
-                let element = $('table:nth-child(1) .oddeven:last-child');
-                element.after(trainingOrganizationNumberInput);
             </script>
             <?php
         }
