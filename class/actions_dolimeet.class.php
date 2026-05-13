@@ -1041,7 +1041,7 @@ class ActionsDolimeet
             'tab_type'       => 'trainingsession',
             'hook_name_list' => 'trainingsessionlist',
             'hook_name_card' => 'trainingsessioncard',
-            'create_url'     => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
+            'create_url'     => 'custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
             'class_path'     => 'custom/dolimeet/class/trainingsession.class.php'
         ];
         $this->results = $linkableObjectTypes;
