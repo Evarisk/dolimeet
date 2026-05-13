@@ -152,6 +152,17 @@ class ActionsDolimeet
             $this->resprints = $out;
         }
 
+        if (preg_match('/thirdpartycontact/', $parameters['context'])) {
+            $resourcesRequired = [
+                'js'  => '/custom/dolimeet/js/dolimeet.min.js'
+            ];
+
+            $out .= '<!-- Includes JS added by module saturne -->';
+            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+
+            $this->resprints = $out;
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -653,6 +664,36 @@ class ActionsDolimeet
                 </script>
                 <?php
             }
+        }
+
+
+        if (strpos($parameters['context'], 'thirdpartycontact')) {
+
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $signatory   = new SaturneSignature($db);
+
+            $sql = "SELECT t.rowid";
+            $sql .= " FROM ".MAIN_DB_PREFIX."socpeople as t";
+            $sql .= " WHERE t.fk_soc = ".GETPOSTINT('socid');
+            $result = $db->query($sql);
+            $num = $db->num_rows($result);
+
+            $contactIds = [];
+            $i = 0;
+            while ($i < $num) {
+			    $obj = $db->fetch_object($result);
+                $filter = ['customsql' => 'status > 0 AND object_type="trainingsession" AND element_type="socpeople" AND element_id='.$obj->rowid];
+                $signatories = $signatory->fetchAll('', '', 0, 0, $filter);
+                $contactIds[$obj->rowid] = count($signatories);
+                $i++;
+            }
+
+            ?>
+            <script>
+                window.dolimeet.contactList.insertData(<?php echo json_encode($contactIds); ?>, '<?= $langs->trans('Formations') ?>');
+            </script>
+            <?php
         }
 
         return 0; // or return 1 to replace standard code.
