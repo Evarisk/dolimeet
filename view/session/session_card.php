@@ -32,6 +32,11 @@ if (file_exists('../../dolimeet.main.inc.php')) {
 
 // Get module parameters.
 $objectType = GETPOST('object_type', 'alpha');
+// Strip trailing '?...' that can leak in when an external caller appends '?action=create&backtopage=...'
+// to a create_url that already contained a query string (e.g., digiquali survey/control "+" button).
+if (strpos($objectType, '?') !== false) {
+    $objectType = strstr($objectType, '?', true);
+}
 
 // Load Dolibarr libraries.
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
