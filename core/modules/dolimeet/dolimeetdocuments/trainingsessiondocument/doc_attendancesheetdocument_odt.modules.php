@@ -117,11 +117,11 @@ class doc_attendancesheetdocument_odt extends SaturneDocumentModel
             $tmpArray['project_ref_label'] = '';
         }
 
-        $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
-        $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
+        $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuserrel');
+        $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuserrel');
         $tmpArray['duration']   = convertSecondToTime($object->duration);
 
-        $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
+        $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuserrel');
 
         $moreParam['tmparray']                  = $tmpArray;
         $moreParam['multipleAttendantsSegment'] = ['sessiontrainer', 'trainee'];
