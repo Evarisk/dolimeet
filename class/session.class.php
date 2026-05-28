@@ -493,6 +493,19 @@ class Session extends SaturneObject
             $statusType = 'status8';
         }
 
+        // When validated and every attendant has signed, show "Signé" instead of "Validé (en attente de signature)"
+        if ($status == self::STATUS_VALIDATED && $status == $this->status && $this->id > 0) {
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $signatory = new SaturneSignature($this->db, 'dolimeet', $this->element);
+            if ($signatory->checkSignatoriesSignatures($this->id, $this->element) == 1) {
+                global $langs;
+                $langs->load('signature@saturne');
+                $signedLabel = $langs->transnoentitiesnoconv('Signed');
+                return dolGetStatus($signedLabel, $signedLabel, '', 'status4', $mode);
+            }
+        }
+
         return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
     }
 
