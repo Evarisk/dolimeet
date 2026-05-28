@@ -232,11 +232,11 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 break;
 
             case 'LINEPROPAL_INSERT' :
-            case 'LINEPROPAL_UPDATE' :
+            case 'LINEPROPAL_MODIFY' :
             case 'LINEPROPAL_DELETE' :
                 // Keep the formation public note in sync on a draft proposal so the content is previewable before validation.
-                // NB: only line triggers are used here. PROPAL_MODIFY must NOT, because set_public_note() calls
-                // update_note() which itself fires PROPAL_MODIFY -> infinite recursion.
+                // NB: line update fires LINEPROPAL_MODIFY (not _UPDATE). PROPAL_MODIFY must NOT be used here, because
+                // set_public_note() calls update_note() which itself fires PROPAL_MODIFY -> infinite recursion.
                 require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
                 require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
 
