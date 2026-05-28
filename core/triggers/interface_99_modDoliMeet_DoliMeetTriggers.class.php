@@ -231,6 +231,29 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 }
                 break;
 
+            case 'LINEPROPAL_INSERT' :
+            case 'LINEPROPAL_UPDATE' :
+            case 'LINEPROPAL_DELETE' :
+                // Keep the formation public note in sync on a draft proposal so the content is previewable before validation.
+                // NB: only line triggers are used here. PROPAL_MODIFY must NOT, because set_public_note() calls
+                // update_note() which itself fires PROPAL_MODIFY -> infinite recursion.
+                require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+                require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
+
+                // $object is a PropaleLigne on LINEPROPAL_*
+                $propalId = !empty($object->fk_propal) ? $object->fk_propal : $object->id;
+                if ($propalId > 0) {
+                    $propal = new Propal($this->db);
+                    if ($propal->fetch($propalId) > 0) {
+                        $propal->fetch_lines();
+                        $propal->fetch_optionals();
+                        if ($propal->statut == Propal::STATUS_DRAFT && !empty($propal->array_options['options_trainingsession_type'])) {
+                            set_public_note($propal, $propal, 'PROPAL_CREATE');
+                        }
+                    }
+                }
+                break;
+
             case 'PROPAL_CREATE' :
                 if (GETPOST('options_trainingsession_type', 'int') > 0) {
 

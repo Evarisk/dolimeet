@@ -163,7 +163,7 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
                 continue;
             }
 
-            $formationTitle .= $line->label;
+            $formationTitle .= dol_strlen($line->label) > 0 ? $line->label : $line->product_label;
 
             $nbTrainees += count($trainingSessions);
             foreach ($trainingSessions as $modelTrainingSession) {
