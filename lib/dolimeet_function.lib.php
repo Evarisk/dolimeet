@@ -142,7 +142,7 @@ function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerK
         // (inflated durations and duplicated sessions in the note).
         foreach ($lines as $line) {
             if (in_array($line->fk_product, array_keys($productIds))) {
-                $formationTitle .= ($triggerKey == 'CONTRACT_CREATE' && dol_strlen($line->product_label) > 0) ? $line->product_label : $line->label;
+                $formationTitle .= dol_strlen($line->product_label) > 0 ? $line->product_label : $line->label;
             }
         }
 
