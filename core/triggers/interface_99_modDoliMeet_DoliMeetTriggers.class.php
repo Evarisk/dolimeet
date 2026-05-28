@@ -255,7 +255,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $propalLine->fk_parent_line = 0;
                             $propalLine->fk_product     = $product->id;
                             $propalLine->product_label  = $product->label;
-                            $propalLine->desc           = $product->description;
+                            $propalLine->desc           = dol_strlen($product->description) > 0 ? $product->description : $product->label;
                             $propalLine->tva_tx         = $product->tva_tx;
                             $propalLine->qty            = 1;
                             $propalLine->rang           = $formationService['position'];
@@ -296,7 +296,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $result   = $product->fetch(getDolGlobalInt($confName));
 
                             if ($result > 0) {
-                                $contratLigne->description = $product->description;
+                                $contratLigne->description = dol_strlen($product->description) > 0 ? $product->description : $product->label;
                                 $contratLigne->subprice    = $product->price;
                                 $contratLigne->qty         = 1;
                                 $contratLigne->tva_tx      = $product->tva_tx;
