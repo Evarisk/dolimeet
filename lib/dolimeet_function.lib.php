@@ -130,49 +130,35 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
     $nbTrainees      = 0;
     $durations       = 0;
     $publicNotePart2 = '';
-    if ($triggerKey == 'CONTRACT_CREATE') {
-        foreach ($propal->lines as $line) {
-            if (!in_array($line->fk_product, array_keys($productIds))) {
-                continue;
+
+    // On contract creation the formation lines come from the linked proposal, otherwise from the object itself
+    $lines = ($triggerKey == 'CONTRACT_CREATE') ? $propal->lines : $object->lines;
+
+    if ($object->element === 'contrat') {
+        // A contract owns its own (already cloned) sessions, all linked by fk_contrat. They must be fetched once,
+        // independently of the number of formation lines, otherwise the same sessions are summed several times
+        // (inflated durations and duplicated sessions in the note).
+        foreach ($lines as $line) {
+            if (in_array($line->fk_product, array_keys($productIds))) {
+                $formationTitle .= ($triggerKey == 'CONTRACT_CREATE' && dol_strlen($line->product_label) > 0) ? $line->product_label : $line->label;
             }
+        }
 
-            if ($object->element === 'contrat') {
-                $filter = 't.fk_contrat = ' . $object->id;
-            } else {
-                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product;
-            }
-
-            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
-            if (!is_array($trainingSessions) || empty($trainingSessions)) {
-                continue;
-            }
-
-            $formationTitle .= $line->product_label;
-
-            $nbTrainees += count($trainingSessions);
-            foreach ($trainingSessions as $trainingSession) {
-                $durations += $trainingSession->duration;
-                if ($object->element == 'contrat') {
-                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
-                } else {
-                    $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
-                }
-                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
+        $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.fk_contrat = ' . (int) $object->id]);
+        if (is_array($trainingSessions) && !empty($trainingSessions)) {
+            $nbTrainees = count($trainingSessions);
+            foreach ($trainingSessions as $contractTrainingSession) {
+                $durations       += $contractTrainingSession->duration;
+                $publicNotePart2 .= dol_print_date($contractTrainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>' . ' - ' . $contractTrainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($contractTrainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($contractTrainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
             }
         }
     } else {
-        foreach ($object->lines as $line) {
+        foreach ($lines as $line) {
             if (!in_array($line->fk_product, array_keys($productIds))) {
                 continue;
             }
 
-            if ($object->element === 'contrat') {
-                $filter = 't.fk_contrat = ' . $object->id;
-            } else {
-                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product;
-            }
-
-            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
+            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product]);
             if (!is_array($trainingSessions) || empty($trainingSessions)) {
                 continue;
             }
@@ -180,14 +166,9 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
             $formationTitle .= $line->label;
 
             $nbTrainees += count($trainingSessions);
-            foreach ($trainingSessions as $trainingSession) {
-                $durations += $trainingSession->duration;
-                if ($object->element == 'contrat') {
-                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
-                } else {
-                    $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
-                }
-                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
+            foreach ($trainingSessions as $modelTrainingSession) {
+                $durations       += $modelTrainingSession->duration;
+                $publicNotePart2 .= 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>' . ' - ' . $modelTrainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($modelTrainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($modelTrainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
             }
         }
     }
