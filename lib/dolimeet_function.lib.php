@@ -100,12 +100,14 @@ function get_formation_service(): array
 /**
  * Set public note on project/propal/contract
  *
- * @param CommonObject $object  Object
- * @param Propal|null  $propal  Propal object (optional)
+ * @param CommonObject $object           Object
+ * @param Propal|null  $propal           Propal object (optional)
+ * @param string       $triggerKey       Trigger key the note is rebuilt from
+ * @param int          $excludeContactId Trainee contact id to exclude (e.g. on contact unlink, fired before the link is removed)
  *
  * @throws Exception
  */
-function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerKey = '')
+function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerKey = '', $excludeContactId = 0)
 {
     global $conf, $db, $langs;
 
@@ -188,9 +190,18 @@ function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerK
     // Part 3 - Trainee list
     $internalTrainee = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
     $externalTrainee = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
-    if ((is_array($internalTrainee) && !empty($internalTrainee)) || (is_array($externalTrainee) && !empty($externalTrainee))) {
+    $contacts        = array_merge(
+        (is_array($internalTrainee) ? $internalTrainee : []),
+        (is_array($externalTrainee) ? $externalTrainee : [])
+    );
+    // On contact unlink the trigger fires before the link is removed: exclude the trainee being removed
+    if ($excludeContactId > 0) {
+        $contacts = array_filter($contacts, function ($contact) use ($excludeContactId) {
+            return (int) $contact['id'] !== (int) $excludeContactId;
+        });
+    }
+    if (!empty($contacts)) {
         $object->note_public .= '<br />' . $langs->transnoentities('PublicNoteTraineeList') . '<br />';
-        $contacts = array_merge($internalTrainee, $externalTrainee);
         $object->note_public .= $langs->transnoentities('TrainingSessionNbTrainees') . ' : ' . count($contacts) . '<br /><ul>';
         foreach ($contacts as $contact) {
             //@todo option pour le mail

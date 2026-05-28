@@ -231,6 +231,61 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 }
                 break;
 
+            case 'CONTRAT_DELETE_CONTACT' :
+                // Mirror of CONTRAT_ADD_CONTACT: when a contact is unlinked from a training contract, drop its
+                // signatory on the draft sessions and refresh the public note.
+                if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
+                    require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+                    require_once __DIR__ . '/../../class/trainingsession.class.php';
+                    require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+
+                    // The trigger fires BEFORE the element_contact row is deleted: resolve the unlinked contact from the link id (still present)
+                    $linkId = (int) ($object->context['contact_id'] ?? 0);
+                    if ($linkId > 0) {
+                        $sql  = 'SELECT ec.fk_socpeople AS contactid, tc.code AS code, tc.source AS source';
+                        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'element_contact AS ec';
+                        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact AS tc ON tc.rowid = ec.fk_c_type_contact';
+                        $sql .= ' WHERE ec.rowid = ' . $linkId;
+                        $resql = $this->db->query($sql);
+                        if ($resql && $this->db->num_rows($resql) > 0) {
+                            $contactObj    = $this->db->fetch_object($resql);
+                            $contactID     = (int) $contactObj->contactid;
+                            $contactCode   = $contactObj->code;
+                            $contactSource = $contactObj->source;
+
+                            // Remove this specific contact's signatory from the contract draft sessions
+                            if ($contactCode == 'TRAINEE' || $contactCode == 'SESSIONTRAINER') {
+                                $trainingSession = new Trainingsession($this->db);
+                                $signatory       = new SaturneSignature($this->db, 'dolimeet', $trainingSession->element);
+                                $role            = ($contactCode == 'TRAINEE') ? 'Trainee' : 'SessionTrainer';
+                                $elementType     = ($contactSource == 'internal') ? 'user' : 'socpeople';
+
+                                $trainingSessions = $trainingSession->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . Session::STATUS_DRAFT . ' AND t.fk_contrat = ' . $object->id]);
+                                if (is_array($trainingSessions) && !empty($trainingSessions)) {
+                                    foreach ($trainingSessions as $session) {
+                                        $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => "fk_object = " . $session->id . " AND object_type = '" . $trainingSession->element . "' AND role = '" . $role . "' AND element_id = " . $contactID . " AND element_type = '" . $elementType . "' AND status = 1"]);
+                                        if (is_array($signatories) && !empty($signatories)) {
+                                            foreach ($signatories as $signatoryToDelete) {
+                                                $signatoryToDelete->setDeleted($user, true);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Refresh the public note, excluding the trainee being removed (its link is not deleted yet)
+                            if ($contactCode == 'TRAINEE') {
+                                $object->fetchObjectLinked(null, 'propal', $object->id, 'contrat');
+                                if (isset($object->linkedObjects['propal']) && !empty($object->linkedObjects['propal']) && count($object->linkedObjects['propal']) == 1) {
+                                    $propal = array_shift($object->linkedObjects['propal']);
+                                    set_public_note($object, $propal, '', $contactID);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+
             case 'LINEPROPAL_INSERT' :
             case 'LINEPROPAL_MODIFY' :
             case 'LINEPROPAL_DELETE' :
