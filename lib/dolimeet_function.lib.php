@@ -105,7 +105,7 @@ function get_formation_service(): array
  *
  * @throws Exception
  */
-function set_public_note(CommonObject $object, Propal $propal = null, $triggerKey = '')
+function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerKey = '')
 {
     global $conf, $db, $langs;
 
