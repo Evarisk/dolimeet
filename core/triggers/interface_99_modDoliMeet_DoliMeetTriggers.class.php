@@ -231,6 +231,51 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 }
                 break;
 
+            case 'CONTRAT_DELETE_CONTACT' :
+                require_once __DIR__ . '/../../class/trainingsession.class.php';
+                require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+
+                // Session signatories only exist for formation contracts, so gate on the presence of draft sessions rather than on the trainingsession_type extrafield (it can be empty while sessions still carry signatories created by TRAININGSESSION_CREATE)
+                $trainingSession  = new Trainingsession($this->db);
+                $trainingSessions = $trainingSession->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . Session::STATUS_DRAFT . ' AND t.fk_contrat = ' . $object->id]);
+                if (is_array($trainingSessions) && !empty($trainingSessions)) {
+                    // The element_contact link still exists at trigger time (core removes it after the trigger), so the removed contact can still be resolved
+                    $contactLineID    = $object->context['contact_id'] ?? 0;
+                    $internalContacts = $object->liste_contact(-1, 'internal');
+                    $externalContacts = $object->liste_contact(-1, 'external');
+                    $contacts         = array_merge(
+                        is_array($internalContacts) ? $internalContacts : [],
+                        is_array($externalContacts) ? $externalContacts : []
+                    );
+
+                    $removedContact = [];
+                    foreach ($contacts as $contact) {
+                        if ($contact['rowid'] == $contactLineID) {
+                            $removedContact = $contact;
+                            break;
+                        }
+                    }
+
+                    if (!empty($removedContact) && ($removedContact['code'] == 'TRAINEE' || $removedContact['code'] == 'SESSIONTRAINER')) {
+                        $signatory     = new SaturneSignature($this->db, 'dolimeet', $trainingSession->element);
+                        $signatoryRole = ($removedContact['code'] == 'TRAINEE') ? 'Trainee' : 'SessionTrainer';
+                        $elementType   = ($removedContact['source'] == 'internal') ? 'user' : 'socpeople';
+
+                        // Remove the signatory created for this contact on each draft session of the contract (mirror of CONTRAT_ADD_CONTACT / TRAININGSESSION_CREATE)
+                        foreach ($trainingSessions as $trainingSession) {
+                            $sessionSignatories = $signatory->fetchSignatory($signatoryRole, $trainingSession->id, $trainingSession->element);
+                            if (is_array($sessionSignatories) && !empty($sessionSignatories)) {
+                                foreach ($sessionSignatories as $sessionSignatory) {
+                                    if ($sessionSignatory->element_id == $removedContact['id'] && $sessionSignatory->element_type == $elementType) {
+                                        $sessionSignatory->setDeleted($user, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+
             case 'PROPAL_CREATE' :
                 if (GETPOST('options_trainingsession_type', 'int') > 0) {
 
