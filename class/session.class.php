@@ -463,9 +463,9 @@ class Session extends SaturneObject
      * @param  int|int[] $categories Category or categories IDs
      * @return int                   0 < if KO, >0 if OK
      */
-    public function setCategories($categories): int
+    public function setCategories($categories, string $typeCateg = '', bool $removeExisting = false): int
     {
-        return parent::setCategoriesCommon($categories, 'session');
+        return parent::setCategoriesCommon($categories, 'session', $removeExisting);
     }
 
     /**
