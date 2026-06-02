@@ -202,9 +202,12 @@ class ActionsDolimeet
         }
 
         if (strpos($parameters['context'], 'propalcard') !== false) {
-            $extrafields->attributes['propal']['label']['trainingsession_type']     = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_type']);
-            $extrafields->attributes['propal']['label']['trainingsession_service']  = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_service']);
-            $extrafields->attributes['propal']['label']['trainingsession_location'] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label']['trainingsession_location']);
+            $propalExtraFieldsNames = ['trainingsession_type', 'trainingsession_location'];
+            foreach ($propalExtraFieldsNames as $propalExtraFieldsName) {
+                if (isset($extrafields->attributes['propal']['label'][$propalExtraFieldsName])) {
+                    $extrafields->attributes['propal']['label'][$propalExtraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label'][$propalExtraFieldsName]);
+                }
+            }
 
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
