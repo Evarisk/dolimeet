@@ -1260,6 +1260,8 @@ class ActionsDolimeet
             require_once __DIR__ . '/session.class.php';
             $session = new Session($db);
             switch ($parameters['object']->element ?? '') {
+                case 'ticket':
+                    return 0; // Tickets are not natively supported by dolimeet_session
                 case 'societe' :
                     $objectElement = 'soc';
                     break;
