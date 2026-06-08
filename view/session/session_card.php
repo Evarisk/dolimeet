@@ -270,7 +270,7 @@ if ($action == 'create') {
             $_POST['date_endmin']  = $now['minutes'];
         }
 
-        if ($_POST['fk_soc'] == -1) {
+        if (GETPOSTISSET('fk_soc') && $_POST['fk_soc'] == -1) {
             $_POST['fk_soc'] = 0;
         }
     }
