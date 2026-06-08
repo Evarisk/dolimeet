@@ -69,6 +69,7 @@ function trainingsession_function_lib1()
                 FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds
                 WHERE ds.fk_element = t.rowid
                     AND ds.model = 1
+                    AND ds.status >= 0
                     AND ds.element_type = \'service\'
                     AND ds.date_start IS NOT NULL
                     AND ds.date_end IS NOT NULL
