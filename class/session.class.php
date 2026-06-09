@@ -800,8 +800,26 @@ class Session extends SaturneObject
 
         $signatory = new SaturneSignature($this->db);
 
-        $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => 't.module_name = \'dolimeet\' AND status > 0']);
-        if (!is_array($signatories) || empty($signatories)) {
+        // Aggregate the counts in SQL instead of hydrating every signatory: the dashboard only needs
+        // counts and this table can hold thousands of rows, which exhausts the PHP memory limit.
+        $sql  = 'SELECT object_type, attendance, role, COUNT(*) AS nb';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $signatory->table_element . ' AS t';
+        $sql .= " WHERE t.module_name = 'dolimeet' AND t.status > 0";
+        $sql .= ' GROUP BY object_type, attendance, role';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+
+        $signatoryCounts = [];
+        while ($obj = $this->db->fetch_object($resql)) {
+            $signatoryCounts[] = $obj;
+        }
+        $this->db->free($resql);
+
+        if (empty($signatoryCounts)) {
             $this->error = 'NoSignatoryFound';
             return -1;
         }
@@ -847,14 +865,19 @@ class Session extends SaturneObject
             }
         }
 
-        foreach ($signatories as $signatory) {
-            if (empty($signatory->object_type) || !isset($array[$signatory->object_type])) {
+        foreach ($signatoryCounts as $signatoryCount) {
+            if (empty($signatoryCount->object_type) || !isset($array[$signatoryCount->object_type])) {
                 continue;
             }
 
-            $array[$signatory->object_type]['data']['nbSession']++;
-            $array[$signatory->object_type]['data']['attendance'][$signatory->attendance]['nbAttendance']++;
-            $array[$signatory->object_type]['data']['roles'][$signatory->role]['nbSignatory']++;
+            $nb = (int) $signatoryCount->nb;
+            $array[$signatoryCount->object_type]['data']['nbSession'] += $nb;
+            if (isset($array[$signatoryCount->object_type]['data']['attendance'][$signatoryCount->attendance])) {
+                $array[$signatoryCount->object_type]['data']['attendance'][$signatoryCount->attendance]['nbAttendance'] += $nb;
+            }
+            if (isset($array[$signatoryCount->object_type]['data']['roles'][$signatoryCount->role])) {
+                $array[$signatoryCount->object_type]['data']['roles'][$signatoryCount->role]['nbSignatory'] += $nb;
+            }
         }
 
         foreach (array_keys($this->sessionTypes) as $sessionType) {
