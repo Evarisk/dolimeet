@@ -1,0 +1,229 @@
+# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# Doliopi
+#
+
+ModuleDoliopiName      = Doliopi
+ModuleDoliopiDesc      = Follow-up of meetings, training sessions, audits
+DoliopiDescription     = Follow-up of meetings, training sessions, audits
+DoliopiDescriptionLong = Follow-up of meetings, training sessions, audits
+
+
+
+#
+# Config page
+#
+
+# Setup
+SatisfactionSurvey                          = Satisfaction survey
+BillingSatisfactionSurvey                   = Billing satisfaction survey
+BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
+TraineeSatisfactionSurvey                   = Trainee satisfaction survey
+TraineeSatisfactionSurveyDescription        = Defines the model used by default for trainee satisfaction surveys
+SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
+SessiontrainerSatisfactionSurveyDescription = Defines the model used by default for session trainer satisfaction surveys
+OpcoSatisfactionSurvey                      = OPCO satisfaction survey
+OpcoSatisfactionSurveyDescription           = Defines the model used by default for OPCO satisfaction surveys
+
+
+
+#
+# Session
+#
+
+# Right - Droit
+ReadMyObject = Read my %s (if assigned as a participant)
+
+# Data - Donnée
+SessionsMin             = sessions
+NewSession              = New session
+SessionList             = List of sessions
+SessionTypes            = Session types
+SessionNumberingModule  = Numbering of sessions
+Schedules               = Schedules
+ContratSchedules        = Training schedule
+SessionListOnProject    = List of sessions related to the project
+EnableObjectDescription = Activate object %s
+Content                 = Content
+SelectSessionType       = Select a session type
+
+
+
+#
+# Meeting
+#
+
+# Data - Donnée
+Meeting                = Meeting
+Meetings               = meetings
+TheMeeting             = the meeting
+MeetingList            = List of meetings
+MeetingCreate          = Create a meeting
+NewMeeting             = New meeting
+ModifyMeeting          = Modify a meeting
+MeetingsCategoriesArea = Meeting tags/categories area
+
+# Attendant role - Rôle participant
+Contributor = Contributeur
+Responsible = Responsable
+
+
+
+#
+# Training Session
+#
+
+# Data
+TrainingSession                       = Training session
+Trainingsession                       = Training session
+Trainingsessions                      = training sessions
+TheTrainingsession                    = the training session
+OfTrainingsession                     = of training session
+TrainingsessionList                   = List of training sessions
+TrainingSessionList                   = List of training sessions
+TrainingSessionCreate                 = Create a training session
+Contract                              = Contract
+NewTrainingsession                    = New training session
+ModifyTrainingsession                 = Modify a training session
+TrainingSessionStart                  = Start date of the training
+TrainingSessionEnd                    = End date of the training
+ActionFormation                       = Training action
+ActionFormationApprentissage          = Apprenticeship training action
+ActionVAE                             = VAE action
+BilanCompetences                      = Skills assessment
+TrainingSessionType                   = Type of training
+TrainingSessionLocation               = Location of the training
+TrainingsessionsCategoriesArea        = Trainingsession tags/categories area
+DontForgotAddSessionTrainerAndTrainee = Remember to add at least one trainer and one trainee to the training contract.
+AttendantsFromContract                = Contract attendants
+TrainingSessionStartErrorMatchingDate = <strong> Error: consistency of course start dates. </strong><br> The start date of the contract is not equal to the start date of the first training session %s.
+TrainingSessionEndErrorMatchingDate   = <strong> Error: consistency of course end dates. </strong><br> The end date of the training contract is not equal to the end date of the last training session %s.
+TrainingSessionDurations              = Duration of training sessions
+TrainingSessionStartHelp              = Start date of the first training session of the contract
+TrainingSessionEndHelp                = End date of the last training session of the contract
+TrainingSessionTypeHelp               = Type of training session linked to the contract
+TrainingSessionLocationHelp           = Place where the training session linked to the contract took place
+TrainingSessionDurationHelp           = Total duration of the sessions HH:MM (ex: 60:30) <br> The duration shown on the certificate corresponds to the total number of hours of sessions attended by a trainee.
+CalculatedTotalSessionDuration        = Total calculated duration time:
+TrainingSessionDurationErrorMatching  = <strong> Error: consistency of training session duration. </strong><br> The total duration of the sessions indicated in the contract is different from the calculated duration of all the sessions linked to the contract.
+NoCertificateBecauseAbsent            = No certificate was generated for <b> %s %s </b> because it was absent from at least one session.
+
+
+# Attendant role
+SessionTrainer                              = Trainer
+Trainee                                     = Trainee
+TypeContact_contrat_internal_SESSIONTRAINER = Trainer
+TypeContact_contrat_external_SESSIONTRAINER = Trainer
+TypeContact_contrat_internal_TRAINEE        = Trainee
+TypeContact_contrat_external_TRAINEE        = Trainee
+
+
+
+#
+# Training Session Document
+#
+
+# Data
+AttendanceSheetDocument                       = Attendance sheet
+AttendanceSheetDocuments                      = attendance sheets
+attendancesheetdocument                       = attendance sheet
+attendancesheetdocument.odt                   = Attendance sheet
+AttendanceSheetDocumentPDFDescription         = Attendance sheet PDF
+DisplayAttendanceAbsentInSignature            = Displays the absent presence in the signature field of the attendance sheet
+DisplayAttendanceAbsentInSignatureDescription = Displays the absent presence if the person is absent and has not signed
+CompletionCertificateDocument                 = Certificate of completion
+CompletionCertificateDocuments                = certificates of completion
+completioncertificatedocument                 = certificate of completion
+completioncertificatedocument.odt             = Certificate of completion
+
+
+
+#
+# Audit
+#
+
+# Data
+Audit                = Audit
+AuditReport          = Audit
+Audits               = audits
+TheAudit             = the audit
+AuditList            = List of audits
+AuditCreate          = Create an audit
+NewAudit             = New audit
+ModifyAudit          = Modifying an audit
+AuditsCategoriesArea = Audit tags/categories area
+
+# Attendant role
+Auditor = Auditor
+Auditee = Auditee
+
+
+
+#
+# Widget/Dashboard - Widget/Tableau de bord
+#
+
+# Data - Donnée
+SessionInfos                         = Session information
+AverageDurationsSessionInfos         = Information on average session duration
+NbMeetings                           = Number of meetings
+AverageDurationMeetings              = Average duration of meetings
+NbTrainingsessions                   = Number of training sessions
+AverageDurationTrainingsessions      = Average duration of training sessions
+NbAudits                             = Number of audits
+AverageDurationAudits                = Average duration of audits
+AttendantMeetingInfos                = Information on meeting attendants
+NbAttendantMeetings                  = Number of meeting attendants
+NbContributors                       = Number of contributors
+NbResponsibles                       = Number of responsibles
+AttendancePresentMeetingRate         = Meeting attendance rate
+AttendanceDelayMeetingRate           = Meeting lateness rate
+AttendanceAbsentMeetingRate          = Absence rate from meetings
+AttendantTrainingsessionInfos        = Information on training session attendants
+NbAttendantTrainingsessions          = Number of attendants in training sessions
+NbTrainees                           = Number of trainees
+NbSessionTrainers                    = Number of trainers
+AttendancePresentTrainingsessionRate = Attendance rate at training sessions
+AttendanceDelayTrainingsessionRate   = Late arrivals to training sessions
+AttendanceAbsentTrainingsessionRate  = Absence rate from training sessions
+AttendantAuditInfos                  = Information on audit attendants
+NbAttendantAudits                    = Number of audit attendants
+NbAuditees                           = Number of auditees
+NbAuditors                           = Number of auditors
+AttendancePresentAuditRate           = Audit attendance rate
+AttendanceDelayAuditRate             = Late audit rate
+AttendanceAbsentAuditRate            = Absence rate from audits
+SessionTypeMonitorings               = Session type monitorings
+AverageDurationBySessionType         = Average duration by session type
+MeetingAttendance                    = Meeting attendance
+TrainingsessionAttendance            = Training session attendance
+AuditAttendance                      = Audit attendance
+
+
+#
+# Other
+#
+
+# Data
+TrainingOrganizationNumber        = Declaration number of the training organisation
+SocietyAttendants                 = Third party external attendants
+SetContrat                        = Define contract
+DateAndTime                       = Date and time
+SignAttendanceSheetOnline         = Sign the attendance sheet online
+SetSatisfactionSurvey             = Create a satisfaction survey
+NeedToSetSatisfactionSurvey       = Satisfaction survey configuration %s required
+DefineSessionTrainerResponsible   = You must define the session training responsible in the Doliopi configuration.

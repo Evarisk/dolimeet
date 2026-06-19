@@ -17,17 +17,17 @@
 
 /**
  * \file    view/session/session_card.php
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   Page to create/edit/view session.
  */
 
-// Load DoliMeet environment.
-if (file_exists('../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../dolimeet.main.inc.php';
-} elseif (file_exists('../../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../../dolimeet.main.inc.php';
+// Load Doliopi environment.
+if (file_exists('../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../doliopi.main.inc.php';
+} elseif (file_exists('../../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../../doliopi.main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 
 // Get module parameters.
@@ -45,8 +45,8 @@ require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
-// Load DoliMeet libraries.
-require_once __DIR__ . '/../../lib/dolimeet_' . $objectType . '.lib.php';
+// Load Doliopi libraries.
+require_once __DIR__ . '/../../lib/doliopi_' . $objectType . '.lib.php';
 require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 
 // Global variables definitions.
@@ -69,7 +69,7 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $className   = ucfirst($objectType);
 $object      = new $className($db);
 $document    = new SessionDocument($db, $object->element . 'document');
-$signatory   = new SaturneSignature($db, 'dolimeet', $object->element);
+$signatory   = new SaturneSignature($db, 'doliopi', $object->element);
 $extrafields = new ExtraFields($db);
 $contact     = new Contact($db);
 $contract    = new Contrat($db);
@@ -100,12 +100,12 @@ if (empty($action) && empty($id) && empty($ref)) {
 // Load object.
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
-$upload_dir = $conf->dolimeet->multidir_output[$object->entity ?? 1];
+$upload_dir = $conf->doliopi->multidir_output[$object->entity ?? 1];
 
 // Security check - Protection if external user.
-$permissionToRead   = $user->rights->dolimeet->$objectType->read || $user->rights->dolimeet->assignedtome->$objectType;
-$permissiontoadd    = $user->rights->dolimeet->$objectType->write;
-$permissiontodelete = $user->rights->dolimeet->$objectType->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
+$permissionToRead   = $user->rights->doliopi->$objectType->read || $user->rights->doliopi->assignedtome->$objectType;
+$permissiontoadd    = $user->rights->doliopi->$objectType->write;
+$permissiontodelete = $user->rights->doliopi->$objectType->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
 saturne_check_access($permissionToRead, null, true);
 
 /*
@@ -121,14 +121,14 @@ if ($resHook < 0) {
 if (empty($resHook)) {
     $error = 0;
 
-    $backurlforlist = dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?object_type=' . $object->element;
+    $backurlforlist = dol_buildpath('/doliopi/view/session/session_list.php', 1) . '?object_type=' . $object->element;
 
     if (empty($backtopage) || ($cancel && empty($id))) {
         if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
             if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) {
                 $backtopage = $backurlforlist;
             } else {
-                $backtopage = dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . '&object_type=' . $object->element;
+                $backtopage = dol_buildpath('/doliopi/view/session/session_card.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . '&object_type=' . $object->element;
             }
         }
     }
@@ -194,7 +194,7 @@ if (empty($resHook)) {
  */
 
 $title    = $langs->trans(ucfirst($object->element));
-$help_url = 'FR:Module_DoliMeet';
+$help_url = 'FR:Module_Doliopi';
 
 saturne_header(0, '', $title, $help_url);
 
@@ -251,11 +251,11 @@ if ($action == 'create') {
             }
         }
 
-        $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_START_HOUR'));
+        $time = explode(':', getDolGlobalString('DOLIOPI_TRAININGSESSION_MORNING_START_HOUR'));
         $_POST['date_starthour']  = $time[0];
         $_POST['date_startmin']   = $time[1];
 
-        $time = explode(':', getDolGlobalString('DOLIMEET_TRAININGSESSION_MORNING_END_HOUR'));
+        $time = explode(':', getDolGlobalString('DOLIOPI_TRAININGSESSION_MORNING_END_HOUR'));
         $_POST['date_endhour']  = $time[0];
         $_POST['date_endmin']   = $time[1];
 
@@ -421,7 +421,7 @@ if (($id || $ref) && $action == 'edit') {
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create'))) {
     $res = $object->fetch_optionals();
 
-    $linkback = '<a href="' . dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?restore_lastsearch_values=1&object_type=' . $object->element . '">' . $langs->trans('BackToList') . '</a>';
+    $linkback = '<a href="' . dol_buildpath('/doliopi/view/session/session_list.php', 1) . '?restore_lastsearch_values=1&object_type=' . $object->element . '">' . $langs->trans('BackToList') . '</a>';
     saturne_get_fiche_head($object, 'card', $title);
     saturne_banner_tab($object, 'ref', $linkback);
 
@@ -516,7 +516,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             $mesg .= '<br>' . $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element)));
         }
     }
-    $mesg .= (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0 ? '' : '<br>' . $langs->trans('DefineSessionTrainerResponsible'));
+    $mesg .= (getDolGlobalInt('DOLIOPI_SESSION_TRAINER_RESPONSIBLE') > 0 ? '' : '<br>' . $langs->trans('DefineSessionTrainerResponsible'));
 
     if (!in_array(0, $nbAttendantByRole)) {
         $nbAttendants = 1;
@@ -608,7 +608,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                 // Sign
                 $displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
                 if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-                    print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element . '&document_type=' . $documentType . '&attendant_table_mode=simple', 3) . '">' . $displayButton . '</a>';
+                    print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=Doliopi&object_type=' . $object->element . '&document_type=' . $documentType . '&attendant_table_mode=simple', 3) . '">' . $displayButton . '</a>';
                 } else {
                     print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
                 }
@@ -694,12 +694,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
             }
             $urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element;
 
-            print saturne_show_documents('dolimeet:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0 && (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0 || $object->element != 'trainingsession')), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg);
+            print saturne_show_documents('doliopi:' . ucfirst($object->element) . 'Document', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object, 0, 'remove_file', ($object->status > $object::STATUS_DRAFT && $nbAttendants > 0 && (getDolGlobalInt('DOLIOPI_SESSION_TRAINER_RESPONSIBLE') > 0 || $object->element != 'trainingsession')), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))) . $mesg);
         }
 
         print '</div><div class="fichehalfright">';
 
-        $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliMeet&object_type=' . $object->element);
+        $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=Doliopi&object_type=' . $object->element);
 
         // List of actions on element.
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';

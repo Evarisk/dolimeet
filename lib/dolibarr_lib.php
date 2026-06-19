@@ -133,7 +133,7 @@ function getOnlineSignatureUrl2($mode, $type, $ref = '', $localorexternal = 1, $
             return 'Invalid parameter CONTRACT_ONLINE_SIGNATURE_SECURITY_TOKEN. Contains a null character.';
         }
 
-        $out = $urltouse.'/custom/dolimeet/core/dolibarr/newonlinesign.php?source=contract&ref='.($mode ? '<span style="color: #666666">' : '');
+        $out = $urltouse.'/custom/doliopi/core/dolibarr/newonlinesign.php?source=contract&ref='.($mode ? '<span style="color: #666666">' : '');
         if ($mode == 1) {
             $out .= 'contract_ref';
         }

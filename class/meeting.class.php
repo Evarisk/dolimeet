@@ -17,11 +17,11 @@
 
 /**
  * \file    class/meeting.class.php
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   This file is a CRUD class file for Meeting (Create/Read/Update/Delete).
  */
 
-// Load DoliMeet libraries.
+// Load Doliopi libraries.
 require_once __DIR__ . '/session.class.php';
 
 /**

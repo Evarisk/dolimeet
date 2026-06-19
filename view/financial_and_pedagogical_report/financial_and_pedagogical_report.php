@@ -17,17 +17,17 @@
 
 /**
  * \file    view/financial_and_pedagogical_report/financial_and_pedagogical_report.php
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   Page to view financial_and_pedagogical_report
  */
 
-// Load DoliMeet environment
-if (file_exists('../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../dolimeet.main.inc.php';
-} elseif (file_exists('../../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../../dolimeet.main.inc.php';
+// Load Doliopi environment
+if (file_exists('../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../doliopi.main.inc.php';
+} elseif (file_exists('../../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../../doliopi.main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 
 // Load Saturne libraries
@@ -37,10 +37,10 @@ require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
 global $db, $langs, $user;
 
 // Initialize technical objects
-$saturneDashboard = new SaturneDashboard($db, 'dolimeet');
+$saturneDashboard = new SaturneDashboard($db, 'doliopi');
 
 // Permissions
-$permissionToRead = $user->hasRight('dolimeet', 'adminpage', 'read');
+$permissionToRead = $user->hasRight('doliopi', 'adminpage', 'read');
 
 // Security check
 saturne_check_access($permissionToRead);
@@ -50,7 +50,7 @@ saturne_check_access($permissionToRead);
  */
 
 $title = $langs->transnoentities('FinancialAndPedagogicalReport');
-saturne_header(0,'', $title, $helpUrl ?? '', '', 0, 0, [], [], '', 'mod-dolimeet bodyforlist');
+saturne_header(0,'', $title, $helpUrl ?? '', '', 0, 0, [], [], '', 'mod-doliopi bodyforlist');
 
 $years       = [];
 $currentYear = date('Y', dol_now());
@@ -61,11 +61,11 @@ for ($i = 0; $i <= $showYears; $i++) {
 
 $moreHtmlRight  = img_picto($langs->trans('Filter') . ' ' . $langs->trans('Year'), 'title_agenda', 'class="pictofixedwidth"') . Form::selectarray('search_year', $years, $currentYear, 0, 0, 0, '', 0, 0, 0, '', 'maxwidth200');
 $moreHtmlRight .= '<div class="wpeo-button button-square-30 select-dataset-dashboard-info" style="color: #ffffff !important;"><i class="button-icon fas fa-redo"></i></div>';
-$generateUrl    = dol_buildpath('/dolimeet/view/financial_and_pedagogical_report/generate_bpf_pdf.php', 1);
+$generateUrl    = dol_buildpath('/doliopi/view/financial_and_pedagogical_report/generate_bpf_pdf.php', 1);
 $moreHtmlRight .= ' <a id="generate-bpf-pdf" class="butAction" href="' . $generateUrl . '">' . img_picto('', 'fa-file-pdf') . ' ' . $langs->trans('GeneratePDF') . '</a>';
 $moreHtmlRight .= '<script>jQuery(function($){$("#generate-bpf-pdf").on("click",function(e){e.preventDefault();var y=$("select[name=search_year]").val()||"' . (int) $currentYear . '";window.location="' . $generateUrl . '?search_year="+y;});});</script>';
 
-print load_fiche_titre($title, $moreHtmlRight, 'dolimeet_color.png@dolimeet');
+print load_fiche_titre($title, $moreHtmlRight, 'doliopi_color.png@doliopi');
 
 print '<div class="fichecenter">';
 

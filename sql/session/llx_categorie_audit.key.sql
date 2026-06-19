@@ -17,4 +17,4 @@ ALTER TABLE llx_categorie_audit ADD PRIMARY KEY pk_categorie_audit (fk_categorie
 ALTER TABLE llx_categorie_audit ADD INDEX idx_categorie_audit_fk_categorie (fk_categorie);
 ALTER TABLE llx_categorie_audit ADD INDEX idx_categorie_audit_fk_audit (fk_audit);
 ALTER TABLE llx_categorie_audit ADD CONSTRAINT fk_categorie_audit_categorie_rowid FOREIGN KEY (fk_categorie) REFERENCES llx_categorie (rowid);
-ALTER TABLE llx_categorie_audit ADD CONSTRAINT fk_categorie_audit_dolimeet_session_rowid FOREIGN KEY (fk_audit) REFERENCES llx_dolimeet_session (rowid);
+ALTER TABLE llx_categorie_audit ADD CONSTRAINT fk_categorie_audit_doliopi_session_rowid FOREIGN KEY (fk_audit) REFERENCES llx_doliopi_session (rowid);

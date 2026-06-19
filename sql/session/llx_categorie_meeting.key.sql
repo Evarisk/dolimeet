@@ -17,4 +17,4 @@ ALTER TABLE llx_categorie_meeting ADD PRIMARY KEY pk_categorie_meeting (fk_categ
 ALTER TABLE llx_categorie_meeting ADD INDEX idx_categorie_meeting_fk_categorie (fk_categorie);
 ALTER TABLE llx_categorie_meeting ADD INDEX idx_categorie_meeting_fk_meeting (fk_meeting);
 ALTER TABLE llx_categorie_meeting ADD CONSTRAINT fk_categorie_meeting_categorie_rowid FOREIGN KEY (fk_categorie) REFERENCES llx_categorie (rowid);
-ALTER TABLE llx_categorie_meeting ADD CONSTRAINT fk_categorie_meeting_dolimeet_session_rowid FOREIGN KEY (fk_meeting) REFERENCES llx_dolimeet_session (rowid);
+ALTER TABLE llx_categorie_meeting ADD CONSTRAINT fk_categorie_meeting_doliopi_session_rowid FOREIGN KEY (fk_meeting) REFERENCES llx_doliopi_session (rowid);

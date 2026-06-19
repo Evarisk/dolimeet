@@ -17,17 +17,17 @@
 
 /**
  * \file    view/session/session_list.php
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   List page for session
  */
 
-// Load DoliMeet environment
-if (file_exists('../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../dolimeet.main.inc.php';
-} elseif (file_exists('../../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../../dolimeet.main.inc.php';
+// Load Doliopi environment
+if (file_exists('../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../doliopi.main.inc.php';
+} elseif (file_exists('../../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../../doliopi.main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 
 // Get module parameters
@@ -38,7 +38,7 @@ if (isModEnabled('categorie')) {
     require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 }
 
-// load DoliMeet libraries
+// load Doliopi libraries
 require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 
 // Global variables definitions
@@ -256,7 +256,7 @@ if (empty($resHook)) {
     // Mass actions
     $objectclass = 'Session';
     $objectlabel = 'Session';
-    $uploaddir   = $conf->dolimeet->dir_output;
+    $uploaddir   = $conf->doliopi->dir_output;
 
     require_once DOL_DOCUMENT_ROOT . '/core/actions_massactions.inc.php';
 
@@ -274,7 +274,7 @@ if ($mode == 'pwa') {
 }
 
 $title   = $langs->trans(ucfirst($object->element) . 'List');
-$helpUrl = 'FR:Module_DoliMeet';
+$helpUrl = 'FR:Module_Doliopi';
 
 saturne_header(0,'', $title, $helpUrl, '', 0, 0, [], [], '', 'mod-' . $object->module . '-' . $object->element . ' page-list bodyforlist');
 
@@ -299,7 +299,7 @@ saturne_header(0,'', $title, $helpUrl, '', 0, 0, [], [], '', 'mod-' . $object->m
 //if ($searchSocietyAttendants > 0) {
 //    $sql .= ' AND t.rowid = search_society_attendants.fk_object ';
 //}
-//if (!$user->rights->dolimeet->$objectType->read && $user->rights->dolimeet->assignedtome->$objectType) {
+//if (!$user->rights->doliopi->$objectType->read && $user->rights->doliopi->assignedtome->$objectType) {
 //    $sql .= ' AND t.rowid = search_assignedtome.fk_object ';
 //}
 
@@ -316,8 +316,8 @@ if (!empty($fromType) && $fromID > 0) {
 
     $moreUrlParameters = '&fromtype=' . urlencode($fromType) . '&fromid=' . urlencode($fromID);
     if ($fromType == 'product') {
-        $moreUrlParameters .= '&model=on&element_type=service&fk_project=' . getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . '&fk_element=' . $fromID;
-        $formMoreParams     = ['model' => 'on', 'element_type' => 'service', 'fk_project' => getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT'), 'fk_element' => $fromID];
+        $moreUrlParameters .= '&model=on&element_type=service&fk_project=' . getDolGlobalInt('DOLIOPI_TRAININGSESSION_TEMPLATES_PROJECT') . '&fk_element=' . $fromID;
+        $formMoreParams     = ['model' => 'on', 'element_type' => 'service', 'fk_project' => getDolGlobalInt('DOLIOPI_TRAININGSESSION_TEMPLATES_PROJECT'), 'fk_element' => $fromID];
     }
     $formMoreParams = ['fromtype' => $fromType, 'fromid' => $fromID];
     $statusMode = 3;
@@ -346,7 +346,7 @@ if ($object->element == 'session' || !empty($fromType) && $fromID > 0) {
     $newCardButton = $form->selectarray('object_type_select', $objectTypes, $object->element, ($fromType != 'contrat' ? $langs->trans('SelectSessionType') : ''));
 }
 //$helpText = ($objectType != 'session' ? '' : $langs->trans('SelectSessionType'));
-$createUrl = dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?action=create' . $moreUrlParameters;
+$createUrl = dol_buildpath('/doliopi/view/session/session_card.php', 1) . '?action=create' . $moreUrlParameters;
 //$status  = ($objectType != 'session' ? $permissiontoadd : -2);
 
 ////                if ($resource['label'] == 'InternalAttendants') {

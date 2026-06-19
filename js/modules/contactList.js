@@ -16,7 +16,7 @@
 
 /**
  * \file    js/modules/contactList.js
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   JavaScript public contact file
  */
 
@@ -28,7 +28,7 @@
  * @since   22.0.0
  * @version 22.0.0
  */
-window.dolimeet.contactList = {};
+window.doliopi.contactList = {};
 
 /**
  * Public contact init
@@ -38,8 +38,8 @@ window.dolimeet.contactList = {};
  *
  * @return {void}
  */
-window.dolimeet.contactList.init = function init() {
-  window.dolimeet.contactList.event();
+window.doliopi.contactList.init = function init() {
+  window.doliopi.contactList.event();
 };
 
 /**
@@ -50,7 +50,7 @@ window.dolimeet.contactList.init = function init() {
  *
  * @return {void}
  */
-window.dolimeet.contactList.event = function initializeEvents() {
+window.doliopi.contactList.event = function initializeEvents() {
 };
 
 /**
@@ -61,7 +61,7 @@ window.dolimeet.contactList.event = function initializeEvents() {
  *
  * @return {void}
  */
-window.dolimeet.contactList.insertData = function(contactIds, formationLangTrans) {
+window.doliopi.contactList.insertData = function(contactIds, formationLangTrans) {
     $table = $('.div-table-responsive')
     $listTitle = $table.find('tr.liste_titre').last()
     $tableLines = $table.find('tr.oddeven')

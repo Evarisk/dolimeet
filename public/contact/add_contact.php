@@ -17,7 +17,7 @@
 
 /**
  * \file    public/contact/add_contact.php
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   Public page to create contact
  */
 
@@ -43,13 +43,13 @@ if (!defined('NOBROWSERNOTIF')) {
     define('NOBROWSERNOTIF', 1);
 }
 
-// Load DoliMeet environment
-if (file_exists('../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../dolimeet.main.inc.php';
-} elseif (file_exists('../../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../../dolimeet.main.inc.php';
+// Load Doliopi environment
+if (file_exists('../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../doliopi.main.inc.php';
+} elseif (file_exists('../../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../../doliopi.main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 
 // Load Dolibarr libraries
@@ -74,7 +74,7 @@ $user    = new User($db);
 $object->fetch($id);
 $object->fetchProject();
 
-$publicInterfaceUserId = getDolGlobalInt('DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER');
+$publicInterfaceUserId = getDolGlobalInt('DOLIOPI_DEFAULT_PUBLIC_INTERFACE_USER');
 if ($publicInterfaceUserId > 0) {
     $user->fetch($publicInterfaceUserId);
     $user->loadRights();
@@ -170,7 +170,7 @@ $conf->dol_hide_leftmenu = 1;
 saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card'); ?>
 
 <div class="public-card__container" data-public-interface="true">
-    <?php if (getDolGlobalInt('DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED')) : ?>
+    <?php if (getDolGlobalInt('DOLIOPI_CONTACT_PUBLIC_INTERFACE_ENABLED')) : ?>
         <div class="public-card__header">
             <div class="header-information">
                 <div class="information-title">Convention de formation <?php echo $object->ref . ' - ' . $object->project->ref . ' - ' . $object->project->title; ?></div>

@@ -18,8 +18,8 @@
 
 /**
  * \file    js/session.js
- * \ingroup dolimeet
- * \brief   JavaScript session file for module DoliMeet
+ * \ingroup doliopi
+ * \brief   JavaScript session file for module Doliopi
  */
 
 'use strict';
@@ -27,46 +27,46 @@
 /**
  * Init session JS
  *
- * @memberof DoliMeet_Session
+ * @memberof Doliopi_Session
  *
  * @since   1.2.0
  * @version 1.2.0
  *
  * @type {Object}
  */
-window.dolimeet.session = {};
+window.doliopi.session = {};
 
 /**
  * Session init
  *
- * @memberof DoliMeet_Session
+ * @memberof Doliopi_Session
  *
  * @since   1.2.0
  * @version 1.2.0
  *
  * @returns {void}
  */
-window.dolimeet.session.init = function() {
-    window.dolimeet.session.event();
+window.doliopi.session.init = function() {
+    window.doliopi.session.event();
 };
 
 /**
  * Session event
  *
- * @memberof DoliMeet_Session
+ * @memberof Doliopi_Session
  *
  * @since   1.2.0
  * @version 1.2.0
  *
  * @returns {void}
  */
-window.dolimeet.session.event = function() {
-  $(document).on('change', '#fk_soc', window.dolimeet.session.reloadField);
-  $(document).on('change', '#model', window.dolimeet.session.reloadFieldModel);
-  $(document).on('change', '#element_type', window.dolimeet.session.reloadFieldElementType);
+window.doliopi.session.event = function() {
+  $(document).on('change', '#fk_soc', window.doliopi.session.reloadField);
+  $(document).on('change', '#model', window.doliopi.session.reloadFieldModel);
+  $(document).on('change', '#element_type', window.doliopi.session.reloadFieldElementType);
   $('#date_start, #date_starthour, #date_startmin, #date_end, #date_endhour, #date_endmin').change(function () {
     setTimeout(function () {
-      window.dolimeet.session.getDiffTimestamp();
+      window.doliopi.session.getDiffTimestamp();
     }, 100);
   });
 };
@@ -74,14 +74,14 @@ window.dolimeet.session.event = function() {
 /**
  * Session reload field
  *
- * @memberof DoliMeet_Session
+ * @memberof Doliopi_Session
  *
  * @since   1.2.0
  * @version 1.2.0
  *
  * @returns {void}
  */
-window.dolimeet.session.reloadField = function() {
+window.doliopi.session.reloadField = function() {
   let form     = document.getElementById('session_form');
   let formData = new FormData(form);
 
@@ -121,14 +121,14 @@ window.dolimeet.session.reloadField = function() {
 /**
  * Reload model field
  *
- * @memberof DoliMeet_Session
+ * @memberof Doliopi_Session
  *
  * @since   1.5.0
  * @version 1.5.0
  *
  * @returns {void}
  */
-window.dolimeet.session.reloadFieldModel = function() {
+window.doliopi.session.reloadFieldModel = function() {
   let token          = window.saturne.toolbox.getToken();
   let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
   let field          = this.checked ? 'on' : 'off';
@@ -148,14 +148,14 @@ window.dolimeet.session.reloadFieldModel = function() {
 /**
  * Reload specific field element_type and fk_element
  *
- * @memberof DoliMeet_Session
+ * @memberof Doliopi_Session
  *
  * @since   1.5.0
  * @version 1.5.0
  *
  * @returns {void}
  */
-window.dolimeet.session.reloadFieldElementType = function() {
+window.doliopi.session.reloadFieldElementType = function() {
   let token          = window.saturne.toolbox.getToken();
   let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
   let field          = $(this).val();
@@ -180,14 +180,14 @@ window.dolimeet.session.reloadFieldElementType = function() {
 /**
  * get time diff between start and end date
  *
- * @memberof DoliMeet_Session
+ * @memberof Doliopi_Session
  *
  * @since   1.5.0
  * @version 1.5.0
  *
  * @returns {void}
  */
-window.dolimeet.session.getDiffTimestamp = function() {
+window.doliopi.session.getDiffTimestamp = function() {
   let dateStartDay   = $('#date_startday').val();
   let dateStartMonth = $('#date_startmonth').val();
   let dateStartYear  = $('#date_startyear').val();

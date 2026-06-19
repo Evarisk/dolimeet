@@ -14,42 +14,42 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 -- 1.1.0
-ALTER TABLE `llx_dolimeet_session` CHANGE `date_start` `date_start` DATETIME NOT NULL;
-ALTER TABLE `llx_dolimeet_session` CHANGE `date_end` `date_end` DATETIME NOT NULL;
-ALTER TABLE `llx_dolimeet_session` CHANGE `tms` `tms` TIMESTAMP on update CURRENT_TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE `llx_dolimeet_session` CHANGE `status` `status` INT(11) NOT NULL;
-ALTER TABLE `llx_dolimeet_session` CHANGE `import_key` `import_key` VARCHAR(14) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;
+ALTER TABLE `llx_doliopi_session` CHANGE `date_start` `date_start` DATETIME NOT NULL;
+ALTER TABLE `llx_doliopi_session` CHANGE `date_end` `date_end` DATETIME NOT NULL;
+ALTER TABLE `llx_doliopi_session` CHANGE `tms` `tms` TIMESTAMP on update CURRENT_TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `llx_doliopi_session` CHANGE `status` `status` INT(11) NOT NULL;
+ALTER TABLE `llx_doliopi_session` CHANGE `import_key` `import_key` VARCHAR(14) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;
 ALTER TABLE `llx_saturne_object_signature` ADD `attendance` SMALLINT NULL AFTER `transaction_url`;
 
 -- 1.2.0
 ALTER TABLE `llx_c_trainingsession_type` CHANGE `active` `active` TINYINT(4) NULL DEFAULT '1';
 ALTER TABLE `llx_c_trainingsession_type` ADD `position` INT NULL DEFAULT '0' AFTER `active`;
-ALTER TABLE `llx_dolimeet_session` DROP `model_pdf`, DROP `last_main_doc`, DROP `document_url`;
+ALTER TABLE `llx_doliopi_session` DROP `model_pdf`, DROP `last_main_doc`, DROP `document_url`;
 
 -- 1.5.0
 UPDATE llx_c_email_templates SET joinfiles = '0' WHERE label = 'Signature_Feuille_Présence';
-ALTER TABLE `llx_dolimeet_session` ADD `element_type` VARCHAR(128) NULL AFTER `type`;
-ALTER TABLE `llx_dolimeet_session` ADD `model` BOOLEAN NULL DEFAULT FALSE AFTER `element_type`;
-ALTER TABLE `llx_dolimeet_session` ADD `position` TINYINT(4) NULL AFTER `model`;
-ALTER TABLE `llx_dolimeet_session` ADD `fk_element` INT NULL AFTER `fk_soc`;
-ALTER TABLE `llx_dolimeet_session` CHANGE `date_start` `date_start` DATETIME NULL;
-ALTER TABLE `llx_dolimeet_session` CHANGE `date_end` `date_end` DATETIME NULL;
+ALTER TABLE `llx_doliopi_session` ADD `element_type` VARCHAR(128) NULL AFTER `type`;
+ALTER TABLE `llx_doliopi_session` ADD `model` BOOLEAN NULL DEFAULT FALSE AFTER `element_type`;
+ALTER TABLE `llx_doliopi_session` ADD `position` TINYINT(4) NULL AFTER `model`;
+ALTER TABLE `llx_doliopi_session` ADD `fk_element` INT NULL AFTER `fk_soc`;
+ALTER TABLE `llx_doliopi_session` CHANGE `date_start` `date_start` DATETIME NULL;
+ALTER TABLE `llx_doliopi_session` CHANGE `date_end` `date_end` DATETIME NULL;
 
 -- 21.0.0
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'TRAINEE' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'internal' AND code = 'OPCO' AND module = 'dolimeet';
-DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'external' AND code = 'OPCO' AND module = 'dolimeet';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'TRAINEE' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'internal' AND code = 'OPCO' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'TRAINEE' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'propal' AND source = 'external' AND code = 'OPCO' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'TRAINEE' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'SESSIONTRAINER' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'internal' AND code = 'OPCO' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'TRAINEE' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'SESSIONTRAINER' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'project' AND source = 'external' AND code = 'OPCO' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'internal' AND code = 'OPCO' AND module = 'doliopi';
+DELETE FROM llx_c_type_contact WHERE element = 'contrat' AND source = 'external' AND code = 'OPCO' AND module = 'doliopi';
 
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'BilanCompetences';
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionVAE';

@@ -17,7 +17,7 @@
 
 /**
  * \file    class/session.class.php
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   This file is a CRUD class file for Session (Create/Read/Update/Delete).
  */
 
@@ -34,7 +34,7 @@ class Session extends SaturneObject
     /**
      * @var string Module name.
      */
-    public $module = 'dolimeet';
+    public $module = 'doliopi';
 
     /**
      * @var string Element type of object.
@@ -44,7 +44,7 @@ class Session extends SaturneObject
     /**
      * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
      */
-    public $table_element = 'dolimeet_session';
+    public $table_element = 'doliopi_session';
 
     /**
      * @var int Does this object support multicompany module ?
@@ -58,7 +58,7 @@ class Session extends SaturneObject
     public $isextrafieldmanaged = 1;
 
     /**
-     * @var string Name of icon for session. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'session@dolimeet' if picto is file 'img/object_session.png'.
+     * @var string Name of icon for session. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'session@doliopi' if picto is file 'img/object_session.png'.
      */
     public string $picto = '';
 
@@ -316,7 +316,7 @@ class Session extends SaturneObject
                 unset($this->fields['fk_contrat']);
                 break;
             default :
-                $this->picto = 'dolimeet_color@dolimeet';
+                $this->picto = 'doliopi_color@doliopi';
                 break;
         }
 
@@ -448,7 +448,7 @@ class Session extends SaturneObject
      */
     public function setDraft(User $user, int $noTrigger = 0): int
     {
-        $signatory = new SaturneSignature($this->db, 'dolimeet', $this->type);
+        $signatory = new SaturneSignature($this->db, 'doliopi', $this->type);
         $signatory->deleteSignatoriesSignatures($this->id, $this->type);
 
         return parent::setDraft($user, $noTrigger);
@@ -497,7 +497,7 @@ class Session extends SaturneObject
         if ($status == self::STATUS_VALIDATED && $status == $this->status && $this->id > 0) {
             require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
-            $signatory = new SaturneSignature($this->db, 'dolimeet', $this->element);
+            $signatory = new SaturneSignature($this->db, 'doliopi', $this->element);
             if ($signatory->checkSignatoriesSignatures($this->id, $this->element) == 1) {
                 global $langs;
                 $langs->load('signature@saturne');
@@ -804,7 +804,7 @@ class Session extends SaturneObject
         // counts and this table can hold thousands of rows, which exhausts the PHP memory limit.
         $sql  = 'SELECT object_type, attendance, role, COUNT(*) AS nb';
         $sql .= ' FROM ' . MAIN_DB_PREFIX . $signatory->table_element . ' AS t';
-        $sql .= " WHERE t.module_name = 'dolimeet' AND t.status > 0";
+        $sql .= " WHERE t.module_name = 'doliopi' AND t.status > 0";
         $sql .= ' GROUP BY object_type, attendance, role';
 
         $resql = $this->db->query($sql);
@@ -900,7 +900,7 @@ class SessionDocument extends SaturneDocuments
     /**
      * @var string Module name.
      */
-    public $module = 'dolimeet';
+    public $module = 'doliopi';
 
     /**
      * @var string Element type of object.

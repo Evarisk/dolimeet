@@ -16,7 +16,7 @@
 
 /**
  * \file    js/modules/publicContact.js
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   JavaScript public contact file
  */
 
@@ -28,7 +28,7 @@
  * @since   21.0.0
  * @version 21.0.0
  */
-window.dolimeet.publicContact = {};
+window.doliopi.publicContact = {};
 
 /**
  * Public contact init
@@ -38,8 +38,8 @@ window.dolimeet.publicContact = {};
  *
  * @return {void}
  */
-window.dolimeet.publicContact.init = function init() {
-  window.dolimeet.publicContact.event();
+window.doliopi.publicContact.init = function init() {
+  window.doliopi.publicContact.event();
 };
 
 /**
@@ -50,10 +50,10 @@ window.dolimeet.publicContact.init = function init() {
  *
  * @return {void}
  */
-window.dolimeet.publicContact.event = function initializeEvents() {
-  $(document).on('click', '#addContact', window.dolimeet.publicContact.addContactRow);
-  $(document).on('click', '.remove-btn', window.dolimeet.publicContact.removeContactRow);
-  $(document).on('input', '.firstname, .lastname, .email', window.dolimeet.publicContact.updateButtonState);
+window.doliopi.publicContact.event = function initializeEvents() {
+  $(document).on('click', '#addContact', window.doliopi.publicContact.addContactRow);
+  $(document).on('click', '.remove-btn', window.doliopi.publicContact.removeContactRow);
+  $(document).on('input', '.firstname, .lastname, .email', window.doliopi.publicContact.updateButtonState);
 };
 
 /**
@@ -64,7 +64,7 @@ window.dolimeet.publicContact.event = function initializeEvents() {
  *
  * @return {void}
  */
-window.dolimeet.publicContact.addContactRow = function addContactRow() {
+window.doliopi.publicContact.addContactRow = function addContactRow() {
   const newRow = `
     <div class="contact-row">
         <input type="text" class="firstname" name="firstname[]" placeholder="Prénom" required>
@@ -83,7 +83,7 @@ window.dolimeet.publicContact.addContactRow = function addContactRow() {
  *
  * @return {void}
  */
-window.dolimeet.publicContact.removeContactRow = function removeContactRow() {
+window.doliopi.publicContact.removeContactRow = function removeContactRow() {
   const $this       = $(this);
   const $contactRow = $('#contactsList .contact-row');
 
@@ -101,7 +101,7 @@ window.dolimeet.publicContact.removeContactRow = function removeContactRow() {
  * @param  {jQuery} $modal The jQuery object of the modal to target.
  * @return {void}
  */
-window.dolimeet.publicContact.updateButtonState = function updateButtonState() {
+window.doliopi.publicContact.updateButtonState = function updateButtonState() {
   let allLinesFilled = true;
 
   // Pour chaque ligne de contact
