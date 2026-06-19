@@ -17,24 +17,24 @@
 
 /**
  * \file    admin/financial_and_pedagogical_report.php
- * \ingroup dolimeet
- * \brief   DoliMeet financial_and_pedagogical_report config page
+ * \ingroup doliopi
+ * \brief   Doliopi financial_and_pedagogical_report config page
  */
 
-// Load DoliMeet environment
-if (file_exists('../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../dolimeet.main.inc.php';
-} elseif (file_exists('../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../dolimeet.main.inc.php';
+// Load Doliopi environment
+if (file_exists('../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../doliopi.main.inc.php';
+} elseif (file_exists('../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../doliopi.main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
-// Load DoliMeet libraries
-require_once __DIR__ . '/../lib/dolimeet.lib.php';
+// Load Doliopi libraries
+require_once __DIR__ . '/../lib/doliopi.lib.php';
 
 // Global variables definitions
 global $conf, $db, $langs, $user;
@@ -49,7 +49,7 @@ $action = GETPOST('action', 'alpha');
 $form = new Form($db);
 
 // Permissions
-$permissionToRead = $user->hasRight('dolimeet', 'adminpage', 'read');
+$permissionToRead = $user->hasRight('doliopi', 'adminpage', 'read');
 
 // Security check
 saturne_check_access($permissionToRead);
@@ -71,9 +71,9 @@ if ($action == 'generate_categories') {
     }
     $tagIDs['C1bis'] = ['C1bis' => $tagIDs['C1bis'], $subTagIDs];
 
-    dolibarr_set_const($db, 'DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORY_ID', $tagParentID, 'integer', 0, '', $conf->entity);
-    dolibarr_set_const($db, 'DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_SUBCATEGORIES_ID', json_encode($tagIDs), 'chaine', 0, '', $conf->entity);
-    dolibarr_set_const($db, 'DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET', 1, 'integer', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DOLIOPI_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORY_ID', $tagParentID, 'integer', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DOLIOPI_FINANCIAL_AND_PEDAGOGICAL_REPORT_SUBCATEGORIES_ID', json_encode($tagIDs), 'chaine', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DOLIOPI_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET', 1, 'integer', 0, '', $conf->entity);
 
     setEventMessages('SavedConfig', []);
     header('Location: ' . $_SERVER['PHP_SELF']);
@@ -87,8 +87,8 @@ if ($action == 'update_organization_identification') {
     }
 
     $bpfAddressPublic = GETPOST('bpf_address_public', 'int');
-    if ($bpfAddressPublic != getDolGlobalInt('DOLIMEET_BPF_ADDRESS_PUBLIC')) {
-        dolibarr_set_const($db, 'DOLIMEET_BPF_ADDRESS_PUBLIC', $bpfAddressPublic, 'integer', 0, '', $conf->entity);
+    if ($bpfAddressPublic != getDolGlobalInt('DOLIOPI_BPF_ADDRESS_PUBLIC')) {
+        dolibarr_set_const($db, 'DOLIOPI_BPF_ADDRESS_PUBLIC', $bpfAddressPublic, 'integer', 0, '', $conf->entity);
     }
 
     setEventMessages('SavedConfig', []);
@@ -98,8 +98,8 @@ if ($action == 'update_organization_identification') {
 
 if ($action == 'update_general_information') {
     $bpfRemoteTraining = GETPOST('bpf_remote_training', 'int');
-    if ($bpfRemoteTraining != getDolGlobalInt('DOLIMEET_BPF_REMOTE_TRAINING')) {
-        dolibarr_set_const($db, 'DOLIMEET_BPF_REMOTE_TRAINING', $bpfRemoteTraining, 'integer', 0, '', $conf->entity);
+    if ($bpfRemoteTraining != getDolGlobalInt('DOLIOPI_BPF_REMOTE_TRAINING')) {
+        dolibarr_set_const($db, 'DOLIOPI_BPF_REMOTE_TRAINING', $bpfRemoteTraining, 'integer', 0, '', $conf->entity);
     }
 
     setEventMessages('SavedConfig', []);
@@ -109,8 +109,8 @@ if ($action == 'update_general_information') {
 
 if ($action == 'update_manager') {
     $bpfManagerStatus = GETPOST('bpf_manager_status', 'alpha');
-    if ($bpfManagerStatus != getDolGlobalString('DOLIMEET_BPF_MANAGER_STATUS')) {
-        dolibarr_set_const($db, 'DOLIMEET_BPF_MANAGER_STATUS', $bpfManagerStatus, 'chaine', 0, '', $conf->entity);
+    if ($bpfManagerStatus != getDolGlobalString('DOLIOPI_BPF_MANAGER_STATUS')) {
+        dolibarr_set_const($db, 'DOLIOPI_BPF_MANAGER_STATUS', $bpfManagerStatus, 'chaine', 0, '', $conf->entity);
     }
 
     setEventMessages('SavedConfig', []);
@@ -122,8 +122,8 @@ if ($action == 'update_manager') {
  * View
  */
 
-$title    = $langs->trans('ModuleSetup', 'DoliMeet');
-$help_url = 'FR:Module_DoliMeet';
+$title    = $langs->trans('ModuleSetup', 'Doliopi');
+$help_url = 'FR:Module_Doliopi';
 
 saturne_header(0,'', $title, $help_url);
 
@@ -132,8 +132,8 @@ $linkBack = '<a href="' . DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_
 print load_fiche_titre($title, $linkBack, 'title_setup');
 
 // Configuration header
-$head = dolimeet_admin_prepare_head();
-print dol_get_fiche_head($head, 'financial_and_pedagogical_report', $title, -1, 'dolimeet_color@dolimeet');
+$head = doliopi_admin_prepare_head();
+print dol_get_fiche_head($head, 'financial_and_pedagogical_report', $title, -1, 'doliopi_color@doliopi');
 
 // Generate categories.
 print load_fiche_titre($langs->trans('Config'), '', '');
@@ -150,7 +150,7 @@ print '<input type="hidden" name="action" value="generate_categories">';
 
 print '<tr><td>' . $form->textwithpicto($langs->trans('BPFCategories'), $langs->trans('BPFCategoriesDescription')) . '</td>';
 print '<td class="center">';
-print '<button class="butAction' . (getDolGlobalInt('DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? 'Refused' : '') . '"' . (getDolGlobalInt('DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? 'disabled' : '') . '>' . $langs->trans('Create') . '</button>';
+print '<button class="butAction' . (getDolGlobalInt('DOLIOPI_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? 'Refused' : '') . '"' . (getDolGlobalInt('DOLIOPI_FINANCIAL_AND_PEDAGOGICAL_REPORT_CATEGORIES_SET') ? 'disabled' : '') . '>' . $langs->trans('Create') . '</button>';
 print '</td></tr>';
 
 print '</form>';
@@ -178,7 +178,7 @@ print '<tr class="oddeven"><td>';
 print $langs->trans('BPFAddressPublic');
 print '</td>';
 print '<td class="minwidth400 maxwidth500">';
-print $form->selectyesno('bpf_address_public', getDolGlobalInt('DOLIMEET_BPF_ADDRESS_PUBLIC'), 1);
+print $form->selectyesno('bpf_address_public', getDolGlobalInt('DOLIOPI_BPF_ADDRESS_PUBLIC'), 1);
 print '</td></tr>';
 
 print '</table>';
@@ -200,7 +200,7 @@ print '<tr class="oddeven"><td>';
 print $langs->trans('BPFRemoteTraining');
 print '</td>';
 print '<td class="minwidth400 maxwidth500">';
-print $form->selectyesno('bpf_remote_training', getDolGlobalInt('DOLIMEET_BPF_REMOTE_TRAINING'), 1);
+print $form->selectyesno('bpf_remote_training', getDolGlobalInt('DOLIOPI_BPF_REMOTE_TRAINING'), 1);
 print '</td></tr>';
 
 print '</table>';
@@ -222,7 +222,7 @@ print '<tr class="oddeven"><td>';
 print $langs->trans('BPFManagerStatus');
 print '</td>';
 print '<td class="minwidth400 maxwidth500">';
-print '<input type="text" name="bpf_manager_status" value="' . dol_escape_htmltag(getDolGlobalString('DOLIMEET_BPF_MANAGER_STATUS')) . '" class="minwidth300"/>';
+print '<input type="text" name="bpf_manager_status" value="' . dol_escape_htmltag(getDolGlobalString('DOLIOPI_BPF_MANAGER_STATUS')) . '" class="minwidth300"/>';
 print '</td></tr>';
 
 print '</table>';

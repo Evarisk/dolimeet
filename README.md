@@ -1,4 +1,4 @@
-# DoliMeet sur [DOLIBARR ERP CRM](https://dolibarr.org)
+# Doliopi sur [DOLIBARR ERP CRM](https://dolibarr.org)
 
 ## Informations
 
@@ -19,9 +19,9 @@
 ## Liens
 
 - Support & Assistance : [Forum dolibarr.fr](https://dolibarr.fr) / Par mail à technique@evarisk.com
-- Demo : [Demo DoliMeet](https://demodoli.digirisk.com) - ID: demo - Password: demo
-- Documentation : [Wiki DoliMeet](https://wiki.dolibarr.org/index.php/Module_DoliMeet)
-- Projet GitHub : [Projet DoliMeet](https://github.com/Evarisk/dolimeet/projects?query=is%3Aopen)
+- Demo : [Demo Doliopi](https://demodoli.digirisk.com) - ID: demo - Password: demo
+- Documentation : [Wiki Doliopi](https://wiki.dolibarr.org/index.php/Module_Doliopi)
+- Projet GitHub : [Projet Doliopi](https://github.com/Evarisk/doliopi/projects?query=is%3Aopen)
 - Saturne Framework : [Télécharger Saturne](https://dolistore.com/fr/modules/1906-Saturne.html)
 - D'autres modules développés par Evarisk disponibles sur [DoliStore.com](https://dolistore.com)
 
@@ -41,7 +41,7 @@
 ### Méthode 1 :
 
 - Depuis le menu "Déployer/Installer un module externe" de Dolibarr :
-- Glisser l'archive ZIP 'module_dolimeet-X.Y.Z' et cliquer sur "ENVOYER FICHIER"
+- Glisser l'archive ZIP 'module_doliopi-X.Y.Z' et cliquer sur "ENVOYER FICHIER"
 - Glisser l'archive ZIP 'module_saturne-X.Y.Z' et cliquer sur "ENVOYER FICHIER"
 - Activer le module dans la liste des Modules/Applications installés
 
@@ -49,7 +49,7 @@
 
 - Dans le dossier "dolibarr/htdocs/custom" copier la ligne suivante :
 ``` 
-git clone -b main https://github.com/Evarisk/dolimeet.git dolimeet
+git clone -b main https://github.com/Evarisk/doliopi.git doliopi
 git clone -b main https://github.com/Evarisk/saturne.git saturne
 ```
 - Activer le module dans la liste des Modules/Applications installés

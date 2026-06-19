@@ -17,25 +17,25 @@
 
 /**
  * \file    view/financial_and_pedagogical_report/generate_bpf_pdf.php
- * \ingroup dolimeet
+ * \ingroup doliopi
  * \brief   Overlay BPF data on the empty Cerfa 10443*17 PDF template and stream it.
  */
 
-// Load DoliMeet environment
-if (file_exists('../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../dolimeet.main.inc.php';
-} elseif (file_exists('../../../dolimeet.main.inc.php')) {
-    require_once __DIR__ . '/../../../dolimeet.main.inc.php';
+// Load Doliopi environment
+if (file_exists('../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../doliopi.main.inc.php';
+} elseif (file_exists('../../../doliopi.main.inc.php')) {
+    require_once __DIR__ . '/../../../doliopi.main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
-// Load DoliMeet libraries
-require_once __DIR__ . '/../../class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php';
+// Load Doliopi libraries
+require_once __DIR__ . '/../../class/doliopidocuments/financialandpedagogicalreportdocument.class.php';
 
 // Global variables definitions
 global $conf, $db, $langs, $mysoc, $user;
@@ -43,13 +43,13 @@ global $conf, $db, $langs, $mysoc, $user;
 saturne_load_langs();
 
 // Permissions
-$permissionToRead = $user->hasRight('dolimeet', 'adminpage', 'read');
+$permissionToRead = $user->hasRight('doliopi', 'adminpage', 'read');
 saturne_check_access($permissionToRead);
 
 $templatePath = __DIR__ . '/../../documents/templates/cerfa_10443-17.pdf';
 if (!file_exists($templatePath)) {
     setEventMessages('Template Cerfa introuvable : ' . $templatePath, [], 'errors');
-    header('Location: ' . dol_buildpath('/dolimeet/view/financial_and_pedagogical_report/financial_and_pedagogical_report.php', 1));
+    header('Location: ' . dol_buildpath('/doliopi/view/financial_and_pedagogical_report/financial_and_pedagogical_report.php', 1));
     exit;
 }
 
@@ -257,7 +257,7 @@ $writeAt($xy['naf'][0], $xy['naf'][1], $mysoc->idprof3);
 $writeAt($xy['legalForm'][0], $xy['legalForm'][1], getFormeJuridiqueLabel($mysoc->forme_juridique_code));
 $writeAt($xy['orgName'][0], $xy['orgName'][1], $mysoc->name);
 $writeAt($xy['address'][0], $xy['address'][1], $mysoc->address . ' ' . $mysoc->zip . ' ' . $mysoc->town);
-if (getDolGlobalInt('DOLIMEET_BPF_ADDRESS_PUBLIC')) {
+if (getDolGlobalInt('DOLIOPI_BPF_ADDRESS_PUBLIC')) {
     $cross($xy['addrPubYes'][0], $xy['addrPubYes'][1]);
 } else {
     $cross($xy['addrPubNo'][0], $xy['addrPubNo'][1]);
@@ -274,7 +274,7 @@ $writeAt($xy['fyStartY'][0], $xy['fyStartY'][1], dol_print_date($start, '%Y'));
 $writeAt($xy['fyEndD'][0], $xy['fyEndD'][1], dol_print_date($end, '%d'));
 $writeAt($xy['fyEndM'][0], $xy['fyEndM'][1], dol_print_date($end, '%m'));
 $writeAt($xy['fyEndY'][0], $xy['fyEndY'][1], dol_print_date($end, '%Y'));
-if (getDolGlobalInt('DOLIMEET_BPF_REMOTE_TRAINING')) {
+if (getDolGlobalInt('DOLIOPI_BPF_REMOTE_TRAINING')) {
     $cross($xy['remoteYes'][0], $xy['remoteYes'][1]);
 } else {
     $cross($xy['remoteNo'][0], $xy['remoteNo'][1]);
@@ -324,7 +324,7 @@ if ($pageCount >= 2) {
     $writeAtRight($xy2['f1tN'][0], $xy2['f1tN'][1], (string) $f1Total[0]);
     $writeAtRight($xy2['f1tH'][0], $xy2['f1tH'][1], $fmtHours($f1Total[1]));
 
-    // Cadre F2 — no signal in dolimeet, leave at 0
+    // Cadre F2 — no signal in doliopi, leave at 0
     $writeAtRight($xy2['f2N'][0], $xy2['f2N'][1], '0');
     $writeAtRight($xy2['f2H'][0], $xy2['f2H'][1], '0');
 
@@ -362,7 +362,7 @@ if ($pageCount >= 2) {
 
     // Cadre H
     $writeAt($xy2['managerName'][0], $xy2['managerName'][1], $mysoc->managers);
-    $writeAt($xy2['managerStatus'][0], $xy2['managerStatus'][1], getDolGlobalString('DOLIMEET_BPF_MANAGER_STATUS'));
+    $writeAt($xy2['managerStatus'][0], $xy2['managerStatus'][1], getDolGlobalString('DOLIOPI_BPF_MANAGER_STATUS'));
 
     // Footer
     $writeAt($xy2['town'][0], $xy2['town'][1], $mysoc->town);

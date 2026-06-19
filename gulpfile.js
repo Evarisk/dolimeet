@@ -7,12 +7,12 @@ const uglify = require('gulp-uglify');
 const concat = require('gulp-concat');
 
 const paths = {
-  js_backend : ['js/dolimeet.js', 'js/modules/*.js']
+  js_backend : ['js/doliopi.js', 'js/modules/*.js']
 };
 
 gulp.task('js_backend', function() {
   return gulp.src(paths.js_backend)
-    .pipe(concat('dolimeet.min.js'))
+    .pipe(concat('doliopi.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('./js/'));
 });

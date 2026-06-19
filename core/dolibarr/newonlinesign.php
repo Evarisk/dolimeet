@@ -56,7 +56,7 @@ if (file_exists('../../../../main.inc.php')) {
 } elseif (file_exists('../../../../../main.inc.php')) {
     require '../../../../../main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
@@ -768,7 +768,7 @@ if ($action == "dosign" && empty($cancel)) {
 				var name = document.getElementById("name").value;
 				$.ajax({
 					type: "POST",
-					url: \''.DOL_URL_ROOT.'/custom/dolimeet/core/ajax/onlineSign2.php\',
+					url: \''.DOL_URL_ROOT.'/custom/doliopi/core/ajax/onlineSign2.php\',
 					dataType: "text",
 					data: {
 						"action" : \'importSignature2\',

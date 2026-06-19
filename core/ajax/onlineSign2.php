@@ -58,7 +58,7 @@ if (file_exists('../../../../main.inc.php')) {
 } elseif (file_exists('../../../../../main.inc.php')) {
     require '../../../../../main.inc.php';
 } else {
-    die('Include of dolimeet main fails');
+    die('Include of doliopi main fails');
 }
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 /**

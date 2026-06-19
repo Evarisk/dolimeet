@@ -11,7 +11,7 @@ jobs:
       uses: Evarisk/Saturne/.github/workflows/release.yml@main
       with:
         tag: ${{ github.ref_name }}
-        module: dolimeet
+        module: doliopi
 
       permissions:
         contents: write
