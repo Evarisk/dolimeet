@@ -1276,7 +1276,16 @@ class ActionsDolimeet
                     $objectElement = $parameters['object']->element ?? '';
                     break;
             }
-            $filter  = $filter ?? 't.status >= 0 AND t.fk_' . $objectElement . ' = ' . ($parameters['object']->id ?? 0);
+            // Only objects owning a dedicated foreign key on the session table can be linked
+            // to a session. For any other object (e.g. digiriskelement) t.fk_<element> does not
+            // exist and would raise a SQL error, so skip the count silently.
+            if (!isset($filter)) {
+                $fkField = 'fk_' . $objectElement;
+                if (!array_key_exists($fkField, $session->fields)) {
+                    return 0;
+                }
+                $filter = 't.status >= 0 AND t.' . $fkField . ' = ' . ($parameters['object']->id ?? 0);
+            }
             $filter .= GETPOST('object_type') ? " AND t.type = '" . GETPOST('object_type') . "'" : '';
             $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
             if (is_array($sessions) && !empty($sessions)) {
