@@ -355,8 +355,12 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
             case 'CONTRACT_CREATE' :
                 if (GETPOST('options_trainingsession_type', 'int') > 0) {
+                    // Load Dolibarr libraries
+                    require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+                    require_once __DIR__ . '/../../lib/dolibarr_lib.php';
 
                     $propal       = new Propal($this->db);
                     $product      = new Product($this->db);
@@ -390,7 +394,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         // Load DoliMeet libraries
                         require_once __DIR__ . '/../../class/trainingsession.class.php';
                         require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
-                        require_once __DIR__ . '/../../lib/dolibarr_lib.php';
 
                         $trainingSession = new Trainingsession($this->db);
 
@@ -438,10 +441,11 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $object->validate($user);
 
                     $contactSingle = listeContact($object, -1, 'internal', 0, 'SALESREPSIGN');
-
-                    $contact = new Contact($this->db);
-                    $contact->fetch($contactSingle[0]['rowid']);
-                    $contact->setValueFrom('mandatory_signature', 1, 'element_contact', $contactSingle[0]['rowid'], 'int', '', $user, '', '');
+                    if (is_array($contactSingle) && !empty($contactSingle)) {
+                        $contact = new Contact($this->db);
+                        $contact->fetch($contactSingle[0]['rowid']);
+                        $contact->setValueFrom('mandatory_signature', 1, 'element_contact', $contactSingle[0]['rowid'], 'int', '', $user, '', '');
+                    }
                 }
                 break;
         }
