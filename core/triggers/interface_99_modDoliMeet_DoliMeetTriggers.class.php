@@ -355,9 +355,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
             case 'CONTRACT_CREATE' :
                 if (GETPOST('options_trainingsession_type', 'int') > 0) {
-                    // Load Dolibarr libraries
-                    require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
-
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
                     require_once __DIR__ . '/../../lib/dolibarr_lib.php';
@@ -440,11 +437,10 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                     $object->validate($user);
 
+                    // 'rowid' is the ID of the llx_element_contact link, not the ID of the contact
                     $contactSingle = listeContact($object, -1, 'internal', 0, 'SALESREPSIGN');
                     if (is_array($contactSingle) && !empty($contactSingle)) {
-                        $contact = new Contact($this->db);
-                        $contact->fetch($contactSingle[0]['rowid']);
-                        $contact->setValueFrom('mandatory_signature', 1, 'element_contact', $contactSingle[0]['rowid'], 'int', '', $user, '', '');
+                        $object->setValueFrom('mandatory_signature', 1, 'element_contact', $contactSingle[0]['rowid'], 'int', '', $user, '', '');
                     }
                 }
                 break;
