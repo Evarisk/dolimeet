@@ -662,7 +662,11 @@ class ActionsDolimeet
                 ?>
                 <script>
                     $(document).ready(function() {
-                        $('#idprod').replaceWith(<?php echo json_encode($out); ?>);
+                        // Only swap the <option> list, never the <select> itself: objectline_create.tpl.php
+                        // binds .change() on #idprod before this footer hook runs, and replaceWith() would
+                        // destroy that handler -- the product description/price/vat AJAX would never fire.
+                        var newOptions = $('<div></div>').html(<?php echo json_encode($out); ?>).find('#idprod').html();
+                        $('#idprod').html(newOptions).val('-1').trigger('change.select2');
                     });
                 </script>
                 <?php
