@@ -745,16 +745,12 @@ class Session extends SaturneObject
     /**
      * Get all session infos
      *
-     * @return int|array     Widget datas label/content
+     * @return array         Widget datas label/content
      * @throws Exception
      */
     public function getSessionInfos()
     {
         $sessions = $this->fetchAll();
-        if (!is_array($sessions) || empty($sessions)) {
-            $this->error = 'NoSessionFound';
-            return -1;
-        }
 
         $sessionDatas = [];
         foreach (array_keys($this->sessionTypes) as $sessionType) {
@@ -763,6 +759,11 @@ class Session extends SaturneObject
                 'duration'        => 0,
                 'AverageDuration' => 0,
             ];
+        }
+
+        if (!is_array($sessions) || empty($sessions)) {
+            $this->error = 'NoSessionFound';
+            return $sessionDatas;
         }
 
         foreach ($sessions as $session) {
