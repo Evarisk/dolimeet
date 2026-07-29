@@ -174,6 +174,7 @@ OfTrainingsession                     = de la session de formation
 TrainingsessionList                   = Liste des sessions de formation
 TrainingSessionList                   = Liste des sessions de formation
 TrainingSessionCreate                 = Créer une session de formation
+Contract                              = Contrat
 NewTrainingsession                    = Nouvelle session de formation
 ModifyTrainingsession                 = Modifier une session de formation
 ActionFormation                       = Action de formation
