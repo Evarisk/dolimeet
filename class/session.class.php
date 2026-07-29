@@ -792,7 +792,7 @@ class Session extends SaturneObject
     /**
      * Get all signatory infos
      *
-     * @return int|array     Widget datas label/content
+     * @return array         Widget datas label/content
      * @throws Exception
      */
     public function getSignatoryInfos()
@@ -808,21 +808,20 @@ class Session extends SaturneObject
         $sql .= " WHERE t.module_name = 'dolimeet' AND t.status > 0";
         $sql .= ' GROUP BY object_type, attendance, role';
 
+        $signatoryCounts = [];
+
         $resql = $this->db->query($sql);
         if (!$resql) {
             $this->error = $this->db->lasterror();
-            return -1;
+        } else {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $signatoryCounts[] = $obj;
+            }
+            $this->db->free($resql);
         }
-
-        $signatoryCounts = [];
-        while ($obj = $this->db->fetch_object($resql)) {
-            $signatoryCounts[] = $obj;
-        }
-        $this->db->free($resql);
 
         if (empty($signatoryCounts)) {
             $this->error = 'NoSignatoryFound';
-            return -1;
         }
 
         $array           = [];
@@ -854,7 +853,7 @@ class Session extends SaturneObject
             $signatoriesInDictionary = saturne_fetch_dictionary('c_' . $sessionType . '_attendants_role');
             if (!is_array($signatoriesInDictionary) || empty($signatoriesInDictionary)) {
                 $this->error = 'NoSignatoryInDictionaryFound';
-                return -1;
+                $signatoriesInDictionary = [];
             }
 
             foreach ($signatoriesInDictionary as $signatoryInDictionary) {
