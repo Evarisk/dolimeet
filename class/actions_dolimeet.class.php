@@ -392,9 +392,10 @@ class ActionsDolimeet
                                 arsort($surveyIDs);
                                 foreach ($surveyIDs as $surveyID) {
                                     $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
-                                    //$filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
                                     if (getDolGlobalInt($confName) > 0) {
-                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', '')) {
+                                        // Restrict to the survey built from the sheet configured for this contact role, otherwise a contact holding several roles shows the same survey on each of its rows
+                                        $filter = ' AND e.fk_sheet = ' . getDolGlobalInt($confName);
+                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
                                             $survey->fetch($surveyID);
                                             $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
