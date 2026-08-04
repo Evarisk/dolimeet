@@ -157,7 +157,7 @@ class ActionsDolimeet
                 'js'  => '/custom/dolimeet/js/dolimeet.min.js'
             ];
 
-            $out .= '<!-- Includes JS added by module saturne -->';
+            $out = '<!-- Includes JS added by module saturne -->';
             $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
 
             $this->resprints = $out;
