@@ -219,6 +219,10 @@ saturne_check_access($permissionToRead, $object, true);
 // Enable the "Sign" mass action offered by the saturne list templates: an attendant signs all the sessions they attend at once
 $enableMassSignature = 1;
 
+// Document the signature page works on, so the list can link straight to it
+$signatureDocumentTypes = ['meeting' => 'MeetingDocument', 'trainingsession' => 'AttendanceSheetDocument', 'audit' => 'AuditDocument'];
+$signatureDocumentType  = $signatureDocumentTypes[$object->element] ?? '';
+
 /*
  * Actions
  */
