@@ -216,6 +216,9 @@ $permissiontodelete = $user->hasRight($object->module, $object->element, 'delete
 // Security check
 saturne_check_access($permissionToRead, $object, true);
 
+// Enable the "Sign" mass action offered by the saturne list templates: an attendant signs all the sessions they attend at once
+$enableMassSignature = 1;
+
 /*
  * Actions
  */
