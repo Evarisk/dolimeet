@@ -257,6 +257,19 @@ class ActionsDolimeet
     {
         global $conf, $extrafields, $langs, $object;
 
+        // The training contract list carries indicator columns: the filter row keeps its cells aligned
+        if ($this->isTrainingContractList($parameters)) {
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $out = '';
+            foreach (array_keys($this->getTrainingContractIndicators()) as $indicatorAlias) {
+                $out .= '<td class="liste_titre"></td>';
+            }
+            $this->resprints = $out;
+
+            return 0;
+        }
+
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
             require_once __DIR__ . '/../../saturne/lib/object.lib.php';
             $objectsMetadata                = saturne_get_objects_metadata();
@@ -1313,6 +1326,202 @@ class ActionsDolimeet
         }
 
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Tell whether the list being drawn is the training contract one
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return bool              True on the DoliMeet training contract list
+     */
+    protected function isTrainingContractList(array $parameters): bool
+    {
+        return preg_match('/contractlist/', $parameters['context']) && GETPOST('contextpage', 'aZ') == 'trainingcontract';
+    }
+
+    /**
+     * Indicators the training contract list carries, and the query that fills each of them
+     *
+     * Every indicator is a correlated subquery on the contract row rather than a query per line: the list
+     * stays one query, whatever the number of contracts on the page.
+     *
+     * @return array Indicators, keyed by the alias they are read back with
+     */
+    protected function getTrainingContractIndicators(): array
+    {
+        $sessionTable   = MAIN_DB_PREFIX . 'dolimeet_session';
+        $signatureTable = MAIN_DB_PREFIX . 'saturne_object_signature';
+        $surveyTable    = MAIN_DB_PREFIX . 'digiquali_survey';
+        $linkTable      = MAIN_DB_PREFIX . 'element_element';
+
+        // Signatures of one session role, counted by state: registered, pending, signed
+        $sessionSignatures = 'SELECT CONCAT(COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_REGISTERED . '), 0), \'|\', COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_PENDING_SIGNATURE . '), 0), \'|\', COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_SIGNED . '), 0))'
+            . ' FROM ' . $signatureTable . ' AS sig'
+            . ' INNER JOIN ' . $sessionTable . ' AS ds ON ds.rowid = sig.fk_object AND sig.object_type = ds.type'
+            . ' WHERE ds.fk_contrat = c.rowid AND sig.module_name = \'dolimeet\' AND sig.status > 0 AND sig.role = ';
+
+        $indicators = [
+            'dolimeet_nb_session' => [
+                'label' => 'NbSessions',
+                'sql'   => '(SELECT COUNT(*) FROM ' . $sessionTable . ' AS ds WHERE ds.fk_contrat = c.rowid)'
+            ],
+            'dolimeet_trainee_signatures' => [
+                'label' => 'TraineeSignatures',
+                'sql'   => '(' . $sessionSignatures . '\'Trainee\')'
+            ],
+            'dolimeet_trainer_signatures' => [
+                'label' => 'TrainerSignatures',
+                'sql'   => '(' . $sessionSignatures . '\'SessionTrainer\')'
+            ]
+        ];
+
+        // A questionnaire is recognised by the sheet it was built on, so only a configured role is followed
+        $surveyRoles = ['trainee' => 'TraineeSurvey', 'sessiontrainer' => 'TrainerSurvey', 'billing' => 'BillingSurvey'];
+        foreach ($surveyRoles as $surveyRole => $surveyLabel) {
+            $sheetID = getDolGlobalInt('DOLIMEET_' . dol_strtoupper($surveyRole) . '_SATISFACTION_SURVEY_SHEET');
+            if ($sheetID <= 0) {
+                continue;
+            }
+
+            $surveyFrom = ' FROM ' . $signatureTable . ' AS sig'
+                . ' INNER JOIN ' . $surveyTable . ' AS sv ON sv.rowid = sig.fk_object'
+                . ' INNER JOIN ' . $linkTable . ' AS ee ON ee.fk_target = sv.rowid AND ee.targettype = \'digiquali_survey\' AND ee.sourcetype = \'contrat\''
+                . ' WHERE ee.fk_source = c.rowid AND sig.module_name = \'digiquali\' AND sig.object_type = \'survey\' AND sig.status > 0 AND sv.fk_sheet = ' . $sheetID;
+
+            $indicators['dolimeet_' . $surveyRole . '_survey_reminder'] = [
+                'label' => $surveyLabel . 'Reminder',
+                'sql'   => '(SELECT MAX(sig.last_email_sent_date)' . $surveyFrom . ')'
+            ];
+            $indicators['dolimeet_' . $surveyRole . '_survey_state'] = [
+                'label' => $surveyLabel . 'State',
+                'sql'   => '(SELECT CONCAT(COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_SIGNED . '), 0), \'|\', COUNT(*))' . $surveyFrom . ')'
+            ];
+        }
+
+        return $indicators;
+    }
+
+    /**
+     * Overloading the printFieldListSelect function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListSelect(array $parameters): int
+    {
+        if (!$this->isTrainingContractList($parameters)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $sql = '';
+        foreach ($this->getTrainingContractIndicators() as $indicatorAlias => $indicator) {
+            $sql .= ', ' . $indicator['sql'] . ' AS ' . $indicatorAlias;
+        }
+        $this->resprints = $sql;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printFieldListTitle function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListTitle(array $parameters): int
+    {
+        global $langs;
+
+        if (!$this->isTrainingContractList($parameters)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $out = '';
+        foreach ($this->getTrainingContractIndicators() as $indicator) {
+            $out .= '<th class="liste_titre center">' . $langs->trans($indicator['label']) . '</th>';
+        }
+        $this->resprints = $out;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printFieldListValue function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListValue(array $parameters): int
+    {
+        global $langs;
+
+        if (!$this->isTrainingContractList($parameters)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $obj = $parameters['obj'] ?? null;
+        $out = '';
+        foreach ($this->getTrainingContractIndicators() as $indicatorAlias => $indicator) {
+            $value = $obj->$indicatorAlias ?? null;
+            $out  .= '<td class="center nowraponall">' . $this->renderTrainingContractIndicator($indicatorAlias, $value, $obj) . '</td>';
+        }
+        $this->resprints = $out;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Render one indicator of the training contract list
+     *
+     * @param  string      $indicatorAlias Alias the indicator was read with
+     * @param  string|null $value          Raw value returned by the query
+     * @param  object|null $obj            Current row
+     * @return string                      Cell content
+     */
+    protected function renderTrainingContractIndicator(string $indicatorAlias, ?string $value, ?object $obj): string
+    {
+        global $langs;
+
+        if ($indicatorAlias == 'dolimeet_nb_session') {
+            if (empty($value)) {
+                return '<span class="opacitymedium">0</span>';
+            }
+            $sessionListUrl = dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?object_type=trainingsession&fromtype=contrat&fromid=' . ($obj->rowid ?? 0);
+
+            return '<a href="' . $sessionListUrl . '">' . $value . '</a>';
+        }
+
+        if (strpos($indicatorAlias, '_survey_reminder') !== false) {
+            return dol_strlen($value) > 0 ? dol_print_date($this->db->jdate($value), 'day') : '<span class="opacitymedium">-</span>';
+        }
+
+        if (strpos($indicatorAlias, '_survey_state') !== false) {
+            [$answered, $total] = array_pad(explode('|', (string) $value), 2, 0);
+            if ((int) $total == 0) {
+                return '<span class="opacitymedium">-</span>';
+            }
+            $badge = (int) $answered >= (int) $total ? 'badge-status4' : 'badge-status1';
+
+            return '<span class="badge ' . $badge . '">' . (int) $answered . ' / ' . (int) $total . '</span>';
+        }
+
+        // Signature states of a session role, in the order they are announced in the header
+        [$registered, $pending, $signed] = array_pad(explode('|', (string) $value), 3, 0);
+        if ((int) $registered + (int) $pending + (int) $signed == 0) {
+            return '<span class="opacitymedium">-</span>';
+        }
+
+        $out  = '<span class="badge badge-status0 classfortooltip" title="' . dol_escape_htmltag($langs->transnoentities('SignatureStateNothing')) . '">' . (int) $registered . '</span> ';
+        $out .= '<span class="badge badge-status1 classfortooltip" title="' . dol_escape_htmltag($langs->transnoentities('SignatureStateStarted')) . '">' . (int) $pending . '</span> ';
+        $out .= '<span class="badge badge-status4 classfortooltip" title="' . dol_escape_htmltag($langs->transnoentities('SignatureStateSigned')) . '">' . (int) $signed . '</span>';
+
+        return $out;
     }
 
     /**
