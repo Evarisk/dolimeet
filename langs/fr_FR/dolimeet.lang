@@ -90,6 +90,7 @@ BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par d
 
 # Formation - Formation
 TrainingContract                    = Convention de formation
+TrainingContracts                   = Conventions de formation
 PracticalGuide                      = Guide pratique
 WelcomeBooklet                      = Livret d'accueil
 RulesOfProcedure                    = Réglement intérieur
