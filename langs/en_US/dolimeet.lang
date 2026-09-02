@@ -231,3 +231,17 @@ SignAttendanceSheetOnline         = Sign the attendance sheet online
 SetSatisfactionSurvey             = Create a satisfaction survey
 NeedToSetSatisfactionSurvey       = Satisfaction survey configuration %s required
 DefineSessionTrainerResponsible   = You must define the session training responsible in the DoliMeet configuration.
+
+# Survey reminder
+SurveyReminderCronLabel               = Reminder of the unanswered satisfaction surveys
+SurveyReminderCronComment             = Sends the survey link again to the attendants who did not answer it yet, every DOLIMEET_SATISFACTION_SURVEY_REMINDER_DELAY days and at most DOLIMEET_SATISFACTION_SURVEY_REMINDER_MAX times
+SurveyReminderDigiQualiRequired       = DigiQuali 1.11.0 or higher is required to remind the surveys
+SurveyReminderNoSheetConfigured       = No satisfaction survey sheet is configured, there is nothing to remind
+SurveyReminderNothingToSend           = No survey to remind
+SurveyReminderResult                  = %d reminder(s) sent, %d skipped
+SurveyReminderDelay                   = Delay between two reminders (days)
+SurveyReminderMax                     = Maximum number of reminders per survey
+SatisfactionSurveyReminderLabel       = DLM_Reminder_Satisfaction_Survey_%s
+SatisfactionSurveyReminderTopic       = [__[MAIN_INFO_SOCIETE_NOM]__] Reminder: satisfaction survey for the training contract __REF__
+SatisfactionSurveyReminderContent     = Hello,<br /><br />We have not received your answer to the satisfaction survey linked to your training contract "__REF__" - "__DOLIMEET_CONTRACT_LABEL__" yet.<br /><br />It only takes a few minutes:<br /><a href="__DOLIMEET_SURVEY_LINK__">Answer the survey</a><br /><br />If you already answered it, please ignore this message.<p>Best regards,<br /><br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
+SurveyReminderDisabled                = Reminders are turned off: the maximum number of reminders is zero

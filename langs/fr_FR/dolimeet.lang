@@ -482,6 +482,9 @@ NameAndPositionOfSignatory = Nom et qualité du signataire
 SatisfactionSurveyLabel              = DLM_Questionnaire_Satisfaction_%s
 SatisfactionSurveyTopic              = [__[MAIN_INFO_SOCIETE_NOM]__] Remise des liens de questionnaire de satisfaction %s pour la convention de formation __REF__
 SatisfactionSurveyContent            = Bonjour,<br /><br />Nous vous envoyons ce mail afin de vous mettre au courant des questionnaires de satisfaction %s liées avec votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br />Ci-dessous, vous trouverez un aperçu des questionnaires, incluant les détails pertinents :<br /><br />__DOLIMEET_CONTRACT_SURVEY_INFOS__<br /><br />Nous vous prions de bien vouloir transmettre ces liens aux parties concernées.<br />Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
+SatisfactionSurveyReminderLabel      = DLM_Relance_Questionnaire_Satisfaction_%s
+SatisfactionSurveyReminderTopic      = [__[MAIN_INFO_SOCIETE_NOM]__] Relance : questionnaire de satisfaction pour la convention de formation __REF__
+SatisfactionSurveyReminderContent    = Bonjour,<br /><br />Nous n'avons pas encore reçu votre réponse au questionnaire de satisfaction lié à votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br /><br />Vous pouvez y répondre en quelques minutes :<br /><a href="__DOLIMEET_SURVEY_LINK__">Répondre au questionnaire</a><br /><br />Si vous y avez déjà répondu, merci d'ignorer ce message.<p>Bien cordialement,<br /><br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
 CompletionCertificateDocumentLabel   = DLM_Certificat_Réalisation
 CompletionCertificateDocumentTopic   = [__[MAIN_INFO_SOCIETE_NOM]__] Remise du certificat de réalisation pour la convention de formation __REF__
 CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en pièce jointe le certificat de réalisation lié à votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br><br />Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
@@ -561,3 +564,14 @@ TrainingStart                       = %s
 TrainingEnd                         = au %s
 TrainingDuration                    = pour une durée de %s heure(s) <sup>2</sup>
 TrainingLegalNotice                 = Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m’engage à conserver l’ensemble des pièces justificatives qui ont permis d’établir le présent certificat pendant une durée de 3 ans à compter de la fin de l’année du dernier paiement. En cas de cofinancement des fonds européens la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.
+
+# Survey reminder - Relance des questionnaires
+SurveyReminderCronLabel              = Relance des questionnaires de satisfaction non répondus
+SurveyReminderCronComment            = Renvoie le lien du questionnaire aux participants qui n'y ont pas encore répondu, tous les DOLIMEET_SATISFACTION_SURVEY_REMINDER_DELAY jours et au plus DOLIMEET_SATISFACTION_SURVEY_REMINDER_MAX fois
+SurveyReminderDigiQualiRequired      = DigiQuali 1.11.0 ou supérieur est nécessaire pour relancer les questionnaires
+SurveyReminderNoSheetConfigured      = Aucun modèle de questionnaire de satisfaction n'est configuré, il n'y a rien à relancer
+SurveyReminderNothingToSend          = Aucun questionnaire à relancer
+SurveyReminderResult                 = %d relance(s) envoyée(s), %d ignorée(s)
+SurveyReminderDelay                  = Délai entre deux relances (jours)
+SurveyReminderMax                    = Nombre maximum de relances par questionnaire
+SurveyReminderDisabled               = Les relances sont désactivées : le nombre maximum de relances est à zéro
