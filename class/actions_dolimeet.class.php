@@ -1349,6 +1349,8 @@ class ActionsDolimeet
      */
     protected function getTrainingContractIndicators(): array
     {
+        require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+
         $sessionTable   = MAIN_DB_PREFIX . 'dolimeet_session';
         $signatureTable = MAIN_DB_PREFIX . 'saturne_object_signature';
         $surveyTable    = MAIN_DB_PREFIX . 'digiquali_survey';
@@ -1359,6 +1361,31 @@ class ActionsDolimeet
             . ' FROM ' . $signatureTable . ' AS sig'
             . ' INNER JOIN ' . $sessionTable . ' AS ds ON ds.rowid = sig.fk_object AND sig.object_type = ds.type'
             . ' WHERE ds.fk_contrat = c.rowid AND sig.module_name = \'dolimeet\' AND sig.status > 0 AND sig.role = ';
+
+        // Who the agreement names, one column per role it is followed by. A role can be held by a user or
+        // by a contact, so both cards are read and whichever answers gives the name
+        $contactNames = 'SELECT GROUP_CONCAT(COALESCE(CONCAT(sp.lastname, \' \', sp.firstname), CONCAT(u.lastname, \' \', u.firstname)) SEPARATOR \', \')'
+            . ' FROM ' . MAIN_DB_PREFIX . 'element_contact AS ec'
+            . ' INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact AS tc ON tc.rowid = ec.fk_c_type_contact AND tc.element = \'contrat\' AND tc.code = '
+            . ''; // the code is appended per role
+
+        $contactFrom = ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople AS sp ON sp.rowid = ec.fk_socpeople AND tc.source = \'external\''
+            . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user AS u ON u.rowid = ec.fk_socpeople AND tc.source = \'internal\''
+            . ' WHERE ec.element_id = c.rowid';
+
+        // An agreement is invoiced through a link Dolibarr writes in either direction, so both are read.
+        // The link table drives the lookup on its own index: collecting the invoice ids first and filtering
+        // the invoices on that set costs fifteen times more
+        $invoiceLink = ' FROM ' . MAIN_DB_PREFIX . 'element_element AS ee';
+        $invoiceJoin = ' INNER JOIN ' . MAIN_DB_PREFIX . 'facture AS f ON f.rowid = ee.%s AND f.entity IN (' . getEntity('facture') . ') AND f.fk_statut IN (' . Facture::STATUS_VALIDATED . ', ' . Facture::STATUS_CLOSED . ')';
+        $payment     = ' INNER JOIN ' . MAIN_DB_PREFIX . 'paiement_facture AS pf ON pf.fk_facture = ee.%s';
+        $straight    = ' WHERE ee.sourcetype = \'contrat\' AND ee.targettype = \'facture\' AND ee.fk_source = c.rowid';
+        $reverse     = ' WHERE ee.sourcetype = \'facture\' AND ee.targettype = \'contrat\' AND ee.fk_target = c.rowid';
+
+        $invoicedAmount = '(SELECT COALESCE(SUM(f.total_ttc), 0)' . $invoiceLink . sprintf($invoiceJoin, 'fk_target') . $straight . ')'
+            . ' + (SELECT COALESCE(SUM(f.total_ttc), 0)' . $invoiceLink . sprintf($invoiceJoin, 'fk_source') . $reverse . ')';
+        $paidAmount = '(SELECT COALESCE(SUM(pf.amount), 0)' . $invoiceLink . sprintf($payment, 'fk_target') . $straight . ')'
+            . ' + (SELECT COALESCE(SUM(pf.amount), 0)' . $invoiceLink . sprintf($payment, 'fk_source') . $reverse . ')';
 
         $indicators = [
             'dolimeet_nb_session' => [
@@ -1372,6 +1399,30 @@ class ActionsDolimeet
             'dolimeet_trainer_signatures' => [
                 'label' => 'TrainerSignatures',
                 'sql'   => '(' . $sessionSignatures . '\'SessionTrainer\')'
+            ],
+            'dolimeet_contact_sessiontrainer' => [
+                'label' => 'TrainerContacts',
+                'sql'   => '(' . $contactNames . '\'SESSIONTRAINER\'' . $contactFrom . ')'
+            ],
+            'dolimeet_contact_trainee' => [
+                'label' => 'TraineeContacts',
+                'sql'   => '(' . $contactNames . '\'TRAINEE\'' . $contactFrom . ')'
+            ],
+            'dolimeet_contact_billing' => [
+                'label' => 'BillingContacts',
+                'sql'   => '(' . $contactNames . '\'BILLING\'' . $contactFrom . ')'
+            ],
+            'dolimeet_contact_customer' => [
+                'label' => 'FollowUpContacts',
+                'sql'   => '(' . $contactNames . '\'CUSTOMER\'' . $contactFrom . ')'
+            ],
+            'dolimeet_invoice_total' => [
+                'label' => 'ContractInvoicing',
+                'sql'   => $invoicedAmount
+            ],
+            'dolimeet_invoice_paid' => [
+                'label' => 'ContractPayment',
+                'sql'   => $paidAmount
             ]
         ];
 
@@ -1495,6 +1546,24 @@ class ActionsDolimeet
             $sessionListUrl = dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?object_type=trainingsession&fromtype=contrat&fromid=' . ($obj->rowid ?? 0);
 
             return '<a href="' . $sessionListUrl . '">' . $value . '</a>';
+        }
+
+        if (strpos($indicatorAlias, 'dolimeet_contact_') === 0) {
+            return dol_strlen($value) > 0 ? dol_escape_htmltag(dol_trunc($value, 40)) : '<span class="opacitymedium">-</span>';
+        }
+
+        if ($indicatorAlias == 'dolimeet_invoice_total') {
+            return (float) $value > 0 ? price((float) $value, 0, '', 1, -1, -1, 'auto') : '<span class="opacitymedium">-</span>';
+        }
+
+        if ($indicatorAlias == 'dolimeet_invoice_paid') {
+            $invoiceTotal = (float) ($obj->dolimeet_invoice_total ?? 0);
+            if ($invoiceTotal == 0) {
+                return '<span class="opacitymedium">-</span>';
+            }
+            $badge = (float) $value >= $invoiceTotal ? 'badge-status4' : 'badge-status1';
+
+            return '<span class="badge ' . $badge . '">' . price((float) $value, 0, '', 1, -1, -1, 'auto') . '</span>';
         }
 
         if (strpos($indicatorAlias, '_survey_reminder') !== false) {
