@@ -194,14 +194,15 @@ print '</form>';
 print load_fiche_titre($langs->trans('SurveyReminder'), '', '', 0, 'survey_reminder');
 
 // The reminder only ever leaves once the scheduled job runs: say so where it is configured
-$cronJob = new Cronjob($db);
-$result  = $cronJob->fetch(0, 'DoliMeetSurveyReminder', 'sendSatisfactionSurveyReminders');
+$cronJob     = new Cronjob($db);
+$result      = $cronJob->fetch(0, 'DoliMeetSurveyReminder', 'sendSatisfactionSurveyReminders');
+$cronJobLink = '<a href="' . dol_buildpath('/cron/card.php', 1) . '?id=' . $cronJob->id . '">' . $langs->transnoentities('SurveyReminderCronLink') . '</a>';
 if ($result <= 0 || $cronJob->id <= 0) {
-    print '<div class="warning">' . $langs->trans('SurveyReminderCronNotInstalled') . '</div>';
+    print '<div class="warning">' . $langs->transnoentities('SurveyReminderCronNotInstalled') . '</div>';
 } elseif (empty($cronJob->status)) {
-    print '<div class="warning">' . $langs->trans('SurveyReminderCronDisabled', '<a href="' . dol_buildpath('/cron/card.php', 1) . '?id=' . $cronJob->id . '">' . $langs->trans('SurveyReminderCronLink') . '</a>') . '</div>';
+    print '<div class="warning">' . $langs->transnoentities('SurveyReminderCronDisabled', $cronJobLink) . '</div>';
 } else {
-    print '<div class="info">' . $langs->trans('SurveyReminderCronEnabled', '<a href="' . dol_buildpath('/cron/card.php', 1) . '?id=' . $cronJob->id . '">' . $langs->trans('SurveyReminderCronLink') . '</a>') . '</div>';
+    print '<div class="info">' . $langs->transnoentities('SurveyReminderCronEnabled', $cronJobLink) . '</div>';
 }
 
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
