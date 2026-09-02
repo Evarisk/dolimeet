@@ -375,7 +375,9 @@ if (($id || $ref) && $action == 'edit') {
         }
     }
 
-    if ($_POST['fk_soc'] == -1) {
+    // The select posts -1 for "no thirdparty": normalised here so the filters built below read an empty
+    // value. The form is also reached in GET, where the key simply does not exist
+    if (GETPOSTISSET('fk_soc') && GETPOSTINT('fk_soc') == -1) {
         $_POST['fk_soc'] = 0;
     }
 
