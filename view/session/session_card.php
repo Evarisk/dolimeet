@@ -502,6 +502,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     $nbAttendantByRole = [];
     $nbAttendants      = 0;
     foreach ($attendantsRole as $attendantRole) {
+        // The counter has to exist before it is incremented: it was only initialised when the role had
+        // no attendant at all, so PHP 8 warned on the undefined key exactly when there was someone to count
+        $nbAttendantByRole[$attendantRole] = 0;
+
         $signatories = $signatory->fetchSignatory($attendantRole, $object->id, $object->element);
         if (is_array($signatories) && !empty($signatories)) {
             foreach ($signatories as $objectSignatory) {
@@ -509,8 +513,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                     $nbAttendantByRole[$attendantRole]++;
                 }
             }
-        } else {
-            $nbAttendantByRole[$attendantRole] = 0;
         }
         if ($nbAttendantByRole[$attendantRole] == 0) {
             $mesg .= '<br>' . $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element)));
