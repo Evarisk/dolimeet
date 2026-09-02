@@ -84,6 +84,19 @@ if ($action == 'set_satisfaction_survey') {
         if ($satisfactionSurveyID != getDolGlobalInt($confName)) {
             dolibarr_set_const($db, $confName, $satisfactionSurveyID, 'integer', 0, '', $conf->entity);
         }
+
+        // One mail model to hand the questionnaire over, one to chase it: the survey is sent and
+        // reminded per role, so each role names its own
+        $mailTemplateConfNames = [
+            'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_EMAIL_TEMPLATE'          => $satisfactionSurvey . '_satisfaction_survey_email_template',
+            'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_REMINDER_EMAIL_TEMPLATE' => $satisfactionSurvey . '_satisfaction_survey_reminder_email_template'
+        ];
+        foreach ($mailTemplateConfNames as $mailTemplateConfName => $mailTemplateInputName) {
+            $mailTemplateID = max(0, GETPOSTINT($mailTemplateInputName));
+            if ($mailTemplateID != getDolGlobalInt($mailTemplateConfName)) {
+                dolibarr_set_const($db, $mailTemplateConfName, $mailTemplateID, 'integer', 0, '', $conf->entity);
+            }
+        }
     }
 
     setEventMessage('SavedConfig');
@@ -306,6 +319,7 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
 
 if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
     require_once __DIR__ . '/../../digiquali/class/sheet.class.php';
+    require_once __DIR__ . '/../../saturne/class/saturnemail.class.php';
 
     $sheet = new Sheet($db);
 
@@ -315,10 +329,25 @@ if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_V
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="set_satisfaction_survey">';
 
+    // The mail models are the contract ones, the same the contract mail form offers
+    $mailTemplates       = [];
+    $saturneMail         = new SaturneMail($db);
+    $mailTemplateRecords = $saturneMail->fetchAll('ASC', 'label', 0, 0, ['customsql' => "t.type_template = 'contract' AND t.entity IN (0, " . $conf->entity . ')']);
+    if (is_array($mailTemplateRecords)) {
+        foreach ($mailTemplateRecords as $mailTemplateRecord) {
+            $mailTemplates[$mailTemplateRecord->id] = $mailTemplateRecord->label;
+        }
+    }
+
+    // Until a model is picked, the survey mail keeps the one the module registered on activation
+    $defaultMailTemplates = json_decode(getDolGlobalString('DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'), true);
+
     print '<table class="noborder centpercent">';
     print '<tr class="liste_titre">';
     print '<td>' . $langs->trans('Name') . '</td>';
     print '<td>' . $langs->trans('Value') . '</td>';
+    print '<td>' . $langs->trans('SatisfactionSurveyEmailTemplate') . '</td>';
+    print '<td>' . $langs->trans('SatisfactionSurveyReminderEmailTemplate') . '</td>';
     print '</tr>';
 
     $satisfactionSurveys = [
@@ -334,6 +363,18 @@ if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_V
         print '<td class="minwidth400 maxwidth500">';
         $confName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurveyRole) . '_SATISFACTION_SURVEY_SHEET';
         print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList(getDolGlobalInt($confName), $satisfactionSurveyRole . '_satisfaction_survey_model', 's.type = "survey" AND s.status = ' . Sheet::STATUS_LOCKED, '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
+        print '</td>';
+
+        $mailTemplateConfName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurveyRole) . '_SATISFACTION_SURVEY_EMAIL_TEMPLATE';
+        $reminderConfName     = 'DOLIMEET_' . dol_strtoupper($satisfactionSurveyRole) . '_SATISFACTION_SURVEY_REMINDER_EMAIL_TEMPLATE';
+        $selectedMailTemplate = max(0, getDolGlobalInt($mailTemplateConfName)) ?: (int) ($defaultMailTemplates[$satisfactionSurveyRole] ?? 0);
+
+        print '<td class="minwidth200 maxwidth300">';
+        print img_picto('', 'email', 'class="pictofixedwidth"') . $form->selectarray($satisfactionSurveyRole . '_satisfaction_survey_email_template', $mailTemplates, $selectedMailTemplate, 1, 0, 0, '', 0, 0, 0, '', 'minwidth200 maxwidth300');
+        print '</td>';
+
+        print '<td class="minwidth200 maxwidth300">';
+        print img_picto('', 'email', 'class="pictofixedwidth"') . $form->selectarray($satisfactionSurveyRole . '_satisfaction_survey_reminder_email_template', $mailTemplates, max(0, getDolGlobalInt($reminderConfName)), 1, 0, 0, '', 0, 0, 0, '', 'minwidth200 maxwidth300');
         print '</td></tr>';
     }
 

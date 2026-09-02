@@ -87,6 +87,8 @@ CustomerSatisfactionSurvey                  = Enquête de satisfaction client
 CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
 BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire/OPCO
 BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire/OPCO
+SatisfactionSurveyEmailTemplate             = Modèle d'email d'envoi
+SatisfactionSurveyReminderEmailTemplate     = Modèle d'email de relance
 
 # Formation - Formation
 TrainingContract                    = Convention de formation
