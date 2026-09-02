@@ -83,9 +83,25 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
     {
         global $conf;
 
+        // The fiscal year frames every figure below, and it is also what the report shows when there is
+        // nothing to count: every early exit hands back the same shape, filled with zeros
+        $year                 = GETPOSTISSET('search_year') ? GETPOSTINT('search_year') : date('Y');
+        $firstDayOfFiscalYear = dol_get_first_day($year, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
+        $lastDayOfFiscalYear  = dol_time_plus_duree($firstDayOfFiscalYear, 1, 'y');
+        $lastDayOfFiscalYear  = dol_time_plus_duree($lastDayOfFiscalYear, -1, 'd');
+
+        $emptyBPFInfos = [
+            'BPFInfos'               => [],
+            'firstDayOfFiscalYear'   => $firstDayOfFiscalYear,
+            'lastDayOfFiscalYear'    => $lastDayOfFiscalYear,
+            'BPFPartDAmounts'        => ['total' => 0, 'salaries' => 0, 'purchases' => 0],
+            'BPFPartETrainers'       => ['internal' => ['count' => 0, 'hours' => 0], 'external' => ['count' => 0, 'hours' => 0]],
+            'BPFInfosByTrainingType' => []
+        ];
+
         // Protect against direct access due to the use of this class in the dashboard
         if (!isModEnabled('product') || !isModEnabled('invoice')) {
-            return [];
+            return $emptyBPFInfos;
         }
 
         // Load Dolibarr libraries
@@ -105,7 +121,7 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         // Load BPF subcategories
         $BPFSubTagsC = json_decode(getDolGlobalString('DOLIMEET_FINANCIAL_AND_PEDAGOGICAL_REPORT_SUBCATEGORIES_ID'), true);
         if (empty($BPFSubTagsC)) {
-            return [];
+            return $emptyBPFInfos;
         }
         $BPFSubTagsC = array_merge($BPFSubTagsC, $BPFSubTagsC['C1bis'][0]);
         unset($BPFSubTagsC['C1bis']);
@@ -122,15 +138,10 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         }
 
         // Load invoices
-        $year                 = GETPOSTISSET('search_year') ? GETPOSTINT('search_year') : date('Y');
-        $firstDayOfFiscalYear = dol_get_first_day($year, getDolGlobalString('SOCIETE_FISCAL_MONTH_START'));
-        $lastDayOfFiscalYear  = dol_time_plus_duree($firstDayOfFiscalYear, 1, 'y');
-        $lastDayOfFiscalYear  = dol_time_plus_duree($lastDayOfFiscalYear, -1, 'd');
-
         $filter   = ['customsql' => 't.fk_statut IN (' . Facture::STATUS_VALIDATED . ',' . Facture::STATUS_CLOSED . ') AND t.datef BETWEEN ' . "'" . dol_print_date($firstDayOfFiscalYear, 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($lastDayOfFiscalYear, 'dayrfc') . "'"];
         $invoices = saturne_fetch_all_object_type('Facture', '', '', 0, 0, $filter);
         if (!is_array($invoices) || empty($invoices)) {
-            return [];
+            return $emptyBPFInfos;
         }
 
         $BPFInfos      = ['sales' => 0];
@@ -385,12 +396,12 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
                 $totalHT            = 0;
                 $BPFLabelsPartC1bis = ['C1a', 'C1b', 'C1c', 'C1d', 'C1e', 'C1f', 'C1g', 'C1h'];
                 foreach ($BPFLabelsPartC1bis as $BPFLabelPartC1bis) {
-                    $totalHT += $BPFInfos['BPFInfos'][$BPFLabelPartC1bis]['totalHT'];
+                    $totalHT += ($BPFInfos['BPFInfos'][$BPFLabelPartC1bis]['totalHT'] ?? 0);
                 }
                 $array['content'][] = round($totalHT) . ' ' . $langs->getCurrencySymbol($conf->currency);
             } else {
-                $BPFTotalPartC     += $BPFInfos['BPFInfos'][$BPFLabelPartC]['totalHT'];
-                $array['content'][] = round($BPFInfos['BPFInfos'][$BPFLabelPartC]['totalHT']) . ' ' . $langs->getCurrencySymbol($conf->currency);
+                $BPFTotalPartC     += ($BPFInfos['BPFInfos'][$BPFLabelPartC]['totalHT'] ?? 0);
+                $array['content'][] = round($BPFInfos['BPFInfos'][$BPFLabelPartC]['totalHT'] ?? 0) . ' ' . $langs->getCurrencySymbol($conf->currency);
             }
         }
 
@@ -400,8 +411,8 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         $array['content'][] = round($BPFTotalPartC) . ' ' . $langs->getCurrencySymbol($conf->currency);
 
         $salesPercent = $langs->trans('NoData');
-        if ($BPFTotalPartC > 0 && $BPFInfos['BPFInfos']['sales'] > 0) {
-            $salesPercent = ceil($BPFTotalPartC / $BPFInfos['BPFInfos']['sales'] * 100) . ' %';
+        if ($BPFTotalPartC > 0 && ($BPFInfos['BPFInfos']['sales'] ?? 0) > 0) {
+            $salesPercent = ceil($BPFTotalPartC / ($BPFInfos['BPFInfos']['sales'] ?? 0) * 100) . ' %';
         }
         $array['content'][] = $salesPercent;
 
@@ -553,8 +564,8 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
             if ($BPFLabelPartF1 == 'F1e') {
                 [$totalNbTraineesPartF1e , $totalTrainingSessionDurationsPartF1e] = [0, 0];
                 foreach ($BPFLabelPartC as $BPFLabelPartF1e) {
-                    $totalNbTraineesPartF1e               += $BPFInfos['BPFInfos'][$BPFLabelPartF1e]['NbTrainees'];
-                    $totalTrainingSessionDurationsPartF1e += $BPFInfos['BPFInfos'][$BPFLabelPartF1e]['TrainingSessionDurations'];
+                    $totalNbTraineesPartF1e               += ($BPFInfos['BPFInfos'][$BPFLabelPartF1e]['NbTrainees'] ?? 0);
+                    $totalTrainingSessionDurationsPartF1e += ($BPFInfos['BPFInfos'][$BPFLabelPartF1e]['TrainingSessionDurations'] ?? 0);
                 }
                 $totalNbTrainees               += $totalNbTraineesPartF1e;
                 $totalTrainingSessionDurations += $totalTrainingSessionDurationsPartF1e;
@@ -562,9 +573,9 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
             } elseif ($BPFLabelPartF1 == 'F1') {
                 $array['content'][] = img_picto('', 'fa-user-graduate', 'class="pictofixedwidth"') . $totalNbTrainees . ' - ' . img_picto('', 'fa-clock', 'class="pictofixedwidth"') . convertSecondToTime($totalTrainingSessionDurations, 'allhour') . ' H';
             } else {
-                $totalNbTrainees               += $BPFInfos['BPFInfos'][$BPFLabelPartC]['NbTrainees'];
-                $totalTrainingSessionDurations += $BPFInfos['BPFInfos'][$BPFLabelPartC]['TrainingSessionDurations'];
-                $array['content'][]             = img_picto('', 'fa-user-graduate', 'class="pictofixedwidth"') . $BPFInfos['BPFInfos'][$BPFLabelPartC]['NbTrainees'] . ' - ' . img_picto('', 'fa-clock', 'class="pictofixedwidth"') . convertSecondToTime($BPFInfos['BPFInfos'][$BPFLabelPartC]['TrainingSessionDurations'], 'allhour') . ' H';
+                $totalNbTrainees               += ($BPFInfos['BPFInfos'][$BPFLabelPartC]['NbTrainees'] ?? 0);
+                $totalTrainingSessionDurations += ($BPFInfos['BPFInfos'][$BPFLabelPartC]['TrainingSessionDurations'] ?? 0);
+                $array['content'][]             = img_picto('', 'fa-user-graduate', 'class="pictofixedwidth"') . ($BPFInfos['BPFInfos'][$BPFLabelPartC]['NbTrainees'] ?? 0) . ' - ' . img_picto('', 'fa-clock', 'class="pictofixedwidth"') . convertSecondToTime(($BPFInfos['BPFInfos'][$BPFLabelPartC]['TrainingSessionDurations'] ?? 0), 'allhour') . ' H';
             }
         }
 
