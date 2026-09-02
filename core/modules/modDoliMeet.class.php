@@ -235,6 +235,8 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SET', 'integer', 0, '', 0, 'current'],
             $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_SATISFACTION_SURVEY_REMINDER_DELAY', 'integer', 7, '', 0, 'current'],
+            $i++ => ['DOLIMEET_SATISFACTION_SURVEY_REMINDER_MAX', 'integer', 3, '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_MORNING_START_HOUR', 'chaine', '09:00', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_MORNING_END_HOUR', 'chaine', '12:00', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR', 'chaine', '14:00', '', 0, 'current'],
@@ -361,7 +363,22 @@ class modDoliMeet extends DolibarrModules
 
         // Cronjobs (List of cron jobs entries to add when module is enabled).
         // unit_frequency must be 60 for minute, 3600 for hour, 86400 for day, 604800 for week.
-        $this->cronjobs = [];
+        $this->cronjobs = [
+            0 => [
+                'label'         => $langs->transnoentities('SurveyReminderCronLabel'),
+                'jobtype'       => 'method',
+                'class'         => '/custom/dolimeet/class/dolimeetsurveyreminder.class.php',
+                'objectname'    => 'DoliMeetSurveyReminder',
+                'method'        => 'sendSatisfactionSurveyReminders',
+                'parameters'    => '',
+                'comment'       => $langs->transnoentities('SurveyReminderCronComment'),
+                'frequency'     => 1,
+                'unitfrequency' => 3600 * 24,
+                'priority'      => 50,
+                'status'        => 0,
+                'test'          => 'isModEnabled("dolimeet") && isModEnabled("digiquali")'
+            ]
+        ];
 
         // Permissions provided by this module.
         $this->rights = [];
@@ -646,6 +663,30 @@ class modDoliMeet extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE', $emailTemplateID, 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 3, 'integer', 0, '', $conf->entity);
+        }
+
+        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') <= 3 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+            $position = 200;
+            foreach (['billing', 'trainee', 'sessiontrainer', 'customer'] as $satisfactionSurvey) {
+                $saturneMail->entity        = 0;
+                $saturneMail->type_template = 'contract';
+                $saturneMail->lang          = 'fr_FR';
+                $saturneMail->datec         = $this->db->idate(dol_now());
+                $saturneMail->label         = $langs->transnoentities('SatisfactionSurveyReminderLabel', $langs->transnoentities(ucfirst($satisfactionSurvey)));
+                $saturneMail->position      = $position;
+                $saturneMail->enabled       = "isModEnabled('contrat')";
+                $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyReminderTopic');
+                $saturneMail->joinfiles     = 0;
+                $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyReminderContent');
+
+                $reminderTemplateID = $saturneMail->create($user);
+                if ($reminderTemplateID > 0) {
+                    dolibarr_set_const($this->db, 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_REMINDER_EMAIL_TEMPLATE', $reminderTemplateID, 'integer', 0, '', $conf->entity);
+                }
+                $position += 10;
+            }
+
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 4, 'integer', 0, '', $conf->entity);
         }
 
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_UPDATED') == 0) {
