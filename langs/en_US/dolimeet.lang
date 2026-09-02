@@ -90,6 +90,8 @@ Responsible = Responsable
 # Data
 TrainingSession                       = Training session
 Trainingsession                       = Training session
+TrainingContract                      = Training contract
+TrainingContracts                     = Training contracts
 Trainingsessions                      = training sessions
 TheTrainingsession                    = the training session
 OfTrainingsession                     = of training session

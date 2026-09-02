@@ -1417,6 +1417,13 @@ class ActionsDolimeet
             }
         }
 
+        // The DoliMeet menu opens the core contract list on the training contracts only: a contract
+        // becomes one as soon as it carries a training type. The value is a dictionary rowid held in a
+        // varchar column, so it is compared as the string it is stored as
+        if (preg_match('/contractlist/', $parameters['context']) && GETPOST('contextpage', 'aZ') == 'trainingcontract') {
+            $this->resprints = " AND ef.trainingsession_type IS NOT NULL AND ef.trainingsession_type NOT IN ('', '0')";
+        }
+
         return 0; // or return 1 to replace standard code
     }
 

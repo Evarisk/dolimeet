@@ -508,7 +508,23 @@ class modDoliMeet extends DolibarrModules
                 'user'     => 2,
             ];
         }
-        
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
+            'type'     => 'left',
+            'titre'    => $langs->transnoentities('TrainingContracts'),
+            'prefix'   => '<i class="fas fa-file-contract pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_training_contract_list',
+            'url'      => '/contrat/list.php?contextpage=trainingcontract',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => 'isModEnabled("dolimeet") && isModEnabled("contrat")',
+            'perms'    => '$user->hasRight("contrat", "lire")',
+            'target'   => '',
+            'user'     => 2,
+        ];
+
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=dolimeet',
             'type'     => 'left',
