@@ -270,3 +270,15 @@ BillingContacts                       = Contract billing
 FollowUpContacts                      = Contract follow-up
 ContractInvoicing                     = Invoicing
 ContractPayment                       = Payment
+
+#
+# Error
+#
+
+# Data
+ErrorMissingFormationServiceConfig   = Error: the training service configuration is missing<br><a href="../../custom/dolimeet/admin/setup.php#formation">Please click here to open the configuration page</a>
+ErrorNoFormationServiceFound         = Error: no usable training service was found. Check that your services belong to the main training service category and that the total duration of their template sessions matches the service duration.<br><a href="%s">Please click here to open the configuration page</a>
+ErrorFormationNoteNoLine             = Error: the training note of %s could not be built because this document has no service line. Add at least one training service then run the action again.
+ErrorFormationServiceNoModelSession  = Error: no template session is linked to the training service "%s". Create at least one template session for this service in the training session templates project.
+ErrorFormationTrainingConfigMissing  = Error: the training configuration is incomplete (main training service category and/or training session templates project are not set).<br><a href="%s">Please click here to open the configuration page</a>
+ErrorFormationVariousCategoryMissing = Error: the training configuration is incomplete (the main category of miscellaneous training services is not set).<br><a href="%s">Please click here to open the configuration page</a>

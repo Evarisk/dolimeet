@@ -118,13 +118,20 @@ function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerK
 
     $productIds = trainingsession_function_lib1();
     if (!is_array($productIds) || empty($productIds)) {
-        setEventMessages($langs->transnoentities('Error3'), [], 'errors');
+        setEventMessages($langs->transnoentities('ErrorNoFormationServiceFound', dol_buildpath('/dolimeet/admin/setup.php', 1) . '#formation'), [], 'errors');
         return -1;
     }
 
-    $object->fetch_lines();
-    if (!is_array($object->lines) || empty($object->lines)) {
-        setEventMessages($langs->transnoentities('Error1'), [], 'errors');
+    // On contract creation the formation lines come from the linked proposal: Dolibarr copies the proposal lines
+    // onto the contract only AFTER the CONTRACT_CREATE trigger, so the contract has no line of its own yet.
+    if ($triggerKey == 'CONTRACT_CREATE' && $propal !== null) {
+        $lines = $propal->lines;
+    } else {
+        $object->fetch_lines();
+        $lines = $object->lines;
+    }
+    if (!is_array($lines) || empty($lines)) {
+        setEventMessages($langs->transnoentities('ErrorFormationNoteNoLine', $object->ref), [], 'errors');
         return -1;
     }
 
@@ -132,9 +139,6 @@ function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerK
     $nbTrainees      = 0;
     $durations       = 0;
     $publicNotePart2 = '';
-
-    // On contract creation the formation lines come from the linked proposal, otherwise from the object itself
-    $lines = ($triggerKey == 'CONTRACT_CREATE') ? $propal->lines : $object->lines;
 
     if ($object->element === 'contrat') {
         // A contract owns its own (already cloned) sessions, all linked by fk_contrat. They must be fetched once,
