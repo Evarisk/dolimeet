@@ -507,7 +507,12 @@ MissingDefaultUserPublicInterfaceConfig       = Aucun utilisateur n’est défin
 #
 
 # Data - Donnée
-ErrorMissingFormationServiceConfig = Erreur : configuration des services de formation manquantes<br><a href="../../custom/dolimeet/admin/setup.php#formation">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorMissingFormationServiceConfig   = Erreur : configuration des services de formation manquantes<br><a href="../../custom/dolimeet/admin/setup.php#formation">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorNoFormationServiceFound         = Erreur : aucun service de formation exploitable n'a été trouvé. Vérifiez que vos services sont rattachés à la catégorie principale des services de formation et que la durée cumulée de leurs sessions modèles est égale à la durée du service.<br><a href="%s">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorFormationNoteNoLine             = Erreur : la note de formation de %s n'a pas pu être générée car ce document ne contient aucune ligne de service. Ajoutez au moins un service de formation puis relancez l'action.
+ErrorFormationServiceNoModelSession  = Erreur : aucune session modèle n'est rattachée au service de formation « %s ». Créez au moins une session modèle pour ce service dans le projet des modèles de sessions de formation.
+ErrorFormationTrainingConfigMissing  = Erreur : configuration des formations incomplète (catégorie principale des services de formation et/ou projet des modèles de sessions de formation non renseignés).<br><a href="%s">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorFormationVariousCategoryMissing = Erreur : configuration des formations incomplète (catégorie principale des services divers de formation non renseignée).<br><a href="%s">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
 
 
 

@@ -347,7 +347,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     set_public_note($object, $object, 'PROPAL_CREATE');
 
                     if ($error > 0) {
-                        setEventMessages('ErrorMissingFormationServiceConfig', [], 'errors');
+                        setEventMessages($langs->transnoentities('ErrorMissingFormationServiceConfig'), [], 'errors');
                         return -1;
                     }
                 }
@@ -367,6 +367,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $langs->load('propal');
 
                     // Add formation services on contract (by default FOR_ADM_CF1, FOR_ADM_RI1)
+                    $error             = 0;
                     $formationServices = get_formation_service();
                     foreach ($formationServices as $formationService) {
                         if ($formationService['ref'] == 'FOR_ADM_CF1' || $formationService['ref'] == 'FOR_ADM_RI1') {
@@ -382,8 +383,15 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $contratLigne->rang        = $formationService['position'];
 
                                 $object->addline($contratLigne->description, $contratLigne->subprice, $contratLigne->qty, $contratLigne->tva_tx, 0.0, 0.0, $contratLigne->fk_product, 0.0, '', '', 'HT', 0.0, 0, null, 0, [], null, $contratLigne->rang);
+                            } else {
+                                $error++;
                             }
                         }
+                    }
+
+                    // Non blocking: the contract is still created, but its administrative services are missing
+                    if ($error > 0) {
+                        setEventMessages($langs->transnoentities('ErrorMissingFormationServiceConfig'), [], 'warnings');
                     }
 
                     // Create training session from propal
@@ -396,13 +404,13 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                         $productIds = trainingsession_function_lib1();
                         if (!is_array($productIds) || empty($productIds)) {
-                            setEventMessages($langs->transnoentities('ErrorMissingFormationServiceConfig'), [], 'errors');
+                            setEventMessages($langs->transnoentities('ErrorNoFormationServiceFound', dol_buildpath('/dolimeet/admin/setup.php', 1) . '#formation'), [], 'errors');
                             return -1;
                         }
 
                         $propal->fetch($object->linked_objects['propal']);
                         if (!is_array($propal->lines) || empty($propal->lines)) {
-                            setEventMessages($langs->transnoentities('Error1'), [], 'errors');
+                            setEventMessages($langs->transnoentities('ErrorFormationNoteNoLine', $propal->ref), [], 'errors');
                             return -1;
                         }
                         foreach ($propal->lines as $line) {
@@ -412,7 +420,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                             $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . $line->fk_product]);
                             if (!is_array($trainingSessions) || empty($trainingSessions)) {
-                                setEventMessages($langs->transnoentities('Error2'), [], 'errors');
+                                setEventMessages($langs->transnoentities('ErrorFormationServiceNoModelSession', $productIds[$line->fk_product]), [], 'errors');
                                 return -1;
                             }
 
