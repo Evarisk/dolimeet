@@ -1069,35 +1069,35 @@ class ActionsDolimeet
     }
 
     /**
-     * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below.
+     * Overloading the saturneExtendGetObjectsMetadata function : replacing the parent's function with the one below.
      *
-     * @param  array $linkableObjectTypes  Array of linkable objects.
-     * @return int                         0 < on error, 0 on success, 1 to replace standard code.
+     * @param  array $parameters Hook metadatas (context, etc...).
+     * @return int               0 < on error, 0 on success, 1 to replace standard code.
      */
-    public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
+    public function saturneExtendGetObjectsMetadata(array $parameters): int
     {
-        require_once __DIR__ . '/../class/trainingsession.class.php';
-        require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
-
-        $trainingSession = new Trainingsession($this->db);
-
-        $linkableObjectTypes['dolimeet_trainsess'] = [
+        $objectsMetadata['dolimeet_trainsess'] = [
+            'mainmenu'       => 'dolimeet',
+            'leftmenu'       => '',
             'langs'          => 'Trainingsession',
             'langfile'       => 'dolimeet@dolimeet',
-            'picto'          => $trainingSession->picto,
-            'className'      => 'Trainingsession',
-            'name_field'     => 'ref',
+            'picto'          => 'fontawesome_fa-people-arrows_fas_#d35968',
+            'color'          => '#d35968',
+            'class_name'     => 'Trainingsession',
             'post_name'      => 'fk_trainingsession',
             'link_name'      => 'dolimeet_trainsess',
             'tab_type'       => 'trainingsession',
-            'hook_name_list' => 'trainingsessionlist',
+            'table_element'  => 'dolimeet_session',
+            'name_field'     => 'ref',
             'hook_name_card' => 'trainingsessioncard',
+            'hook_name_list' => 'trainingsessionlist',
             'create_url'     => 'custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
-            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php'
+            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php',
+            'lib_path'       => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php'
         ];
-        $this->results = $linkableObjectTypes;
+        $this->results = $objectsMetadata;
 
-        return 1;
+        return 0; // or return 1 to replace standard code
     }
 
     /**
