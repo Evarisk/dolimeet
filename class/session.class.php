@@ -263,6 +263,12 @@ class Session extends SaturneObject
     public $fk_contrat;
 
     /**
+     * Session types the module handles. Seules ces valeurs sont acceptees pour le parametre
+     * d'URL object_type, qui sert a construire des chemins d'inclusion.
+     */
+    public const SESSION_TYPES = ['meeting', 'trainingsession', 'audit'];
+
+    /**
      * @var array Session types
      */
     public array $sessionTypes = [
@@ -424,6 +430,22 @@ class Session extends SaturneObject
     }
 
     /**
+     * Force category type to 'session' for all session subtypes (trainingsession, meeting, audit).
+     * Dolibarr core (actions_addupdatedelete.inc.php) calls setCategories() without a type, and
+     * SaturneObject falls back to $this->element. The only category link table is llx_categorie_session,
+     * so anything else (e.g. llx_categorie_trainingsession) doesn't exist and fatals.
+     *
+     * @param  int[]|int $categories     Category ID or array of Categories IDs
+     * @param  string    $typeCateg      Category type — defaults to 'session' for this hierarchy
+     * @param  bool      $removeExisting True : remove existing categories not supplied in $categories
+     * @return int                       <0 if KO, >0 if OK
+     */
+    public function setCategories($categories, string $typeCateg = '', bool $removeExisting = false): int
+    {
+        return parent::setCategories($categories, $typeCateg ?: 'session', $removeExisting);
+    }
+
+    /**
      * Set draft status
      *
      * @param  User      $user      Object user that modify
@@ -475,6 +497,19 @@ class Session extends SaturneObject
         }
         if ($status == self::STATUS_ARCHIVED) {
             $statusType = 'status8';
+        }
+
+        // When validated and every attendant has signed, show "Signé" instead of "Validé (en attente de signature)"
+        if ($status == self::STATUS_VALIDATED && $status == $this->status && $this->id > 0) {
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $signatory = new SaturneSignature($this->db, 'dolimeet', $this->element);
+            if ($signatory->checkSignatoriesSignatures($this->id, $this->element) == 1) {
+                global $langs;
+                $langs->load('signature@saturne');
+                $signedLabel = $langs->transnoentitiesnoconv('Signed');
+                return dolGetStatus($signedLabel, $signedLabel, '', 'status4', $mode);
+            }
         }
 
         return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
@@ -716,16 +751,12 @@ class Session extends SaturneObject
     /**
      * Get all session infos
      *
-     * @return int|array     Widget datas label/content
+     * @return array         Widget datas label/content
      * @throws Exception
      */
     public function getSessionInfos()
     {
         $sessions = $this->fetchAll();
-        if (!is_array($sessions) || empty($sessions)) {
-            $this->error = 'NoSessionFound';
-            return -1;
-        }
 
         $sessionDatas = [];
         foreach (array_keys($this->sessionTypes) as $sessionType) {
@@ -734,6 +765,11 @@ class Session extends SaturneObject
                 'duration'        => 0,
                 'AverageDuration' => 0,
             ];
+        }
+
+        if (!is_array($sessions) || empty($sessions)) {
+            $this->error = 'NoSessionFound';
+            return $sessionDatas;
         }
 
         foreach ($sessions as $session) {
@@ -762,7 +798,7 @@ class Session extends SaturneObject
     /**
      * Get all signatory infos
      *
-     * @return int|array     Widget datas label/content
+     * @return array         Widget datas label/content
      * @throws Exception
      */
     public function getSignatoryInfos()
@@ -771,10 +807,27 @@ class Session extends SaturneObject
 
         $signatory = new SaturneSignature($this->db);
 
-        $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => 't.module_name = \'dolimeet\' AND status > 0']);
-        if (!is_array($signatories) || empty($signatories)) {
+        // Aggregate the counts in SQL instead of hydrating every signatory: the dashboard only needs
+        // counts and this table can hold thousands of rows, which exhausts the PHP memory limit.
+        $sql  = 'SELECT object_type, attendance, role, COUNT(*) AS nb';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $signatory->table_element . ' AS t';
+        $sql .= " WHERE t.module_name = 'dolimeet' AND t.status > 0";
+        $sql .= ' GROUP BY object_type, attendance, role';
+
+        $signatoryCounts = [];
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error = $this->db->lasterror();
+        } else {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $signatoryCounts[] = $obj;
+            }
+            $this->db->free($resql);
+        }
+
+        if (empty($signatoryCounts)) {
             $this->error = 'NoSignatoryFound';
-            return -1;
         }
 
         $array           = [];
@@ -806,7 +859,7 @@ class Session extends SaturneObject
             $signatoriesInDictionary = saturne_fetch_dictionary('c_' . $sessionType . '_attendants_role');
             if (!is_array($signatoriesInDictionary) || empty($signatoriesInDictionary)) {
                 $this->error = 'NoSignatoryInDictionaryFound';
-                return -1;
+                $signatoriesInDictionary = [];
             }
 
             foreach ($signatoriesInDictionary as $signatoryInDictionary) {
@@ -818,14 +871,19 @@ class Session extends SaturneObject
             }
         }
 
-        foreach ($signatories as $signatory) {
-            if (empty($signatory->object_type) || !isset($array[$signatory->object_type])) {
+        foreach ($signatoryCounts as $signatoryCount) {
+            if (empty($signatoryCount->object_type) || !isset($array[$signatoryCount->object_type])) {
                 continue;
             }
 
-            $array[$signatory->object_type]['data']['nbSession']++;
-            $array[$signatory->object_type]['data']['attendance'][$signatory->attendance]['nbAttendance']++;
-            $array[$signatory->object_type]['data']['roles'][$signatory->role]['nbSignatory']++;
+            $nb = (int) $signatoryCount->nb;
+            $array[$signatoryCount->object_type]['data']['nbSession'] += $nb;
+            if (isset($array[$signatoryCount->object_type]['data']['attendance'][$signatoryCount->attendance])) {
+                $array[$signatoryCount->object_type]['data']['attendance'][$signatoryCount->attendance]['nbAttendance'] += $nb;
+            }
+            if (isset($array[$signatoryCount->object_type]['data']['roles'][$signatoryCount->role])) {
+                $array[$signatoryCount->object_type]['data']['roles'][$signatoryCount->role]['nbSignatory'] += $nb;
+            }
         }
 
         foreach (array_keys($this->sessionTypes) as $sessionType) {

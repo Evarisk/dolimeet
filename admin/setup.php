@@ -76,21 +76,6 @@ if ($action == 'set_session_trainer_responsible') {
     exit;
 }
 
-if ($action == 'set_satisfaction_survey') {
-    $satisfactionSurveys = ['sessiontrainer', 'trainee', 'customer', 'billing'];
-    foreach ($satisfactionSurveys as $satisfactionSurvey) {
-        $satisfactionSurveyID = GETPOST($satisfactionSurvey . '_satisfaction_survey_model');
-        $confName             = 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_SHEET';
-        if ($satisfactionSurveyID != getDolGlobalInt($confName)) {
-            dolibarr_set_const($db, $confName, $satisfactionSurveyID, 'integer', 0, '', $conf->entity);
-        }
-    }
-
-    setEventMessage('SavedConfig');
-    header('Location: ' . $_SERVER['PHP_SELF']);
-    exit;
-}
-
 if ($action == 'update_formation_datas') {
     foreach ($formationServices as $formationService) {
         $formationServiceID = GETPOST($formationService['name'], 'int');
@@ -298,44 +283,6 @@ if (getDolGlobalInt('DOLIMEET_TRAININGSESSION_MENU_ENABLED')) {
     print '<td class="minwidth400 maxwidth500">';
     print img_picto($langs->trans('User'), 'user', 'class="pictofixedwidth"') . $form->select_dolusers(getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE'), 'session_trainer_responsible_id', 1, null, 0, '', '', '0', 0, 0, '', 0, '', 'minwidth400 maxwidth500');
     print '</td></tr>';
-
-    print '</table>';
-    print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
-    print '</form>';
-}
-
-if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
-    require_once __DIR__ . '/../../digiquali/class/sheet.class.php';
-
-    $sheet = new Sheet($db);
-
-    print load_fiche_titre($langs->trans('SatisfactionSurvey'), '', '', 0, 'satisfaction_survey');
-
-    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
-    print '<input type="hidden" name="token" value="' . newToken() . '">';
-    print '<input type="hidden" name="action" value="set_satisfaction_survey">';
-
-    print '<table class="noborder centpercent">';
-    print '<tr class="liste_titre">';
-    print '<td>' . $langs->trans('Name') . '</td>';
-    print '<td>' . $langs->trans('Value') . '</td>';
-    print '</tr>';
-
-    $satisfactionSurveys = [
-        'sessiontrainer' => ['picto' => 'user-tie'],
-        'trainee'        => ['picto' => 'user-graduate'],
-        'customer'       => ['picto' => 'building'],
-        'billing'        => ['picto' => 'file-invoice-dollar'],
-    ];
-    foreach ($satisfactionSurveys as $satisfactionSurveyRole => $satisfactionSurvey) {
-        print '<tr class="oddeven"><td>';
-        print $form->textwithpicto(img_picto('', 'fontawesome_fa-' . $satisfactionSurvey['picto'] . '_fas', 'class="pictofixedwidth"') . $langs->trans(ucfirst($satisfactionSurveyRole) . 'SatisfactionSurvey'), $langs->transnoentities(ucfirst($satisfactionSurveyRole) . 'SatisfactionSurveyDescription'));
-        print '</td>';
-        print '<td class="minwidth400 maxwidth500">';
-        $confName = 'DOLIMEET_' . dol_strtoupper($satisfactionSurveyRole) . '_SATISFACTION_SURVEY_SHEET';
-        print img_picto($langs->trans('Sheet'), $sheet->picto, 'class="pictofixedwidth"') . $sheet->selectSheetList(getDolGlobalInt($confName), $satisfactionSurveyRole . '_satisfaction_survey_model', 's.type = "survey" AND s.status = ' . Sheet::STATUS_LOCKED, '1', 0, 0, [], '', 0, 0, 'minwidth400 maxwidth500');
-        print '</td></tr>';
-    }
 
     print '</table>';
     print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';

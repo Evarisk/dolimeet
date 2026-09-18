@@ -39,6 +39,18 @@ if (isModEnabled('categorie')) {
 }
 
 // load DoliMeet libraries
+require_once __DIR__ . '/../../class/session.class.php';
+
+// $objectType vient de l'URL et sert a construire le chemin d'inclusion ci-dessous : sans ce
+// controle, un type inconnu fait echouer le require_once et laisse une page blanche. La liste
+// accepte en plus 'session', son type par defaut, qui les couvre tous
+if (!in_array($objectType, array_merge(Session::SESSION_TYPES, ['session']), true)) {
+    $langs->load('errors');
+    setEventMessages($langs->trans('ErrorBadValueForParameter', $objectType, 'object_type'), null, 'errors');
+    header('Location: ' . dol_buildpath('/custom/dolimeet/dolimeetindex.php?mainmenu=dolimeet', 1));
+    exit;
+}
+
 require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 
 // Global variables definitions
@@ -215,6 +227,13 @@ $permissiontodelete = $user->hasRight($object->module, $object->element, 'delete
 
 // Security check
 saturne_check_access($permissionToRead, $object, true);
+
+// Enable the "Sign" mass action offered by the saturne list templates: an attendant signs all the sessions they attend at once
+$enableMassSignature = 1;
+
+// Document the signature page works on, so the list can link straight to it
+$signatureDocumentTypes = ['meeting' => 'MeetingDocument', 'trainingsession' => 'AttendanceSheetDocument', 'audit' => 'AuditDocument'];
+$signatureDocumentType  = $signatureDocumentTypes[$object->element] ?? '';
 
 /*
  * Actions

@@ -100,12 +100,14 @@ function get_formation_service(): array
 /**
  * Set public note on project/propal/contract
  *
- * @param CommonObject $object  Object
- * @param Propal|null  $propal  Propal object (optional)
+ * @param CommonObject $object           Object
+ * @param Propal|null  $propal           Propal object (optional)
+ * @param string       $triggerKey       Trigger key the note is rebuilt from
+ * @param int          $excludeContactId Trainee contact id to exclude (e.g. on contact unlink, fired before the link is removed)
  *
  * @throws Exception
  */
-function set_public_note(CommonObject $object, Propal $propal = null, $triggerKey = '')
+function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerKey = '', $excludeContactId = 0)
 {
     global $conf, $db, $langs;
 
@@ -116,13 +118,20 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
 
     $productIds = trainingsession_function_lib1();
     if (!is_array($productIds) || empty($productIds)) {
-        setEventMessages($langs->transnoentities('Error3'), [], 'errors');
+        setEventMessages($langs->transnoentities('ErrorNoFormationServiceFound', dol_buildpath('/dolimeet/admin/setup.php', 1) . '#formation'), [], 'errors');
         return -1;
     }
 
-    $object->fetch_lines();
-    if (!is_array($object->lines) || empty($object->lines)) {
-        setEventMessages($langs->transnoentities('Error1'), [], 'errors');
+    // On contract creation the formation lines come from the linked proposal: Dolibarr copies the proposal lines
+    // onto the contract only AFTER the CONTRACT_CREATE trigger, so the contract has no line of its own yet.
+    if ($triggerKey == 'CONTRACT_CREATE' && $propal !== null) {
+        $lines = $propal->lines;
+    } else {
+        $object->fetch_lines();
+        $lines = $object->lines;
+    }
+    if (!is_array($lines) || empty($lines)) {
+        setEventMessages($langs->transnoentities('ErrorFormationNoteNoLine', $object->ref), [], 'errors');
         return -1;
     }
 
@@ -130,64 +139,42 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
     $nbTrainees      = 0;
     $durations       = 0;
     $publicNotePart2 = '';
-    if ($triggerKey == 'CONTRACT_CREATE') {
-        foreach ($propal->lines as $line) {
-            if (!in_array($line->fk_product, array_keys($productIds))) {
-                continue;
+
+    if ($object->element === 'contrat') {
+        // A contract owns its own (already cloned) sessions, all linked by fk_contrat. They must be fetched once,
+        // independently of the number of formation lines, otherwise the same sessions are summed several times
+        // (inflated durations and duplicated sessions in the note).
+        foreach ($lines as $line) {
+            if (in_array($line->fk_product, array_keys($productIds))) {
+                $formationTitle .= dol_strlen($line->product_label) > 0 ? $line->product_label : $line->label;
             }
+        }
 
-            if ($object->element === 'contrat') {
-                $filter = 't.fk_contrat = ' . $object->id;
-            } else {
-                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product;
-            }
-
-            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
-            if (!is_array($trainingSessions) || empty($trainingSessions)) {
-                continue;
-            }
-
-            $formationTitle .= $line->product_label;
-
-            $nbTrainees += count($trainingSessions);
-            foreach ($trainingSessions as $trainingSession) {
-                $durations += $trainingSession->duration;
-                if ($object->element == 'contrat') {
-                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
-                } else {
-                    $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
-                }
-                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
+        $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.fk_contrat = ' . (int) $object->id]);
+        if (is_array($trainingSessions) && !empty($trainingSessions)) {
+            $nbTrainees = count($trainingSessions);
+            foreach ($trainingSessions as $contractTrainingSession) {
+                $durations       += $contractTrainingSession->duration;
+                $publicNotePart2 .= dol_print_date($contractTrainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>' . ' - ' . $contractTrainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($contractTrainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($contractTrainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
             }
         }
     } else {
-        foreach ($object->lines as $line) {
+        foreach ($lines as $line) {
             if (!in_array($line->fk_product, array_keys($productIds))) {
                 continue;
             }
 
-            if ($object->element === 'contrat') {
-                $filter = 't.fk_contrat = ' . $object->id;
-            } else {
-                $filter = 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product;
-            }
-
-            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => $filter]);
+            $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . (int) $line->fk_product]);
             if (!is_array($trainingSessions) || empty($trainingSessions)) {
                 continue;
             }
 
-            $formationTitle .= $line->label;
+            $formationTitle .= dol_strlen($line->label) > 0 ? $line->label : $line->product_label;
 
             $nbTrainees += count($trainingSessions);
-            foreach ($trainingSessions as $trainingSession) {
-                $durations += $trainingSession->duration;
-                if ($object->element == 'contrat') {
-                    $publicNotePart2Date = dol_print_date($trainingSession->date_start, 'day', 'tzuserrel') . ' - <strong>' . $langs->transnoentities('Validated') . '</strong>';
-                } else {
-                    $publicNotePart2Date = 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>';
-                }
-                $publicNotePart2 .= $publicNotePart2Date . ' - ' . $trainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($trainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($trainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
+            foreach ($trainingSessions as $modelTrainingSession) {
+                $durations       += $modelTrainingSession->duration;
+                $publicNotePart2 .= 'JJ/MM/AAAA - <strong>' . $langs->transnoentities('ToBePlanned') . '</strong>' . ' - ' . $modelTrainingSession->label . ' : ' . $langs->transnoentities('HourStart') . ' : <strong>' . dol_print_date($modelTrainingSession->date_start, 'hour', 'tzuserrel') . '</strong> - ' . $langs->transnoentities('HourEnd') . ' : <strong>' . dol_print_date($modelTrainingSession->date_end, 'hour', 'tzuserrel') . '</strong><br />';
             }
         }
     }
@@ -207,9 +194,18 @@ function set_public_note(CommonObject $object, Propal $propal = null, $triggerKe
     // Part 3 - Trainee list
     $internalTrainee = $object->liste_contact(-1, 'internal', 0, 'TRAINEE');
     $externalTrainee = $object->liste_contact(-1, 'external', 0, 'TRAINEE');
-    if ((is_array($internalTrainee) && !empty($internalTrainee)) || (is_array($externalTrainee) && !empty($externalTrainee))) {
+    $contacts        = array_merge(
+        (is_array($internalTrainee) ? $internalTrainee : []),
+        (is_array($externalTrainee) ? $externalTrainee : [])
+    );
+    // On contact unlink the trigger fires before the link is removed: exclude the trainee being removed
+    if ($excludeContactId > 0) {
+        $contacts = array_filter($contacts, function ($contact) use ($excludeContactId) {
+            return (int) $contact['id'] !== (int) $excludeContactId;
+        });
+    }
+    if (!empty($contacts)) {
         $object->note_public .= '<br />' . $langs->transnoentities('PublicNoteTraineeList') . '<br />';
-        $contacts = array_merge($internalTrainee, $externalTrainee);
         $object->note_public .= $langs->transnoentities('TrainingSessionNbTrainees') . ' : ' . count($contacts) . '<br /><ul>';
         foreach ($contacts as $contact) {
             //@todo option pour le mail

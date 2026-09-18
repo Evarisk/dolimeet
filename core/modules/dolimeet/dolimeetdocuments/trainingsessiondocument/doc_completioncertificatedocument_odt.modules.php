@@ -122,8 +122,8 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
             $tmpArray['action_nature'] = '';
         }
 
-        $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
-        $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
+        $tmpArray['date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuserrel');
+        $tmpArray['date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuserrel');
         $tmpArray['duration']   = convertSecondToTime($object->duration, 'allhourmin');
 
         $tmpArray['attendant_fullname'] = strtoupper($moreParam['attendant']->lastname) . ' ' . ucfirst($moreParam['attendant']->firstname);
@@ -169,7 +169,7 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
             $tmpArray['mycompany_owner_signature'] = '';
         }
 
-        $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuser');
+        $tmpArray['date_creation'] = dol_print_date(dol_now(), 'dayhour', 'tzuserrel');
 
         $moreParam['tmparray'] = $tmpArray;
 

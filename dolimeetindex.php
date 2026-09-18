@@ -30,4 +30,7 @@ if (file_exists('dolimeet.main.inc.php')) {
     die('Include of dolimeet main fails');
 }
 
+// Load the session dashboard widgets on the home page (opt-in per type since #574).
+$moreParams = ['LoadSession' => 1];
+
 require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';

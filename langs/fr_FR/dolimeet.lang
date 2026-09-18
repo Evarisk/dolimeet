@@ -30,6 +30,53 @@ DoliMeetDescriptionLong = Suivi des réunions, sessions de formation, audit
 ContactPublicInterfaceEnabled             = Activer l'interface publique d'ajout de contact au contrat
 ContactPublicInterfaceEnabledDescription  = Permet aux contacts externes d'être ajoutés aux contrats via une interface publique sécurisée
 
+# Financial and pedagogical report - Bilan pédagogique et financier
+FinancialAndPedagogicalReport        = Bilan pédagogique et financier
+FinancialAndPedagogicalReportInitial = BPF
+
+# Tags - catégories
+BPFTagC     = BPF
+BPFTagC1    = BPF-C1-EFS
+BPFTagC1bis = BPF-C1-OGFFF
+BPFTagC1a   = BPF-C1a-OGFFF-CT-APP
+BPFTagC1b   = BPF-C1b-OGFFF-CT-PRO
+BPFTagC1c   = BPF-C1c-OGFFF-Pro-A
+BPFTagC1d   = BPF-C1d-OGFFF-CIF-PTP
+BPFTagC1e   = BPF-C1e-OGFFF-CPF
+BPFTagC1f   = BPF-C1f-OGFFF-CSP/POEI
+BPFTagC1g   = BPF-C1g-OGFFF-DSTNS
+BPFTagC1h   = BPF-C1h-OGFFF-PDC/AD
+BPFTagC3    = BPF-C3-PPFA
+BPFTagC4    = BPF-C4-PPFPS-IE
+BPFTagC5    = BPF-C5-PPFPS-E
+BPFTagC6    = BPF-C6-PPFPS-CR
+BPFTagC7    = BPF-C7-PPFPS-FT
+BPFTagC8    = BPF-C8-PPFPS-ARP
+BPFTagC9    = BPF-C9-CT-PTI
+BPFTagC10   = BPF-C10-CT-AOF
+BPFTagC11   = BPF-C11-APTFP
+
+BPFTagCDescription     = Bilan pédagogique et financier
+BPFTagC1Description    = <b>1</b> - Entreprises pour la formation de leurs salariés
+BPFTagC1bisDescription = Organismes gestionnaires des fonds de la formation professionnelle pour des actions dispensées dans le cadre
+BPFTagC1aDescription   = <b>a</b> - Contrats d'apprentissage
+BPFTagC1bDescription   = <b>b</b> - Contrats de professionnalisation
+BPFTagC1cDescription   = <b>c</b> - Promotion ou de la reconversion par alternance
+BPFTagC1dDescription   = <b>d</b> - Congés individuels de formation et des projets de transition professionnelle
+BPFTagC1eDescription   = <b>e</b> - Compte personnel de formation
+BPFTagC1fDescription   = <b>f</b> - Dispositifs spécifiques pour les personnes en recherche d’emploi (CSP, POEI, etc.)
+BPFTagC1gDescription   = <b>g</b> - Dispositifs spécifiques pour les travailleurs non-salariés
+BPFTagC1hDescription   = <b>h</b> - Plan de développement des compétences ou d’autres dispositifs
+BPFTagC3Description    = <b>3</b> - Pouvoirs publics pour la formation de leurs agents (État, collectivités territoriales, établissements publics à caractère administratif)
+BPFTagC4Description    = <b>4</b> - Pouvoirs publics pour la formation de publics spécifiques : Instances européennes
+BPFTagC5Description    = <b>5</b> - Pouvoirs publics pour la formation de publics spécifiques : État
+BPFTagC6Description    = <b>6</b> - Pouvoirs publics pour la formation de publics spécifiques : Conseils régionaux
+BPFTagC7Description    = <b>7</b> - Pouvoirs publics pour la formation de publics spécifiques : France travail (ex Pôle emploi)
+BPFTagC8Description    = <b>8</b> - Pouvoirs publics pour la formation de publics spécifiques : Autres ressources publiques
+BPFTagC9Description    = <b>9</b> - Contrats conclus avec des personnes à titre individuel et à leurs frais
+BPFTagC10Description   = <b>10</b> - Contrats conclus avec d’autres organismes de formation (y compris CFA)
+BPFTagC11Description   = <b>11</b> - Autres produits au titre de la formation professionnelle
+
 # Setup - Réglages
 SatisfactionSurvey                          = Enquête de satisfaction
 SessiontrainerSatisfactionSurvey            = Enquête de satisfaction formateur
@@ -40,9 +87,12 @@ CustomerSatisfactionSurvey                  = Enquête de satisfaction client
 CustomerSatisfactionSurveyDescription       = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction client
 BillingSatisfactionSurvey                   = Enquête de satisfaction commanditaire/OPCO
 BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire/OPCO
+SatisfactionSurveyEmailTemplate             = Modèle d'email d'envoi
+SatisfactionSurveyReminderEmailTemplate     = Modèle d'email de relance
 
 # Formation - Formation
 TrainingContract                    = Convention de formation
+TrainingContracts                   = Conventions de formation
 PracticalGuide                      = Guide pratique
 WelcomeBooklet                      = Livret d'accueil
 RulesOfProcedure                    = Réglement intérieur
@@ -127,6 +177,7 @@ OfTrainingsession                     = de la session de formation
 TrainingsessionList                   = Liste des sessions de formation
 TrainingSessionList                   = Liste des sessions de formation
 TrainingSessionCreate                 = Créer une session de formation
+Contract                              = Contrat
 NewTrainingsession                    = Nouvelle session de formation
 ModifyTrainingsession                 = Modifier une session de formation
 ActionFormation                       = Action de formation
@@ -266,6 +317,163 @@ MeetingAttendance                    = Participation aux réunions
 TrainingsessionAttendance            = Participation aux sessions de formations
 AuditAttendance                      = Participation aux audits
 
+# Financial and pedagogical report - Bilan pédagogique et financier
+BPFTitlePartA     = A. IDENTIFICATION DE L'ORGANISME DE FORMATION
+BPFAddressPublic  = Acceptez-vous que cette adresse soit rendue publique
+BPFTitlePartB     = B. INFORMATIONS GÉNÉRALES
+BPFRemoteTraining = Avez-vous mis en œuvre, durant cette période, une (des) action(s) de formation en tout ou partie à distance (classes virtuelles, Elearning, etc.)
+
+BPFTitlePartC       = C. BILAN FINANCIER HORS TAXES : ORIGINE DES PRODUITS DE L’ORGANISME
+BPFTagC2Description = <b>2</b>  - Total des produits provenant des organismes gestionnaires des fonds de la formation (total des lignes a à h)
+BPFTotalPartC       = TOTAL DES PRODUITS RÉALISÉS AU TITRE DE LA FORMATION PROFESSIONNELLE (total des lignes 1 à 11)
+BPFCAPartC          = Part du chiffre d'affaires global réalisée dans le domaine de la formation professionnelle (en %%)
+
+BPFTitlePartD   = D. BILAN FINANCIER HORS TAXES : CHARGES DE L’ORGANISME
+BPFLabelPartD1  = Total des charges de l'organisme liées à l'activité de formation
+BPFLabelPartD1a = dont Salaires des formateurs
+BPFLabelPartD1b = dont Achats de prestation de formation et honoraires de formation
+BPFTitlePartE         = E. PERSONNES DISPENSANT DES HEURES DE FORMATION
+BPFLabelPartEInternal = Personnes de votre organisme (formateurs salariés, bénévoles, indépendants)
+BPFLabelPartEExternal = Personnes extérieures à votre organisme (sous-traitance, prestation, honoraires)
+
+BPFTitlePartF   = F. BILAN PÉDAGOGIQUE : STAGIAIRES BÉNÉFICIANT D’UNE FORMATION DISPENSÉE PAR L’ORGANISME ET APPRENTIS EN FORMATION
+BPFTitlePartF1  = F - 1. TYPE DE STAGIAIRES DE L’ORGANISME
+BPFLabelPartF1a = <b>a</b> - Salariés d’employeurs privés hors apprentis
+BPFLabelPartF1b = <b>b</b> - Apprentis
+BPFLabelPartF1c = <b>c</b> - Personnes en recherche d’emploi formées par votre organisme de formation
+BPFLabelPartF1d = <b>d</b> - Particuliers à leurs propres frais formés par votre organisme de formation
+BPFLabelPartF1e = <b>e</b> - Autres stagiaires
+BPFLabelPartF1  = <b>1</b> - TOTAL (a + b + c + d + e)
+
+BPFTitlePartF2 = F - 2. DONT ACTIVITÉ SOUS-TRAITÉE DE L’ORGANISME
+BPFLabelPartF2 = Stagiaires ou apprentis dont l’action a été confiée par votre organisme à un autre organisme
+
+BPFTitlePartF3        = F - 3. OBJECTIF GÉNÉRAL DES PRESTATIONS DISPENSÉES
+BPFLabelPartF3a       = <b>a</b> - Formations visant un diplôme, un titre à finalité professionnelle ou un CQP enregistré au RNCP
+BPFLabelPartF3aLevel68 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 6 à 8 (Licence, Master, diplôme d'ingénieur, Doctorat...)
+BPFLabelPartF3aLevel5 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 5 (BTS, DUT, écoles de formation sanitaire et sociale...)
+BPFLabelPartF3aLevel4 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 4 (BAC professionnel, BT, BP, BM...)
+BPFLabelPartF3aLevel3 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 3 (BEP, CAP...)
+BPFLabelPartF3aLevel2 = &nbsp;&nbsp;&nbsp;&nbsp;- dont de niveau 2
+BPFLabelPartF3aCQP    = &nbsp;&nbsp;&nbsp;&nbsp;- dont certificat de qualification professionnelle (CQP) sans niveau de qualification
+BPFLabelPartF3b       = <b>b</b> - Formations visant une certification (dont CQP) ou une habilitation enregistrée au répertoire spécifique (RS)
+BPFLabelPartF3c       = <b>c</b> - Formations visant un CQP non enregistré au RNCP ou au RS
+BPFLabelPartF3d       = <b>d</b> - Autres formations professionnelles
+BPFLabelPartF3e       = <b>e</b> - Bilans de compétences
+BPFLabelPartF3f       = <b>f</b> - Actions d'accompagnement à la VAE
+BPFLabelPartF3        = <b>3</b> - TOTAL (a + b + c + d + e + f)
+
+BPFTitlePartF4         = F - 4. SPÉCIALITÉS DE FORMATION
+BPFLabelPartF4Specialty = Spécialité %s
+BPFLabelPartF4Other    = Autres spécialités
+BPFLabelPartF4         = <b>4</b> - TOTAL
+
+# Dictionary - Dictionnaire
+GeneralTraining                 = Formations générales
+MultiScienceSpecialities        = Spécialités pluriscientifiques
+PhysicsAndChemistry             = Physique-chimie
+ChemistryBiology                = Chimie-biologie, biochimie
+NaturalSciences                 = Sciences naturelles (biologie-géologie)
+Mathematics                     = Mathématiques
+Physics                         = Physique
+Chemistry                       = Chimie
+EarthSciences                   = Sciences de la terre
+LifeSciences                    = Sciences de la vie
+MultiDiscHumanLaw               = Spécialités pluridisciplinaires, sciences humaines et droit
+Geography                       = Géographie
+Economy                         = Economie
+SocialSciences                  = Sciences sociales (y compris démographie, anthropologie)
+Psychology                      = Psychologie
+Linguistics                     = Linguistique
+History                         = Histoire
+PhilosophyEthics                = Philosophie, éthique et théologie
+LawPoliticalSciences            = Droit, sciences politiques
+LiteraryArtistic                = Spécialités littéraires et artistiques plurivalentes
+FrenchLiterature                = Français, littérature et civilisation française
+VisualArts                      = Arts plastiques
+MusicPerformingArts             = Musique, arts du spectacle
+OtherArtisticDisciplines        = Autres disciplines artistiques et spécialités artistiques plurivalentes
+AncientLanguages                = Langues et civilisations anciennes
+ModernLanguages                 = Langues vivantes, civilisations étrangères et régionales
+IndustrialTechnologies          = Technologies industrielles fondamentales (génie industriel, procédés de Transformation, spécialités à dominante fonctionnelle)
+IndustrialCommandTech           = Technologies de commandes des transformations industriels (automatismes et robotique industriels, informatique industrielle)
+AgronomyAgriculture             = Spécialités plurivalentes de l'agronomie et de l'agriculture
+PlantProduction                 = Productions végétales, cultures spécialisées (horticulture, viticulture, arboriculture fruitière...)
+AnimalProduction                = Productions animales, élevage spécialisé, aquaculture, soins aux animaux, y compris vétérinaire
+ForestsWildlifeFishing          = Forêts, espaces naturels, faune sauvage, pêche
+LandscapePlanning               = Aménagement paysager (parcs, jardins, espaces verts ...)
+MultiTechTransformations        = Spécialités pluritechnologiques des transformations
+AgroFoodCuisine                 = Agro-alimentaire, alimentation, cuisine
+ChemicalTransformations         = Transformations chimiques et apparentées (y compris industrie 345 Application des droits et statut des personnes pharmaceutique)
+Metallurgy                      = Métallurgie (y compris sidérurgie, fonderie, non ferreux...)
+BuildingMaterialsGlass          = Matériaux de construction, verre, céramique
+PlasticsComposites              = Plasturgie, matériaux composites
+PaperCardboard                  = Papier, carton
+EnergyClimateEngineering        = Energie, génie climatique (y compris énergie nucléaire, thermique, hydraulique)
+MultiTechConstructionWood       = Spécialités pluritechnologiques, génie civil, construction, bois
+MinesTopography                 = Mines et carrières, génie civil, topographie
+BuildingConstructionRoofing     = Bâtiment : construction et couverture
+BuildingFinishing               = Bâtiment : finitions
+WoodworkFurniture               = Travail du bois et de l'ameublement
+MultiTechSoftMaterials          = Spécialités pluritechnologiques matériaux souples
+Textile                         = Textile
+ClothingFashion                 = Habillement (y compris mode, couture)
+LeatherSkins                    = Cuirs et peaux
+MultiTechMechElec               = Spécialités pluritechnologiques mécanique-électricité (y compris maintenance mécano-électrique)
+GeneralMechanicsMachining       = Mécanique générale et de précision, usinage
+AutoEnginesMechanics            = Moteurs et mécanique auto
+AeroSpaceMechanics              = Mécanique aéronautique et spatiale
+MetalStructures                 = Structures métalliques (y compris soudure, carrosserie, coque bateau, cellule avion)
+ElectricityElectronics          = Electricité, électronique (non compris automatismes, productique)
+ServicesSpecialities            = Spécialités plurivalentes des services
+ExchangesManagementSpecialities = Spécialités plurivalentes des échanges et de la gestion (y compris administration générale des entreprises et des collectivités)
+TransportHandlingStorage        = Transports, manutention, magasinage
+CommerceSales                   = Commerce, vente
+FinanceBankInsurance            = Finances, banque, assurances
+AccountingManagement            = Comptabilité, gestion
+HumanResourcesManagement        = Ressources humaines, gestion du personnel, gestion de l'emploi
+CommunicationSpecialities       = Spécialités plurivalentes de la communication
+JournalismCommunication         = Journalisme, communication (y compris communication graphique et publicité)
+PrintingPublishingTechniques    = Techniques de l'imprimerie et de l'édition
+ImageSoundTechniques            = Techniques de l'image et du son, métiers connexes du spectacle
+SecretarialOffice               = Secrétariat, bureautique
+DocumentationLibraries          = Documentation, bibliothèques, administration des données
+InformationTechnology           = Informatique, traitement de l'information, réseaux de transmission des données
+HealthSpecialities              = Spécialités plurivalentes sanitaires et sociales
+Health                          = Santé
+SocialWork                      = Travail social
+EducationTraining               = Enseignement, formation
+HospitalityTourism              = Accueil, hôtellerie, tourisme
+CulturalSportsLeisure           = Animation culturelle, sportive et de loisirs
+PersonalCare                    = Coiffure, esthétique et autres spécialités des services aux personnes
+TerritoryPlanning               = Aménagement du territoire, développement, urbanisme
+HeritageProtection              = Protection et développement du patrimoine
+EnvironmentalSanitation         = Nettoyage, assainissement, protection de l'environnement
+Security                        = Sécurité des biens et des personnes, police, surveillance (y compris hygiène et sécurité)
+LegalRights                     = Application des droits et statut des personnes
+MilitarySpecialties             = Spécialités militaires
+MultipleSkills                  = Spécialités concernant plusieurs capacités
+SportsPractices                 = Pratiques sportives (y compris : arts martiaux)
+MentalDevelopment               = Développement des capacités mentales et apprentissages de base
+BehavioralDevelopment           = Développement des capacités comportementales et relationnelles
+OrganizationalDevelopment       = Développement des capacités individuelles d'organisation
+SocialIntegration               = Développement des capacités d'orientation, d'insertion ou de réinsertion sociales
+LeisureActivities               = Jeux et activités spécifiques de loisirs
+DomesticEconomy                 = Economie et activités domestiques
+FamilyLife                      = Vie familiale, vie sociale et autres formations au développement personnel
+
+BPFTitlePartG  = G. BILAN PÉDAGOGIQUE : STAGIAIRES DONT LA FORMATION A ÉTÉ CONFIÉE A VOTRE ORGANISME PAR UN AUTRE ORGANISME DE FORMATION
+BPFLabelPartG5 = Formations confiées à votre organisme par un autre organisme de formation
+
+BPFTitlePartH     = H. PERSONNE AYANT LA QUALITÉ DE DIRIGEANT
+BPFManagerStatus  = Qualité du dirigeant (Président, Gérant, Directeur, etc.)
+NameAndFirstName  = Nom et prénom
+ManagementStatus  = Qualité
+
+BPFTitlePartFooter         = PIED DE PAGE DU BILAN PÉDAGOGIQUE ET FINANCIER
+GeneratePDF                = Générer le PDF Cerfa
+NameAndPositionOfSignatory = Nom et qualité du signataire
+
 #
 # Email - Email
 #
@@ -274,6 +482,9 @@ AuditAttendance                      = Participation aux audits
 SatisfactionSurveyLabel              = DLM_Questionnaire_Satisfaction_%s
 SatisfactionSurveyTopic              = [__[MAIN_INFO_SOCIETE_NOM]__] Remise des liens de questionnaire de satisfaction %s pour la convention de formation __REF__
 SatisfactionSurveyContent            = Bonjour,<br /><br />Nous vous envoyons ce mail afin de vous mettre au courant des questionnaires de satisfaction %s liées avec votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br />Ci-dessous, vous trouverez un aperçu des questionnaires, incluant les détails pertinents :<br /><br />__DOLIMEET_CONTRACT_SURVEY_INFOS__<br /><br />Nous vous prions de bien vouloir transmettre ces liens aux parties concernées.<br />Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
+SatisfactionSurveyReminderLabel      = DLM_Relance_Questionnaire_Satisfaction_%s
+SatisfactionSurveyReminderTopic      = [__[MAIN_INFO_SOCIETE_NOM]__] Relance : questionnaire de satisfaction pour la convention de formation __REF__
+SatisfactionSurveyReminderContent    = Bonjour,<br /><br />Nous n'avons pas encore reçu votre réponse au questionnaire de satisfaction lié à votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br /><br />Vous pouvez y répondre en quelques minutes :<br /><a href="__DOLIMEET_SURVEY_LINK__">Répondre au questionnaire</a><br /><br />Si vous y avez déjà répondu, merci d'ignorer ce message.<p>Bien cordialement,<br /><br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
 CompletionCertificateDocumentLabel   = DLM_Certificat_Réalisation
 CompletionCertificateDocumentTopic   = [__[MAIN_INFO_SOCIETE_NOM]__] Remise du certificat de réalisation pour la convention de formation __REF__
 CompletionCertificateDocumentContent = Bonjour,<br /><br />Veuillez trouver en pièce jointe le certificat de réalisation lié à votre convention de formation "__REF__" - "__DOLIMEET_CONTRACT_LABEL__".<br><br />Nous restons à votre disposition pour toute information supplémentaire.<p>Bien cordialement,<br /><br />__USER_FULLNAME__<br />__USER_EMAIL__<br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
@@ -296,7 +507,12 @@ MissingDefaultUserPublicInterfaceConfig       = Aucun utilisateur n’est défin
 #
 
 # Data - Donnée
-ErrorMissingFormationServiceConfig = Erreur : configuration des services de formation manquantes<br><a href="../../custom/dolimeet/admin/setup.php#formation">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorMissingFormationServiceConfig   = Erreur : configuration des services de formation manquantes<br><a href="../../custom/dolimeet/admin/setup.php#formation">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorNoFormationServiceFound         = Erreur : aucun service de formation exploitable n'a été trouvé. Vérifiez que vos services sont rattachés à la catégorie principale des services de formation et que la durée cumulée de leurs sessions modèles est égale à la durée du service.<br><a href="%s">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorFormationNoteNoLine             = Erreur : la note de formation de %s n'a pas pu être générée car ce document ne contient aucune ligne de service. Ajoutez au moins un service de formation puis relancez l'action.
+ErrorFormationServiceNoModelSession  = Erreur : aucune session modèle n'est rattachée au service de formation « %s ». Créez au moins une session modèle pour ce service dans le projet des modèles de sessions de formation.
+ErrorFormationTrainingConfigMissing  = Erreur : configuration des formations incomplète (catégorie principale des services de formation et/ou projet des modèles de sessions de formation non renseignés).<br><a href="%s">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
+ErrorFormationVariousCategoryMissing = Erreur : configuration des formations incomplète (catégorie principale des services divers de formation non renseignée).<br><a href="%s">Veuillez cliquer ici pour vous rendre sur la page de configuration</a>
 
 
 
@@ -305,8 +521,7 @@ ErrorMissingFormationServiceConfig = Erreur : configuration des services de form
 #
 
 # Data - Donnée
-TrainingOrganizationNumber        = Numéro de déclaration de l\'organisme de formation
-TrainingOrganizationNumberTooltip = Renseignez ici votre numéro de déclaration si vous êtes reconnu comme organisme de formation
+TrainingOrganizationNumber        = Numéro de déclaration de l'organisme de formation
 SocietyAttendants                 = Tiers des participants externe
 DateAndTime                       = Date et horaire
 SignAttendanceSheetOnline         = Signer la feuille de présence en ligne
@@ -354,3 +569,39 @@ TrainingStart                       = %s
 TrainingEnd                         = au %s
 TrainingDuration                    = pour une durée de %s heure(s) <sup>2</sup>
 TrainingLegalNotice                 = Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m’engage à conserver l’ensemble des pièces justificatives qui ont permis d’établir le présent certificat pendant une durée de 3 ans à compter de la fin de l’année du dernier paiement. En cas de cofinancement des fonds européens la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.
+
+# Survey reminder - Relance des questionnaires
+SurveyReminderCronLabel              = Relance des questionnaires de satisfaction non répondus
+SurveyReminderCronComment            = Renvoie le lien du questionnaire aux participants qui n'y ont pas encore répondu, tous les DOLIMEET_SATISFACTION_SURVEY_REMINDER_DELAY jours et au plus DOLIMEET_SATISFACTION_SURVEY_REMINDER_MAX fois
+SurveyReminderDigiQualiRequired      = DigiQuali 1.11.0 ou supérieur est nécessaire pour relancer les questionnaires
+SurveyReminderNoSheetConfigured      = Aucun modèle de questionnaire de satisfaction n'est configuré, il n'y a rien à relancer
+SurveyReminderNothingToSend          = Aucun questionnaire à relancer
+SurveyReminderResult                 = %d relance(s) envoyée(s), %d ignorée(s)
+SurveyReminderDelay                  = Délai entre deux relances (jours)
+SurveyReminderMax                    = Nombre maximum de relances par questionnaire
+SurveyReminderDisabled               = Les relances sont désactivées : le nombre maximum de relances est à zéro
+Questionnaires                       = Questionnaires
+SurveyReminder                       = Relance des questionnaires
+SurveyReminderMaxHelp                = Zéro désactive la relance : aucun rappel ne sera envoyé
+SurveyReminderCronNotInstalled       = La tâche planifiée de relance n'existe pas encore. Réactivez le module DoliMeet pour la créer.
+SurveyReminderCronDisabled           = <b>Attention :</b> la tâche planifiée de relance n'est pas activée, aucun email automatique ne sera envoyé. %s
+SurveyReminderCronEnabled            = La tâche planifiée de relance est activée. %s
+SurveyReminderCronLink               = Voir la tâche planifiée
+NbSessions                           = Sessions
+TraineeSignatures                    = Signatures stagiaires
+TrainerSignatures                    = Signatures formateurs
+TraineeSurveyReminder                = Questionnaire stagiaire : dernière relance
+TraineeSurveyState                   = Questionnaire stagiaire : état
+TrainerSurveyReminder                = Questionnaire formateur : dernière relance
+TrainerSurveyState                   = Questionnaire formateur : état
+BillingSurveyReminder                = Questionnaire commanditaire : dernière relance
+BillingSurveyState                   = Questionnaire commanditaire : état
+SignatureStateNothing                = Rien
+SignatureStateStarted                = Démarré
+SignatureStateSigned                 = Signé
+TrainerContacts                      = Formateur
+TraineeContacts                      = Stagiaire
+BillingContacts                      = Facturation convention
+FollowUpContacts                     = Suivi convention
+ContractInvoicing                    = Facturation
+ContractPayment                      = Paiement

@@ -51,7 +51,7 @@ function trainingsession_function_lib1()
     $templateProjectId = getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT');
 
     if (empty($mainCategory) || empty($templateProjectId)) {
-        setEventMessages($langs->transnoentities('Error3.1'), [], 'errors');
+        setEventMessages($langs->transnoentities('ErrorFormationTrainingConfigMissing', dol_buildpath('/dolimeet/admin/setup.php', 1) . '#formation'), [], 'errors');
         return -1;
     }
 
@@ -69,6 +69,7 @@ function trainingsession_function_lib1()
                 FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds
                 WHERE ds.fk_element = t.rowid
                     AND ds.model = 1
+                    AND ds.status >= 0
                     AND ds.element_type = \'service\'
                     AND ds.date_start IS NOT NULL
                     AND ds.date_end IS NOT NULL
@@ -92,7 +93,7 @@ function trainingsession_function_lib2()
     $variousCategory = getDolGlobalInt('DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY');
 
     if (empty($variousCategory)) {
-        setEventMessages($langs->transnoentities('Error3.1'), [], 'errors');
+        setEventMessages($langs->transnoentities('ErrorFormationVariousCategoryMissing', dol_buildpath('/dolimeet/admin/setup.php', 1) . '#formation'), [], 'errors');
         return -1;
     }
 
@@ -118,8 +119,8 @@ function get_formation_label(CommonObject $object): string
     $formationLabel = '';
     $productIds     = trainingsession_function_lib1();
     if (!is_array($productIds) || empty($productIds)) {
-        setEventMessages($langs->transnoentities('Error3'), [], 'errors');
-        return -1;
+        setEventMessages($langs->transnoentities('ErrorNoFormationServiceFound', dol_buildpath('/dolimeet/admin/setup.php', 1) . '#formation'), [], 'errors');
+        return '';
     }
 
     foreach ($object->lines as $line) {

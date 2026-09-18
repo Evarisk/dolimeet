@@ -99,7 +99,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $pdf->SetXY($this->marge_droite - 5, $posy);
         $pdf->Cell(0, 0, '', 0, 1);
         $pdf->Cell(0, 6, $langs->transnoentities('MadeAt') . ' : ' . $mysoc->town, 0, 1);
-        $pdf->Cell(0, 6, $langs->transnoentities('The') . ' : ' . dol_print_date(dol_now(), 'dayhour', 'tzuser'), 0, 1);
+        $pdf->Cell(0, 6, $langs->transnoentities('The') . ' : ' . dol_print_date(dol_now(), 'dayhour', 'tzuserrel'), 0, 1);
 
         $pdf->SetXY($posX, $posy + 5);
         $signatureStartY = $pdf->GetY();
@@ -240,8 +240,8 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $companyName    = $mysoc->name;
         $formationLabel = $object->formationLabel;
         $contractRef    = $object->ref;
-        $trainingStart  = dol_print_date($object->date_start, 'day', 'tzuser');
-        $trainingEnd    = dol_print_date($object->date_end, 'day', 'tzuser');
+        $trainingStart  = dol_print_date($object->date_start, 'day', 'tzuserrel');
+        $trainingEnd    = dol_print_date($object->date_end, 'day', 'tzuserrel');
         $totalHours     = convertSecondToTime($object->duration, 'allhourmin');
         $actionName     = $langs->trans($trainingSessionDicts[$object->array_options['options_trainingsession_type']]->label);
         $issuerName     = $userTmp->firstname . ' ' . $userTmp->lastname;
