@@ -1,28 +1,40 @@
-# [DoliMeet] [23.0.0] - Certificat de complétion - Workflow formation enrichi
+# [DoliMeet] [23.1.0] - Bilan Pédagogique et Financier - Suivi des questionnaires
 
-Description : Cette version introduit la génération PDF du certificat de complétion, refond le tableau de bord pour des graphes plus performants, ajoute le déclenchement automatique de mails sur action, et corrige de nombreux points sur les contrats, les sessions et les templates.
+Description : Cette version apporte le Bilan Pédagogique et Financier (tableau de bord et PDF Cerfa 10443*17), le suivi des questionnaires de satisfaction avec relances automatiques, la liste des contrats de formation et ses indicateurs, ainsi qu'une longue série de corrections sur les sessions, les notes de formation et la compatibilité PHP 8.
 
 ## Nouvelles fonctionnalités et innovations
 
-### Certificat de complétion
+### Bilan Pédagogique et Financier
 
-* Nouveau modèle PDF de certificat de complétion (`completioncertificatedocument`).
-* Génération automatique : `write_file` opérationnel, traductions des clés PDF en place.
-* Plusieurs itérations de correctifs pour finaliser le rendu du certificat.
-
-<!-- 📸 Ajouter une screenshot ici -->
-
-### Triggers et templates de mail
-
-* Nouveau trigger DoliMeet et modèle de mail associé : possibilité de configurer un envoi automatique sur événement métier.
-* Bouton « Envoyer un mail » directement sur l'action, ouvrant le sondage de satisfaction dans un nouvel onglet.
-* Statuts personnalisés (custom status) ajoutés sur les actions DoliMeet.
+* Nouveau tableau de bord « rapport financier et pédagogique » et sa page de configuration.
+* Génération du PDF Cerfa 10443*17 avec les cadres D, E, F, G et H.
+* Dictionnaire dédié pour la partie F2 et pourcentage de chiffre d'affaires sur la partie C.
+* Le rapport garde une structure complète même quand l'exercice ne porte aucune donnée.
 
 <!-- 📸 Ajouter une screenshot ici -->
 
-### Tableau de bord
+### Suivi des questionnaires de satisfaction
 
-* Refonte du dashboard pour de meilleures performances et préparation de l'ajout de nouveaux graphes.
+* Onglet de configuration des questionnaires et de leurs réglages de relance.
+* Modèles de mail d'envoi et de relance définissables par questionnaire.
+* Tâche planifiée de relance des questionnaires restés sans réponse.
+
+<!-- 📸 Ajouter une screenshot ici -->
+
+### Liste des contrats de formation
+
+* Nouvelle entrée dans le menu DoliMeet.
+* Indicateurs de formation, contacts et facturation directement sur la liste.
+
+<!-- 📸 Ajouter une screenshot ici -->
+
+### Sessions et contacts
+
+* Action de signature de masse depuis la liste des sessions.
+* Nom du document de signature affiché par type de session.
+* Nombre de formations affiché sur la liste des contacts.
+* Nouveau trigger `CONTRAT_DELETE_CONTACT`, miroir de l'ajout de contact.
+* L'utilisateur par défaut de l'interface publique reçoit le droit `societe.contact.creer`.
 
 <!-- 📸 Ajouter une screenshot ici -->
 
@@ -30,74 +42,115 @@ Description : Cette version introduit la génération PDF du certificat de compl
 
 ## Améliorations & corrections
 
-### Sessions et formations
+### Propositions commerciales de formation
 
-* Filtre de durée sur les sessions ignore désormais les valeurs `0`.
-* Correction d'un fatal `getNomUrl` sur la liste de sessions.
-* Gestion des sessions sur template améliorée.
-* `update_formation_datas` : action admin améliorée.
+* La description du produit se remplit de nouveau à l'ajout d'une ligne : le hook ne remplaçait plus le `<select>` produit, ce qui détruisait le `change()` posé par le cœur et empêchait l'appel AJAX qui alimente description, prix et TVA.
+* La note publique de formation se rafraîchit sur `LINEPROPAL_MODIFY` et non `LINEPROPAL_UPDATE`.
+* Durées gonflées et sessions dupliquées dans la note publique corrigées (les sessions du contrat ne sont plus relues à chaque ligne).
+* Le libellé du produit prend le relais quand la description de la ligne de service est vide.
+* L'objet de la formation n'est plus vide sur la note de contrat.
+* La note de formation est construite à partir des lignes réellement utilisées.
 
-### Contrats
+### Sessions
 
-* Bannière de contrat corrigée et compatibilité PHP 8 assurée.
+* Plus de page blanche quand `object_type` est absent ou inconnu, ni de fatal sur un `object_type` corrompu.
+* Le compteur de participants est initialisé avant d'être incrémenté.
+* Le statut « Signé » apparaît dès que tous les participants ont signé.
+* La session de formation redevient un objet liable.
+* Lecture de `$_POST['fk_soc']` sécurisée sur le formulaire de création.
+* Création des tables `llx_categorie_*` manquantes pour les sous-types de session, et `setCategories` routé sur `session`.
+* Le comptage de sessions est ignoré pour les objets sans clé étrangère de session.
 
-### Bibliothèques et hooks
+### Tableau de bord
 
-* Vérification du type de source de contact ajoutée avant traitement (évite des fatals quand la source n'est pas définie).
-* Override de `listeContact` corrigé (override correct au lieu d'un appel direct).
-* Séparation entre service de formation et autres services dans une fonction de bibliothèque dédiée.
-* Logique de création du sondage de satisfaction corrigée (ne se déclenchait pas dans certains cas).
+* Les widgets de session se chargent sur la page d'accueil DoliMeet.
+* Les compteurs de signataires sont agrégés en SQL.
+* Plus de `TypeError` ni de `foreach` sur données vides quand aucune session n'existe.
 
-### PDF Attendance
+### Contrats et triggers
 
-* Document de feuille de présence corrigé.
+* `CONTRACT_CREATE` : le `fetch()` de contact inutile sur `mandatory_signature` est supprimé et `dolibarr_lib.php` est chargé sur tous les chemins.
+* Le nettoyage des signataires sur `CONTRAT_DELETE_CONTACT` est conditionné aux sessions en brouillon, et non au type de formation.
 
-### Admin
+### Hooks et bibliothèques
 
-* Token manquant ajouté sur une action admin.
-* Erreur sur `satisfactionSurveys` corrigée.
+* Le questionnaire de satisfaction est filtré sur la fiche configurée pour le rôle du contact.
+* Garde sur la décoration du libellé de l'extrafield propale, et retrait du `trainingsession_service` déprécié.
+* Plus d'erreur SQL dans `completeTabsHead` quand l'objet est un ticket.
+* Les sessions supprimées sont exclues du calcul de durée des services de formation.
 
-### Module / configuration
+### Traductions, PHP 8 et configuration
 
-* Inclusions manquantes pour Dolistore ajoutées.
-* `completioncertificatedocument` : document manquant ajouté à l'install.
-* Paramètres manquants dans `conf` ajoutés.
-* Menu et droits améliorés.
-* Fatal sur substitution corrigé (vérification d'array manquante).
-* Fatal `require_once` manquant corrigé.
+* Traduction fr_FR manquante de la clé `Contract` ajoutée, elle restait en anglais dans tous les modules.
+* Résultats de `trainingsession_function_lib1/lib2` ramenés à un tableau pour l'union PHP 8.
+* Type nullable explicite sur `set_public_note` (dépréciation PHP 8.4) et warning `$out` corrigé.
+* Les entités ne s'affichent plus brutes dans la notice de tâche planifiée.
 
-### Actions DoliMeet
+### Intégration continue
 
-* Warning sur la clé `opco_financing` corrigé.
+* Les assets sont compilés par le socle Saturne, le gulpfile local est supprimé.
+* Vérification des assets compilés à chaque push, en mode `verify` depuis que le robot ne peut plus pousser sur `develop`.
 
-### Traductions
+---
 
-* Trad ajoutée pour `MandatorySignature`.
+## Comparaison des versions [23.0.0](https://github.com/Evarisk/dolimeet/compare/23.0.0...23.1.0) et 23.1.0
 
-### Code
-
-* Plusieurs passes de nettoyage des classes (`[Class] core: clean code`).
-
-## Comparaison des versions [21.0.0](https://github.com/Evarisk/dolimeet/compare/21.0.0...23.0.0) et 23.0.0
-
-* [#823] [Lang] add: trad for MandatorySignature [`7c48730`](https://github.com/Evarisk/dolimeet/commit/7c48730)
-* [#815] [Contract] fix: banner and php8 [`66d8b77`](https://github.com/Evarisk/dolimeet/commit/66d8b77)
-* [#814] [Hook] fix: logic issue on check for create survey satisfaction [`498339c`](https://github.com/Evarisk/dolimeet/commit/498339c)
-* [#812] [Dashboard] fix: rework for more performance and prepare other graphs [`5fcee3a`](https://github.com/Evarisk/dolimeet/commit/5fcee3a)
-* [#811] [Lib] fix: need to override listeContact functions [`ce8ce88`](https://github.com/Evarisk/dolimeet/commit/ce8ce88)
-* [#810] [ActionDolimeet] fix: warning opco_financing key [`b1dfff6`](https://github.com/Evarisk/dolimeet/commit/b1dfff6)
-* [#808] [Lib] fix: change function for separate formation service and others [`bfc60c4`](https://github.com/Evarisk/dolimeet/commit/bfc60c4)
-* [#807] [Admin] fix: error on satisfactionSurveys [`74059c7`](https://github.com/Evarisk/dolimeet/commit/74059c7)
-* [#806] [Session] fix: need to ignore 0 on duration filter [`2098e9e`](https://github.com/Evarisk/dolimeet/commit/2098e9e)
-* [#804] [ActionsDolimeet] add: trigger and mail model [`9570ad7`](https://github.com/Evarisk/dolimeet/commit/9570ad7)
-* [#795] [PDF] fix: attendance sheet document [`2ad6eda`](https://github.com/Evarisk/dolimeet/commit/2ad6eda)
-* [#794] [ActionsDolimeet] add: custom status, send mail button [`b180b49`](https://github.com/Evarisk/dolimeet/commit/b180b49) [`ec5d507`](https://github.com/Evarisk/dolimeet/commit/ec5d507)
-* [#792] [PDF] add: completion certificate pdf model [`60bbc8a`](https://github.com/Evarisk/dolimeet/commit/60bbc8a) [`8c2ac4f`](https://github.com/Evarisk/dolimeet/commit/8c2ac4f) [`2e1744b`](https://github.com/Evarisk/dolimeet/commit/2e1744b) [`3c5b3a4`](https://github.com/Evarisk/dolimeet/commit/3c5b3a4) [`688d3fd`](https://github.com/Evarisk/dolimeet/commit/688d3fd) [`66a615e`](https://github.com/Evarisk/dolimeet/commit/66a615e)
-* [#756] [Lib] fix: need to check contact source type [`c59d568`](https://github.com/Evarisk/dolimeet/commit/c59d568)
-* [#709] [Admin] fix: improve action update_formation_datas [`2440dc0`](https://github.com/Evarisk/dolimeet/commit/2440dc0)
-* [#2270] [SessionClass] fix: fatal getnomurl session list [`a0ccb29`](https://github.com/Evarisk/dolimeet/commit/a0ccb29)
-* [Mod] fix: missing parameters, menu/rights, dolistore include [`862a608`](https://github.com/Evarisk/dolimeet/commit/862a608) [`d67f37c`](https://github.com/Evarisk/dolimeet/commit/d67f37c) [`4cf78f6`](https://github.com/Evarisk/dolimeet/commit/4cf78f6) [`043397d`](https://github.com/Evarisk/dolimeet/commit/043397d)
-* [Substitution/Lib] fix: array check + missing require_once [`d58751a`](https://github.com/Evarisk/dolimeet/commit/d58751a) [`13971c5`](https://github.com/Evarisk/dolimeet/commit/13971c5)
-* [Session] fix: management on session template [`036376f`](https://github.com/Evarisk/dolimeet/commit/036376f)
-* [Admin] fix: missing token in action [`e07677b`](https://github.com/Evarisk/dolimeet/commit/e07677b)
-* [Class] core: clean code [`4b4962a`](https://github.com/Evarisk/dolimeet/commit/4b4962a) (et 4 commits associés)
+* [#905] [CI] fix: basculer les assets en mode verify, le robot ne peut plus pousser [`5ff84c4`](https://github.com/Evarisk/dolimeet/commit/5ff84c4)
+* [#903] [CI] feat: verifier les assets compiles a chaque push [`c8afc19`](https://github.com/Evarisk/dolimeet/commit/c8afc19)
+* [#901] [CI] rework: compiler les assets via le socle, supprimer le gulpfile local [`5001d4e`](https://github.com/Evarisk/dolimeet/commit/5001d4e)
+* [#898] [Session] fix: page blanche quand object_type est absent ou inconnu [`aafc128`](https://github.com/Evarisk/dolimeet/commit/aafc128)
+* [#896] [TrainingSession] fix: la session de formation redevient un objet liable [`90cd55b`](https://github.com/Evarisk/dolimeet/commit/90cd55b)
+* [#894] [Formation] fix: build the formation note from the lines actually used [`c4b3c2a`](https://github.com/Evarisk/dolimeet/commit/c4b3c2a)
+* [#880] [Setup] fix: entities shown raw in the scheduled job notice [`e3f072f`](https://github.com/Evarisk/dolimeet/commit/e3f072f)
+* [#880] [Contract] feat: contacts and invoicing on the training contract list [`c9aabc6`](https://github.com/Evarisk/dolimeet/commit/c9aabc6)
+* [#880] [Contract] feat: training indicators on the training contract list [`fad6f80`](https://github.com/Evarisk/dolimeet/commit/fad6f80)
+* [#880] [Setup] feat: questionnaire configuration tab and its reminder settings [`1f64552`](https://github.com/Evarisk/dolimeet/commit/1f64552)
+* [#880] [Cron] feat: scheduled reminder of the unanswered satisfaction surveys [`043ed28`](https://github.com/Evarisk/dolimeet/commit/043ed28)
+* [#880] [Setup] feat: send and reminder mail models per satisfaction survey [`57941b8`](https://github.com/Evarisk/dolimeet/commit/57941b8)
+* [#880] [Menu] feat: training contract list in the DoliMeet menu [`b2476b8`](https://github.com/Evarisk/dolimeet/commit/b2476b8)
+* [#885] [BPF] fix: give the report a full shape when the fiscal year carries no data [`0aff4f6`](https://github.com/Evarisk/dolimeet/commit/0aff4f6)
+* [#883] [Session] fix: initialise the attendant counter before incrementing it [`1ef8d7f`](https://github.com/Evarisk/dolimeet/commit/1ef8d7f)
+* [#778] [Session] feat: name the signature document of each session type on the list [`5718815`](https://github.com/Evarisk/dolimeet/commit/5718815)
+* [#880] [Session] feat: enable the mass sign action on the session list [`9805fa8`](https://github.com/Evarisk/dolimeet/commit/9805fa8)
+* fix: resolve undefined variable $out warning in actions_dolimeet [`8cb3a79`](https://github.com/Evarisk/dolimeet/commit/8cb3a79)
+* [#873] [Hook] fix: filter the satisfaction survey on the sheet configured for the contact role [`124bae6`](https://github.com/Evarisk/dolimeet/commit/124bae6)
+* [#875] [Lang] fix: add the missing fr_FR translation of the Contract key [`2d916de`](https://github.com/Evarisk/dolimeet/commit/2d916de)
+* Fix Invalid argument for foreach in dashboard for signatories when no data [`2ee00a5`](https://github.com/Evarisk/dolimeet/commit/2ee00a5)
+* Fix TypeError in session dashboard when no sessions exist [`67c6047`](https://github.com/Evarisk/dolimeet/commit/67c6047)
+* [#868] [JS] fix: keep core change() handler on propal product combo [`f820386`](https://github.com/Evarisk/dolimeet/commit/f820386)
+* [#866] [Trigger] fix: drop useless Contact fetch on CONTRACT_CREATE mandatory_signature [`126b230`](https://github.com/Evarisk/dolimeet/commit/126b230)
+* [#864] [Trigger] fix: load dolibarr_lib.php on every CONTRACT_CREATE path [`4495b3e`](https://github.com/Evarisk/dolimeet/commit/4495b3e)
+* [#862] [Session] fix: skip session count for objects without a session FK [`2642dbc`](https://github.com/Evarisk/dolimeet/commit/2642dbc)
+* [#858] [Session] fix: aggregate signatory dashboard counts in SQL [`3e971b2`](https://github.com/Evarisk/dolimeet/commit/3e971b2)
+* [#858] [Dashboard] fix: load session widgets on DoliMeet home page [`ea305ce`](https://github.com/Evarisk/dolimeet/commit/ea305ce)
+* [#856] [Lib] fix: exclude deleted sessions from training service duration match [`972d3f4`](https://github.com/Evarisk/dolimeet/commit/972d3f4)
+* [#854] [Session] fix: guard $_POST['fk_soc'] read on session create form [`e236660`](https://github.com/Evarisk/dolimeet/commit/e236660)
+* [#852] [Session] fix: create missing llx_categorie_* tables for session subtypes [`fdfcdaa`](https://github.com/Evarisk/dolimeet/commit/fdfcdaa)
+* fix: prevent sql error in completeTabsHead when object is a ticket [`f13967c`](https://github.com/Evarisk/dolimeet/commit/f13967c)
+* [#848] [Hook] fix: guard propal extrafield label decoration, drop deprecated trainingsession_service [`44be897`](https://github.com/Evarisk/dolimeet/commit/44be897)
+* [#845] [Trigger] fix: gate CONTRAT_DELETE_CONTACT signatory cleanup on draft sessions, not trainingsession_type [`cf3643e`](https://github.com/Evarisk/dolimeet/commit/cf3643e)
+* [#793] [Session] fix: show "Signé" status once all attendants have signed [`57c6262`](https://github.com/Evarisk/dolimeet/commit/57c6262)
+* [#741] [Lib] fix: empty 'objet de la formation' on contract note (use product_label) [`68e5d30`](https://github.com/Evarisk/dolimeet/commit/68e5d30)
+* [#816] [Trigger] add: CONTRAT_DELETE_CONTACT to mirror contact add [`79b3a34`](https://github.com/Evarisk/dolimeet/commit/79b3a34)
+* [Lib] fix: explicit nullable type for set_public_note $propal param (PHP 8.4 deprecation) [`dfa3994`](https://github.com/Evarisk/dolimeet/commit/dfa3994)
+* [#828] [Trigger] fix: listen to LINEPROPAL_MODIFY (not _UPDATE) for note refresh [`a77d9ab`](https://github.com/Evarisk/dolimeet/commit/a77d9ab)
+* [#828] [Trigger] fix: refresh formation public note on draft proposal line changes [`2283f4f`](https://github.com/Evarisk/dolimeet/commit/2283f4f)
+* [#705] [Trigger] fix: fallback to product label when description is empty on formation service lines [`dab3ba1`](https://github.com/Evarisk/dolimeet/commit/dab3ba1)
+* [#831] [Lib] fix: fetch contract sessions once to stop inflated durations and duplicated sessions in public note [`82f2ee3`](https://github.com/Evarisk/dolimeet/commit/82f2ee3)
+* [#813] [PublicInterface] add: grant societe.contact.creer to default public interface user [`4a403e7`](https://github.com/Evarisk/dolimeet/commit/4a403e7)
+* [Session] fix: route setCategories to 'session' to avoid missing llx_categorie_{element} table [`1033602`](https://github.com/Evarisk/dolimeet/commit/1033602)
+* [#826] [Session] fix: trainingsession card fatal on '?'-corrupted object_type [`023f50a`](https://github.com/Evarisk/dolimeet/commit/023f50a)
+* [#829] [BPF] add: génération du PDF Cerfa 10443*17 + cadres D/E/F/G/H [`416b872`](https://github.com/Evarisk/dolimeet/commit/416b872)
+* [ActionsDolimeet] fix: coerce trainingsession lib1/lib2 results to array for PHP 8 union [`bf5176b`](https://github.com/Evarisk/dolimeet/commit/bf5176b)
+* [#574] [Dashboard] add: C part missing CA percent [`957f190`](https://github.com/Evarisk/dolimeet/commit/957f190)
+* [#574] [Dashboard] add: dictonary for part F2 [`1c1a726`](https://github.com/Evarisk/dolimeet/commit/1c1a726)
+* [#574] [Dashboard] add: other BPF parts [`dd162d9`](https://github.com/Evarisk/dolimeet/commit/dd162d9)
+* [#574] [Dashboard] fix: date [`d6c2cdf`](https://github.com/Evarisk/dolimeet/commit/d6c2cdf)
+* [#574] [Dashboard] fix: missing include [`323baef`](https://github.com/Evarisk/dolimeet/commit/323baef)
+* [#574] [Dashboard] add: C part (WIP) [`608c405`](https://github.com/Evarisk/dolimeet/commit/608c405)
+* [#574] [Hook] fix: php8 [`8ab14c3`](https://github.com/Evarisk/dolimeet/commit/8ab14c3)
+* [#574] [Class] add: dashboard financial_and_pedagogical_report [`f2ea3cb`](https://github.com/Evarisk/dolimeet/commit/f2ea3cb)
+* [#574] [admin] add: financial_and_pedagogical_report [`4f37890`](https://github.com/Evarisk/dolimeet/commit/4f37890)
+* [#802] [Js] fix: moove js and remove console log [`40bdaf3`](https://github.com/Evarisk/dolimeet/commit/40bdaf3)
+* [#802] [ActionsDolimeet] add: number of formations on contact list [`6eccfa2`](https://github.com/Evarisk/dolimeet/commit/6eccfa2)
+* [#802] [ActionsDolimeet] add: number of formations on contact list [`8cd6c39`](https://github.com/Evarisk/dolimeet/commit/8cd6c39)
