@@ -178,7 +178,7 @@ class modDoliMeet extends DolibarrModules
 
         // Prerequisites.
         $this->phpmin                = [7, 4]; // Minimum version of PHP required by module.
-        $this->need_dolibarr_version = [16, 0]; // Minimum version of Dolibarr required by module.
+        $this->need_dolibarr_version = [23, 0]; // Minimum version of Dolibarr required by module.
 
         // Messages at activation.
         $this->warnings_activation     = []; // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','MX'='textmx'...).
