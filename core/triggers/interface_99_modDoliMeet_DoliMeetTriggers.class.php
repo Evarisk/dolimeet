@@ -47,7 +47,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $this->name        = preg_replace('/^Interface/i', '', get_class($this));
         $this->family      = 'demo';
         $this->description = 'DoliMeet triggers.';
-        $this->version     = '23.0.0';
+        $this->version     = '23.1.0';
         $this->picto       = 'dolimeet@dolimeet';
     }
 
@@ -231,6 +231,83 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 }
                 break;
 
+            case 'CONTRAT_DELETE_CONTACT' :
+                // Mirror of CONTRAT_ADD_CONTACT: when a contact is unlinked from a training contract, drop its
+                // signatory on the draft sessions and refresh the public note.
+                require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+                require_once __DIR__ . '/../../class/trainingsession.class.php';
+                require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+
+                // Gate on the presence of draft sessions, not on the trainingsession_type extrafield: it can be empty on formation contracts whose session signatories were created by TRAININGSESSION_CREATE.
+                $trainingSession  = new Trainingsession($this->db);
+                $trainingSessions = $trainingSession->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . Session::STATUS_DRAFT . ' AND t.fk_contrat = ' . $object->id]);
+                if (is_array($trainingSessions) && !empty($trainingSessions)) {
+                    // The trigger fires BEFORE the element_contact row is deleted: resolve the unlinked contact from the link id (still present)
+                    $linkId = (int) ($object->context['contact_id'] ?? 0);
+                    if ($linkId > 0) {
+                        $sql  = 'SELECT ec.fk_socpeople AS contactid, tc.code AS code, tc.source AS source';
+                        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'element_contact AS ec';
+                        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact AS tc ON tc.rowid = ec.fk_c_type_contact';
+                        $sql .= ' WHERE ec.rowid = ' . $linkId;
+                        $resql = $this->db->query($sql);
+                        if ($resql && $this->db->num_rows($resql) > 0) {
+                            $contactObj    = $this->db->fetch_object($resql);
+                            $contactID     = (int) $contactObj->contactid;
+                            $contactCode   = $contactObj->code;
+                            $contactSource = $contactObj->source;
+
+                            // Remove this specific contact's signatory from the contract draft sessions
+                            if ($contactCode == 'TRAINEE' || $contactCode == 'SESSIONTRAINER') {
+                                $signatory   = new SaturneSignature($this->db, 'dolimeet', $trainingSession->element);
+                                $role        = ($contactCode == 'TRAINEE') ? 'Trainee' : 'SessionTrainer';
+                                $elementType = ($contactSource == 'internal') ? 'user' : 'socpeople';
+
+                                foreach ($trainingSessions as $session) {
+                                    $signatories = $signatory->fetchAll('', '', 0, 0, ['customsql' => "fk_object = " . $session->id . " AND object_type = '" . $trainingSession->element . "' AND role = '" . $role . "' AND element_id = " . $contactID . " AND element_type = '" . $elementType . "' AND status = 1"]);
+                                    if (is_array($signatories) && !empty($signatories)) {
+                                        foreach ($signatories as $signatoryToDelete) {
+                                            $signatoryToDelete->setDeleted($user, true);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Refresh the public note, excluding the trainee being removed (formation note only; its link is not deleted yet)
+                            if ($contactCode == 'TRAINEE' && !empty($object->array_options['options_trainingsession_type'])) {
+                                $object->fetchObjectLinked(null, 'propal', $object->id, 'contrat');
+                                if (isset($object->linkedObjects['propal']) && !empty($object->linkedObjects['propal']) && count($object->linkedObjects['propal']) == 1) {
+                                    $propal = array_shift($object->linkedObjects['propal']);
+                                    set_public_note($object, $propal, '', $contactID);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+
+            case 'LINEPROPAL_INSERT' :
+            case 'LINEPROPAL_MODIFY' :
+            case 'LINEPROPAL_DELETE' :
+                // Keep the formation public note in sync on a draft proposal so the content is previewable before validation.
+                // NB: line update fires LINEPROPAL_MODIFY (not _UPDATE). PROPAL_MODIFY must NOT be used here, because
+                // set_public_note() calls update_note() which itself fires PROPAL_MODIFY -> infinite recursion.
+                require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+                require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
+
+                // $object is a PropaleLigne on LINEPROPAL_*
+                $propalId = !empty($object->fk_propal) ? $object->fk_propal : $object->id;
+                if ($propalId > 0) {
+                    $propal = new Propal($this->db);
+                    if ($propal->fetch($propalId) > 0) {
+                        $propal->fetch_lines();
+                        $propal->fetch_optionals();
+                        if ($propal->statut == Propal::STATUS_DRAFT && !empty($propal->array_options['options_trainingsession_type'])) {
+                            set_public_note($propal, $propal, 'PROPAL_CREATE');
+                        }
+                    }
+                }
+                break;
+
             case 'PROPAL_CREATE' :
                 if (GETPOST('options_trainingsession_type', 'int') > 0) {
 
@@ -255,7 +332,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $propalLine->fk_parent_line = 0;
                             $propalLine->fk_product     = $product->id;
                             $propalLine->product_label  = $product->label;
-                            $propalLine->desc           = $product->description;
+                            $propalLine->desc           = dol_strlen($product->description) > 0 ? $product->description : $product->label;
                             $propalLine->tva_tx         = $product->tva_tx;
                             $propalLine->qty            = 1;
                             $propalLine->rang           = $formationService['position'];
@@ -270,7 +347,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     set_public_note($object, $object, 'PROPAL_CREATE');
 
                     if ($error > 0) {
-                        setEventMessages('ErrorMissingFormationServiceConfig', [], 'errors');
+                        setEventMessages($langs->transnoentities('ErrorMissingFormationServiceConfig'), [], 'errors');
                         return -1;
                     }
                 }
@@ -280,6 +357,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 if (GETPOST('options_trainingsession_type', 'int') > 0) {
                     // Load DoliMeet libraries
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+                    require_once __DIR__ . '/../../lib/dolibarr_lib.php';
 
                     $propal       = new Propal($this->db);
                     $product      = new Product($this->db);
@@ -289,6 +367,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $langs->load('propal');
 
                     // Add formation services on contract (by default FOR_ADM_CF1, FOR_ADM_RI1)
+                    $error             = 0;
                     $formationServices = get_formation_service();
                     foreach ($formationServices as $formationService) {
                         if ($formationService['ref'] == 'FOR_ADM_CF1' || $formationService['ref'] == 'FOR_ADM_RI1') {
@@ -296,7 +375,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                             $result   = $product->fetch(getDolGlobalInt($confName));
 
                             if ($result > 0) {
-                                $contratLigne->description = $product->description;
+                                $contratLigne->description = dol_strlen($product->description) > 0 ? $product->description : $product->label;
                                 $contratLigne->subprice    = $product->price;
                                 $contratLigne->qty         = 1;
                                 $contratLigne->tva_tx      = $product->tva_tx;
@@ -304,8 +383,15 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                                 $contratLigne->rang        = $formationService['position'];
 
                                 $object->addline($contratLigne->description, $contratLigne->subprice, $contratLigne->qty, $contratLigne->tva_tx, 0.0, 0.0, $contratLigne->fk_product, 0.0, '', '', 'HT', 0.0, 0, null, 0, [], null, $contratLigne->rang);
+                            } else {
+                                $error++;
                             }
                         }
+                    }
+
+                    // Non blocking: the contract is still created, but its administrative services are missing
+                    if ($error > 0) {
+                        setEventMessages($langs->transnoentities('ErrorMissingFormationServiceConfig'), [], 'warnings');
                     }
 
                     // Create training session from propal
@@ -313,19 +399,18 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                         // Load DoliMeet libraries
                         require_once __DIR__ . '/../../class/trainingsession.class.php';
                         require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
-                        require_once __DIR__ . '/../../lib/dolibarr_lib.php';
 
                         $trainingSession = new Trainingsession($this->db);
 
                         $productIds = trainingsession_function_lib1();
                         if (!is_array($productIds) || empty($productIds)) {
-                            setEventMessages($langs->transnoentities('ErrorMissingFormationServiceConfig'), [], 'errors');
+                            setEventMessages($langs->transnoentities('ErrorNoFormationServiceFound', dol_buildpath('/dolimeet/admin/setup.php', 1) . '#formation'), [], 'errors');
                             return -1;
                         }
 
                         $propal->fetch($object->linked_objects['propal']);
                         if (!is_array($propal->lines) || empty($propal->lines)) {
-                            setEventMessages($langs->transnoentities('Error1'), [], 'errors');
+                            setEventMessages($langs->transnoentities('ErrorFormationNoteNoLine', $propal->ref), [], 'errors');
                             return -1;
                         }
                         foreach ($propal->lines as $line) {
@@ -335,7 +420,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                             $trainingSessions = $trainingSession->fetchAll('ASC', 'position', 0, 0, ['customsql' => 't.status = 1 AND t.model = 1 AND t.element_type = \'service\' AND t.fk_element = ' . $line->fk_product]);
                             if (!is_array($trainingSessions) || empty($trainingSessions)) {
-                                setEventMessages($langs->transnoentities('Error2'), [], 'errors');
+                                setEventMessages($langs->transnoentities('ErrorFormationServiceNoModelSession', $productIds[$line->fk_product]), [], 'errors');
                                 return -1;
                             }
 
@@ -360,11 +445,11 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                     $object->validate($user);
 
+                    // 'rowid' is the ID of the llx_element_contact link, not the ID of the contact
                     $contactSingle = listeContact($object, -1, 'internal', 0, 'SALESREPSIGN');
-
-                    $contact = new Contact($this->db);
-                    $contact->fetch($contactSingle[0]['rowid']);
-                    $contact->setValueFrom('mandatory_signature', 1, 'element_contact', $contactSingle[0]['rowid'], 'int', '', $user, '', '');
+                    if (is_array($contactSingle) && !empty($contactSingle)) {
+                        $object->setValueFrom('mandatory_signature', 1, 'element_contact', $contactSingle[0]['rowid'], 'int', '', $user, '', '');
+                    }
                 }
                 break;
         }

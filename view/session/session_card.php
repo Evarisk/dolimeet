@@ -32,6 +32,11 @@ if (file_exists('../../dolimeet.main.inc.php')) {
 
 // Get module parameters.
 $objectType = GETPOST('object_type', 'alpha');
+// Strip trailing '?...' that can leak in when an external caller appends '?action=create&backtopage=...'
+// to a create_url that already contained a query string (e.g., digiquali survey/control "+" button).
+if (strpos($objectType, '?') !== false) {
+    $objectType = strstr($objectType, '?', true);
+}
 
 // Load Dolibarr libraries.
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
@@ -41,6 +46,17 @@ require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
 // Load DoliMeet libraries.
+require_once __DIR__ . '/../../class/session.class.php';
+
+// $objectType vient de l'URL et sert a construire les chemins d'inclusion ci-dessous : sans ce
+// controle, un type absent ou inconnu fait echouer le require_once et laisse une page blanche
+if (!in_array($objectType, Session::SESSION_TYPES, true)) {
+    $langs->load('errors');
+    setEventMessages($langs->trans('ErrorBadValueForParameter', $objectType, 'object_type'), null, 'errors');
+    header('Location: ' . dol_buildpath('/custom/dolimeet/dolimeetindex.php?mainmenu=dolimeet', 1));
+    exit;
+}
+
 require_once __DIR__ . '/../../lib/dolimeet_' . $objectType . '.lib.php';
 require_once __DIR__ . '/../../class/' . $objectType . '.class.php';
 
@@ -164,7 +180,7 @@ if (empty($resHook)) {
     // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen.
     require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
-    // Actions set_thirdparty, set_project, set_contract
+    // Actions set_thirdparty, set_project, set_contrat
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 
     // Actions builddoc, forcebuilddoc, remove_file.
@@ -265,7 +281,7 @@ if ($action == 'create') {
             $_POST['date_endmin']  = $now['minutes'];
         }
 
-        if ($_POST['fk_soc'] == -1) {
+        if (GETPOSTISSET('fk_soc') && $_POST['fk_soc'] == -1) {
             $_POST['fk_soc'] = 0;
         }
     }
@@ -370,7 +386,9 @@ if (($id || $ref) && $action == 'edit') {
         }
     }
 
-    if ($_POST['fk_soc'] == -1) {
+    // The select posts -1 for "no thirdparty": normalised here so the filters built below read an empty
+    // value. The form is also reached in GET, where the key simply does not exist
+    if (GETPOSTISSET('fk_soc') && GETPOSTINT('fk_soc') == -1) {
         $_POST['fk_soc'] = 0;
     }
 
@@ -497,6 +515,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     $nbAttendantByRole = [];
     $nbAttendants      = 0;
     foreach ($attendantsRole as $attendantRole) {
+        // The counter has to exist before it is incremented: it was only initialised when the role had
+        // no attendant at all, so PHP 8 warned on the undefined key exactly when there was someone to count
+        $nbAttendantByRole[$attendantRole] = 0;
+
         $signatories = $signatory->fetchSignatory($attendantRole, $object->id, $object->element);
         if (is_array($signatories) && !empty($signatories)) {
             foreach ($signatories as $objectSignatory) {
@@ -504,8 +526,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
                     $nbAttendantByRole[$attendantRole]++;
                 }
             }
-        } else {
-            $nbAttendantByRole[$attendantRole] = 0;
         }
         if ($nbAttendantByRole[$attendantRole] == 0) {
             $mesg .= '<br>' . $langs->trans('NoAttendant', $langs->trans($attendantRole), $langs->transnoentities('The' . ucfirst($object->element)));

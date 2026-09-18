@@ -38,7 +38,7 @@ function dolimeet_admin_prepare_head(): array
     $h    = 0;
     $head = [];
 
-    $sessionObjectTypes = ['meeting' => 'comments', 'trainingsession' => 'people-arrows', 'audit' => 'tasks'];
+    $sessionObjectTypes = ['meeting' => 'comments', 'audit' => 'tasks', 'trainingsession' => 'people-arrows'];
     foreach ($sessionObjectTypes as $sessionObjectType => $picto) {
         if (!getDolGlobalInt('DOLIMEET_' . dol_strtoupper($sessionObjectType) . '_MENU_ENABLED')) {
             continue;
@@ -52,9 +52,19 @@ function dolimeet_admin_prepare_head(): array
         $h++;
     }
 
+    $head[$h][0] = dol_buildpath('dolimeet/admin/questionnaire.php', 1);
+    $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-poll pictofixedwidth"></i>' . $langs->trans('Questionnaires') : '<i class="fas fa-poll"></i>';
+    $head[$h][2] = 'questionnaire';
+    $h++;
+
     $head[$h][0] = dol_buildpath('saturne/admin/publicinterface.php', 1) . '?module_name=DoliMeet';
     $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-globe pictofixedwidth"></i>' . $langs->trans('PublicInterface') : '<i class="fas fa-globe"></i>';
     $head[$h][2] = 'publicinterface';
+    $h++;
+
+    $head[$h][0] = dol_buildpath('dolimeet/admin/financial_and_pedagogical_report.php', 1);
+    $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('FinancialAndPedagogicalReport') : '<i class="fas fa-file-alt"></i>';
+    $head[$h][2] = 'financial_and_pedagogical_report';
     $h++;
 
     $head[$h][0] = dol_buildpath('/saturne/admin/documents.php?module_name=DoliMeet', 1);

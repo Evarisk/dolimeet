@@ -56,3 +56,5 @@ UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionVAE';
 UPDATE llx_c_trainingsession_type SET active = '0' WHERE ref = 'ActionFormationApprentissage';
 
 ALTER TABLE llx_element_contact ADD mandatory_signature TINYINT AFTER element_id;
+
+ALTER TABLE llx_dolimeet_session ADD INDEX idx_dolimeet_session_fk_contrat (fk_contrat);

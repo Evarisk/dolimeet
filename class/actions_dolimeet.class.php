@@ -152,6 +152,17 @@ class ActionsDolimeet
             $this->resprints = $out;
         }
 
+        if (preg_match('/thirdpartycontact/', $parameters['context'])) {
+            $resourcesRequired = [
+                'js'  => '/custom/dolimeet/js/dolimeet.min.js'
+            ];
+
+            $out = '<!-- Includes JS added by module saturne -->';
+            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+
+            $this->resprints = $out;
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -191,6 +202,13 @@ class ActionsDolimeet
         }
 
         if (strpos($parameters['context'], 'propalcard') !== false) {
+            $propalExtraFieldsNames = ['trainingsession_type', 'trainingsession_location'];
+            foreach ($propalExtraFieldsNames as $propalExtraFieldsName) {
+                if (isset($extrafields->attributes['propal']['label'][$propalExtraFieldsName])) {
+                    $extrafields->attributes['propal']['label'][$propalExtraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label'][$propalExtraFieldsName]);
+                }
+            }
+
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
             } ?>
@@ -210,6 +228,8 @@ class ActionsDolimeet
 
         if (strpos($parameters['context'], 'productcard')) {
             global $extrafields, $object;
+
+            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
 
             if ($object->type == $object::TYPE_PRODUCT) {
                 $extrafields->attributes['product']['list']['syllabus'] = 0;
@@ -236,6 +256,19 @@ class ActionsDolimeet
     public function printFieldListOption(array $parameters): int
     {
         global $conf, $extrafields, $langs, $object;
+
+        // The training contract list carries indicator columns: the filter row keeps its cells aligned
+        if ($this->isTrainingContractList($parameters)) {
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $out = '';
+            foreach (array_keys($this->getTrainingContractIndicators()) as $indicatorAlias) {
+                $out .= '<td class="liste_titre"></td>';
+            }
+            $this->resprints = $out;
+
+            return 0;
+        }
 
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
             require_once __DIR__ . '/../../saturne/lib/object.lib.php';
@@ -340,23 +373,6 @@ class ActionsDolimeet
             <?php
         }
 
-        // Do something only for the current context.
-        if ($parameters['currentcontext'] == 'admincompany') {
-            $form      = new Form($db);
-            $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-            $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-            $trainingOrganizationNumberInput = '<input name="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" id="MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER" value="'. $conf->global->MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER .'">';
-            ?>
-            <script>
-                let trainingOrganizationNumberInput = $('<tr class="oddeven"><td><label for="training_organization_number"><?php print $picto . $form->textwithpicto($langs->trans('TrainingOrganizationNumber'), $langs->trans('TrainingOrganizationNumberTooltip'));?></label></td>');
-                trainingOrganizationNumberInput.append('<td>' + <?php echo json_encode($trainingOrganizationNumberInput) ; ?> + '</td></tr>');
-
-                let element = $('table:nth-child(1) .oddeven:last-child');
-                element.after(trainingOrganizationNumberInput);
-            </script>
-            <?php
-        }
-
         // Do something only for the current context
         if (preg_match('/contacttpl/', $parameters['context']) && preg_match('/contractcontactcard/', $parameters['context']) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             global $object;
@@ -389,9 +405,10 @@ class ActionsDolimeet
                                 arsort($surveyIDs);
                                 foreach ($surveyIDs as $surveyID) {
                                     $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
-                                    //$filter   = ' AND e.fk_sheet = ' . $conf->global->$confName;
                                     if (getDolGlobalInt($confName) > 0) {
-                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', '')) {
+                                        // Restrict to the survey built from the sheet configured for this contact role, otherwise a contact holding several roles shows the same survey on each of its rows
+                                        $filter = ' AND e.fk_sheet = ' . getDolGlobalInt($confName);
+                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
                                             $survey->fetch($surveyID);
                                             $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
@@ -651,15 +668,53 @@ class ActionsDolimeet
 
                 $productIds        = trainingsession_function_lib1();
                 $variousProductIds = trainingsession_function_lib2();
+                // lib1/lib2 return -1 (int) when their required global config is missing;
+                // coerce to [] so the array union below doesn't fatal on PHP 8 (array + int)
+                $productIds        = is_array($productIds) ? $productIds : [];
+                $variousProductIds = is_array($variousProductIds) ? $variousProductIds : [];
                 $out = Form::selectarray('idprod', $productIds + $variousProductIds, '', 1, 0, 0, '', 0, 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 ?>
                 <script>
                     $(document).ready(function() {
-                        $('#idprod').replaceWith(<?php echo json_encode($out); ?>);
+                        // Only swap the <option> list, never the <select> itself: objectline_create.tpl.php
+                        // binds .change() on #idprod before this footer hook runs, and replaceWith() would
+                        // destroy that handler -- the product description/price/vat AJAX would never fire.
+                        var newOptions = $('<div></div>').html(<?php echo json_encode($out); ?>).find('#idprod').html();
+                        $('#idprod').html(newOptions).val('-1').trigger('change.select2');
                     });
                 </script>
                 <?php
             }
+        }
+
+
+        if (strpos($parameters['context'], 'thirdpartycontact')) {
+
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $signatory   = new SaturneSignature($db);
+
+            $sql = "SELECT t.rowid";
+            $sql .= " FROM ".MAIN_DB_PREFIX."socpeople as t";
+            $sql .= " WHERE t.fk_soc = ".GETPOSTINT('socid');
+            $result = $db->query($sql);
+            $num = $db->num_rows($result);
+
+            $contactIds = [];
+            $i = 0;
+            while ($i < $num) {
+			    $obj = $db->fetch_object($result);
+                $filter = ['customsql' => 'status > 0 AND object_type="trainingsession" AND element_type="socpeople" AND element_id='.$obj->rowid];
+                $signatories = $signatory->fetchAll('', '', 0, 0, $filter);
+                $contactIds[$obj->rowid] = count($signatories);
+                $i++;
+            }
+
+            ?>
+            <script>
+                window.dolimeet.contactList.insertData(<?php echo json_encode($contactIds); ?>, '<?= $langs->trans('Formations') ?>');
+            </script>
+            <?php
         }
 
         return 0; // or return 1 to replace standard code.
@@ -725,6 +780,36 @@ class ActionsDolimeet
         if ($parameters['currentcontext'] == 'admincompany') {
             if ($action == 'update') {
                 dolibarr_set_const($this->db, 'MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', GETPOST('MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER'), 'chaine', 0, '', $conf->entity);
+            }
+        }
+
+        if ($parameters['currentcontext'] == 'dolimeetpublicinterfaceadmin') {
+            if ($action == 'set_default_public_interface_user') {
+                $this->ensurePublicInterfaceUserHasContactCreerRight(GETPOSTINT('default_public_interface_user_id'));
+                // Let saturne's publicinterface.php save the const itself.
+            } elseif ($action == 'create_default_public_interface_user') {
+                // Take over saturne's flow so we can grant the right to the newly created user.
+                require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
+                $userTmp           = new User($this->db);
+                $userTmp->lastname = $langs->transnoentities('DefaultPublicInterfaceUserLastName');
+                $userTmp->login    = 'default_public_interface_user';
+                $userTmp->entity   = 0;
+                $userTmp->employee = 0;
+                $userTmp->setPassword($user);
+
+                $newUserId = $userTmp->create($user);
+                if ($newUserId > 0) {
+                    $this->ensurePublicInterfaceUserHasContactCreerRight($newUserId);
+                    dolibarr_set_const($this->db, 'DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER', $newUserId, 'integer', 0, '', $conf->entity);
+                    dolibarr_set_const($this->db, 'DOLIMEET_DEFAULT_PUBLIC_INTERFACE_USER_CREATED', $newUserId, 'integer', 0, '', $conf->entity);
+                    setEventMessage($langs->trans('SavedConfig'));
+                } else {
+                    setEventMessages($userTmp->error, $userTmp->errors, 'errors');
+                }
+
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?module_name=DoliMeet');
+                exit;
             }
         }
 
@@ -984,35 +1069,35 @@ class ActionsDolimeet
     }
 
     /**
-     * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below.
+     * Overloading the saturneExtendGetObjectsMetadata function : replacing the parent's function with the one below.
      *
-     * @param  array $linkableObjectTypes  Array of linkable objects.
-     * @return int                         0 < on error, 0 on success, 1 to replace standard code.
+     * @param  array $parameters Hook metadatas (context, etc...).
+     * @return int               0 < on error, 0 on success, 1 to replace standard code.
      */
-    public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
+    public function saturneExtendGetObjectsMetadata(array $parameters): int
     {
-        require_once __DIR__ . '/../class/trainingsession.class.php';
-        require_once __DIR__ . '/../lib/dolimeet_trainingsession.lib.php';
-
-        $trainingSession = new Trainingsession($this->db);
-
-        $linkableObjectTypes['dolimeet_trainsess'] = [
+        $objectsMetadata['dolimeet_trainsess'] = [
+            'mainmenu'       => 'dolimeet',
+            'leftmenu'       => '',
             'langs'          => 'Trainingsession',
             'langfile'       => 'dolimeet@dolimeet',
-            'picto'          => $trainingSession->picto,
-            'className'      => 'Trainingsession',
-            'name_field'     => 'ref',
+            'picto'          => 'fontawesome_fa-people-arrows_fas_#d35968',
+            'color'          => '#d35968',
+            'class_name'     => 'Trainingsession',
             'post_name'      => 'fk_trainingsession',
             'link_name'      => 'dolimeet_trainsess',
             'tab_type'       => 'trainingsession',
-            'hook_name_list' => 'trainingsessionlist',
+            'table_element'  => 'dolimeet_session',
+            'name_field'     => 'ref',
             'hook_name_card' => 'trainingsessioncard',
-            'create_url'     => 'custom/dolimeet/view/trainingsession/session_card.php?action=create&object_type=trainingsession',
-            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php'
+            'hook_name_list' => 'trainingsessionlist',
+            'create_url'     => 'custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
+            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php',
+            'lib_path'       => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php'
         ];
-        $this->results = $linkableObjectTypes;
+        $this->results = $objectsMetadata;
 
-        return 1;
+        return 0; // or return 1 to replace standard code
     }
 
     /**
@@ -1193,6 +1278,8 @@ class ActionsDolimeet
             require_once __DIR__ . '/session.class.php';
             $session = new Session($db);
             switch ($parameters['object']->element ?? '') {
+                case 'ticket':
+                    return 0; // Tickets are not natively supported by dolimeet_session
                 case 'societe' :
                     $objectElement = 'soc';
                     break;
@@ -1207,7 +1294,16 @@ class ActionsDolimeet
                     $objectElement = $parameters['object']->element ?? '';
                     break;
             }
-            $filter  = $filter ?? 't.status >= 0 AND t.fk_' . $objectElement . ' = ' . ($parameters['object']->id ?? 0);
+            // Only objects owning a dedicated foreign key on the session table can be linked
+            // to a session. For any other object (e.g. digiriskelement) t.fk_<element> does not
+            // exist and would raise a SQL error, so skip the count silently.
+            if (!isset($filter)) {
+                $fkField = 'fk_' . $objectElement;
+                if (!array_key_exists($fkField, $session->fields)) {
+                    return 0;
+                }
+                $filter = 't.status >= 0 AND t.' . $fkField . ' = ' . ($parameters['object']->id ?? 0);
+            }
             $filter .= GETPOST('object_type') ? " AND t.type = '" . GETPOST('object_type') . "'" : '';
             $sessions = $session->fetchAll('', '', 0, 0, ['customsql' => $filter]);
             if (is_array($sessions) && !empty($sessions)) {
@@ -1230,6 +1326,271 @@ class ActionsDolimeet
         }
 
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Tell whether the list being drawn is the training contract one
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return bool              True on the DoliMeet training contract list
+     */
+    protected function isTrainingContractList(array $parameters): bool
+    {
+        return preg_match('/contractlist/', $parameters['context']) && GETPOST('contextpage', 'aZ') == 'trainingcontract';
+    }
+
+    /**
+     * Indicators the training contract list carries, and the query that fills each of them
+     *
+     * Every indicator is a correlated subquery on the contract row rather than a query per line: the list
+     * stays one query, whatever the number of contracts on the page.
+     *
+     * @return array Indicators, keyed by the alias they are read back with
+     */
+    protected function getTrainingContractIndicators(): array
+    {
+        require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+
+        $sessionTable   = MAIN_DB_PREFIX . 'dolimeet_session';
+        $signatureTable = MAIN_DB_PREFIX . 'saturne_object_signature';
+        $surveyTable    = MAIN_DB_PREFIX . 'digiquali_survey';
+        $linkTable      = MAIN_DB_PREFIX . 'element_element';
+
+        // Signatures of one session role, counted by state: registered, pending, signed
+        $sessionSignatures = 'SELECT CONCAT(COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_REGISTERED . '), 0), \'|\', COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_PENDING_SIGNATURE . '), 0), \'|\', COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_SIGNED . '), 0))'
+            . ' FROM ' . $signatureTable . ' AS sig'
+            . ' INNER JOIN ' . $sessionTable . ' AS ds ON ds.rowid = sig.fk_object AND sig.object_type = ds.type'
+            . ' WHERE ds.fk_contrat = c.rowid AND sig.module_name = \'dolimeet\' AND sig.status > 0 AND sig.role = ';
+
+        // Who the agreement names, one column per role it is followed by. A role can be held by a user or
+        // by a contact, so both cards are read and whichever answers gives the name
+        $contactNames = 'SELECT GROUP_CONCAT(COALESCE(CONCAT(sp.lastname, \' \', sp.firstname), CONCAT(u.lastname, \' \', u.firstname)) SEPARATOR \', \')'
+            . ' FROM ' . MAIN_DB_PREFIX . 'element_contact AS ec'
+            . ' INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact AS tc ON tc.rowid = ec.fk_c_type_contact AND tc.element = \'contrat\' AND tc.code = '
+            . ''; // the code is appended per role
+
+        $contactFrom = ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople AS sp ON sp.rowid = ec.fk_socpeople AND tc.source = \'external\''
+            . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user AS u ON u.rowid = ec.fk_socpeople AND tc.source = \'internal\''
+            . ' WHERE ec.element_id = c.rowid';
+
+        // An agreement is invoiced through a link Dolibarr writes in either direction, so both are read.
+        // The link table drives the lookup on its own index: collecting the invoice ids first and filtering
+        // the invoices on that set costs fifteen times more
+        $invoiceLink = ' FROM ' . MAIN_DB_PREFIX . 'element_element AS ee';
+        $invoiceJoin = ' INNER JOIN ' . MAIN_DB_PREFIX . 'facture AS f ON f.rowid = ee.%s AND f.entity IN (' . getEntity('facture') . ') AND f.fk_statut IN (' . Facture::STATUS_VALIDATED . ', ' . Facture::STATUS_CLOSED . ')';
+        $payment     = ' INNER JOIN ' . MAIN_DB_PREFIX . 'paiement_facture AS pf ON pf.fk_facture = ee.%s';
+        $straight    = ' WHERE ee.sourcetype = \'contrat\' AND ee.targettype = \'facture\' AND ee.fk_source = c.rowid';
+        $reverse     = ' WHERE ee.sourcetype = \'facture\' AND ee.targettype = \'contrat\' AND ee.fk_target = c.rowid';
+
+        $invoicedAmount = '(SELECT COALESCE(SUM(f.total_ttc), 0)' . $invoiceLink . sprintf($invoiceJoin, 'fk_target') . $straight . ')'
+            . ' + (SELECT COALESCE(SUM(f.total_ttc), 0)' . $invoiceLink . sprintf($invoiceJoin, 'fk_source') . $reverse . ')';
+        $paidAmount = '(SELECT COALESCE(SUM(pf.amount), 0)' . $invoiceLink . sprintf($payment, 'fk_target') . $straight . ')'
+            . ' + (SELECT COALESCE(SUM(pf.amount), 0)' . $invoiceLink . sprintf($payment, 'fk_source') . $reverse . ')';
+
+        $indicators = [
+            'dolimeet_nb_session' => [
+                'label' => 'NbSessions',
+                'sql'   => '(SELECT COUNT(*) FROM ' . $sessionTable . ' AS ds WHERE ds.fk_contrat = c.rowid)'
+            ],
+            'dolimeet_trainee_signatures' => [
+                'label' => 'TraineeSignatures',
+                'sql'   => '(' . $sessionSignatures . '\'Trainee\')'
+            ],
+            'dolimeet_trainer_signatures' => [
+                'label' => 'TrainerSignatures',
+                'sql'   => '(' . $sessionSignatures . '\'SessionTrainer\')'
+            ],
+            'dolimeet_contact_sessiontrainer' => [
+                'label' => 'TrainerContacts',
+                'sql'   => '(' . $contactNames . '\'SESSIONTRAINER\'' . $contactFrom . ')'
+            ],
+            'dolimeet_contact_trainee' => [
+                'label' => 'TraineeContacts',
+                'sql'   => '(' . $contactNames . '\'TRAINEE\'' . $contactFrom . ')'
+            ],
+            'dolimeet_contact_billing' => [
+                'label' => 'BillingContacts',
+                'sql'   => '(' . $contactNames . '\'BILLING\'' . $contactFrom . ')'
+            ],
+            'dolimeet_contact_customer' => [
+                'label' => 'FollowUpContacts',
+                'sql'   => '(' . $contactNames . '\'CUSTOMER\'' . $contactFrom . ')'
+            ],
+            'dolimeet_invoice_total' => [
+                'label' => 'ContractInvoicing',
+                'sql'   => $invoicedAmount
+            ],
+            'dolimeet_invoice_paid' => [
+                'label' => 'ContractPayment',
+                'sql'   => $paidAmount
+            ]
+        ];
+
+        // A questionnaire is recognised by the sheet it was built on, so only a configured role is followed
+        $surveyRoles = ['trainee' => 'TraineeSurvey', 'sessiontrainer' => 'TrainerSurvey', 'billing' => 'BillingSurvey'];
+        foreach ($surveyRoles as $surveyRole => $surveyLabel) {
+            $sheetID = getDolGlobalInt('DOLIMEET_' . dol_strtoupper($surveyRole) . '_SATISFACTION_SURVEY_SHEET');
+            if ($sheetID <= 0) {
+                continue;
+            }
+
+            $surveyFrom = ' FROM ' . $signatureTable . ' AS sig'
+                . ' INNER JOIN ' . $surveyTable . ' AS sv ON sv.rowid = sig.fk_object'
+                . ' INNER JOIN ' . $linkTable . ' AS ee ON ee.fk_target = sv.rowid AND ee.targettype = \'digiquali_survey\' AND ee.sourcetype = \'contrat\''
+                . ' WHERE ee.fk_source = c.rowid AND sig.module_name = \'digiquali\' AND sig.object_type = \'survey\' AND sig.status > 0 AND sv.fk_sheet = ' . $sheetID;
+
+            $indicators['dolimeet_' . $surveyRole . '_survey_reminder'] = [
+                'label' => $surveyLabel . 'Reminder',
+                'sql'   => '(SELECT MAX(sig.last_email_sent_date)' . $surveyFrom . ')'
+            ];
+            $indicators['dolimeet_' . $surveyRole . '_survey_state'] = [
+                'label' => $surveyLabel . 'State',
+                'sql'   => '(SELECT CONCAT(COALESCE(SUM(sig.status = ' . SaturneSignature::STATUS_SIGNED . '), 0), \'|\', COUNT(*))' . $surveyFrom . ')'
+            ];
+        }
+
+        return $indicators;
+    }
+
+    /**
+     * Overloading the printFieldListSelect function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListSelect(array $parameters): int
+    {
+        if (!$this->isTrainingContractList($parameters)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $sql = '';
+        foreach ($this->getTrainingContractIndicators() as $indicatorAlias => $indicator) {
+            $sql .= ', ' . $indicator['sql'] . ' AS ' . $indicatorAlias;
+        }
+        $this->resprints = $sql;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printFieldListTitle function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListTitle(array $parameters): int
+    {
+        global $langs;
+
+        if (!$this->isTrainingContractList($parameters)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $out = '';
+        foreach ($this->getTrainingContractIndicators() as $indicator) {
+            $out .= '<th class="liste_titre center">' . $langs->trans($indicator['label']) . '</th>';
+        }
+        $this->resprints = $out;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the printFieldListValue function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListValue(array $parameters): int
+    {
+        global $langs;
+
+        if (!$this->isTrainingContractList($parameters)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $obj = $parameters['obj'] ?? null;
+        $out = '';
+        foreach ($this->getTrainingContractIndicators() as $indicatorAlias => $indicator) {
+            $value = $obj->$indicatorAlias ?? null;
+            $out  .= '<td class="center nowraponall">' . $this->renderTrainingContractIndicator($indicatorAlias, $value, $obj) . '</td>';
+        }
+        $this->resprints = $out;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Render one indicator of the training contract list
+     *
+     * @param  string      $indicatorAlias Alias the indicator was read with
+     * @param  string|null $value          Raw value returned by the query
+     * @param  object|null $obj            Current row
+     * @return string                      Cell content
+     */
+    protected function renderTrainingContractIndicator(string $indicatorAlias, ?string $value, ?object $obj): string
+    {
+        global $langs;
+
+        if ($indicatorAlias == 'dolimeet_nb_session') {
+            if (empty($value)) {
+                return '<span class="opacitymedium">0</span>';
+            }
+            $sessionListUrl = dol_buildpath('/dolimeet/view/session/session_list.php', 1) . '?object_type=trainingsession&fromtype=contrat&fromid=' . ($obj->rowid ?? 0);
+
+            return '<a href="' . $sessionListUrl . '">' . $value . '</a>';
+        }
+
+        if (strpos($indicatorAlias, 'dolimeet_contact_') === 0) {
+            return dol_strlen($value) > 0 ? dol_escape_htmltag(dol_trunc($value, 40)) : '<span class="opacitymedium">-</span>';
+        }
+
+        if ($indicatorAlias == 'dolimeet_invoice_total') {
+            return (float) $value > 0 ? price((float) $value, 0, '', 1, -1, -1, 'auto') : '<span class="opacitymedium">-</span>';
+        }
+
+        if ($indicatorAlias == 'dolimeet_invoice_paid') {
+            $invoiceTotal = (float) ($obj->dolimeet_invoice_total ?? 0);
+            if ($invoiceTotal == 0) {
+                return '<span class="opacitymedium">-</span>';
+            }
+            $badge = (float) $value >= $invoiceTotal ? 'badge-status4' : 'badge-status1';
+
+            return '<span class="badge ' . $badge . '">' . price((float) $value, 0, '', 1, -1, -1, 'auto') . '</span>';
+        }
+
+        if (strpos($indicatorAlias, '_survey_reminder') !== false) {
+            return dol_strlen($value) > 0 ? dol_print_date($this->db->jdate($value), 'day') : '<span class="opacitymedium">-</span>';
+        }
+
+        if (strpos($indicatorAlias, '_survey_state') !== false) {
+            [$answered, $total] = array_pad(explode('|', (string) $value), 2, 0);
+            if ((int) $total == 0) {
+                return '<span class="opacitymedium">-</span>';
+            }
+            $badge = (int) $answered >= (int) $total ? 'badge-status4' : 'badge-status1';
+
+            return '<span class="badge ' . $badge . '">' . (int) $answered . ' / ' . (int) $total . '</span>';
+        }
+
+        // Signature states of a session role, in the order they are announced in the header
+        [$registered, $pending, $signed] = array_pad(explode('|', (string) $value), 3, 0);
+        if ((int) $registered + (int) $pending + (int) $signed == 0) {
+            return '<span class="opacitymedium">-</span>';
+        }
+
+        $out  = '<span class="badge badge-status0 classfortooltip" title="' . dol_escape_htmltag($langs->transnoentities('SignatureStateNothing')) . '">' . (int) $registered . '</span> ';
+        $out .= '<span class="badge badge-status1 classfortooltip" title="' . dol_escape_htmltag($langs->transnoentities('SignatureStateStarted')) . '">' . (int) $pending . '</span> ';
+        $out .= '<span class="badge badge-status4 classfortooltip" title="' . dol_escape_htmltag($langs->transnoentities('SignatureStateSigned')) . '">' . (int) $signed . '</span>';
+
+        return $out;
     }
 
     /**
@@ -1332,6 +1693,13 @@ class ActionsDolimeet
                 $sql = " AND t.fk_element = " . GETPOSTINT('fromid') . " AND t.element_type = 'service'";
                 $this->resprints = $sql;
             }
+        }
+
+        // The DoliMeet menu opens the core contract list on the training contracts only: a contract
+        // becomes one as soon as it carries a training type. The value is a dictionary rowid held in a
+        // varchar column, so it is compared as the string it is stored as
+        if (preg_match('/contractlist/', $parameters['context']) && GETPOST('contextpage', 'aZ') == 'trainingcontract') {
+            $this->resprints = " AND ef.trainingsession_type IS NOT NULL AND ef.trainingsession_type NOT IN ('', '0')";
         }
 
         return 0; // or return 1 to replace standard code
@@ -1830,5 +2198,44 @@ class ActionsDolimeet
         }
 
         return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Grant societe.contact.creer to the public interface user so it can create contacts
+     * from public/contact/add_contact.php. Idempotent — User::addrights is a no-op when the
+     * permission is already present.
+     *
+     * @param int $userId User to grant the right to.
+     */
+    private function ensurePublicInterfaceUserHasContactCreerRight(int $userId): void
+    {
+        global $conf;
+
+        if ($userId <= 0) {
+            return;
+        }
+
+        $sql  = 'SELECT id FROM ' . MAIN_DB_PREFIX . 'rights_def';
+        $sql .= " WHERE module = 'societe' AND perms = 'contact' AND subperms = 'creer'";
+        $sql .= ' AND entity = ' . ((int) $conf->entity);
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            return;
+        }
+
+        $row = $this->db->fetch_object($resql);
+        if (!$row) {
+            return;
+        }
+
+        require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
+        $publicUser = new User($this->db);
+        if ($publicUser->fetch($userId) <= 0) {
+            return;
+        }
+
+        $publicUser->addrights((int) $row->id);
     }
 }

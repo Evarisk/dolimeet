@@ -32,6 +32,8 @@ DoliMeetDescriptionLong = Follow-up of meetings, training sessions, audits
 SatisfactionSurvey                          = Satisfaction survey
 BillingSatisfactionSurvey                   = Billing satisfaction survey
 BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
+SatisfactionSurveyEmailTemplate             = Sending email template
+SatisfactionSurveyReminderEmailTemplate     = Reminder email template
 TraineeSatisfactionSurvey                   = Trainee satisfaction survey
 TraineeSatisfactionSurveyDescription        = Defines the model used by default for trainee satisfaction surveys
 SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
@@ -90,6 +92,8 @@ Responsible = Responsable
 # Data
 TrainingSession                       = Training session
 Trainingsession                       = Training session
+TrainingContract                      = Training contract
+TrainingContracts                     = Training contracts
 Trainingsessions                      = training sessions
 TheTrainingsession                    = the training session
 OfTrainingsession                     = of training session
@@ -220,7 +224,6 @@ AuditAttendance                      = Audit attendance
 
 # Data
 TrainingOrganizationNumber        = Declaration number of the training organisation
-TrainingOrganizationNumberTooltip = Enter your registration number here if you are recognised as a training organisation
 SocietyAttendants                 = Third party external attendants
 SetContrat                        = Define contract
 DateAndTime                       = Date and time
@@ -228,3 +231,54 @@ SignAttendanceSheetOnline         = Sign the attendance sheet online
 SetSatisfactionSurvey             = Create a satisfaction survey
 NeedToSetSatisfactionSurvey       = Satisfaction survey configuration %s required
 DefineSessionTrainerResponsible   = You must define the session training responsible in the DoliMeet configuration.
+
+# Survey reminder
+SurveyReminderCronLabel               = Reminder of the unanswered satisfaction surveys
+SurveyReminderCronComment             = Sends the survey link again to the attendants who did not answer it yet, every DOLIMEET_SATISFACTION_SURVEY_REMINDER_DELAY days and at most DOLIMEET_SATISFACTION_SURVEY_REMINDER_MAX times
+SurveyReminderDigiQualiRequired       = DigiQuali 1.11.0 or higher is required to remind the surveys
+SurveyReminderNoSheetConfigured       = No satisfaction survey sheet is configured, there is nothing to remind
+SurveyReminderNothingToSend           = No survey to remind
+SurveyReminderResult                  = %d reminder(s) sent, %d skipped
+SurveyReminderDelay                   = Delay between two reminders (days)
+SurveyReminderMax                     = Maximum number of reminders per survey
+SatisfactionSurveyReminderLabel       = DLM_Reminder_Satisfaction_Survey_%s
+SatisfactionSurveyReminderTopic       = [__[MAIN_INFO_SOCIETE_NOM]__] Reminder: satisfaction survey for the training contract __REF__
+SatisfactionSurveyReminderContent     = Hello,<br /><br />We have not received your answer to the satisfaction survey linked to your training contract "__REF__" - "__DOLIMEET_CONTRACT_LABEL__" yet.<br /><br />It only takes a few minutes:<br /><a href="__DOLIMEET_SURVEY_LINK__">Answer the survey</a><br /><br />If you already answered it, please ignore this message.<p>Best regards,<br /><br />__MYCOMPANY_NAME__<br />__MYCOMPANY_FULLADDRESS__<br />__MYCOMPANY_EMAIL__
+SurveyReminderDisabled                = Reminders are turned off: the maximum number of reminders is zero
+Questionnaires                        = Surveys
+SurveyReminder                        = Survey reminder
+SurveyReminderMaxHelp                 = Zero turns the reminder off: no reminder will be sent
+SurveyReminderCronNotInstalled        = The scheduled reminder job does not exist yet. Enable the DoliMeet module again to create it.
+SurveyReminderCronDisabled            = <b>Careful:</b> the scheduled reminder job is not enabled, no automatic email will be sent. %s
+SurveyReminderCronEnabled             = The scheduled reminder job is enabled. %s
+SurveyReminderCronLink                = See the scheduled job
+NbSessions                            = Sessions
+TraineeSignatures                     = Trainee signatures
+TrainerSignatures                     = Trainer signatures
+TraineeSurveyReminder                 = Trainee survey: last reminder
+TraineeSurveyState                    = Trainee survey: state
+TrainerSurveyReminder                 = Trainer survey: last reminder
+TrainerSurveyState                    = Trainer survey: state
+BillingSurveyReminder                 = Billing survey: last reminder
+BillingSurveyState                    = Billing survey: state
+SignatureStateNothing                 = Nothing
+SignatureStateStarted                 = Started
+SignatureStateSigned                  = Signed
+TrainerContacts                       = Trainer
+TraineeContacts                       = Trainee
+BillingContacts                       = Contract billing
+FollowUpContacts                      = Contract follow-up
+ContractInvoicing                     = Invoicing
+ContractPayment                       = Payment
+
+#
+# Error
+#
+
+# Data
+ErrorMissingFormationServiceConfig   = Error: the training service configuration is missing<br><a href="../../custom/dolimeet/admin/setup.php#formation">Please click here to open the configuration page</a>
+ErrorNoFormationServiceFound         = Error: no usable training service was found. Check that your services belong to the main training service category and that the total duration of their template sessions matches the service duration.<br><a href="%s">Please click here to open the configuration page</a>
+ErrorFormationNoteNoLine             = Error: the training note of %s could not be built because this document has no service line. Add at least one training service then run the action again.
+ErrorFormationServiceNoModelSession  = Error: no template session is linked to the training service "%s". Create at least one template session for this service in the training session templates project.
+ErrorFormationTrainingConfigMissing  = Error: the training configuration is incomplete (main training service category and/or training session templates project are not set).<br><a href="%s">Please click here to open the configuration page</a>
+ErrorFormationVariousCategoryMissing = Error: the training configuration is incomplete (the main category of miscellaneous training services is not set).<br><a href="%s">Please click here to open the configuration page</a>

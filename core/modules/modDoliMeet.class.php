@@ -78,7 +78,7 @@ class modDoliMeet extends DolibarrModules
         $this->editor_url  = 'https://evarisk.com';
 
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'.
-        $this->version = '23.0.0';
+        $this->version = '23.1.0';
 
         // Url to the file with your last numberversion of this module.
         //$this->url_last_version = 'http://www.example.com/versionmodule.txt';
@@ -225,6 +225,9 @@ class modDoliMeet extends DolibarrModules
 
             // CONST CONFIGURATION.
             $i++ => ['MAIN_INFO_SOCIETE_TRAINING_ORGANIZATION_NUMBER', 'chaine', '', '', 0, 'current'],
+            $i++ => ['DOLIMEET_BPF_ADDRESS_PUBLIC', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_BPF_REMOTE_TRAINING', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_BPF_MANAGER_STATUS', 'chaine', '', '', 0, 'current'],
 
             // CONST MODULE.
             $i++ => ['DOLIMEET_VERSION','chaine', $this->version, '', 0, 'current'],
@@ -232,6 +235,8 @@ class modDoliMeet extends DolibarrModules
             $i++ => ['DOLIMEET_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SET', 'integer', 0, '', 0, 'current'],
             $i++ => ['DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DOLIMEET_SATISFACTION_SURVEY_REMINDER_DELAY', 'integer', 7, '', 0, 'current'],
+            $i++ => ['DOLIMEET_SATISFACTION_SURVEY_REMINDER_MAX', 'integer', 3, '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_MORNING_START_HOUR', 'chaine', '09:00', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_MORNING_END_HOUR', 'chaine', '12:00', '', 0, 'current'],
             $i++ => ['DOLIMEET_TRAININGSESSION_AFTERNOON_START_HOUR', 'chaine', '14:00', '', 0, 'current'],
@@ -283,24 +288,28 @@ class modDoliMeet extends DolibarrModules
                 MAIN_DB_PREFIX . 'c_trainingsession_type',
                 MAIN_DB_PREFIX . 'c_meeting_attendants_role',
                 MAIN_DB_PREFIX . 'c_trainingsession_attendants_role',
-                MAIN_DB_PREFIX . 'c_audit_attendants_role'
+                MAIN_DB_PREFIX . 'c_audit_attendants_role',
+                MAIN_DB_PREFIX . 'c_trainingsession_specialities'
             ],
             // Label of tables.
             'tablib' => [
                 'TrainingSessionType',
                 'Meeting',
                 'TrainingSession',
-                'Audit'
+                'Audit',
+                'TrainingSessionSpecialities'
             ],
             // Request to select fields.
             'tabsql' => [
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_type as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_meeting_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_attendants_role as f',
-                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_audit_attendants_role as f'
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_audit_attendants_role as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.code, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_trainingsession_specialities as f'
             ],
             // Sort order.
             'tabsqlsort' => [
+                'position ASC',
                 'position ASC',
                 'position ASC',
                 'position ASC',
@@ -311,24 +320,28 @@ class modDoliMeet extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'code,ref,label,description,position'
             ],
             // List of fields (list of fields to edit a record).
             'tabfieldvalue' => [
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'code,ref,label,description,position'
             ],
             // List of fields (list of fields for insert).
             'tabfieldinsert' => [
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'code,ref,label,description,position'
             ],
             // Name of columns with primary key (try to always name it 'rowid').
             'tabrowid' => [
+                'rowid',
                 'rowid',
                 'rowid',
                 'rowid',
@@ -336,6 +349,7 @@ class modDoliMeet extends DolibarrModules
             ],
             // Condition to show each dictionary.
             'tabcond' => [
+                $conf->dolimeet->enabled,
                 $conf->dolimeet->enabled,
                 $conf->dolimeet->enabled,
                 $conf->dolimeet->enabled,
@@ -349,7 +363,22 @@ class modDoliMeet extends DolibarrModules
 
         // Cronjobs (List of cron jobs entries to add when module is enabled).
         // unit_frequency must be 60 for minute, 3600 for hour, 86400 for day, 604800 for week.
-        $this->cronjobs = [];
+        $this->cronjobs = [
+            0 => [
+                'label'         => $langs->transnoentities('SurveyReminderCronLabel'),
+                'jobtype'       => 'method',
+                'class'         => '/custom/dolimeet/class/dolimeetsurveyreminder.class.php',
+                'objectname'    => 'DoliMeetSurveyReminder',
+                'method'        => 'sendSatisfactionSurveyReminders',
+                'parameters'    => '',
+                'comment'       => $langs->transnoentities('SurveyReminderCronComment'),
+                'frequency'     => 1,
+                'unitfrequency' => 3600 * 24,
+                'priority'      => 50,
+                'status'        => 0,
+                'test'          => 'isModEnabled("dolimeet") && isModEnabled("digiquali")'
+            ]
+        ];
 
         // Permissions provided by this module.
         $this->rights = [];
@@ -496,6 +525,38 @@ class modDoliMeet extends DolibarrModules
                 'user'     => 2,
             ];
         }
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
+            'type'     => 'left',
+            'titre'    => $langs->transnoentities('TrainingContracts'),
+            'prefix'   => '<i class="fas fa-file-contract pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'dolimeet_training_contract_list',
+            'url'      => '/contrat/list.php?contextpage=trainingcontract',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => 'isModEnabled("dolimeet") && isModEnabled("contrat")',
+            'perms'    => '$user->hasRight("contrat", "lire")',
+            'target'   => '',
+            'user'     => 2,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=dolimeet',
+            'type'     => 'left',
+            'titre'    => $langs->transnoentities('FinancialAndPedagogicalReportInitial'),
+            'prefix'   => '<i class="fas fa-file-alt pictofixedwidth"></i>',
+            'mainmenu' => 'dolimeet',
+            'leftmenu' => 'financial_and_pedagogical_report',
+            'url'      => '/dolimeet/view/financial_and_pedagogical_report/financial_and_pedagogical_report.php',
+            'langs'    => 'dolimeet@dolimeet',
+            'position' => 1000 + $r,
+            'enabled'  => 'isModEnabled("dolimeet")',
+            'perms'    => '$user->rights->dolimeet->adminpage->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
     }
 
     /**
@@ -602,6 +663,30 @@ class modDoliMeet extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE', $emailTemplateID, 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 3, 'integer', 0, '', $conf->entity);
+        }
+
+        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') <= 3 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+            $position = 200;
+            foreach (['billing', 'trainee', 'sessiontrainer', 'customer'] as $satisfactionSurvey) {
+                $saturneMail->entity        = 0;
+                $saturneMail->type_template = 'contract';
+                $saturneMail->lang          = 'fr_FR';
+                $saturneMail->datec         = $this->db->idate(dol_now());
+                $saturneMail->label         = $langs->transnoentities('SatisfactionSurveyReminderLabel', $langs->transnoentities(ucfirst($satisfactionSurvey)));
+                $saturneMail->position      = $position;
+                $saturneMail->enabled       = "isModEnabled('contrat')";
+                $saturneMail->topic         = $langs->transnoentities('SatisfactionSurveyReminderTopic');
+                $saturneMail->joinfiles     = 0;
+                $saturneMail->content       = $langs->transnoentities('SatisfactionSurveyReminderContent');
+
+                $reminderTemplateID = $saturneMail->create($user);
+                if ($reminderTemplateID > 0) {
+                    dolibarr_set_const($this->db, 'DOLIMEET_' . dol_strtoupper($satisfactionSurvey) . '_SATISFACTION_SURVEY_REMINDER_EMAIL_TEMPLATE', $reminderTemplateID, 'integer', 0, '', $conf->entity);
+                }
+                $position += 10;
+            }
+
+            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 4, 'integer', 0, '', $conf->entity);
         }
 
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_UPDATED') == 0) {
