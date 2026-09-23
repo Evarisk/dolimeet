@@ -379,8 +379,14 @@ if (GETPOST('debug') == 'grid') {
     $pdf->SetTextColor(255, 0, 0);
     $pdf->SetDrawColor(255, 0, 0);
     $pdf->SetFont(pdf_getPDFFont($langs), '', 5);
-    for ($p = 1; $p <= $pdf->getNumPages(); $p++) {
+    // The count is read once : the bottom ruler writes below the last millimetre of the page,
+    // so a page appended here would give the loop a moving end and hang the request
+    $numPages = $pdf->getNumPages();
+    for ($p = 1; $p <= $numPages; $p++) {
         $pdf->setPage($p);
+        // setPage() reapplies the settings saved with the page, automatic page break included,
+        // so switching it off further up the script does not cover this loop
+        $pdf->SetAutoPageBreak(false);
         for ($x = 0; $x <= 210; $x += 10) {
             $pdf->Line($x, 0, $x, 297);
             $pdf->SetXY($x + 0.5, 1);
