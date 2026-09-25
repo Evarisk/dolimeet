@@ -19,37 +19,13 @@ parameters:
 			path: admin/questionnaire.php
 
 		-
-			message: '#^Access to property \$id on an unknown class Cronjob\.$#'
-			identifier: class.notFound
-			count: 2
-			path: admin/questionnaire.php
-
-		-
 			message: '#^Access to property \$picto on an unknown class Sheet\.$#'
 			identifier: class.notFound
 			count: 1
 			path: admin/questionnaire.php
 
 		-
-			message: '#^Access to property \$status on an unknown class Cronjob\.$#'
-			identifier: class.notFound
-			count: 1
-			path: admin/questionnaire.php
-
-		-
-			message: '#^Call to method fetch\(\) on an unknown class Cronjob\.$#'
-			identifier: class.notFound
-			count: 1
-			path: admin/questionnaire.php
-
-		-
 			message: '#^Call to method selectSheetList\(\) on an unknown class Sheet\.$#'
-			identifier: class.notFound
-			count: 1
-			path: admin/questionnaire.php
-
-		-
-			message: '#^Instantiated class Cronjob not found\.$#'
 			identifier: class.notFound
 			count: 1
 			path: admin/questionnaire.php
