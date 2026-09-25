@@ -2057,3 +2057,74 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: view/session/session_list.php
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Categorie\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#2 \$fk_object of method SaturneSignature\:\:fetchSignatory\(\) expects int\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#3 \$contactID of function set_satisfaction_survey expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#4 \$pictoisfullpath of function img_picto expects int\<0, 1\>, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:indexFile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Property DolibarrModules\:\:\$dictionaries \(array\{\}\|array\{langs\: string, tabname\: array\<string\>, tablib\: array\<string\>, tabsql\: array\<string\>, tabsqlsort\: array\<string\>, tabfield\: array\<string\>, tabfieldvalue\: array\<string\>, tabfieldinsert\: array\<string\>, \.\.\.\}\) does not accept array\{langs\: ''dolimeet@dolimeet'', tabname\: array\{''llx_c…'', ''llx_c_meeting…'', ''llx_c…'', ''llx_c_audit…'', ''llx_c…''\}, tablib\: array\{''TrainingSessionType'', ''Meeting'', ''TrainingSession'', ''Audit'', ''TrainingSessionSpec…''\}, tabsql\: array\{''SELECT f\.rowid as…'', ''SELECT f\.rowid as…'', ''SELECT f\.rowid as…'', ''SELECT f\.rowid as…'', ''SELECT f\.rowid as…''\}, tabsqlsort\: array\{''position ASC'', ''position ASC'', ''position ASC'', ''position ASC'', ''position ASC''\}, tabfield\: array\{''ref,label…'', ''ref,label…'', ''ref,label…'', ''ref,label…'', ''code,ref,label…''\}, tabfieldvalue\: array\{''ref,label…'', ''ref,label…'', ''ref,label…'', ''ref,label…'', ''code,ref,label…''\}, tabfieldinsert\: array\{''ref,label…'', ''ref,label…'', ''ref,label…'', ''ref,label…'', ''code,ref,label…''\}, \.\.\.\}\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Property DolibarrModules\:\:\$menu \(1\|array\<array\{commentgroup\?\: string, mainmenu\: string, leftmenu\: string, langs\: string, enabled\: int\|string, target\: string, titre\: string, user\: int, \.\.\.\}\>\) does not accept non\-empty\-array\<array\{commentgroup\?\: string, mainmenu\: string, leftmenu\: string, langs\: string, enabled\: int\|string, target\: string, titre\: string, user\: int, \.\.\.\}\|array\{fk_menu\: '''', type\: ''top'', titre\: ''DoliMeet'', prefix\: string, mainmenu\: ''dolimeet'', leftmenu\: '''', url\: ''/dolimeet…'', langs\: ''dolimeet@dolimeet'', \.\.\.\}\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Cannot access property \$code on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Cannot access property \$contactid on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Cannot access property \$source on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Parameter \#5 \$filter of method User\:\:fetchAll\(\) expects string, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
