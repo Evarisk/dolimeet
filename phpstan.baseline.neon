@@ -1,0 +1,2065 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Variable \$subTagIDs might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: admin/financial_and_pedagogical_report.php
+
+		-
+			message: '#^Variable \$tagIDs might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: admin/financial_and_pedagogical_report.php
+
+		-
+			message: '#^Access to constant STATUS_LOCKED on an unknown class Sheet\.$#'
+			identifier: class.notFound
+			count: 1
+			path: admin/questionnaire.php
+
+		-
+			message: '#^Access to property \$picto on an unknown class Sheet\.$#'
+			identifier: class.notFound
+			count: 1
+			path: admin/questionnaire.php
+
+		-
+			message: '#^Call to method selectSheetList\(\) on an unknown class Sheet\.$#'
+			identifier: class.notFound
+			count: 1
+			path: admin/questionnaire.php
+
+		-
+			message: '#^Instantiated class Sheet not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: admin/questionnaire.php
+
+		-
+			message: '#^Parameter \#10 \$ajaxoptions of method Form\:\:select_produits\(\) expects array\<string, array\<string\>\|string\>, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: admin/setup.php
+
+		-
+			message: '#^Parameter \#11 \$socid of method Form\:\:select_produits\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: admin/setup.php
+
+		-
+			message: '#^Parameter \#9 \$hidelabel of method Form\:\:select_produits\(\) expects int\<0, 3\>, '''' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: admin/setup.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$contact_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$employee\.$#'
+			identifier: property.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$entity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$error\.$#'
+			identifier: property.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
+			identifier: property.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$login\.$#'
+			identifier: property.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to property \$element on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 4
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to property \$id on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to property \$picto on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to property \$table_element on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Access to property \$track_id on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:jdate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:prefix\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method User\:\:addrights\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method User\:\:create\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method User\:\:setPassword\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method Output\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method SetCompression\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method SetFont\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method call_trigger\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method fetch\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method getNomUrl\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method getStatus\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method getTemplatesize\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method importPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method setPrintFooter\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method setSourceFile\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to method useTemplate\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Cannot call method getNomUrl\(\) on CommonObject\|int\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 3
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^If condition is always false\.$#'
+			identifier: if.alwaysFalse
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Instantiated class Survey not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Loose comparison using \=\= between ''billing''\|''customer''\|''sessiontrainer''\|''trainee'' and ''opco'' will always evaluate to false\.$#'
+			identifier: equal.alwaysFalse
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Method ActionsDolimeet\:\:formObjectOptions\(\) has parameter \$action with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Method ActionsDolimeet\:\:formObjectOptions\(\) has parameter \$object with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Method ActionsDolimeet\:\:saturneIndex\(\) with return type void returns int but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$object$#'
+			identifier: parameter.notFound
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#1 \$db of function dol_print_error expects DoliDB\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#12 \$param of function saturne_show_documents expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#14 \$buttonlabel of function saturne_show_documents expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#3 \$object of function complete_substitutions_array expects CommonObject\|null, Survey given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#4 \$object of function getCommonSubstitutionArray expects CommonObject\|null, Survey given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Variable \$contactList might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Variable \$error might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Variable \$picto might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Method Session\:\:loadDashboard\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdashboard.class.php
+
+		-
+			message: '#^Variable \$array might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: class/dolimeetdashboard.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Class DoliDB referenced with incorrect case\: DoliDb\.$#'
+			identifier: class.nameCase
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Class Trainingsession referenced with incorrect case\: TrainingSession\.$#'
+			identifier: class.nameCase
+			count: 2
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartA\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartB\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartC\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartD\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartE\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartF1\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartF2\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartF3\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartF4\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartFooter\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartG\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Method FinancialAndPedagogicalReportDocument\:\:getBPFPartH\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Parameter \#2 \$month of function dol_get_first_day expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
+
+		-
+			message: '#^Access to property \$date_creation on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Access to property \$element on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Access to property \$fk_sheet on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Access to property \$id on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Access to property \$linkedObjectsIds on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 4
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Access to property \$ref on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Access to property \$table_element on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Access to property \$track_id on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Call to method fetch\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Call to method fetchObjectLinked\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Instantiated class Survey not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^PHPDoc tag @return has invalid value \(int                            \< 0 if KO, \> 0 if OK\)\: Unexpected token "if", expected ''\>'' at offset 550 on line 10$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Parameter \#1 \$signatory of method DoliMeetSurveyReminder\:\:getSignatoryEmail\(\) expects SaturneSignature, SaturneObject given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Parameter \#2 \$noTrigger of method SaturneObject\:\:update\(\) expects int\<0, 1\>, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Parameter \#3 \$signatory of method DoliMeetSurveyReminder\:\:sendReminder\(\) expects SaturneSignature, SaturneObject given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Parameter \$survey of method DoliMeetSurveyReminder\:\:getSurveyContractID\(\) has invalid type Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Parameter \$survey of method DoliMeetSurveyReminder\:\:sendReminder\(\) has invalid type Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: class/dolimeetsurveyreminder.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:begin\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:commit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to function property_exists\(\) with \$this\(Session\) and ''label'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to function property_exists\(\) with Session and ''date_creation'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to function property_exists\(\) with Session and ''label'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to function property_exists\(\) with Session and ''ref'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Call to function property_exists\(\) with Session and ''status'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Function dol_escape_htmltag invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: class/session.class.php
+
+		-
+			message: '#^PHPDoc tag @return has invalid value \(int                       \<0 if KO, \>0 if OK\)\: Unexpected token "if", expected ''\>'' at offset 728 on line 10$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^PHPDoc type array of property Session\:\:\$fields is not covariant with PHPDoc type array\<string, array\{type\: string, label\: string, langfile\?\: string, enabled\: int\<0, 2\>\|string, position\: int, notnull\?\: int, visible\: int\<\-6, 6\>\|string, alwayseditable\?\: int\<0, 1\>\|string, \.\.\.\}\> of overridden property CommonObject\:\:\$fields\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^PHPDoc type int of property Session\:\:\$isextrafieldmanaged is not covariant with PHPDoc type int\<0, 1\> of overridden property SaturneObject\:\:\$isextrafieldmanaged\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^PHPDoc type int of property Session\:\:\$ismultientitymanaged is not covariant with PHPDoc type int\<0, 1\>\|string of overridden property SaturneObject\:\:\$ismultientitymanaged\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^PHPDoc type int\|string of property Session\:\:\$date_creation is not covariant with PHPDoc type ''''\|int\|null of overridden property CommonObject\:\:\$date_creation\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^PHPDoc type int\|string of property Session\:\:\$tms is not covariant with PHPDoc type int of overridden property CommonObject\:\:\$tms\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Property CommonObject\:\:\$context \(array\<string, mixed\>\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: class/session.class.php
+
+		-
+			message: '#^Access to an undefined property CompanyBankAccount\:\:\$last_main_doc\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Access to an undefined property CompanyBankAccount\:\:\$model_pdf\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Access to an undefined property CompanyBankAccount\:\:\$ref\.$#'
+			identifier: property.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Access to an undefined property CompanyBankAccount\:\:\$thirdparty\.$#'
+			identifier: property.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Binary operation "\+" between array\<mixed\>\|float\|int\|string and float results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:fetch_thirdparty\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:getLastMainDocLink\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:affected_rows\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:begin\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:commit\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to function is_numeric\(\) with int will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method MultiCell\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method Output\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method SetCompression\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method SetFont\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 6
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method SetXY\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method getTemplatesize\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method importPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method setPrintFooter\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method setSourceFile\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to method useTemplate\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Cannot access property \$context on class\-string\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Cannot access property \$error on class\-string\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Cannot access property \$socid on class\-string\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Cannot access property \$user_validation_id on class\-string\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 4
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Access to an undefined property CompanyBankAccount\:\:\$last_main_doc\.$#'
+			identifier: property.notFound
+			count: 3
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Access to an undefined property CompanyBankAccount\:\:\$ref\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Access to an undefined property CompanyBankAccount\:\:\$thirdparty\.$#'
+			identifier: property.notFound
+			count: 5
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:fetch_thirdparty\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:getLastMainDocLink\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:setDocModel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:begin\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:close\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:commit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Call to function is_numeric\(\) with int will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Loose comparison using \=\= between ''expedition'' and ''expedition'' will always evaluate to true\.$#'
+			identifier: equal.alwaysTrue
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 1
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Variable \$mesg might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: core/dolibarr/newonlinesign.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$job\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
+
+		-
+			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
+
+		-
+			message: '#^Access to an undefined property pdf_attendancesheetdocument\:\:\$error\.$#'
+			identifier: property.notFound
+			count: 5
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Access to an undefined property pdf_attendancesheetdocument\:\:\$result\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfKeyValueGrid\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfKeyValueGrid\(\) has parameter \$cellHeight with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfKeyValueGrid\(\) has parameter \$maxWidth with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfKeyValueGrid\(\) has parameter \$pdf with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfSignatureTable\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfSignatureTable\(\) has parameter \$cellHeight with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfSignatureTable\(\) has parameter \$pdf with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfSignatureTable\(\) has parameter \$role with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfSignatureTable\(\) has parameter \$signatures with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Method pdf_attendancesheetdocument\:\:pdfSignatureTable\(\) has parameter \$title with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Parameter \#6 \$fill of method TCPDF\:\:MultiCell\(\) expects bool, int given\.$#'
+			identifier: argument.type
+			count: 5
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Property pdf_attendancesheetdocument\:\:\$format \(array\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Property pdf_attendancesheetdocument\:\:\$orientation is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$job\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method Open\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetCreator\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetFont\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetKeyWords\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetMargins\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetSubject\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method SetTitle\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method setPrintFooter\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Comparison operation "\>" between 2\|6\|10 and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Method pdf_completioncertificatedocument\:\:_pagehead\(\) has parameter \$defaultFontSize with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Method pdf_completioncertificatedocument\:\:_pagehead\(\) has parameter \$outputLangs with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$outputlangs$#'
+			identifier: parameter.notFound
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Parameter \#2 \$tab_top of method pdf_completioncertificatedocument\:\:tabSignature\(\) expects int, float given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Parameter \#6 \$fill of method TCPDF\:\:MultiCell\(\) expects bool, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$boxes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$config_page_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$conflictwith\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$const\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$const_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$cronjobs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$db\.$#'
+			identifier: property.notFound
+			count: 24
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$depends\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$descriptionlong\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$dictionaries\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$dirs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$editor_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$error\.$#'
+			identifier: property.notFound
+			count: 2
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$errors\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$family\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$familyinfo\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$hidden\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$langfiles\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$max_dolibarr_version\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$menu\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$module_parts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$module_position\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$need_dolibarr_version\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$phpmin\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$picto\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$requiredby\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$rights\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$rights_class\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$tabs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$warnings_activation\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to an undefined property modDoliMeet\:\:\$warnings_activation_ext\.$#'
+			identifier: property.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Call to an undefined method modDoliMeet\:\:_init\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Call to an undefined method modDoliMeet\:\:_load_tables\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Call to an undefined method modDoliMeet\:\:_remove\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Parameter \#4 \$id of method CommonObject\:\:setValueFrom\(\) expects int\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Variable \$emailTemplateSatisfactionSurvey might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: core/modules/modDoliMeet.class.php
+
+		-
+			message: '#^Access to property \$element on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/substitutions/functions_dolimeet.lib.php
+
+		-
+			message: '#^Access to property \$table_element on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/substitutions/functions_dolimeet.lib.php
+
+		-
+			message: '#^Access to property \$track_id on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/substitutions/functions_dolimeet.lib.php
+
+		-
+			message: '#^Call to method fetch\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/substitutions/functions_dolimeet.lib.php
+
+		-
+			message: '#^Instantiated class Survey not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: core/substitutions/functions_dolimeet.lib.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Parameter \#2 \$noTrigger of method SaturneObject\:\:setDeleted\(\) expects int\<0, 1\>, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Parameter \#2 \$propal of function set_public_note expects Propal\|null, CommonObject given\.$#'
+			identifier: argument.type
+			count: 4
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Property DolibarrTriggers\:\:\$version \(''''\|''development''\|''dolibarr''\|''experimental''\) does not accept ''23\.1\.1''\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between '''' and ''createformpubliccon…'' will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: lib/dolibarr_lib.php
+
+		-
+			message: '#^Function getOnlineSignatureUrl2\(\) has parameter \$contact with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: lib/dolibarr_lib.php
+
+		-
+			message: '#^Function listeContact\(\) has parameter \$object with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: lib/dolibarr_lib.php
+
+		-
+			message: '#^Function showOnlineSignatureUrl2\(\) has parameter \$contact with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: lib/dolibarr_lib.php
+
+		-
+			message: '#^Access to property \$element on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Access to property \$fk_sheet on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Access to property \$ref on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 2
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Call to method create\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Call to method getNextNumRef\(\) on an unknown class Survey\.$#'
+			identifier: class.notFound
+			count: 1
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
+			identifier: new.noConstructor
+			count: 1
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Function set_public_note\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Function set_satisfaction_survey\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Instantiated class Survey not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: lib/dolimeet_function.lib.php
+
+		-
+			message: '#^Function trainingsession_function_lib1\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: lib/dolimeet_trainingsession.lib.php
+
+		-
+			message: '#^Function trainingsession_function_lib2\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: lib/dolimeet_trainingsession.lib.php
+
+		-
+			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: public/contact/add_contact.php
+
+		-
+			message: '#^Call to an undefined method User\:\:hasRight\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: public/contact/add_contact.php
+
+		-
+			message: '#^Call to an undefined method User\:\:loadRights\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: public/contact/add_contact.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: public/contact/add_contact.php
+
+		-
+			message: '#^Variable \$publicInterfaceUser might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: public/contact/add_contact.php
+
+		-
+			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 2
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method Cell\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method Line\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 2
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method Output\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 2
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method SetFont\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 2
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method SetMargins\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 2
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method SetXY\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 5
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method getNumPages\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method importPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 2
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method setPage\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method setPrintFooter\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method setSourceFile\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to method useTemplate\(\) on an unknown class TCPDI\.$#'
+			identifier: class.notFound
+			count: 2
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Parameter \#1 \$format of function pdf_getInstance expects ''''\|array\{\}\|array\{float\|int, float\|int\}, ''A4'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Parameter \#2 \$month of function dol_get_first_day expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/financial_and_pedagogical_report/generate_bpf_pdf.php
+
+		-
+			message: '#^Call to function is_array\(\) with non\-empty\-array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
+			identifier: new.noConstructor
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Loose comparison using \!\= between ''trainingsession'' and ''trainingsession'' will always evaluate to false\.$#'
+			identifier: notEqual.alwaysFalse
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Loose comparison using \=\= between 0 and 0 will always evaluate to true\.$#'
+			identifier: equal.alwaysTrue
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Method User\:\:fetchAll\(\) invoked with 7 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#1 \$iHours of function convertTime2Seconds expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#12 \$param of function saturne_show_documents expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#16 \$morepicto of function saturne_show_documents expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#2 \$iMinutes of function convertTime2Seconds expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#20 \$active of function saturne_show_documents expects int, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#4 \$key_in_label of static method Form\:\:multiselectarray\(\) expects int\<0, 1\>, '''' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#5 \$formquestion of method Form\:\:formconfirm\(\) expects array\<array\{name\?\: string, value\?\: bool\|float\|string, values\?\: array\<string\>, default\?\: string, label\?\: string, type\: string, size\?\: int\|string, morecss\?\: string, \.\.\.\}\|string\>\|string\|null, array\{array\{type\: ''text'', name\: ''clone_label'', label\: mixed, value\: string, size\: 24\}, array\{type\: ''radio'', name\: ''clone_attendants'', label\: mixed, values\: array\{mixed, mixed, mixed\}, default\: 0\}\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Parameter \#6 \$delallowed of function saturne_show_documents expects int, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Variable \$backurlforlist might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Variable \$dirFilesArray might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Variable \$fileDirArray might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Variable \$files might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: view/session/session_card.php
+
+		-
+			message: '#^Variable \$langs might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: view/session/session_card.php
+
+		-
+			message: '#^Loose comparison using \=\= between '''' and ''pwa'' will always evaluate to false\.$#'
+			identifier: equal.alwaysFalse
+			count: 2
+			path: view/session/session_list.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 2
+			path: view/session/session_list.php
+
+		-
+			message: '#^Parameter \#1 \$string of function urlencode expects string, int\<1, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_list.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 1
+			path: view/session/session_list.php
+
+		-
+			message: '#^Variable \$langs might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: view/session/session_list.php
+
+		-
+			message: '#^Variable \$objectLinked might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: view/session/session_list.php
+
+		-
+			message: '#^Variable \$objectMetadata might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: view/session/session_list.php
