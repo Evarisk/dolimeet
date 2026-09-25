@@ -36,6 +36,16 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
     protected $db;
 
     /**
+     * Le coeur type cette propriete comme une enumeration, alors que tous les modules y
+     * mettent leur numero de version. Sans cette redeclaration, PHPStan sort « does not
+     * accept '23.1.1' » et la baseline gele le numero : le prochain bump fait echouer
+     * l'analyse, au pire moment, pendant une release. Issue #928
+     *
+     * @var string Trigger version.
+     */
+    public $version;
+
+    /**
      * Constructor.
      *
      * @param DoliDB $db Database handler.
