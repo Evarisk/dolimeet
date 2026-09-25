@@ -38,8 +38,6 @@ TraineeSatisfactionSurvey                   = Trainee satisfaction survey
 TraineeSatisfactionSurveyDescription        = Defines the model used by default for trainee satisfaction surveys
 SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
 SessiontrainerSatisfactionSurveyDescription = Defines the model used by default for session trainer satisfaction surveys
-OpcoSatisfactionSurvey                      = OPCO satisfaction survey
-OpcoSatisfactionSurveyDescription           = Defines the model used by default for OPCO satisfaction surveys
 
 
 
@@ -212,7 +210,6 @@ AttendancePresentAuditRate           = Audit attendance rate
 AttendanceDelayAuditRate             = Late audit rate
 AttendanceAbsentAuditRate            = Absence rate from audits
 SessionTypeMonitorings               = Session type monitorings
-AverageDurationBySessionType         = Average duration by session type
 MeetingAttendance                    = Meeting attendance
 TrainingsessionAttendance            = Training session attendance
 AuditAttendance                      = Audit attendance
@@ -225,7 +222,6 @@ AuditAttendance                      = Audit attendance
 # Data
 TrainingOrganizationNumber        = Declaration number of the training organisation
 SocietyAttendants                 = Third party external attendants
-SetContrat                        = Define contract
 DateAndTime                       = Date and time
 SignAttendanceSheetOnline         = Sign the attendance sheet online
 SetSatisfactionSurvey             = Create a satisfaction survey
