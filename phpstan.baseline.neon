@@ -2063,3 +2063,69 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: view/session/session_list.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Categorie\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#2 \$fk_object of method SaturneSignature\:\:fetchSignatory\(\) expects int\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#3 \$contactID of function set_satisfaction_survey expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#4 \$pictoisfullpath of function img_picto expects int\<0, 1\>, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:indexFile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Propal and ''call_trigger'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Cannot access property \$code on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Cannot access property \$contactid on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Cannot access property \$source on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Parameter \#5 \$filter of method User\:\:fetchAll\(\) expects string, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
