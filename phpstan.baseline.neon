@@ -55,42 +55,6 @@ parameters:
 			path: admin/setup.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$contact_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$employee\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$entity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$error\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$login\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
 			message: '#^Access to property \$element on an unknown class Survey\.$#'
 			identifier: class.notFound
 			count: 4
@@ -121,12 +85,6 @@ parameters:
 			path: class/actions_dolimeet.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:jdate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -134,42 +92,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method DoliDB\:\:prefix\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:addrights\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:create\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:setPassword\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: class/actions_dolimeet.class.php
@@ -262,12 +184,6 @@ parameters:
 			message: '#^Cannot call method getNomUrl\(\) on CommonObject\|int\.$#'
 			identifier: method.nonObject
 			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 3
 			path: class/actions_dolimeet.class.php
 
 		-
@@ -379,12 +295,6 @@ parameters:
 			path: class/dolimeetdashboard.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -392,12 +302,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
@@ -553,12 +457,6 @@ parameters:
 			path: class/dolimeetsurveyreminder.class.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/dolimeetsurveyreminder.class.php
-
-		-
 			message: '#^Call to method fetch\(\) on an unknown class Survey\.$#'
 			identifier: class.notFound
 			count: 1
@@ -567,12 +465,6 @@ parameters:
 		-
 			message: '#^Call to method fetchObjectLinked\(\) on an unknown class Survey\.$#'
 			identifier: class.notFound
-			count: 1
-			path: class/dolimeetsurveyreminder.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: class/dolimeetsurveyreminder.class.php
 
@@ -631,25 +523,7 @@ parameters:
 			path: class/session.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/session.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/session.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/session.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: class/session.class.php
@@ -688,12 +562,6 @@ parameters:
 			message: '#^Call to function property_exists\(\) with Session and ''status'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: class/session.class.php
-
-		-
-			message: '#^Function dol_escape_htmltag invoked with 2 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 2
 			path: class/session.class.php
 
 		-
@@ -805,39 +673,9 @@ parameters:
 			path: core/ajax/onlineSign2.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/onlineSign2.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
 			identifier: method.notFound
 			count: 2
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: core/ajax/onlineSign2.php
 
 		-
@@ -919,36 +757,6 @@ parameters:
 			path: core/ajax/onlineSign2.php
 
 		-
-			message: '#^Cannot access property \$context on class\-string\|object\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Cannot access property \$error on class\-string\|object\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Cannot access property \$socid on class\-string\|object\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Cannot access property \$user_validation_id on class\-string\|object\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 4
-			path: core/ajax/onlineSign2.php
-
-		-
 			message: '#^Access to an undefined property CompanyBankAccount\:\:\$last_main_doc\.$#'
 			identifier: property.notFound
 			count: 3
@@ -991,12 +799,6 @@ parameters:
 			path: core/dolibarr/newonlinesign.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:close\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/dolibarr/newonlinesign.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:commit\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1009,31 +811,7 @@ parameters:
 			path: core/dolibarr/newonlinesign.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/dolibarr/newonlinesign.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: core/dolibarr/newonlinesign.php
@@ -1041,12 +819,6 @@ parameters:
 		-
 			message: '#^Call to function is_numeric\(\) with int will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: core/dolibarr/newonlinesign.php
 
@@ -1085,36 +857,6 @@ parameters:
 			identifier: variable.undefined
 			count: 2
 			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$job\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/doc_completioncertificatedocument_odt.modules.php
 
 		-
 			message: '#^Access to an undefined property pdf_attendancesheetdocument\:\:\$error\.$#'
@@ -1207,36 +949,6 @@ parameters:
 			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_attendancesheetdocument.modules.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$job\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
@@ -1305,12 +1017,6 @@ parameters:
 		-
 			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
-			count: 1
-			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
 
@@ -1609,30 +1315,6 @@ parameters:
 			path: core/substitutions/functions_dolimeet.lib.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
-
-		-
 			message: '#^Parameter \#2 \$noTrigger of method SaturneObject\:\:setDeleted\(\) expects int\<0, 1\>, true given\.$#'
 			identifier: argument.type
 			count: 1
@@ -1645,22 +1327,10 @@ parameters:
 			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
 
 		-
-			message: '#^Property DolibarrTriggers\:\:\$version \(''''\|''development''\|''dolibarr''\|''experimental''\) does not accept ''23\.1\.1''\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
-
-		-
 			message: '#^Strict comparison using \=\=\= between '''' and ''createformpubliccon…'' will always evaluate to false\.$#'
 			identifier: identical.alwaysFalse
 			count: 1
 			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: lib/dolibarr_lib.php
 
 		-
 			message: '#^Function getOnlineSignatureUrl2\(\) has parameter \$contact with no type specified\.$#'
@@ -1711,12 +1381,6 @@ parameters:
 			path: lib/dolimeet_function.lib.php
 
 		-
-			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
-			count: 1
-			path: lib/dolimeet_function.lib.php
-
-		-
 			message: '#^Function set_public_note\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -1745,30 +1409,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: lib/dolimeet_trainingsession.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: public/contact/add_contact.php
-
-		-
-			message: '#^Call to an undefined method User\:\:hasRight\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: public/contact/add_contact.php
-
-		-
-			message: '#^Call to an undefined method User\:\:loadRights\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: public/contact/add_contact.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: public/contact/add_contact.php
 
 		-
 			message: '#^Variable \$publicInterfaceUser might not be defined\.$#'
@@ -1897,18 +1537,6 @@ parameters:
 			path: view/session/session_card.php
 
 		-
-			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
-			count: 1
-			path: view/session/session_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/session/session_card.php
-
-		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
 			count: 1
@@ -1923,12 +1551,6 @@ parameters:
 		-
 			message: '#^Loose comparison using \=\= between 0 and 0 will always evaluate to true\.$#'
 			identifier: equal.alwaysTrue
-			count: 1
-			path: view/session/session_card.php
-
-		-
-			message: '#^Method User\:\:fetchAll\(\) invoked with 7 parameters, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: view/session/session_card.php
 
@@ -2063,3 +1685,75 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: view/session/session_list.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Categorie\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#2 \$fk_object of method SaturneSignature\:\:fetchSignatory\(\) expects int\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#3 \$contactID of function set_satisfaction_survey expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Parameter \#4 \$pictoisfullpath of function img_picto expects int\<0, 1\>, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_dolimeet.class.php
+
+		-
+			message: '#^Call to an undefined method CompanyBankAccount\:\:indexFile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Propal and ''call_trigger'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: core/ajax/onlineSign2.php
+
+		-
+			message: '#^Cannot access property \$code on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Cannot access property \$contactid on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Cannot access property \$source on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^PHPDoc type string of property InterfaceDoliMeetTriggers\:\:\$version is not covariant with PHPDoc type ''''\|''development''\|''dolibarr''\|''experimental'' of overridden property DolibarrTriggers\:\:\$version\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
+
+		-
+			message: '#^Parameter \#5 \$filter of method User\:\:fetchAll\(\) expects string, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/session/session_card.php
