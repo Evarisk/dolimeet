@@ -85,18 +85,6 @@ parameters:
 			path: class/actions_dolimeet.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:jdate\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:prefix\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/actions_dolimeet.class.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
@@ -295,18 +283,6 @@ parameters:
 			path: class/dolimeetdashboard.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/dolimeetdocuments/financialandpedagogicalreportdocument.class.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -451,12 +427,6 @@ parameters:
 			path: class/dolimeetsurveyreminder.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/dolimeetsurveyreminder.class.php
-
-		-
 			message: '#^Call to method fetch\(\) on an unknown class Survey\.$#'
 			identifier: class.notFound
 			count: 1
@@ -509,30 +479,6 @@ parameters:
 			identifier: class.notFound
 			count: 2
 			path: class/dolimeetsurveyreminder.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:begin\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/session.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:commit\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/session.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/session.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/session.class.php
 
 		-
 			message: '#^Call to function property_exists\(\) with \$this\(Session\) and ''label'' will always evaluate to true\.$#'
@@ -649,36 +595,6 @@ parameters:
 			path: core/ajax/onlineSign2.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:affected_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:begin\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:commit\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/onlineSign2.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/onlineSign2.php
-
-		-
 			message: '#^Call to function is_numeric\(\) with int will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -788,30 +704,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method CompanyBankAccount\:\:setDocModel\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:begin\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:commit\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/dolibarr/newonlinesign.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: core/dolibarr/newonlinesign.php
@@ -1055,222 +947,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: core/modules/dolimeet/dolimeetdocuments/trainingsessiondocument/pdf_completioncertificatedocument.modules.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$boxes\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$config_page_url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$conflictwith\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$const\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$const_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$cronjobs\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$db\.$#'
-			identifier: property.notFound
-			count: 24
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$depends\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$descriptionlong\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$dictionaries\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$dirs\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$editor_url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$error\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$errors\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$family\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$familyinfo\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$hidden\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$langfiles\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$max_dolibarr_version\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$menu\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$module_parts\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$module_position\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$need_dolibarr_version\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$phpmin\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$picto\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$requiredby\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$rights\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$rights_class\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$tabs\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$warnings_activation\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Access to an undefined property modDoliMeet\:\:\$warnings_activation_ext\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Call to an undefined method modDoliMeet\:\:_init\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Call to an undefined method modDoliMeet\:\:_load_tables\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/modDoliMeet.class.php
-
-		-
-			message: '#^Call to an undefined method modDoliMeet\:\:_remove\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/modDoliMeet.class.php
 
 		-
 			message: '#^Parameter \#4 \$id of method CommonObject\:\:setValueFrom\(\) expects int\|null, string given\.$#'
@@ -1723,12 +1399,6 @@ parameters:
 			path: core/ajax/onlineSign2.php
 
 		-
-			message: '#^Call to function method_exists\(\) with Propal and ''call_trigger'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: core/ajax/onlineSign2.php
-
-		-
 			message: '#^Cannot access property \$code on object\|false\.$#'
 			identifier: property.nonObject
 			count: 1
@@ -1743,12 +1413,6 @@ parameters:
 		-
 			message: '#^Cannot access property \$source on object\|false\.$#'
 			identifier: property.nonObject
-			count: 1
-			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
-
-		-
-			message: '#^PHPDoc type string of property InterfaceDoliMeetTriggers\:\:\$version is not covariant with PHPDoc type ''''\|''development''\|''dolibarr''\|''experimental'' of overridden property DolibarrTriggers\:\:\$version\.$#'
-			identifier: property.phpDocType
 			count: 1
 			path: core/triggers/interface_99_modDoliMeet_DoliMeetTriggers.class.php
 
