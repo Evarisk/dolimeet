@@ -177,6 +177,12 @@ class ActionsDolimeet
     {
         global $conf, $extrafields, $form, $langs;
 
+        // Sans objet, aucune metadonnee ne peut correspondre : la boucle plus bas ne ferait
+        // que lire ->element sur null, un avertissement par metadonnee
+        if (!is_object($object)) {
+            return 0;
+        }
+
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
             require_once __DIR__ . '/../../saturne/lib/object.lib.php';
             $objectsMetadata                = saturne_get_objects_metadata();
@@ -267,6 +273,13 @@ class ActionsDolimeet
             }
             $this->resprints = $out;
 
+            return 0;
+        }
+
+        // Sur la liste d'un autre module, le coeur ne renseigne pas $object : la boucle plus
+        // bas lisait ->element sur null, un avertissement par metadonnee et par ligne, sans
+        // qu'aucune correspondance soit possible
+        if (!is_object($object)) {
             return 0;
         }
 
