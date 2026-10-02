@@ -1,10 +1,14 @@
 # [DoliMeet] [23.1.2] - Compatibilité déclarée et chaîne qualité
 
-Description : Version de maintenance. Elle déclare la compatibilité Dolibarr 23 à 24, retire quatre clés de traduction mortes qui pouvaient faire ressortir un libellé anglais chez un module voisin, et place le module sous analyse statique à chaque modification.
+Description : Version de maintenance. Elle supprime les avertissements que le module écrivait dans les listes de ses voisins, déclare la compatibilité Dolibarr 23 à 24, retire quatre clés de traduction mortes qui pouvaient faire ressortir un libellé anglais chez un module voisin, et place le module sous analyse statique à chaque modification.
 
 **Cette version demande Saturne 23.2.1 ou supérieur.**
 
 ## Améliorations & corrections
+
+### Listes des autres modules
+
+* **Le module écrivait un avertissement par ligne dans les listes des modules voisins.** Son greffon de colonnes comparait le type de l'objet affiché sans vérifier qu'il y en ait un : sur la liste d'un autre module, Dolibarr ne lui en fournit pas. Mesuré sur la liste du temps passé de DoliSIRH : 35 avertissements pour un seul affichage de page, et aucun traitement utile derrière.
 
 ### Compatibilité
 
@@ -26,6 +30,7 @@ Description : Version de maintenance. Elle déclare la compatibilité Dolibarr 2
 
 ## Comparaison des versions [23.1.1](https://github.com/Evarisk/dolimeet/compare/23.1.1...23.1.2) et 23.1.2
 
+* #948 [Hook] fix: un avertissement par ligne sur les listes des autres modules [`fcfead5`](https://github.com/Evarisk/dolimeet/commit/fcfead5)
 * #944 [Mod] fix: renommer le changelog en ChangeLog.md [`711b68b`](https://github.com/Evarisk/dolimeet/commit/711b68b)
 * #941 [CI] rework: élaguer les entrées mortes de la baseline [`15a684f`](https://github.com/Evarisk/dolimeet/commit/15a684f)
 * #938 [CI] rework: scanner le socle par dossier plutôt que l'exclure par morceaux [`effce64`](https://github.com/Evarisk/dolimeet/commit/effce64)
