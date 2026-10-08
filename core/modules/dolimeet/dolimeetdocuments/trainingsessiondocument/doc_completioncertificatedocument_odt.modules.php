@@ -142,13 +142,13 @@ class doc_completioncertificatedocument_odt extends SaturneDocumentModel
         }
 
         if (getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE') > 0) {
-            $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
+            // Read in every entity : with multicompany, the signature drawn in another entity was missed
+            $result = $signatory->fetchUserSignatory(getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE'));
         } else {
             setEventMessages($langs->trans('DefineSessionTrainerResponsible'), [], 'errors');
             return -1;
         }
-        if(is_array($signatory) && !empty($signatory)) {
-            $signatory = array_shift($signatory);
+        if ($result > 0) {
             $userTmp->fetch($signatory->element_id);
             $tmpArray['mycompany_owner_fullname'] = strtoupper($userTmp->lastname) .  ' ' . ucfirst($userTmp->firstname);
             $tmpArray['mycompany_owner_job']      = $userTmp->job;
