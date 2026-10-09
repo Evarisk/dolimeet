@@ -232,9 +232,18 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $userTmp   = new User($this->db);
         $signatory = new SaturneSignature($this->db, 'dolimeet');
 
-        $signatory = $signatory->fetchSignatory('UserSignature', $conf->global->DOLIMEET_SESSION_TRAINER_RESPONSIBLE, 'user');
-        $signatory = array_shift($signatory);
-        $userTmp->fetch($signatory->element_id);
+        // Read in every entity : with multicompany, the signature drawn in another entity was missed. A
+        // trainer who never signed used to make array_shift() fail on an integer, the certificate now
+        // prints N/A in place of the signature
+        $trainerId = getDolGlobalInt('DOLIMEET_SESSION_TRAINER_RESPONSIBLE');
+        $signatory->fetchUserSignatory($trainerId);
+        if ($trainerId > 0) {
+            $userTmp->fetch($trainerId);
+        }
+        if (empty($signatory->id)) {
+            $signatory->firstname = $userTmp->firstname;
+            $signatory->lastname  = $userTmp->lastname;
+        }
 
         $trainingSessionDicts = saturne_fetch_dictionary('c_trainingsession_type');
 
