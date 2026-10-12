@@ -57,7 +57,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $this->name        = preg_replace('/^Interface/i', '', get_class($this));
         $this->family      = 'demo';
         $this->description = 'DoliMeet triggers.';
-        $this->version     = '23.1.2';
+        $this->version     = '23.1.3';
         $this->picto       = 'dolimeet@dolimeet';
     }
 
