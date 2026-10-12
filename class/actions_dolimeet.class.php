@@ -184,7 +184,7 @@ class ActionsDolimeet
         }
 
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
-            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            dol_include_once('/saturne/lib/object.lib.php');
             $objectsMetadata                = saturne_get_objects_metadata();
             $conf->cache['objectsMetadata'] = $objectsMetadata;
         } else {
@@ -265,7 +265,7 @@ class ActionsDolimeet
 
         // The training contract list carries indicator columns: the filter row keeps its cells aligned
         if ($this->isTrainingContractList($parameters)) {
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $out = '';
             foreach (array_keys($this->getTrainingContractIndicators()) as $indicatorAlias) {
@@ -284,7 +284,7 @@ class ActionsDolimeet
         }
 
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
-            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            dol_include_once('/saturne/lib/object.lib.php');
             $objectsMetadata                = saturne_get_objects_metadata();
             $conf->cache['objectsMetadata'] = $objectsMetadata;
         } else {
@@ -323,7 +323,7 @@ class ActionsDolimeet
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'projectOverview') {
-            require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+            dol_include_once('/saturne/lib/saturne_functions.lib.php');
             require_once __DIR__ . '/session.class.php';
 
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
@@ -392,8 +392,8 @@ class ActionsDolimeet
 
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                 // Load Saturne libraries
-                require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
-                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+                dol_include_once('/saturne/class/saturnesignature.class.php');
+                dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
                 // Load DigiQuali libraries
                 require_once __DIR__ . '/../../digiquali/class/survey.class.php';
@@ -528,7 +528,7 @@ class ActionsDolimeet
         if (preg_match('/categoryindex/', $parameters['context'])) {
             print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
         } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
-            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            dol_include_once('/saturne/lib/object.lib.php');
 
             $id   = GETPOST('id');
             $type = GETPOST('type');
@@ -628,9 +628,9 @@ class ActionsDolimeet
 
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                 // Load Saturne libraries
-                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
-                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
-                require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
+                dol_include_once('/saturne/lib/documents.lib.php');
+                dol_include_once('/saturne/lib/saturne_functions.lib.php');
+                dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
 
                 saturne_load_langs();
 
@@ -703,7 +703,7 @@ class ActionsDolimeet
 
         if (strpos($parameters['context'], 'thirdpartycontact')) {
 
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory   = new SaturneSignature($db);
 
@@ -849,7 +849,7 @@ class ActionsDolimeet
                 $moduleNameLowerCase = 'dolimeet';
                 $permissiontoadd     = $user->rights->dolimeet->trainingsession->write;
 
-                require_once __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
                 $action = '';
             }
 
@@ -859,7 +859,7 @@ class ActionsDolimeet
                 $upload_dir          = $conf->dolimeet->multidir_output[$conf->entity ?? 1];
 
                 // Action to generate pdf from odt file
-                require_once __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+                require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
                 $urlToRedirect = $_SERVER['REQUEST_URI'];
                 $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
@@ -876,9 +876,9 @@ class ActionsDolimeet
 
             if ($action == 'send_email') {
                 require_once __DIR__ . '/../../digiquali/class/survey.class.php';
-                require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
-                require_once __DIR__ . '/../../saturne/class/saturnemail.class.php';
-                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+                dol_include_once('/saturne/class/saturnesignature.class.php');
+                dol_include_once('/saturne/class/saturnemail.class.php');
+                dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
                 saturne_load_langs();
 
@@ -1477,7 +1477,7 @@ class ActionsDolimeet
             return 0;
         }
 
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $sql = '';
         foreach ($this->getTrainingContractIndicators() as $indicatorAlias => $indicator) {
@@ -1502,7 +1502,7 @@ class ActionsDolimeet
             return 0;
         }
 
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $out = '';
         foreach ($this->getTrainingContractIndicators() as $indicator) {
@@ -1527,7 +1527,7 @@ class ActionsDolimeet
             return 0;
         }
 
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $obj = $parameters['obj'] ?? null;
         $out = '';
@@ -1731,7 +1731,7 @@ class ActionsDolimeet
 
         if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
             // Load Saturne libraries
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
