@@ -55,7 +55,7 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
 
     if ($surveyID > 0) {
         // Load Saturne libraries
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
         $signatory->setSignatory($surveyID, $survey->element, $contactSource == 'internal' ? 'user' : 'socpeople', [$contactID], 'Attendant', 1);

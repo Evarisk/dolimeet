@@ -22,7 +22,7 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
+dol_include_once('/saturne/class/saturnedocuments.class.php');
 
 /**
  * Class for FinancialAndPedagogicalReportDocument
@@ -109,7 +109,7 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
         require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
 
         // Load Saturne libraries
-        require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         // load DoliMeet libraries
         require_once __DIR__ . '/../trainingsession.class.php';
@@ -462,7 +462,7 @@ class FinancialAndPedagogicalReportDocument extends SaturneDocuments
     public function loadBPFPartETrainers(int $firstDay, int $lastDay): array
     {
         // Load Saturne libraries
-        require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         // load DoliMeet libraries
         require_once __DIR__ . '/../trainingsession.class.php';
