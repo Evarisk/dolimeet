@@ -62,7 +62,7 @@ window.dolimeet.session.init = function() {
  */
 window.dolimeet.session.event = function() {
   $(document).on('change', '#fk_soc', window.dolimeet.session.reloadField);
-  $(document).on('change', '#model', window.dolimeet.session.reloadFieldModel);
+  $(document).on('change', '#session_form #model', window.dolimeet.session.reloadFieldModel);
   $(document).on('change', '#element_type', window.dolimeet.session.reloadFieldElementType);
   $('#date_start, #date_starthour, #date_startmin, #date_end, #date_endhour, #date_endmin').change(function () {
     setTimeout(function () {
