@@ -22,9 +22,9 @@
  */
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
-require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../saturne/class/saturnedocuments.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/class/saturnedocuments.class.php');
 
 /**
  * Class for Session.
@@ -501,7 +501,7 @@ class Session extends SaturneObject
 
         // When validated and every attendant has signed, show "Signé" instead of "Validé (en attente de signature)"
         if ($status == self::STATUS_VALIDATED && $status == $this->status && $this->id > 0) {
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory = new SaturneSignature($this->db, 'dolimeet', $this->element);
             if ($signatory->checkSignatoriesSignatures($this->id, $this->element) == 1) {
