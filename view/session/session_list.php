@@ -282,8 +282,9 @@ if (empty($resHook)) {
     // Mass actions archive
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/list_massactions.tpl.php';
 
-    // Download PDF mass action, offered by ActionsDolimeet::addMoreMassActions(): one zip with the PDF of every selected session
-    if ($massaction == 'downloadpdf' && $object->element == 'trainingsession' && $permissionToRead && !empty($toselect)) {
+    // Download PDF mass action, offered by ActionsDolimeet::addMoreMassActions(): one zip with the PDF of every selected session.
+    // An empty selection is already reported by actions_massactions.inc.php
+    if ($massaction == 'downloadpdf' && $object->element == 'trainingsession' && $permissionToRead) {
         require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
 
         $zipFile = $conf->dolimeet->dir_temp . '/' . uniqid('trainingsessionpdf_') . '.zip';
