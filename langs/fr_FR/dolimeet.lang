@@ -198,6 +198,8 @@ CalculatedTotalSessionDuration        = Durée totale calculée :
 TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
 NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à au moins une session.
 ErrorMissingTrainingSessionProjectInfo = Attention : information du projet de formation manquante
+DownloadPDFs                          = Télécharger les PDF
+NoPDFForSelectedTrainingsessions      = Aucun PDF n'a été généré pour les sessions de formation sélectionnées.
 
 # Extrafields - Attributs supplémentaires
 TrainingSessionType              = Type de formation

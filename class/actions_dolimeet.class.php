@@ -311,6 +311,26 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the addMoreMassActions function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addMoreMassActions(array $parameters): int
+    {
+        global $langs;
+
+        // The mass action itself is handled by view/session/session_list.php
+        if (strpos($parameters['context'], 'trainingsessionlist') !== false) {
+            $label = '<span class="fas fa-file-download paddingrightonly"></span>' . $langs->trans('DownloadPDFs');
+
+            $this->resprints = '<option value="downloadpdf" data-html="' . dol_escape_htmltag($label) . '">' . $label . '</option>';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the printCommonFooter function : replacing the parent's function with the one below.
      *
      * @param  array     $parameters Hook metadatas (context, etc...).

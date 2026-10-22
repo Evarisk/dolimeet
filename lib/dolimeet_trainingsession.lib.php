@@ -112,6 +112,66 @@ function trainingsession_function_lib2()
     return array_column($variousProducts, 'label', 'id');
 }
 
+/**
+ * Zip the PDF documents of training sessions, in one folder per session named after its ref
+ *
+ * @param  int[]  $sessionIds Training session ids
+ * @param  string $zipFile    Full path of the zip file to create
+ * @return int                Number of zipped PDF, < 0 on error
+ * @throws Exception
+ */
+function trainingsession_zip_pdf_documents(array $sessionIds, string $zipFile): int
+{
+    global $conf, $db, $langs;
+
+    require_once __DIR__ . '/../class/trainingsession.class.php';
+
+    if (!class_exists('ZipArchive')) {
+        $langs->load('errors');
+        setEventMessages($langs->trans('ErrorPHPNeedModule', 'zip'), [], 'errors');
+        return -1;
+    }
+
+    // Same document folders as the ones listed on the session card
+    $documentTypes = ['trainingsession', 'attendancesheet', 'completioncertificate'];
+
+    $session = new Trainingsession($db);
+    $files   = [];
+    foreach ($sessionIds as $sessionId) {
+        if ($session->fetch($sessionId) <= 0) {
+            continue;
+        }
+
+        $sessionRef = dol_sanitizeFileName($session->ref);
+        $uploadDir  = $conf->dolimeet->multidir_output[$session->entity] ?? $conf->dolimeet->dir_output;
+        foreach ($documentTypes as $documentType) {
+            // A specimen is only a preview of the document to sign, it is left out
+            $fileList = dol_dir_list($uploadDir . '/' . $documentType . 'document/' . $sessionRef, 'files', 0, '\.pdf$', 'specimen');
+            foreach ($fileList as $file) {
+                $files[$sessionRef . '/' . $file['name']] = $file['fullname'];
+            }
+        }
+    }
+
+    if (empty($files)) {
+        return 0;
+    }
+
+    dol_mkdir(dirname($zipFile));
+    $zip = new ZipArchive();
+    if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        $langs->load('errors');
+        setEventMessages($langs->trans('ErrorFailToCreateFile', basename($zipFile)), [], 'errors');
+        return -1;
+    }
+    foreach ($files as $nameInZip => $file) {
+        $zip->addFile($file, $nameInZip);
+    }
+    $zip->close();
+
+    return count($files);
+}
+
 function get_formation_label(CommonObject $object): string
 {
     global $langs;

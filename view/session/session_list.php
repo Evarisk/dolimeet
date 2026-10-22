@@ -281,6 +281,26 @@ if (empty($resHook)) {
 
     // Mass actions archive
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/list_massactions.tpl.php';
+
+    // Download PDF mass action, offered by ActionsDolimeet::addMoreMassActions(): one zip with the PDF of every selected session
+    if ($massaction == 'downloadpdf' && $object->element == 'trainingsession' && $permissionToRead && !empty($toselect)) {
+        require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
+
+        $zipFile = $conf->dolimeet->dir_temp . '/' . uniqid('trainingsessionpdf_') . '.zip';
+        $nbFiles = trainingsession_zip_pdf_documents($toselect, $zipFile);
+        if ($nbFiles > 0) {
+            $zipName = dol_sanitizeFileName(str_replace(' ', '_', $langs->transnoentities('Trainingsessions'))) . '_' . dol_print_date(dol_now(), 'dayhourlog') . '.zip';
+
+            top_httphead('application/zip');
+            header('Content-Disposition: attachment; filename="' . $zipName . '"');
+            header('Content-Length: ' . dol_filesize($zipFile));
+            readfileLowMemory($zipFile);
+            dol_delete_file($zipFile);
+            exit;
+        } elseif ($nbFiles == 0) {
+            setEventMessages($langs->trans('NoPDFForSelectedTrainingsessions'), [], 'warnings');
+        }
+    }
 }
 
 /*
