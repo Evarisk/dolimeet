@@ -125,6 +125,7 @@ TrainingSessionDurationErrorMatching  = <strong> Error: consistency of training 
 NoCertificateBecauseAbsent            = No certificate was generated for <b> %s %s </b> because it was absent from at least one session.
 DownloadPDFs                          = Download PDFs
 NoPDFForSelectedTrainingsessions      = No PDF has been generated for the selected training sessions.
+ODTDocumentsNotConvertedToPDF         = %s ODT document(s) could not be converted to PDF and are missing from the ZIP. Check the ODT to PDF conversion setup (LibreOffice).
 
 
 # Attendant role

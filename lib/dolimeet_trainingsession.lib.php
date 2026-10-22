@@ -113,7 +113,39 @@ function trainingsession_function_lib2()
 }
 
 /**
+ * Convert an ODT document into a PDF stored next to it, with the converter set in MAIN_ODT_AS_PDF
+ * Same conversion as the PDF generation button of the document list on the session card
+ *
+ * @param  string $odtFile Full path of the ODT document
+ * @return int             1 on success, -1 on error
+ */
+function trainingsession_convert_odt_to_pdf(string $odtFile): int
+{
+    global $conf;
+
+    require_once ODTPHP_PATH . 'odf.php';
+
+    try {
+        $odfHandler = new Odf($odtFile, [
+            'PATH_TO_TMP'     => $conf->dolimeet->dir_temp,
+            'ZIP_PROXY'       => getDolGlobalString('MAIN_ODF_ZIP_PROXY', 'PclZipProxy'),
+            'DELIMITER_LEFT'  => '{',
+            'DELIMITER_RIGHT' => '}'
+        ]);
+        // No output for download: with MAIN_DISABLE_PDF_AUTOUPDATE the PDF would be sent to the browser instead of the zip
+        $odfHandler->exportAsAttachedPDF($odtFile, 0);
+    } catch (Exception $e) {
+        dol_syslog(__FUNCTION__ . ' ' . $e->getMessage(), LOG_ERR);
+        return -1;
+    }
+
+    // LibreOffice exits with code 0 even when it could not load the source file
+    return file_exists(dirname($odtFile) . '/' . pathinfo($odtFile, PATHINFO_FILENAME) . '.pdf') ? 1 : -1;
+}
+
+/**
  * Zip the PDF documents of training sessions, in one folder per session named after its ref
+ * Documents are generated as ODT by default: the ones without their PDF yet are converted first
  *
  * @param  int[]  $sessionIds Training session ids
  * @param  string $zipFile    Full path of the zip file to create
@@ -135,8 +167,9 @@ function trainingsession_zip_pdf_documents(array $sessionIds, string $zipFile): 
     // Same document folders as the ones listed on the session card
     $documentTypes = ['trainingsession', 'attendancesheet', 'completioncertificate'];
 
-    $session = new Trainingsession($db);
-    $files   = [];
+    $session        = new Trainingsession($db);
+    $files          = [];
+    $nbNotConverted = 0;
     foreach ($sessionIds as $sessionId) {
         if ($session->fetch($sessionId) <= 0) {
             continue;
@@ -145,12 +178,26 @@ function trainingsession_zip_pdf_documents(array $sessionIds, string $zipFile): 
         $sessionRef = dol_sanitizeFileName($session->ref);
         $uploadDir  = $conf->dolimeet->multidir_output[$session->entity] ?? $conf->dolimeet->dir_output;
         foreach ($documentTypes as $documentType) {
+            $documentDir = $uploadDir . '/' . $documentType . 'document/' . $sessionRef;
+
             // A specimen is only a preview of the document to sign, it is left out
-            $fileList = dol_dir_list($uploadDir . '/' . $documentType . 'document/' . $sessionRef, 'files', 0, '\.pdf$', 'specimen');
+            if (getDolGlobalString('MAIN_ODT_AS_PDF')) {
+                foreach (dol_dir_list($documentDir, 'files', 0, '\.odt$', 'specimen') as $odtFile) {
+                    if (!file_exists($documentDir . '/' . pathinfo($odtFile['name'], PATHINFO_FILENAME) . '.pdf') && trainingsession_convert_odt_to_pdf($odtFile['fullname']) < 0) {
+                        $nbNotConverted++;
+                    }
+                }
+            }
+
+            $fileList = dol_dir_list($documentDir, 'files', 0, '\.pdf$', 'specimen');
             foreach ($fileList as $file) {
                 $files[$sessionRef . '/' . $file['name']] = $file['fullname'];
             }
         }
+    }
+
+    if ($nbNotConverted > 0) {
+        setEventMessages($langs->trans('ODTDocumentsNotConvertedToPDF', $nbNotConverted), [], 'warnings');
     }
 
     if (empty($files)) {
