@@ -1124,9 +1124,9 @@ class ActionsDolimeet
             'name_field'     => 'ref',
             'hook_name_card' => 'trainingsessioncard',
             'hook_name_list' => 'trainingsessionlist',
-            'create_url'     => 'custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
-            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php',
-            'lib_path'       => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php'
+            'create_url'     => 'dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
+            'class_path'     => 'dolimeet/class/trainingsession.class.php',
+            'lib_path'       => 'dolimeet/lib/dolimeet_trainingsession.lib.php'
         ];
         $this->results = $objectsMetadata;
 
