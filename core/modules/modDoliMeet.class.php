@@ -573,6 +573,11 @@ class modDoliMeet extends DolibarrModules
     {
         global $conf, $langs, $user;
 
+        // Dolibarr runs init() before activating $this->depends : activate them first, isModEnabled('project') is tested below
+        if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
+            return -1;
+        }
+
         // Permissions.
         $this->remove($options);
 
