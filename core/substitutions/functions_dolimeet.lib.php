@@ -92,7 +92,8 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 
             $confEmailTemplateSatisfactionSurvey = json_decode(getDolGlobalString('DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'), true);
             $emailModelSelected = GETPOST('modelmailselected', 'int');
-            $key                = array_search($emailModelSelected, $confEmailTemplateSatisfactionSurvey);
+            // The constant keeps its default 0 until the survey email templates are created
+            $key                = is_array($confEmailTemplateSatisfactionSurvey) ? array_search($emailModelSelected, $confEmailTemplateSatisfactionSurvey) : false;
 
             if ($key !== false) {
                 $contacts = array_merge($object->liste_contact(-1, 'internal', 0, dol_strtoupper($key)), $object->liste_contact(-1, 'external', 0, dol_strtoupper($key)));

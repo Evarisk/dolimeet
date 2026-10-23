@@ -609,7 +609,8 @@ class modDoliMeet extends DolibarrModules
 
         $saturneMail = new SaturneMail($this->db, 'contrat');
 
-        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+        // Not tied to DOLIMEET_EMAIL_TEMPLATE_SET : DigiQuali can be enabled after DoliMeet, once the later steps already ran
+        if (!is_array(json_decode(getDolGlobalString('DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'), true)) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             $position = 100;
             $satisfactionSurveys = ['billing', 'trainee', 'sessiontrainer', 'opco'];
             foreach ($satisfactionSurveys as $satisfactionSurvey) {
@@ -629,7 +630,9 @@ class modDoliMeet extends DolibarrModules
             }
 
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', json_encode($emailTemplateSatisfactionSurvey), 'chaine', 0, '', $conf->entity);
-            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 1, 'integer', 0, '', $conf->entity);
+            if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0) {
+                dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 1, 'integer', 0, '', $conf->entity);
+            }
         }
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') <= 1) {
             $saturneMail->entity        = 0;
