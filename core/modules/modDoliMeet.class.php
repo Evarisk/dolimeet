@@ -573,6 +573,12 @@ class modDoliMeet extends DolibarrModules
     {
         global $conf, $langs, $user;
 
+        // Saturne provides the functions used below : refuse the activation rather than a fatal error when it is missing
+        if (!function_exists('saturne_load_langs')) {
+            $this->error = $langs->trans('activateModuleDependNotSatisfied', $this->name, 'modSaturne', $this->name);
+            return -1;
+        }
+
         // Dolibarr runs init() before activating $this->depends : activate them first, isModEnabled('project') is tested below
         if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
             return -1;
