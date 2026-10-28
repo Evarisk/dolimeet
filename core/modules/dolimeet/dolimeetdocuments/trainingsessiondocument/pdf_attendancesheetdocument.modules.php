@@ -295,8 +295,11 @@ class pdf_attendancesheetdocument {
         ========================= */
 
         $pdf->SetXY(15, 12);
-        $logo = DOL_DATA_ROOT . '/mycompany/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO');
-        $pdf->Image($logo, $pdf->GetX(), $pdf->GetY(), 50, 10, 'PNG');
+        // Scale the company logo into the 50 x 15 mm box left of the title, keeping its aspect ratio (fitbox)
+        $logo = $conf->mycompany->dir_output . '/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO');
+        if (getDolGlobalString('MAIN_INFO_SOCIETE_LOGO') && is_readable($logo)) {
+            $pdf->Image($logo, $pdf->GetX(), $pdf->GetY(), 50, 15, '', '', '', false, 300, '', false, false, 0, 'LT');
+        }
 
         // Title on the right
         $pdf->SetXY(130, 12);
