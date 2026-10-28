@@ -22,8 +22,8 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../saturne/class/saturnemail.class.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/class/saturnemail.class.php');
 
 /**
  * Class for the scheduled satisfaction survey reminder

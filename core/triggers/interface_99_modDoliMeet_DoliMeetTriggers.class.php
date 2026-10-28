@@ -141,7 +141,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             case 'TRAININGSESSION_CREATE' :
                 require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
-                require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+                dol_include_once('/saturne/class/saturnesignature.class.php');
 
                 $contract  = new Contrat($this->db);
                 $signatory = new SaturneSignature($this->db, 'dolimeet', 'trainingsession');
@@ -226,7 +226,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
                     if ($contactCode == 'TRAINEE' || $contactCode == 'SESSIONTRAINER') {
                         require_once __DIR__ . '/../../class/trainingsession.class.php';
-                        require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+                        dol_include_once('/saturne/class/saturnesignature.class.php');
 
                         $trainingSession  = new Trainingsession($this->db);
                         $signatory        = new SaturneSignature($this->db, 'dolimeet', $trainingSession->element);
@@ -246,7 +246,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                 // signatory on the draft sessions and refresh the public note.
                 require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
                 require_once __DIR__ . '/../../class/trainingsession.class.php';
-                require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+                dol_include_once('/saturne/class/saturnesignature.class.php');
 
                 // Gate on the presence of draft sessions, not on the trainingsession_type extrafield: it can be empty on formation contracts whose session signatories were created by TRAININGSESSION_CREATE.
                 $trainingSession  = new Trainingsession($this->db);
