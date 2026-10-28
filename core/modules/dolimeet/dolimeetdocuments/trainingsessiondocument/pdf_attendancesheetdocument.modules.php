@@ -52,6 +52,21 @@ class pdf_attendancesheetdocument {
     public $type;
 
     /**
+     * @var string Error message, read by CommonObject::commonGenerateDocument() when the generation fails
+     */
+    public $error = '';
+
+    /**
+     * @var string[] Error messages
+     */
+    public $errors = [];
+
+    /**
+     * @var string[] Warning messages, read by CommonObject::commonGenerateDocument() after each generation
+     */
+    public $warnings = [];
+
+    /**
      * @var array Minimum version of PHP required by module.
      * e.g.: PHP ≥ 5.6 = array(5, 6)
      */
@@ -408,7 +423,7 @@ class pdf_attendancesheetdocument {
         $pdf->SetFont('helvetica', '', 7);
         $pdf->MultiCell(190, 3, "Siège social: " . $mysoc->name . " - " . $mysoc->address . " - " . $mysoc->zip . " " . $mysoc->town . " , " . $mysoc->country, 0, 'C', 0, 1);
         $pdf->MultiCell(190, 3, "Téléphone: " . $mysoc->phone . " - " . $mysoc->url . " - " . $mysoc->email, 0, 'C', 0, 1);
-        $pdf->MultiCell(190, 3, $conf->global->SOCIETE_TYPE . " - Capital de " . $mysoc->capital . " € - SIRET: " . $mysoc->idprof2, 0, 'C', 0, 1);
+        $pdf->MultiCell(190, 3, getDolGlobalString('SOCIETE_TYPE') . " - Capital de " . $mysoc->capital . " € - SIRET: " . $mysoc->idprof2, 0, 'C', 0, 1);
         $pdf->MultiCell(190, 3, "NAF-APE: " . $mysoc->idprof3 . " - RCS/RM: " . $mysoc->idprof4 . " - Numéro TVA: " . $mysoc->tva_intra, 0, 'C', 0, 1);
         $pdf->SetFont('helvetica', '', 8);
         $pdf->Cell(190, 3, "1 / 1", 0, 1, 'R');
