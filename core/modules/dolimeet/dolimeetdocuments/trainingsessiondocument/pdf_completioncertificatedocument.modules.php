@@ -28,9 +28,9 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/lib/saturne_functions.lib.php';
-require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+dol_include_once('/saturne/lib/saturne_functions.lib.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
 require_once __DIR__ . '/../../../../../lib/dolimeet_function.lib.php';
 
 /**

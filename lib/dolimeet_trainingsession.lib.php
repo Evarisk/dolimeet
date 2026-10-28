@@ -22,7 +22,7 @@
  */
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+dol_include_once('/saturne/lib/object.lib.php');
 
 /**
  * Prepare training session pages header
@@ -45,7 +45,7 @@ function trainingsession_function_lib1()
     global $conf, $langs;
 
     require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
-    require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+    dol_include_once('/saturne/lib/object.lib.php');
 
     $mainCategory      = getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY');
     $templateProjectId = getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT');
@@ -88,7 +88,7 @@ function trainingsession_function_lib2()
     global $conf, $langs;
 
     require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
-    require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+    dol_include_once('/saturne/lib/object.lib.php');
 
     $variousCategory = getDolGlobalInt('DOLIMEET_FORMATION_VARIOUS_MAIN_CATEGORY');
 
