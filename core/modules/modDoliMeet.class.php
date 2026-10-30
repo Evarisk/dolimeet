@@ -658,11 +658,13 @@ class modDoliMeet extends DolibarrModules
             $saturneMail->joinfiles     = 0;
             $saturneMail->content       = $langs->transnoentities('CompletionCertificateDocumentContent');
 
-            $emailTemplateID = $saturneMail->create($user);
+            $saturneMail->create($user);
 
-            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $emailTemplateID, 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 2, 'integer', 0, '', $conf->entity);
         }
+        // The id of the completion certificate template was kept here and read nowhere: the template is picked by hand
+        // when sending, so the constant only made the email templates overview of Saturne believe a setting sends it (#980)
+        dolibarr_del_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $conf->entity);
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') <= 2) {
             $saturneMail->entity        = 0;
             $saturneMail->type_template = 'contract';
