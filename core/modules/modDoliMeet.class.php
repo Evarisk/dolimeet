@@ -151,7 +151,8 @@ class modDoliMeet extends DolibarrModules
                 'onlinesign',
                 'contractnote',
                 'elementproperties',
-                'dolimeetpublicinterfaceadmin'
+                'dolimeetpublicinterfaceadmin',
+                'emailtemplates'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,

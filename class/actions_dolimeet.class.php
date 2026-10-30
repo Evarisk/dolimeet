@@ -1297,6 +1297,54 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the saturneEmailTemplateSettings function : replacing the parent's function with the one below
+     *
+     * Declares the DoliMeet settings designating an email template, shown by their label in the "Used by" column of
+     * the Saturne email templates overview
+     *
+     * @param  array $parameters Hook metadatas (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function saturneEmailTemplateSettings(array $parameters): int
+    {
+        global $langs;
+
+        $langs->load('dolimeet@dolimeet');
+
+        $questionnaireUrl = dol_buildpath('/dolimeet/admin/questionnaire.php', 1);
+
+        $this->results = [];
+
+        // The survey is sent and reminded per role, each role names its own template
+        foreach (['sessiontrainer', 'trainee', 'customer', 'billing'] as $role) {
+            $roleLabel = $langs->transnoentities(ucfirst($role) . 'SatisfactionSurvey');
+
+            $this->results['DOLIMEET_' . dol_strtoupper($role) . '_SATISFACTION_SURVEY_EMAIL_TEMPLATE'] = [
+                'label' => $roleLabel . ' · ' . $langs->transnoentities('SatisfactionSurveyEmailTemplate'),
+                'url'   => $questionnaireUrl
+            ];
+            $this->results['DOLIMEET_' . dol_strtoupper($role) . '_SATISFACTION_SURVEY_REMINDER_EMAIL_TEMPLATE'] = [
+                'label' => $roleLabel . ' · ' . $langs->transnoentities('SatisfactionSurveyReminderEmailTemplate'),
+                'url'   => $questionnaireUrl
+            ];
+        }
+
+        // Written on activation, used until a template is picked for the role
+        $this->results['DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'] = [
+            'label' => $langs->transnoentities('SatisfactionSurveyDefaultEmailTemplates'),
+            'url'   => $questionnaireUrl
+        ];
+
+        // Written on activation, set nowhere in the interface
+        $this->results['DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE'] = [
+            'label' => $langs->transnoentities('SatisfactionSurveySendToContactEmailTemplate'),
+            'url'   => ''
+        ];
+
+        return 0;
+    }
+
+    /**
      * Overloading the completeTabsHead function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadatas (context, etc...)
