@@ -89,6 +89,8 @@ BillingSatisfactionSurvey                   = Enquête de satisfaction commandit
 BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire/OPCO
 SatisfactionSurveyEmailTemplate             = Modèle d'email d'envoi
 SatisfactionSurveyReminderEmailTemplate     = Modèle d'email de relance
+SatisfactionSurveyDefaultEmailTemplates     = Enquête de satisfaction · Modèles d'envoi par défaut, par rôle
+SatisfactionSurveySendToContactEmailTemplate = Enquête de satisfaction · Envoi à un contact depuis le contrat
 
 # Formation - Formation
 TrainingContract                    = Convention de formation
