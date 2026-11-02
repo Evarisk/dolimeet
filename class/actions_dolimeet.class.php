@@ -1109,6 +1109,11 @@ class ActionsDolimeet
      */
     public function saturneExtendGetObjectsMetadata(array $parameters): int
     {
+        // Paths relative to DOL_DOCUMENT_ROOT as installed (custom/dolimeet on a standard install): Saturne < 23.3.0 and older
+        // readers prepend DOL_DOCUMENT_ROOT, newer ones use dol_buildpath(). Bare name only outside the main document root
+        $moduleDir  = dol_buildpath('/dolimeet', 0);
+        $modulePath = strpos($moduleDir, DOL_DOCUMENT_ROOT . '/') === 0 ? substr($moduleDir, strlen(DOL_DOCUMENT_ROOT) + 1) : 'dolimeet';
+
         $objectsMetadata['dolimeet_trainsess'] = [
             'mainmenu'       => 'dolimeet',
             'leftmenu'       => '',
@@ -1124,9 +1129,9 @@ class ActionsDolimeet
             'name_field'     => 'ref',
             'hook_name_card' => 'trainingsessioncard',
             'hook_name_list' => 'trainingsessionlist',
-            'create_url'     => 'dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
-            'class_path'     => 'dolimeet/class/trainingsession.class.php',
-            'lib_path'       => 'dolimeet/lib/dolimeet_trainingsession.lib.php'
+            'create_url'     => $modulePath . '/view/session/session_card.php?action=create&object_type=trainingsession',
+            'class_path'     => $modulePath . '/class/trainingsession.class.php',
+            'lib_path'       => $modulePath . '/lib/dolimeet_trainingsession.lib.php'
         ];
         $this->results = $objectsMetadata;
 
