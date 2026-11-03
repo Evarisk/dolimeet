@@ -128,6 +128,7 @@ NoCertificateBecauseAbsent            = No certificate was generated for <b> %s 
 DownloadPDFs                          = Download PDFs
 NoPDFForSelectedTrainingsessions      = No PDF has been generated for the selected training sessions.
 ODTDocumentsNotConvertedToPDF         = %s ODT document(s) could not be converted to PDF and are missing from the ZIP. Check the ODT to PDF conversion setup (LibreOffice).
+SessionsWithoutAttendantsNotValidated = Not validated, each role needs at least one attendant: %s
 
 
 # Attendant role

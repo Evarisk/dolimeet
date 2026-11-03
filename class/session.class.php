@@ -461,6 +461,40 @@ class Session extends SaturneObject
     }
 
     /**
+     * Return the attendant roles nobody holds yet on the session, it can not be validated before each of them is filled
+     *
+     * @return string[] Roles without any attendant
+     */
+    public function getMissingAttendantRoles(): array
+    {
+        switch ($this->element) {
+            case 'meeting':
+                $attendantRoles = ['Contributor', 'Responsible'];
+                break;
+            case 'trainingsession':
+                // A training session template is validated without attendants, they are only added to the sessions made from it
+                $attendantRoles = empty($this->model) ? ['Trainee', 'SessionTrainer'] : [];
+                break;
+            case 'audit':
+                $attendantRoles = ['Auditee', 'Auditor'];
+                break;
+            default:
+                $attendantRoles = ['Attendant'];
+        }
+
+        $signatory    = new SaturneSignature($this->db, $this->module, $this->element);
+        $missingRoles = [];
+        foreach ($attendantRoles as $attendantRole) {
+            $signatories = $signatory->fetchSignatory($attendantRole, $this->id, $this->element);
+            if (!is_array($signatories) || empty($signatories)) {
+                $missingRoles[] = $attendantRole;
+            }
+        }
+
+        return $missingRoles;
+    }
+
+    /**
      * Return the status
      *
      * @param  int    $status ID status

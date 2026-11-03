@@ -231,6 +231,9 @@ saturne_check_access($permissionToRead, $object, true);
 // Enable the "Sign" mass action offered by the saturne list templates: an attendant signs all the sessions they attend at once
 $enableMassSignature = 1;
 
+// Enable the "Validate" mass action as well, so the drafts can be validated before being signed: the action itself is run below
+$enableMassValidate = 1;
+
 // Document the signature page works on, so the list can link straight to it
 $signatureDocumentTypes = ['meeting' => 'MeetingDocument', 'trainingsession' => 'AttendanceSheetDocument', 'audit' => 'AuditDocument'];
 $signatureDocumentType  = $signatureDocumentTypes[$object->element] ?? '';
@@ -278,6 +281,58 @@ if (empty($resHook)) {
     $uploaddir   = $conf->dolimeet->dir_output;
 
     require_once DOL_DOCUMENT_ROOT . '/core/actions_massactions.inc.php';
+
+    // Validate mass action, offered through $enableMassValidate but run here: list_massactions.tpl.php loads the sessions
+    // without their type, SESSION_VALIDATE would be triggered in place of TRAININGSESSION_VALIDATE, MEETING_VALIDATE or
+    // AUDIT_VALIDATE: neither the agenda event nor the note of the training contract would be written
+    if (($massaction == 'validate' || ($action == 'validate' && $confirm == 'yes')) && $permissiontoadd && !empty($toselect)) {
+        $nbOk        = 0;
+        $nbSkipped   = 0;
+        $notReadyUrl = [];
+        $error       = 0;
+        foreach ($toselect as $toSelectedID) {
+            $sessionTmp = new $objectclass($db, $object->element);
+            if ($sessionTmp->fetch($toSelectedID) <= 0) {
+                setEventMessages($sessionTmp->error, $sessionTmp->errors, 'errors');
+                $error++;
+                break;
+            }
+
+            // Only a draft session can be validated, else a locked or archived one would go back to the validated status
+            if ($sessionTmp->status != $sessionTmp::STATUS_DRAFT) {
+                $nbSkipped++;
+                continue;
+            }
+
+            // As on its card, a session is only validated once each of its roles has an attendant
+            if (!empty($sessionTmp->getMissingAttendantRoles())) {
+                $notReadyUrl[] = $sessionTmp->getNomUrl(1);
+                continue;
+            }
+
+            if ($sessionTmp->validate($user) > 0) {
+                $nbOk++;
+            } else {
+                setEventMessages($sessionTmp->error, $sessionTmp->errors, 'errors');
+                $error++;
+                break;
+            }
+        }
+
+        if ($error == 0) {
+            setEventMessages($langs->trans('RecordsValidated', $nbOk), []);
+            if ($nbSkipped > 0) {
+                setEventMessages($langs->trans('RecordsNotDraftSkipped', $nbSkipped), [], 'warnings');
+            }
+            if (!empty($notReadyUrl)) {
+                setEventMessages($langs->trans('SessionsWithoutAttendantsNotValidated', implode(', ', $notReadyUrl)), [], 'warnings');
+            }
+        }
+
+        // The selection is validated: the saturne template must not take it over
+        $action     = 'list';
+        $massaction = '';
+    }
 
     // Mass actions archive
     require_once dol_buildpath('/saturne/core/tpl/actions/list_massactions.tpl.php');

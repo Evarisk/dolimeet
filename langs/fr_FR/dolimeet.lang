@@ -203,6 +203,7 @@ ErrorMissingTrainingSessionProjectInfo = Attention : information du projet de fo
 DownloadPDFs                          = Télécharger les PDF
 NoPDFForSelectedTrainingsessions      = Aucun PDF n'a été généré pour les sessions de formation sélectionnées.
 ODTDocumentsNotConvertedToPDF         = %s document(s) ODT n'ont pas pu être convertis en PDF et manquent dans le ZIP. Vérifiez la configuration de la conversion ODT vers PDF (LibreOffice).
+SessionsWithoutAttendantsNotValidated = Non validé(s) faute d'au moins un participant pour chaque rôle : %s
 
 # Extrafields - Attributs supplémentaires
 TrainingSessionType              = Type de formation
