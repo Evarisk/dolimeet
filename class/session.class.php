@@ -592,7 +592,7 @@ class Session extends SaturneObject
         }
 
         // Create clone
-        $object->context = 'createfromclone';
+        $object->context['createfromclone'] = 'createfromclone';
         $sessionID       = $object->create($user);
 
         if ($sessionID > 0) {
