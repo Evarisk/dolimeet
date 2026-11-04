@@ -140,8 +140,8 @@ class ActionsDolimeet
     {
         if (preg_match('/productcard|contractcard|contractcontactcard/', $parameters['context'])) {
             $resourcesRequired = [
-                'css' => '/custom/saturne/css/saturne.min.css',
-                'js'  => '/custom/saturne/js/saturne.min.js'
+                'css' => '/saturne/css/saturne.min.css',
+                'js'  => '/saturne/js/saturne.min.js'
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';
@@ -154,7 +154,7 @@ class ActionsDolimeet
 
         if (preg_match('/thirdpartycontact/', $parameters['context'])) {
             $resourcesRequired = [
-                'js'  => '/custom/dolimeet/js/dolimeet.min.js'
+                'js'  => '/dolimeet/js/dolimeet.min.js'
             ];
 
             $out = '<!-- Includes JS added by module saturne -->';
@@ -448,7 +448,7 @@ class ActionsDolimeet
                                             $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $survey->getStatus();
 
                                             $outputLine[$contact['rowid']] .= ' <a href="?' . http_build_query($_GET + ['action' => 'send_email', 'survey_id' => $survey->id]) . '" class="wpeo-button button-blue"><i class="fas fa-paper-plane" style="color: #fff;"></i></a>';
-                                            $outputLine[$contact['rowid']] .= ' <a href="' . dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3) . '" class="wpeo-button button-blue" target="_blank"><i class="fas fa-external-link-alt" style="color: #fff; opacity: 1;"></i></a>';
+                                            $outputLine[$contact['rowid']] .= ' <a href="' . dol_buildpath('/digiquali/public/public_answer.php', 3) . '?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity . '" class="wpeo-button button-blue" target="_blank"><i class="fas fa-external-link-alt" style="color: #fff; opacity: 1;"></i></a>';
 
                                             $outputLine[$contact['rowid']] .= '</td>';
                                             break;
@@ -461,7 +461,7 @@ class ActionsDolimeet
                                         }
                                     } else {
                                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                        $outputLine[$contact['rowid']] .= '<a href="' . dol_buildpath('/custom/dolimeet/admin/setup.php', 1) . '">';
+                                        $outputLine[$contact['rowid']] .= '<a href="' . dol_buildpath('/dolimeet/admin/setup.php', 1) . '">';
                                         $outputLine[$contact['rowid']] .= $form->textwithpicto($langs->trans('ClickHere'), $langs->trans('NeedToSetSatisfactionSurvey', dol_strtolower($langs->trans(ucfirst(dol_strtolower($contact['code']))))), 1, 'warning') . '</a>';
                                         $outputLine[$contact['rowid']] .= '</td>';
                                     }
@@ -924,7 +924,7 @@ class ActionsDolimeet
                         // Make substitution in email content
                         $substitutionarray                       = getCommonSubstitutionArray($langs, 0, null, $survey);
                         $substitutionarray['__OBJECT_ELEMENT__'] = dol_strtolower($langs->transnoentities(ucfirst($survey->element)));
-                        $substitutionarray['__DOLIMEET_SATIFACTION_SURVEY_LINK'] = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3);
+                        $substitutionarray['__DOLIMEET_SATIFACTION_SURVEY_LINK'] = dol_buildpath('/digiquali/public/public_answer.php', 3) . '?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity;
                         complete_substitutions_array($substitutionarray, $langs, $survey, $parameters);
 
                         $result  = $saturneMail->fetch(getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE'));
@@ -1233,7 +1233,7 @@ class ActionsDolimeet
                 }
 
                 if (getDolGlobalInt('DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED') > 0) {
-                    $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
+                    $moreHtmlStatus .= '<a href="' . dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
                 }
 
                 $this->resprints = $moreHtmlStatus;
@@ -1400,7 +1400,7 @@ class ActionsDolimeet
                     foreach ($parameters['head'] as $headKey => $tabsHead) {
                         if (is_array($tabsHead) && !empty($tabsHead)) {
                             if (isset($tabsHead[2]) && $tabsHead[2] === 'sessionList') {
-                                $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+                                $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
                                 $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
                                 $parameters['head'][$headKey][1]  = $conf->browser->layout == 'classic' ? $picto . 'DoliMeet' : $picto;
                                 $parameters['head'][$headKey][1] .= '<span class="badge marginleftonlyshort">' . $nbSessions . '</span>';
@@ -2073,7 +2073,7 @@ class ActionsDolimeet
 
         // Do something only for the current context.
         if (preg_match('/meetingsignature|trainingsessionsignature|auditsignature/', $parameters['context'])) {
-            $this->resprints = dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $object->id . '&object_type=' . $object->element, 1);
+            $this->resprints = dol_buildpath('/' . $moduleNameLowerCase . '/view/session/session_card.php', 1) . '?id=' . $object->id . '&object_type=' . $object->element;
             return 1;
         }
 

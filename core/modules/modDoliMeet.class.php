@@ -274,7 +274,7 @@ class modDoliMeet extends DolibarrModules
 
         // Array to add new pages in new tabs.
         $this->tabs   = [];
-        $pictoPath    = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+        $pictoPath    = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
         $picto        = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
         $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'];                        // To add a new tab identified by code tabname1.
         $this->tabs[] = ['data' => 'user:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'];                                    // To add a new tab identified by code tabname1.
