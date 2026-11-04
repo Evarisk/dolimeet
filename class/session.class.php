@@ -592,7 +592,7 @@ class Session extends SaturneObject
         }
 
         // Create clone
-        $object->context = 'createfromclone';
+        $object->context['createfromclone'] = 'createfromclone';
         $sessionID       = $object->create($user);
 
         if ($sessionID > 0) {
@@ -644,7 +644,7 @@ class Session extends SaturneObject
             $this->errors = $object->errors;
         }
 
-        unset($object->context);
+        unset($object->context['createfromclone']);
 
         // End.
         if (!$error) {
