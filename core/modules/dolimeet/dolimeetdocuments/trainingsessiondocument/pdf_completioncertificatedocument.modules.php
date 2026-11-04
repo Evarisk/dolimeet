@@ -144,7 +144,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $posX      = $this->marge_gauche;
         $posY      = $this->marge_haute;
 
-        $logoPath = DOL_DOCUMENT_ROOT . '/custom/dolimeet/img/ministere_du_travail.png';
+        $logoPath = dol_buildpath('/dolimeet/img/ministere_du_travail.png', 0);
         if (file_exists($logoPath)) {
             $height = pdf_getHeightForLogo($logoPath);
             $pdf->SetXY($posX, $posY);

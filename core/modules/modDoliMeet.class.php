@@ -274,15 +274,15 @@ class modDoliMeet extends DolibarrModules
 
         // Array to add new pages in new tabs.
         $this->tabs   = [];
-        $pictoPath    = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+        $pictoPath    = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
         $picto        = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'];                        // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'user:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'];                                    // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'];                            // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'project:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'];                              // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'product:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=product&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'contract:+schedules:'. $picto . $langs->trans('Schedules') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/saturne/view/saturne_schedules.php?module_name=DoliMeet&element_type=contrat&id=__ID__'];     // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'];                        // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'user:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'];                                    // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'];                            // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'project:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'];                              // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'product:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=product&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'contract:+schedules:'. $picto . $langs->trans('Schedules') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/saturne/view/saturne_schedules.php?module_name=DoliMeet&element_type=contrat&id=__ID__'];     // To add a new tab identified by code tabname1.
         // Example:
         // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@dolimeet:$user->rights->othermodule->read:/dolimeet/mynewtab2.php?id=__ID__', // To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
         // $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');
@@ -374,7 +374,7 @@ class modDoliMeet extends DolibarrModules
             0 => [
                 'label'         => $langs->transnoentities('SurveyReminderCronLabel'),
                 'jobtype'       => 'method',
-                'class'         => '/custom/dolimeet/class/dolimeetsurveyreminder.class.php',
+                'class'         => '/dolimeet/class/dolimeetsurveyreminder.class.php',
                 'objectname'    => 'DoliMeetSurveyReminder',
                 'method'        => 'sendSatisfactionSurveyReminders',
                 'parameters'    => '',
@@ -802,6 +802,9 @@ class modDoliMeet extends DolibarrModules
             }
             dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 2, 'integer', 0, '', $conf->entity);
         }
+
+        // insert_cronjobs() keeps an existing job as it is: the survey reminder would keep the /custom/ path it was first declared with
+        $sql[] = 'UPDATE ' . MAIN_DB_PREFIX . "cronjob SET classesname = '/dolimeet/class/dolimeetsurveyreminder.class.php' WHERE classesname = '/custom/dolimeet/class/dolimeetsurveyreminder.class.php'";
 
         return $this->_init($sql, $options);
     }

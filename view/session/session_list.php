@@ -47,7 +47,7 @@ require_once __DIR__ . '/../../class/session.class.php';
 if (!in_array($objectType, array_merge(Session::SESSION_TYPES, ['session']), true)) {
     $langs->load('errors');
     setEventMessages($langs->trans('ErrorBadValueForParameter', $objectType, 'object_type'), null, 'errors');
-    header('Location: ' . dol_buildpath('/custom/dolimeet/dolimeetindex.php?mainmenu=dolimeet', 1));
+    header('Location: ' . dol_buildpath('/dolimeet/dolimeetindex.php', 1) . '?mainmenu=dolimeet');
     exit;
 }
 

@@ -215,7 +215,7 @@ class DoliMeetSurveyReminder
 
         $substitutions = getCommonSubstitutionArray($langs, 0, null, $contract);
         $substitutions['__DOLIMEET_SURVEY_REF__']  = $survey->ref;
-        $substitutions['__DOLIMEET_SURVEY_LINK__'] = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3);
+        $substitutions['__DOLIMEET_SURVEY_LINK__'] = dol_buildpath('/digiquali/public/public_answer.php', 3) . '?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity;
         complete_substitutions_array($substitutions, $langs, $contract);
 
         $subject = make_substitutions($mailTemplate->topic, $substitutions);
