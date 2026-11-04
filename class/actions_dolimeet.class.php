@@ -513,9 +513,9 @@ class ActionsDolimeet
                 foreach ($contacts as $contact) {
                     $outputLine[$contact['rowid']]  = '<td class="tdoverflowmax200">';
                     if ($contact['mandatory_signature'] == 1) {
-                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . DOL_URL_ROOT . '/custom/dolimeet/core/ajax/testajax.php?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Enabled'), 'switch_on') . '</a>';
+                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . dol_buildpath('/dolimeet/core/ajax/testajax.php', 1) . '?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Enabled'), 'switch_on') . '</a>';
                     } else {
-                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . DOL_URL_ROOT . '/custom/dolimeet/core/ajax/testajax.php?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
+                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . dol_buildpath('/dolimeet/core/ajax/testajax.php', 1) . '?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
                     }
                     $outputLine[$contact['rowid']] .= '</td>';
                 }
@@ -546,7 +546,7 @@ class ActionsDolimeet
 
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
-            print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
+            print '<script src="' . dol_buildpath('/dolimeet/js/dolimeet.js', 1) . '"></script>';
         } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
             dol_include_once('/saturne/lib/object.lib.php');
 
