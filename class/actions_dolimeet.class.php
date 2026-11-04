@@ -118,10 +118,15 @@ class ActionsDolimeet
         if (preg_match('/elementproperties|category/', $parameters['context'])) {
             $objectElements = ['meeting', 'trainingsession', 'audit', 'session'];
             if (in_array($parameters['elementType'], $objectElements)) {
+                // categories/index.php includes DOL_DOCUMENT_ROOT . '/' . classpath, other readers use dol_include_once(): class directory
+                // relative to DOL_DOCUMENT_ROOT (custom/dolimeet/class on a standard install), bare module path outside the main document root
+                $classDir  = dirname(dol_buildpath('/dolimeet/class/session.class.php', 0));
+                $classPath = strpos($classDir, DOL_DOCUMENT_ROOT . '/') === 0 ? substr($classDir, strlen(DOL_DOCUMENT_ROOT) + 1) : 'dolimeet/class';
+
                 $out = [
                     'module'        => 'dolimeet',
                     'table_element' => 'dolimeet_session',
-                    'classpath'     => 'custom/dolimeet/class',
+                    'classpath'     => $classPath,
                 ];
                 $this->results = $out;
             }
