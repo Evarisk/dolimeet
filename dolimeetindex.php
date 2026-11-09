@@ -33,4 +33,4 @@ if (file_exists('dolimeet.main.inc.php')) {
 // Load the session dashboard widgets on the home page (opt-in per type since #574).
 $moreParams = ['LoadSession' => 1];
 
-require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/index/index_view.tpl.php');

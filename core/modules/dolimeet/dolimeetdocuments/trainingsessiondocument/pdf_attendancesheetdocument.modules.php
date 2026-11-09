@@ -52,6 +52,21 @@ class pdf_attendancesheetdocument {
     public $type;
 
     /**
+     * @var string Error message, read by CommonObject::commonGenerateDocument() when the generation fails
+     */
+    public $error = '';
+
+    /**
+     * @var string[] Error messages
+     */
+    public $errors = [];
+
+    /**
+     * @var string[] Warning messages, read by CommonObject::commonGenerateDocument() after each generation
+     */
+    public $warnings = [];
+
+    /**
      * @var array Minimum version of PHP required by module.
      * e.g.: PHP ≥ 5.6 = array(5, 6)
      */
@@ -295,8 +310,11 @@ class pdf_attendancesheetdocument {
         ========================= */
 
         $pdf->SetXY(15, 12);
-        $logo = DOL_DATA_ROOT . '/mycompany/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO');
-        $pdf->Image($logo, $pdf->GetX(), $pdf->GetY(), 50, 10, 'PNG');
+        // Scale the company logo into the 50 x 15 mm box left of the title, keeping its aspect ratio (fitbox)
+        $logo = $conf->mycompany->dir_output . '/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO');
+        if (getDolGlobalString('MAIN_INFO_SOCIETE_LOGO') && is_readable($logo)) {
+            $pdf->Image($logo, $pdf->GetX(), $pdf->GetY(), 50, 15, '', '', '', false, 300, '', false, false, 0, 'LT');
+        }
 
         // Title on the right
         $pdf->SetXY(130, 12);
@@ -405,7 +423,7 @@ class pdf_attendancesheetdocument {
         $pdf->SetFont('helvetica', '', 7);
         $pdf->MultiCell(190, 3, "Siège social: " . $mysoc->name . " - " . $mysoc->address . " - " . $mysoc->zip . " " . $mysoc->town . " , " . $mysoc->country, 0, 'C', 0, 1);
         $pdf->MultiCell(190, 3, "Téléphone: " . $mysoc->phone . " - " . $mysoc->url . " - " . $mysoc->email, 0, 'C', 0, 1);
-        $pdf->MultiCell(190, 3, $conf->global->SOCIETE_TYPE . " - Capital de " . $mysoc->capital . " € - SIRET: " . $mysoc->idprof2, 0, 'C', 0, 1);
+        $pdf->MultiCell(190, 3, getDolGlobalString('SOCIETE_TYPE') . " - Capital de " . $mysoc->capital . " € - SIRET: " . $mysoc->idprof2, 0, 'C', 0, 1);
         $pdf->MultiCell(190, 3, "NAF-APE: " . $mysoc->idprof3 . " - RCS/RM: " . $mysoc->idprof4 . " - Numéro TVA: " . $mysoc->tva_intra, 0, 'C', 0, 1);
         $pdf->SetFont('helvetica', '', 8);
         $pdf->Cell(190, 3, "1 / 1", 0, 1, 'R');

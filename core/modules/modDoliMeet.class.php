@@ -33,6 +33,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 class modDoliMeet extends DolibarrModules
 {
     /**
+     * @var int[] Minimum version of Saturne required by module, same format as need_dolibarr_version: checked by init() and by the Saturne index page
+     */
+    public $need_saturne_version = [23, 6];
+
+    /**
      * Constructor. Define names, constants, directories, boxes, permissions.
      *
      * @param DoliDB $db Database handler.
@@ -42,8 +47,8 @@ class modDoliMeet extends DolibarrModules
         global $langs, $conf;
         $this->db = $db;
 
-        if (file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php')) {
-            require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+        if (file_exists(dol_buildpath('/saturne/lib/saturne_functions.lib.php'))) {
+            dol_include_once('/saturne/lib/saturne_functions.lib.php');
             saturne_load_langs(['dolimeet@dolimeet']);
         } else {
             $this->error++;
@@ -151,7 +156,8 @@ class modDoliMeet extends DolibarrModules
                 'onlinesign',
                 'contractnote',
                 'elementproperties',
-                'dolimeetpublicinterfaceadmin'
+                'dolimeetpublicinterfaceadmin',
+                'emailtemplates'
             ],
             // Set this to 1 if features of module are opened to external users.
             'moduleforexternal' => 1,
@@ -268,15 +274,15 @@ class modDoliMeet extends DolibarrModules
 
         // Array to add new pages in new tabs.
         $this->tabs   = [];
-        $pictoPath    = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+        $pictoPath    = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
         $picto        = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
-        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'];                        // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'user:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'];                                    // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'];                            // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'project:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'];                              // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'product:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/custom/dolimeet/view/session/session_list.php?fromtype=product&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
-        $this->tabs[] = ['data' => 'contract:+schedules:'. $picto . $langs->trans('Schedules') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/custom/saturne/view/saturne_schedules.php?module_name=DoliMeet&element_type=contrat&id=__ID__'];     // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'thirdparty:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=thirdparty&fromid=__ID__'];                        // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'user:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=user&fromid=__ID__'];                                    // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'contact:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=socpeople&fromid=__ID__'];                            // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'project:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=project&fromid=__ID__'];                              // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'contract:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=contrat&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'product:+sessionList:' . $picto . 'DoliMeet' . ':dolimeet@dolimeet:$user->rights->dolimeet->session->read:/dolimeet/view/session/session_list.php?fromtype=product&fromid=__ID__&object_type=trainingsession']; // To add a new tab identified by code tabname1.
+        $this->tabs[] = ['data' => 'contract:+schedules:'. $picto . $langs->trans('Schedules') . ':dolimeet@dolimeet:$user->rights->contrat->lire:/saturne/view/saturne_schedules.php?module_name=DoliMeet&element_type=contrat&id=__ID__'];     // To add a new tab identified by code tabname1.
         // Example:
         // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@dolimeet:$user->rights->othermodule->read:/dolimeet/mynewtab2.php?id=__ID__', // To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
         // $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');
@@ -368,7 +374,7 @@ class modDoliMeet extends DolibarrModules
             0 => [
                 'label'         => $langs->transnoentities('SurveyReminderCronLabel'),
                 'jobtype'       => 'method',
-                'class'         => '/custom/dolimeet/class/dolimeetsurveyreminder.class.php',
+                'class'         => '/dolimeet/class/dolimeetsurveyreminder.class.php',
                 'objectname'    => 'DoliMeetSurveyReminder',
                 'method'        => 'sendSatisfactionSurveyReminders',
                 'parameters'    => '',
@@ -573,6 +579,27 @@ class modDoliMeet extends DolibarrModules
     {
         global $conf, $langs, $user;
 
+        // Saturne provides the functions used below : refuse the activation rather than a fatal error when it is missing
+        if (!function_exists('saturne_load_langs')) {
+            $this->error = $langs->trans('activateModuleDependNotSatisfied', $this->name, 'modSaturne', $this->name);
+            return -1;
+        }
+
+        // Saturne ships separately: refuse one older than need_saturne_version, it lacks functions this release calls
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+        dol_include_once('/saturne/core/modules/modSaturne.class.php');
+        $saturneVersion = class_exists('modSaturne') ? (new modSaturne($this->db))->version : '';
+        if (versioncompare(explode('.', $saturneVersion), $this->need_saturne_version) < 0) {
+            $langs->load('admin'); // activateModuleDependNotSatisfied, not loaded when the Saturne index page runs init()
+            $this->error = $langs->trans('activateModuleDependNotSatisfied', $this->name, 'modSaturne >= ' . versiontostring($this->need_saturne_version) . ' (' . ($saturneVersion ?: '-') . ')', $this->name);
+            return -1;
+        }
+
+        // Dolibarr runs init() before activating $this->depends : activate them first, isModEnabled('project') is tested below
+        if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
+            return -1;
+        }
+
         // Permissions.
         $this->remove($options);
 
@@ -605,11 +632,12 @@ class modDoliMeet extends DolibarrModules
         addDocumentModel('completioncertificatedocument', 'completioncertificatedocument', $langs->transnoentities('CompletionCertificateDocumentPDF'));
 
         // Load Saturne libraries
-        require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+        dol_include_once('/saturne/class/saturnemail.class.php');
 
         $saturneMail = new SaturneMail($this->db, 'contrat');
 
-        if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0 && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
+        // Not tied to DOLIMEET_EMAIL_TEMPLATE_SET : DigiQuali can be enabled after DoliMeet, once the later steps already ran
+        if (!is_array(json_decode(getDolGlobalString('DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'), true)) && isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             $position = 100;
             $satisfactionSurveys = ['billing', 'trainee', 'sessiontrainer', 'opco'];
             foreach ($satisfactionSurveys as $satisfactionSurvey) {
@@ -629,7 +657,9 @@ class modDoliMeet extends DolibarrModules
             }
 
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY', json_encode($emailTemplateSatisfactionSurvey), 'chaine', 0, '', $conf->entity);
-            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 1, 'integer', 0, '', $conf->entity);
+            if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') == 0) {
+                dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 1, 'integer', 0, '', $conf->entity);
+            }
         }
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') <= 1) {
             $saturneMail->entity        = 0;
@@ -643,11 +673,13 @@ class modDoliMeet extends DolibarrModules
             $saturneMail->joinfiles     = 0;
             $saturneMail->content       = $langs->transnoentities('CompletionCertificateDocumentContent');
 
-            $emailTemplateID = $saturneMail->create($user);
+            $saturneMail->create($user);
 
-            dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $emailTemplateID, 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_SET', 2, 'integer', 0, '', $conf->entity);
         }
+        // The id of the completion certificate template was kept here and read nowhere: the template is picked by hand
+        // when sending, so the constant only made the email templates overview of Saturne believe a setting sends it (#980)
+        dolibarr_del_const($this->db, 'DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE', $conf->entity);
         if (getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_SET') <= 2) {
             $saturneMail->entity        = 0;
             $saturneMail->type_template = 'contract';
@@ -770,6 +802,9 @@ class modDoliMeet extends DolibarrModules
             }
             dolibarr_set_const($this->db, 'DOLIMEET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 2, 'integer', 0, '', $conf->entity);
         }
+
+        // insert_cronjobs() keeps an existing job as it is: the survey reminder would keep the /custom/ path it was first declared with
+        $sql[] = 'UPDATE ' . MAIN_DB_PREFIX . "cronjob SET classesname = '/dolimeet/class/dolimeetsurveyreminder.class.php' WHERE classesname = '/custom/dolimeet/class/dolimeetsurveyreminder.class.php'";
 
         return $this->_init($sql, $options);
     }

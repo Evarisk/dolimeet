@@ -768,7 +768,7 @@ if ($action == "dosign" && empty($cancel)) {
 				var name = document.getElementById("name").value;
 				$.ajax({
 					type: "POST",
-					url: \''.DOL_URL_ROOT.'/custom/dolimeet/core/ajax/onlineSign2.php\',
+					url: \''.dol_buildpath('/dolimeet/core/ajax/onlineSign2.php', 1).'\',
 					dataType: "text",
 					data: {
 						"action" : \'importSignature2\',

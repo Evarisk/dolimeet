@@ -42,8 +42,8 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 
     if ($object->element == 'contrat' && !empty($object->array_options)) {
         // Load Saturne libraries
-        require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
-        require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
+        dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
         // Load DoliMeet libraries
         require_once __DIR__ . '/../../class/session.class.php';
@@ -67,7 +67,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
                             foreach ($signatories as $signatory) {
                                 $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__'] .= '<ul><li>' . strtoupper($signatory->lastname) . ' ' . $signatory->firstname . ' - <strong>' . $signatory->getLibStatut(5) . (($signatory->status == SaturneSignature::STATUS_REGISTERED) ? ' - ' . $langs->transnoentities('PendingSignature') : '') . '</strong>';
                                 if ($signatoryRole != 'SessionTrainer') {
-                                    $signatureUrl = dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=dolimeet&object_type=' . $session->type . '&document_type=AttendanceSheetDocument', 3);
+                                    $signatureUrl = dol_buildpath('/saturne/public/signature/add_signature.php', 3) . '?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=dolimeet&object_type=' . $session->type . '&document_type=AttendanceSheetDocument';
                                     $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__'] .= ' - <a href=' . $signatureUrl . ' target="_blank">' . $langs->transnoentities('SignAttendanceSheetOnline') . '</a>';
                                 }
                                 $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__'] .= '</li></ul>';
@@ -92,7 +92,8 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 
             $confEmailTemplateSatisfactionSurvey = json_decode(getDolGlobalString('DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'), true);
             $emailModelSelected = GETPOST('modelmailselected', 'int');
-            $key                = array_search($emailModelSelected, $confEmailTemplateSatisfactionSurvey);
+            // The constant keeps its default 0 until the survey email templates are created
+            $key                = is_array($confEmailTemplateSatisfactionSurvey) ? array_search($emailModelSelected, $confEmailTemplateSatisfactionSurvey) : false;
 
             if ($key !== false) {
                 $contacts = array_merge($object->liste_contact(-1, 'internal', 0, dol_strtoupper($key)), $object->liste_contact(-1, 'external', 0, dol_strtoupper($key)));
@@ -117,7 +118,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
                                             $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<ul><li>' . $session->ref . ' - ' . $session->label . '</li>';
                                             $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<li>' . $langs->transnoentities('DateAndTime') . ' : ' . dol_strtolower($langs->transnoentities('From')) . ' ' . dol_print_date($session->date_start, 'day', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('At')) . ' ' . dol_print_date($session->date_start, 'hour', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('To')) . ' ' . dol_print_date($session->date_end, 'day', 'tzuserrel') . ' ' . dol_strtolower($langs->transnoentities('At')) . ' ' . dol_print_date($session->date_end, 'hour', 'tzuserrel') . ' (' . dol_strtolower($langs->transnoentities('Duration')) . ' : ' . (($session->duration > 0) ? convertSecondToTime($session->duration, 'allhourmin') : '00:00') . ')' . '</li></ul>';
                                         }
-                                        $publicAnswerUrl = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3);
+                                        $publicAnswerUrl = dol_buildpath('/digiquali/public/public_answer.php', 3) . '?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity;
                                         $substitutionarray['__DOLIMEET_CONTRACT_SURVEY_INFOS__'] .= '<a href=' . $publicAnswerUrl . ' target="_blank">' . $langs->transnoentities('FillSatisfactionSurvey', dol_strtolower($langs->transnoentities(ucfirst(dol_strtolower($contact['code']))))) . '</a><br>';
                                     }
                                     break;
@@ -130,5 +131,5 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
         }
     }
 
-    $substitutionarray['__DOLIMEET_PUBLIC_INTERFACE_CONTACT_URL__'] = dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id;
+    $substitutionarray['__DOLIMEET_PUBLIC_INTERFACE_CONTACT_URL__'] = dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id;
 }

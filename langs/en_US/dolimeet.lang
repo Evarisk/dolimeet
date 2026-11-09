@@ -34,6 +34,8 @@ BillingSatisfactionSurvey                   = Billing satisfaction survey
 BillingSatisfactionSurveyDescription        = Defines the model used by default for billing satisfaction surveys
 SatisfactionSurveyEmailTemplate             = Sending email template
 SatisfactionSurveyReminderEmailTemplate     = Reminder email template
+SatisfactionSurveyDefaultEmailTemplates     = Satisfaction survey · Default sending templates, per role
+SatisfactionSurveySendToContactEmailTemplate = Satisfaction survey · Sent to a contact from the contract
 TraineeSatisfactionSurvey                   = Trainee satisfaction survey
 TraineeSatisfactionSurveyDescription        = Defines the model used by default for trainee satisfaction surveys
 SessiontrainerSatisfactionSurvey            = Session trainer satisfaction survey
@@ -123,6 +125,10 @@ TrainingSessionDurationHelp           = Total duration of the sessions HH:MM (ex
 CalculatedTotalSessionDuration        = Total calculated duration time:
 TrainingSessionDurationErrorMatching  = <strong> Error: consistency of training session duration. </strong><br> The total duration of the sessions indicated in the contract is different from the calculated duration of all the sessions linked to the contract.
 NoCertificateBecauseAbsent            = No certificate was generated for <b> %s %s </b> because it was absent from at least one session.
+DownloadPDFs                          = Download PDFs
+NoPDFForSelectedTrainingsessions      = No PDF has been generated for the selected training sessions.
+ODTDocumentsNotConvertedToPDF         = %s ODT document(s) could not be converted to PDF and are missing from the ZIP. Check the ODT to PDF conversion setup (LibreOffice).
+SessionsWithoutAttendantsNotValidated = Not validated, each role needs at least one attendant: %s
 
 
 # Attendant role

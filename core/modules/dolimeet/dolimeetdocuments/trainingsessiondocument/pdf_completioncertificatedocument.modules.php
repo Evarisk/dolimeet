@@ -28,9 +28,9 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/lib/saturne_functions.lib.php';
-require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+dol_include_once('/saturne/lib/saturne_functions.lib.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
 require_once __DIR__ . '/../../../../../lib/dolimeet_function.lib.php';
 
 /**
@@ -144,7 +144,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         $posX      = $this->marge_gauche;
         $posY      = $this->marge_haute;
 
-        $logoPath = DOL_DOCUMENT_ROOT . '/custom/dolimeet/img/ministere_du_travail.png';
+        $logoPath = dol_buildpath('/dolimeet/img/ministere_du_travail.png', 0);
         if (file_exists($logoPath)) {
             $height = pdf_getHeightForLogo($logoPath);
             $pdf->SetXY($posX, $posY);

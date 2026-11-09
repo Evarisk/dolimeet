@@ -118,10 +118,15 @@ class ActionsDolimeet
         if (preg_match('/elementproperties|category/', $parameters['context'])) {
             $objectElements = ['meeting', 'trainingsession', 'audit', 'session'];
             if (in_array($parameters['elementType'], $objectElements)) {
+                // categories/index.php includes DOL_DOCUMENT_ROOT . '/' . classpath, other readers use dol_include_once(): class directory
+                // relative to DOL_DOCUMENT_ROOT (custom/dolimeet/class on a standard install), bare module path outside the main document root
+                $classDir  = dirname(dol_buildpath('/dolimeet/class/session.class.php', 0));
+                $classPath = strpos($classDir, DOL_DOCUMENT_ROOT . '/') === 0 ? substr($classDir, strlen(DOL_DOCUMENT_ROOT) + 1) : 'dolimeet/class';
+
                 $out = [
                     'module'        => 'dolimeet',
                     'table_element' => 'dolimeet_session',
-                    'classpath'     => 'custom/dolimeet/class',
+                    'classpath'     => $classPath,
                 ];
                 $this->results = $out;
             }
@@ -140,8 +145,8 @@ class ActionsDolimeet
     {
         if (preg_match('/productcard|contractcard|contractcontactcard/', $parameters['context'])) {
             $resourcesRequired = [
-                'css' => '/custom/saturne/css/saturne.min.css',
-                'js'  => '/custom/saturne/js/saturne.min.js'
+                'css' => '/saturne/css/saturne.min.css',
+                'js'  => '/saturne/js/saturne.min.js'
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';
@@ -154,7 +159,7 @@ class ActionsDolimeet
 
         if (preg_match('/thirdpartycontact/', $parameters['context'])) {
             $resourcesRequired = [
-                'js'  => '/custom/dolimeet/js/dolimeet.min.js'
+                'js'  => '/dolimeet/js/dolimeet.min.js'
             ];
 
             $out = '<!-- Includes JS added by module saturne -->';
@@ -184,7 +189,7 @@ class ActionsDolimeet
         }
 
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
-            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            dol_include_once('/saturne/lib/object.lib.php');
             $objectsMetadata                = saturne_get_objects_metadata();
             $conf->cache['objectsMetadata'] = $objectsMetadata;
         } else {
@@ -265,7 +270,7 @@ class ActionsDolimeet
 
         // The training contract list carries indicator columns: the filter row keeps its cells aligned
         if ($this->isTrainingContractList($parameters)) {
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $out = '';
             foreach (array_keys($this->getTrainingContractIndicators()) as $indicatorAlias) {
@@ -284,7 +289,7 @@ class ActionsDolimeet
         }
 
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
-            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            dol_include_once('/saturne/lib/object.lib.php');
             $objectsMetadata                = saturne_get_objects_metadata();
             $conf->cache['objectsMetadata'] = $objectsMetadata;
         } else {
@@ -311,6 +316,26 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the addMoreMassActions function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addMoreMassActions(array $parameters): int
+    {
+        global $langs;
+
+        // The mass action itself is handled by view/session/session_list.php
+        if (strpos($parameters['context'], 'trainingsessionlist') !== false) {
+            $label = '<span class="fas fa-file-download paddingrightonly"></span>' . $langs->trans('DownloadPDFs');
+
+            $this->resprints = '<option value="downloadpdf" data-html="' . dol_escape_htmltag($label) . '">' . $label . '</option>';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the printCommonFooter function : replacing the parent's function with the one below.
      *
      * @param  array     $parameters Hook metadatas (context, etc...).
@@ -323,7 +348,7 @@ class ActionsDolimeet
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'projectOverview') {
-            require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+            dol_include_once('/saturne/lib/saturne_functions.lib.php');
             require_once __DIR__ . '/session.class.php';
 
             $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
@@ -392,8 +417,8 @@ class ActionsDolimeet
 
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                 // Load Saturne libraries
-                require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
-                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+                dol_include_once('/saturne/class/saturnesignature.class.php');
+                dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
                 // Load DigiQuali libraries
                 require_once __DIR__ . '/../../digiquali/class/survey.class.php';
@@ -428,7 +453,7 @@ class ActionsDolimeet
                                             $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $survey->getStatus();
 
                                             $outputLine[$contact['rowid']] .= ' <a href="?' . http_build_query(array_merge($_GET, ['action' => 'send_email', 'survey_id' => $survey->id, 'token' => newToken()])) . '" class="wpeo-button button-blue"><i class="fas fa-paper-plane" style="color: #fff;"></i></a>';
-                                            $outputLine[$contact['rowid']] .= ' <a href="' . dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3) . '" class="wpeo-button button-blue" target="_blank"><i class="fas fa-external-link-alt" style="color: #fff; opacity: 1;"></i></a>';
+                                            $outputLine[$contact['rowid']] .= ' <a href="' . dol_buildpath('/digiquali/public/public_answer.php', 3) . '?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity . '" class="wpeo-button button-blue" target="_blank"><i class="fas fa-external-link-alt" style="color: #fff; opacity: 1;"></i></a>';
 
                                             $outputLine[$contact['rowid']] .= '</td>';
                                             break;
@@ -441,7 +466,7 @@ class ActionsDolimeet
                                         }
                                     } else {
                                         $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
-                                        $outputLine[$contact['rowid']] .= '<a href="' . dol_buildpath('/custom/dolimeet/admin/setup.php', 1) . '">';
+                                        $outputLine[$contact['rowid']] .= '<a href="' . dol_buildpath('/dolimeet/admin/setup.php', 1) . '">';
                                         $outputLine[$contact['rowid']] .= $form->textwithpicto($langs->trans('ClickHere'), $langs->trans('NeedToSetSatisfactionSurvey', dol_strtolower($langs->trans(ucfirst(dol_strtolower($contact['code']))))), 1, 'warning') . '</a>';
                                         $outputLine[$contact['rowid']] .= '</td>';
                                     }
@@ -493,9 +518,9 @@ class ActionsDolimeet
                 foreach ($contacts as $contact) {
                     $outputLine[$contact['rowid']]  = '<td class="tdoverflowmax200">';
                     if ($contact['mandatory_signature'] == 1) {
-                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . DOL_URL_ROOT . '/custom/dolimeet/core/ajax/testajax.php?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Enabled'), 'switch_on') . '</a>';
+                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . dol_buildpath('/dolimeet/core/ajax/testajax.php', 1) . '?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=0&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Enabled'), 'switch_on') . '</a>';
                     } else {
-                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . DOL_URL_ROOT . '/custom/dolimeet/core/ajax/testajax.php?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
+                        $outputLine[$contact['rowid']] .= '<a class="reposition" href="' . dol_buildpath('/dolimeet/core/ajax/testajax.php', 1) . '?action=set&token=' . newToken() . '&rowid=' . ((int) $contact['rowid']) . '&value=1&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id) . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
                     }
                     $outputLine[$contact['rowid']] .= '</td>';
                 }
@@ -526,9 +551,9 @@ class ActionsDolimeet
 
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
-            print '<script src="../custom/dolimeet/js/dolimeet.js"></script>';
+            print '<script src="' . dol_buildpath('/dolimeet/js/dolimeet.js', 1) . '"></script>';
         } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
-            require_once __DIR__ . '/../../saturne/lib/object.lib.php';
+            dol_include_once('/saturne/lib/object.lib.php');
 
             $id   = GETPOST('id');
             $type = GETPOST('type');
@@ -628,9 +653,9 @@ class ActionsDolimeet
 
             if (isset($object->array_options['options_trainingsession_type']) && !empty($object->array_options['options_trainingsession_type'])) {
                 // Load Saturne libraries
-                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
-                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
-                require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
+                dol_include_once('/saturne/lib/documents.lib.php');
+                dol_include_once('/saturne/lib/saturne_functions.lib.php');
+                dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
 
                 saturne_load_langs();
 
@@ -703,7 +728,7 @@ class ActionsDolimeet
 
         if (strpos($parameters['context'], 'thirdpartycontact')) {
 
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory   = new SaturneSignature($db);
 
@@ -849,7 +874,7 @@ class ActionsDolimeet
                 $moduleNameLowerCase = 'dolimeet';
                 $permissiontoadd     = $user->rights->dolimeet->trainingsession->write;
 
-                require_once __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
                 $action = '';
             }
 
@@ -859,7 +884,7 @@ class ActionsDolimeet
                 $upload_dir          = $conf->dolimeet->multidir_output[$conf->entity ?? 1];
 
                 // Action to generate pdf from odt file
-                require_once __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+                require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
                 $urlToRedirect = $_SERVER['REQUEST_URI'];
                 $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
@@ -876,9 +901,9 @@ class ActionsDolimeet
 
             if ($action == 'send_email') {
                 require_once __DIR__ . '/../../digiquali/class/survey.class.php';
-                require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
-                require_once __DIR__ . '/../../saturne/class/saturnemail.class.php';
-                require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+                dol_include_once('/saturne/class/saturnesignature.class.php');
+                dol_include_once('/saturne/class/saturnemail.class.php');
+                dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
                 saturne_load_langs();
 
@@ -904,7 +929,7 @@ class ActionsDolimeet
                         // Make substitution in email content
                         $substitutionarray                       = getCommonSubstitutionArray($langs, 0, null, $survey);
                         $substitutionarray['__OBJECT_ELEMENT__'] = dol_strtolower($langs->transnoentities(ucfirst($survey->element)));
-                        $substitutionarray['__DOLIMEET_SATIFACTION_SURVEY_LINK'] = dol_buildpath('custom/digiquali/public/public_answer.php?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity, 3);
+                        $substitutionarray['__DOLIMEET_SATIFACTION_SURVEY_LINK'] = dol_buildpath('/digiquali/public/public_answer.php', 3) . '?track_id=' . $survey->track_id . '&object_type=' . $survey->element . '&document_type=SurveyDocument&entity=' . $conf->entity;
                         complete_substitutions_array($substitutionarray, $langs, $survey, $parameters);
 
                         $result  = $saturneMail->fetch(getDolGlobalInt('DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE'));
@@ -1089,6 +1114,11 @@ class ActionsDolimeet
      */
     public function saturneExtendGetObjectsMetadata(array $parameters): int
     {
+        // Paths relative to DOL_DOCUMENT_ROOT as installed (custom/dolimeet on a standard install): Saturne < 23.3.0 and older
+        // readers prepend DOL_DOCUMENT_ROOT, newer ones use dol_buildpath(). Bare name only outside the main document root
+        $moduleDir  = dol_buildpath('/dolimeet', 0);
+        $modulePath = strpos($moduleDir, DOL_DOCUMENT_ROOT . '/') === 0 ? substr($moduleDir, strlen(DOL_DOCUMENT_ROOT) + 1) : 'dolimeet';
+
         $objectsMetadata['dolimeet_trainsess'] = [
             'mainmenu'       => 'dolimeet',
             'leftmenu'       => '',
@@ -1104,9 +1134,9 @@ class ActionsDolimeet
             'name_field'     => 'ref',
             'hook_name_card' => 'trainingsessioncard',
             'hook_name_list' => 'trainingsessionlist',
-            'create_url'     => 'custom/dolimeet/view/session/session_card.php?action=create&object_type=trainingsession',
-            'class_path'     => 'custom/dolimeet/class/trainingsession.class.php',
-            'lib_path'       => 'custom/dolimeet/lib/dolimeet_trainingsession.lib.php'
+            'create_url'     => $modulePath . '/view/session/session_card.php?action=create&object_type=trainingsession',
+            'class_path'     => $modulePath . '/class/trainingsession.class.php',
+            'lib_path'       => $modulePath . '/lib/dolimeet_trainingsession.lib.php'
         ];
         $this->results = $objectsMetadata;
 
@@ -1208,7 +1238,7 @@ class ActionsDolimeet
                 }
 
                 if (getDolGlobalInt('DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED') > 0) {
-                    $moreHtmlStatus .= '<a href="' . dol_buildpath('custom/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
+                    $moreHtmlStatus .= '<a href="' . dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
                 }
 
                 $this->resprints = $moreHtmlStatus;
@@ -1277,6 +1307,54 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the saturneEmailTemplateSettings function : replacing the parent's function with the one below
+     *
+     * Declares the DoliMeet settings designating an email template, shown by their label in the "Used by" column of
+     * the Saturne email templates overview
+     *
+     * @param  array $parameters Hook metadatas (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function saturneEmailTemplateSettings(array $parameters): int
+    {
+        global $langs;
+
+        $langs->load('dolimeet@dolimeet');
+
+        $questionnaireUrl = dol_buildpath('/dolimeet/admin/questionnaire.php', 1);
+
+        $this->results = [];
+
+        // The survey is sent and reminded per role, each role names its own template
+        foreach (['sessiontrainer', 'trainee', 'customer', 'billing'] as $role) {
+            $roleLabel = $langs->transnoentities(ucfirst($role) . 'SatisfactionSurvey');
+
+            $this->results['DOLIMEET_' . dol_strtoupper($role) . '_SATISFACTION_SURVEY_EMAIL_TEMPLATE'] = [
+                'label' => $roleLabel . ' · ' . $langs->transnoentities('SatisfactionSurveyEmailTemplate'),
+                'url'   => $questionnaireUrl
+            ];
+            $this->results['DOLIMEET_' . dol_strtoupper($role) . '_SATISFACTION_SURVEY_REMINDER_EMAIL_TEMPLATE'] = [
+                'label' => $roleLabel . ' · ' . $langs->transnoentities('SatisfactionSurveyReminderEmailTemplate'),
+                'url'   => $questionnaireUrl
+            ];
+        }
+
+        // Written on activation, used until a template is picked for the role
+        $this->results['DOLIMEET_EMAIL_TEMPLATE_SATISFACTION_SURVEY'] = [
+            'label' => $langs->transnoentities('SatisfactionSurveyDefaultEmailTemplates'),
+            'url'   => $questionnaireUrl
+        ];
+
+        // Written on activation, set nowhere in the interface
+        $this->results['DOLIMEET_EMAIL_TEMPLATE_COMPLETION_CERTIFICATE_UNIQUE'] = [
+            'label' => $langs->transnoentities('SatisfactionSurveySendToContactEmailTemplate'),
+            'url'   => ''
+        ];
+
+        return 0;
+    }
+
+    /**
      * Overloading the completeTabsHead function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadatas (context, etc...)
@@ -1327,7 +1405,7 @@ class ActionsDolimeet
                     foreach ($parameters['head'] as $headKey => $tabsHead) {
                         if (is_array($tabsHead) && !empty($tabsHead)) {
                             if (isset($tabsHead[2]) && $tabsHead[2] === 'sessionList') {
-                                $pictoPath = dol_buildpath('/custom/dolimeet/img/dolimeet_color.png', 1);
+                                $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
                                 $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
                                 $parameters['head'][$headKey][1]  = $conf->browser->layout == 'classic' ? $picto . 'DoliMeet' : $picto;
                                 $parameters['head'][$headKey][1] .= '<span class="badge marginleftonlyshort">' . $nbSessions . '</span>';
@@ -1477,7 +1555,7 @@ class ActionsDolimeet
             return 0;
         }
 
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $sql = '';
         foreach ($this->getTrainingContractIndicators() as $indicatorAlias => $indicator) {
@@ -1502,7 +1580,7 @@ class ActionsDolimeet
             return 0;
         }
 
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $out = '';
         foreach ($this->getTrainingContractIndicators() as $indicator) {
@@ -1527,7 +1605,7 @@ class ActionsDolimeet
             return 0;
         }
 
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $obj = $parameters['obj'] ?? null;
         $out = '';
@@ -1731,7 +1809,7 @@ class ActionsDolimeet
 
         if (preg_match('/meetinglist|trainingsessionlist|auditlist/', $parameters['context'])) {
             // Load Saturne libraries
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory = new SaturneSignature($this->db, 'dolimeet', $object->element);
 
@@ -2000,7 +2078,7 @@ class ActionsDolimeet
 
         // Do something only for the current context.
         if (preg_match('/meetingsignature|trainingsessionsignature|auditsignature/', $parameters['context'])) {
-            $this->resprints = dol_buildpath('/custom/' . $moduleNameLowerCase . '/view/session/session_card.php?id=' . $object->id . '&object_type=' . $object->element, 1);
+            $this->resprints = dol_buildpath('/' . $moduleNameLowerCase . '/view/session/session_card.php', 1) . '?id=' . $object->id . '&object_type=' . $object->element;
             return 1;
         }
 
