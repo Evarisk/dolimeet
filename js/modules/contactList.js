@@ -62,15 +62,15 @@ window.dolimeet.contactList.event = function initializeEvents() {
  * @return {void}
  */
 window.dolimeet.contactList.insertData = function(contactIds, formationLangTrans) {
-    $table = $('.div-table-responsive')
-    $listTitle = $table.find('tr.liste_titre').last()
-    $tableLines = $table.find('tr.oddeven')
+    const $table      = $('.div-table-responsive')
+    const $listTitle  = $table.find('tr.liste_titre').last()
+    const $tableLines = $table.find('tr.oddeven')
 
     $table.find('tr.liste_titre').first().find('td').eq(1).after('<td class="liste_titre"></td>')
     $listTitle.find('th').eq(1).after('<th>'+formationLangTrans+'</th>')
 
     $tableLines.each(function() {
-        $this = $(this)
+        const $this = $(this)
         let url = new URL($this.find('td a').eq(1)[0].href)
         let id = url.searchParams.get('id')
 

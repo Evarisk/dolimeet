@@ -89,6 +89,8 @@ BillingSatisfactionSurvey                   = Enquête de satisfaction commandit
 BillingSatisfactionSurveyDescription        = Définit le modèle utilisé par défaut pour les enquêtes de satisfaction commanditaire/OPCO
 SatisfactionSurveyEmailTemplate             = Modèle d'email d'envoi
 SatisfactionSurveyReminderEmailTemplate     = Modèle d'email de relance
+SatisfactionSurveyDefaultEmailTemplates     = Enquête de satisfaction · Modèles d'envoi par défaut, par rôle
+SatisfactionSurveySendToContactEmailTemplate = Enquête de satisfaction · Envoi à un contact depuis le contrat
 
 # Formation - Formation
 TrainingContract                    = Convention de formation
@@ -198,6 +200,10 @@ CalculatedTotalSessionDuration        = Durée totale calculée :
 TrainingSessionDurationErrorMatching  = <strong> Erreur : cohérence de la durée des sessions de formation. </strong><br> La durée totale des sessions indiqué dans le contrat est différente de la durée calculé de l'ensemble des sessions liées au contrat.
 NoCertificateBecauseAbsent            = Aucun certificat n'a été généré pour <b> %s %s </b> parcequ'il a été absent à au moins une session.
 ErrorMissingTrainingSessionProjectInfo = Attention : information du projet de formation manquante
+DownloadPDFs                          = Télécharger les PDF
+NoPDFForSelectedTrainingsessions      = Aucun PDF n'a été généré pour les sessions de formation sélectionnées.
+ODTDocumentsNotConvertedToPDF         = %s document(s) ODT n'ont pas pu être convertis en PDF et manquent dans le ZIP. Vérifiez la configuration de la conversion ODT vers PDF (LibreOffice).
+SessionsWithoutAttendantsNotValidated = Non validé(s) faute d'au moins un participant pour chaque rôle : %s
 
 # Extrafields - Attributs supplémentaires
 TrainingSessionType              = Type de formation
