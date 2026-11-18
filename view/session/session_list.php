@@ -47,7 +47,7 @@ require_once __DIR__ . '/../../class/session.class.php';
 if (!in_array($objectType, array_merge(Session::SESSION_TYPES, ['session']), true)) {
     $langs->load('errors');
     setEventMessages($langs->trans('ErrorBadValueForParameter', $objectType, 'object_type'), null, 'errors');
-    header('Location: ' . dol_buildpath('/custom/dolimeet/dolimeetindex.php?mainmenu=dolimeet', 1));
+    header('Location: ' . dol_buildpath('/dolimeet/dolimeetindex.php', 1) . '?mainmenu=dolimeet');
     exit;
 }
 
@@ -231,6 +231,9 @@ saturne_check_access($permissionToRead, $object, true);
 // Enable the "Sign" mass action offered by the saturne list templates: an attendant signs all the sessions they attend at once
 $enableMassSignature = 1;
 
+// Enable the "Validate" mass action as well, so the drafts can be validated before being signed: the action itself is run below
+$enableMassValidate = 1;
+
 // Document the signature page works on, so the list can link straight to it
 $signatureDocumentTypes = ['meeting' => 'MeetingDocument', 'trainingsession' => 'AttendanceSheetDocument', 'audit' => 'AuditDocument'];
 $signatureDocumentType  = $signatureDocumentTypes[$object->element] ?? '';
@@ -279,8 +282,81 @@ if (empty($resHook)) {
 
     require_once DOL_DOCUMENT_ROOT . '/core/actions_massactions.inc.php';
 
+    // Validate mass action, offered through $enableMassValidate but run here: list_massactions.tpl.php loads the sessions
+    // without their type, SESSION_VALIDATE would be triggered in place of TRAININGSESSION_VALIDATE, MEETING_VALIDATE or
+    // AUDIT_VALIDATE: neither the agenda event nor the note of the training contract would be written
+    if (($massaction == 'validate' || ($action == 'validate' && $confirm == 'yes')) && $permissiontoadd && !empty($toselect)) {
+        $nbOk        = 0;
+        $nbSkipped   = 0;
+        $notReadyUrl = [];
+        $error       = 0;
+        foreach ($toselect as $toSelectedID) {
+            $sessionTmp = new $objectclass($db, $object->element);
+            if ($sessionTmp->fetch($toSelectedID) <= 0) {
+                setEventMessages($sessionTmp->error, $sessionTmp->errors, 'errors');
+                $error++;
+                break;
+            }
+
+            // Only a draft session can be validated, else a locked or archived one would go back to the validated status
+            if ($sessionTmp->status != $sessionTmp::STATUS_DRAFT) {
+                $nbSkipped++;
+                continue;
+            }
+
+            // As on its card, a session is only validated once each of its roles has an attendant
+            if (!empty($sessionTmp->getMissingAttendantRoles())) {
+                $notReadyUrl[] = $sessionTmp->getNomUrl(1);
+                continue;
+            }
+
+            if ($sessionTmp->validate($user) > 0) {
+                $nbOk++;
+            } else {
+                setEventMessages($sessionTmp->error, $sessionTmp->errors, 'errors');
+                $error++;
+                break;
+            }
+        }
+
+        if ($error == 0) {
+            setEventMessages($langs->trans('RecordsValidated', $nbOk), []);
+            if ($nbSkipped > 0) {
+                setEventMessages($langs->trans('RecordsNotDraftSkipped', $nbSkipped), [], 'warnings');
+            }
+            if (!empty($notReadyUrl)) {
+                setEventMessages($langs->trans('SessionsWithoutAttendantsNotValidated', implode(', ', $notReadyUrl)), [], 'warnings');
+            }
+        }
+
+        // The selection is validated: the saturne template must not take it over
+        $action     = 'list';
+        $massaction = '';
+    }
+
     // Mass actions archive
-    require_once __DIR__ . '/../../../saturne/core/tpl/actions/list_massactions.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/actions/list_massactions.tpl.php');
+
+    // Download PDF mass action, offered by ActionsDolimeet::addMoreMassActions(): one zip with the PDF of every selected session.
+    // An empty selection is already reported by actions_massactions.inc.php
+    if ($massaction == 'downloadpdf' && $object->element == 'trainingsession' && $permissionToRead) {
+        require_once __DIR__ . '/../../lib/dolimeet_trainingsession.lib.php';
+
+        $zipFile = $conf->dolimeet->dir_temp . '/' . uniqid('trainingsessionpdf_') . '.zip';
+        $nbFiles = trainingsession_zip_pdf_documents($toselect, $zipFile);
+        if ($nbFiles > 0) {
+            $zipName = dol_sanitizeFileName(str_replace(' ', '_', $langs->transnoentities('Trainingsessions'))) . '_' . dol_print_date(dol_now(), 'dayhourlog') . '.zip';
+
+            top_httphead('application/zip');
+            header('Content-Disposition: attachment; filename="' . $zipName . '"');
+            header('Content-Length: ' . dol_filesize($zipFile));
+            readfileLowMemory($zipFile);
+            dol_delete_file($zipFile);
+            exit;
+        } elseif ($nbFiles == 0) {
+            setEventMessages($langs->trans('NoPDFForSelectedTrainingsessions'), [], 'warnings');
+        }
+    }
 }
 
 /*
@@ -383,12 +459,12 @@ $createUrl = dol_buildpath('/dolimeet/view/session/session_card.php', 1) . '?act
 //                    print '</td>';
 //                  }
 
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_header.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_input.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_title.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_loop_object.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_footer.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_header.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_input.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_title.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_loop_object.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_footer.tpl.php');
 
 // End of page
 llxFooter();
