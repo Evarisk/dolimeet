@@ -109,11 +109,15 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
         $triggerType = dol_ucfirst(dol_strtolower(explode('_', $action)[1]));
 
+        // A validation trigger runs before the object takes its final ref, kept meanwhile in newref, as in Dolibarr core:
+        // the event is labelled with it, not with the (PROVn) one
+        $objectRef = (preg_match('/_VALIDATE$/', $action) && !empty($object->newref)) ? $object->newref : $object->ref;
+
         $actionComm->code        = 'AC_' . $action;
         $actionComm->type_code   = 'AC_OTH_AUTO';
         $actionComm->fk_element  = $object->id;
         $actionComm->elementtype = $object->element . '@' . $object->module;
-        $actionComm->label       = $langs->transnoentities('Object' . $triggerType . 'Trigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+        $actionComm->label       = $langs->transnoentities('Object' . $triggerType . 'Trigger', $langs->transnoentities(ucfirst($object->element)), $objectRef);
         $actionComm->datep       = dol_now();
         $actionComm->userownerid = $user->id;
         $actionComm->percentage  = -1;
