@@ -281,7 +281,10 @@ if ($action == 'create') {
             $_POST['date_endmin']  = $now['minutes'];
         }
 
-        if (GETPOSTISSET('fk_soc') && $_POST['fk_soc'] == -1) {
+        // -1 is the empty choice of the third party selector. It may come from the URL as well as from the form:
+        // GETPOST() reads $_GET first, both are set back to 0
+        if (GETPOST('fk_soc', 'int') == -1) {
+            $_GET['fk_soc']  = 0;
             $_POST['fk_soc'] = 0;
         }
     }
