@@ -133,7 +133,8 @@ function getOnlineSignatureUrl2($mode, $type, $ref = '', $localorexternal = 1, $
             return 'Invalid parameter CONTRACT_ONLINE_SIGNATURE_SECURITY_TOKEN. Contains a null character.';
         }
 
-        $out = $urltouse.'/custom/dolimeet/core/dolibarr/newonlinesign.php?source=contract&ref='.($mode ? '<span style="color: #666666">' : '');
+        // Same base as $urltouse (DOL_MAIN_URL_ROOT, or the URL of conf.php for an external access), in the root DoliMeet is installed in
+        $out = dol_buildpath('/dolimeet/core/dolibarr/newonlinesign.php', $localorexternal ? 3 : 2).'?source=contract&ref='.($mode ? '<span style="color: #666666">' : '');
         if ($mode == 1) {
             $out .= 'contract_ref';
         }

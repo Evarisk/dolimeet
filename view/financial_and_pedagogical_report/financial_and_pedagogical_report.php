@@ -31,7 +31,7 @@ if (file_exists('../../dolimeet.main.inc.php')) {
 }
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+dol_include_once('/saturne/class/saturnedashboard.class.php');
 
 // Global variables definitions
 global $db, $langs, $user;

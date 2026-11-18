@@ -1327,6 +1327,12 @@ parameters:
 			path: view/session/session_list.php
 
 		-
+			message: '#^Loose comparison using \=\= between '''' and ''yes'' will always evaluate to false\.$#'
+			identifier: equal.alwaysFalse
+			count: 1
+			path: view/session/session_list.php
+
+		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
 			count: 2
@@ -1341,7 +1347,7 @@ parameters:
 		-
 			message: '#^Result of && is always false\.$#'
 			identifier: booleanAnd.alwaysFalse
-			count: 1
+			count: 3
 			path: view/session/session_list.php
 
 		-
