@@ -87,7 +87,7 @@ class DoliMeetSurveyReminder
         require_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
         // Load DigiQuali libraries
-        require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+        dol_include_once('/digiquali/class/survey.class.php');
 
         $emailFrom = getDolGlobalString('MAIN_MAIL_EMAIL_FROM');
         if (!dol_strlen($emailFrom)) {

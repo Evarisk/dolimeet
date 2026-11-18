@@ -35,8 +35,8 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
     global $db, $user;
 
     // Load DigiQuali libraries
-    require_once __DIR__ . '/../../digiquali/class/survey.class.php';
-    require_once __DIR__ . '/../../digiquali/lib/digiquali_sheet.lib.php';
+    dol_include_once('/digiquali/class/survey.class.php');
+    dol_include_once('/digiquali/lib/digiquali_sheet.lib.php');
 
     $survey = new Survey($db);
 
