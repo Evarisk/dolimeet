@@ -125,7 +125,7 @@ if (!isModEnabled('digiquali') || version_compare(getDolGlobalString('DIGIQUALI_
 }
 
 // Load DigiQuali libraries
-require_once __DIR__ . '/../../digiquali/class/sheet.class.php';
+dol_include_once('/digiquali/class/sheet.class.php');
 
 // Load Saturne libraries
 dol_include_once('/saturne/class/saturnemail.class.php');

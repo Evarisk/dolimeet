@@ -421,7 +421,7 @@ class ActionsDolimeet
                 dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
                 // Load DigiQuali libraries
-                require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+                dol_include_once('/digiquali/class/survey.class.php');
 
                 saturne_load_langs();
 
@@ -900,7 +900,7 @@ class ActionsDolimeet
             global $moduleNameLowerCase;
 
             if ($action == 'send_email') {
-                require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+                dol_include_once('/digiquali/class/survey.class.php');
                 dol_include_once('/saturne/class/saturnesignature.class.php');
                 dol_include_once('/saturne/class/saturnemail.class.php');
                 dol_include_once('/saturne/lib/saturne_functions.lib.php');

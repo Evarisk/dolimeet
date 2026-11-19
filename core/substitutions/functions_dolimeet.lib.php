@@ -86,7 +86,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 
         if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             // Load DigiQuali libraries
-            require_once __DIR__ . '/../../../digiquali/class/survey.class.php';
+            dol_include_once('/digiquali/class/survey.class.php');
 
             $survey = new Survey($db);
 
