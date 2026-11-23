@@ -178,9 +178,9 @@ class Session extends SaturneObject
     public $status;
 
     /**
-     * @var string Label.
+     * @var string|null Label (NULL in database for a session created without it).
      */
-    public string $label;
+    public ?string $label = null;
 
     /**
      * @var int|string Start date.
@@ -193,14 +193,14 @@ class Session extends SaturneObject
     public $date_end;
 
     /**
-     * @var string Content.
+     * @var string|null Content (NULL in database for a session created without it).
      */
-    public string $content;
+    public ?string $content = null;
 
     /**
-     * @var string Object type.
+     * @var string|null Object type (NULL in database for a session created without it).
      */
-    public string $type;
+    public ?string $type = null;
 
     /**
      * @var string|null Element type
@@ -213,9 +213,9 @@ class Session extends SaturneObject
     public $fk_element;
 
     /**
-     * @var bool Model
+     * @var bool|null Model (NULL in database for a session created without it)
      */
-    public bool $model = false;
+    public ?bool $model = false;
 
     /**
      * @var int|null Position

@@ -54,6 +54,9 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
         $session   = new Session($db);
         $signatory = new SaturneSignature($db, 'dolimeet', 'trainingsession');
 
+        // Filled session after session below, and replaced by nothing for a contract without session
+        $substitutionarray['__DOLIMEET_CONTRACT_TRAININGSESSION_INFOS__'] = '';
+
         $sessions = $session->fetchAll('ASC', 'date_start', 0, 0, ['customsql' => 't.fk_contrat = ' . $object->id . " AND t.type = 'trainingsession'"]);
         if (is_array($sessions) && !empty($sessions)) {
             foreach ($sessions as $session) {
@@ -86,7 +89,7 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
 
         if (isModEnabled('digiquali') && version_compare(getDolGlobalString('DIGIQUALI_VERSION'), '1.11.0', '>=')) {
             // Load DigiQuali libraries
-            require_once __DIR__ . '/../../../digiquali/class/survey.class.php';
+            dol_include_once('/digiquali/class/survey.class.php');
 
             $survey = new Survey($db);
 
