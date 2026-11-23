@@ -281,7 +281,10 @@ if ($action == 'create') {
             $_POST['date_endmin']  = $now['minutes'];
         }
 
-        if (GETPOSTISSET('fk_soc') && $_POST['fk_soc'] == -1) {
+        // -1 is the empty choice of the third party selector. It may come from the URL as well as from the form:
+        // GETPOST() reads $_GET first, both are set back to 0
+        if (GETPOST('fk_soc', 'int') == -1) {
+            $_GET['fk_soc']  = 0;
             $_POST['fk_soc'] = 0;
         }
     }
@@ -461,7 +464,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
     if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         // Define confirmation messages.
         $formQuestionClone = [
-            ['type' => 'text',  'name' => 'clone_label',      'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $object->label, 'size' => 24],
+            ['type' => 'text',  'name' => 'clone_label',      'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => (string) $object->label, 'size' => 24],
             ['type' => 'radio', 'name' => 'clone_attendants', 'label' => $langs->trans('CloneAttendants'), 'values' => [0 => $langs->trans('Attendants'), 1 => $langs->trans('AttendantsFromContract'), 2 => $langs->trans('None')], 'default' => 0]
         ];
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&object_type=' . $object->element, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element)), $object->ref), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);

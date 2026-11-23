@@ -421,7 +421,7 @@ class ActionsDolimeet
                 dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
                 // Load DigiQuali libraries
-                require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+                dol_include_once('/digiquali/class/survey.class.php');
 
                 saturne_load_langs();
 
@@ -807,10 +807,10 @@ class ActionsDolimeet
      *
      * @param  array        $parameters Hook metadatas (context, etc...).
      * @param  CommonObject $object     Current object.
-     * @param  string       $action     Current action.
+     * @param  string|null  $action     Current action.
      * @return int                      0 < on error, 0 on success, 1 to replace standard code.
      */
-    public function doActions(array $parameters, $object, string $action): int
+    public function doActions(array $parameters, $object, ?string $action): int
     {
         global $conf, $langs, $user, $db;
 
@@ -900,7 +900,7 @@ class ActionsDolimeet
             global $moduleNameLowerCase;
 
             if ($action == 'send_email') {
-                require_once __DIR__ . '/../../digiquali/class/survey.class.php';
+                dol_include_once('/digiquali/class/survey.class.php');
                 dol_include_once('/saturne/class/saturnesignature.class.php');
                 dol_include_once('/saturne/class/saturnemail.class.php');
                 dol_include_once('/saturne/lib/saturne_functions.lib.php');
@@ -2151,11 +2151,11 @@ class ActionsDolimeet
      *
      * @param  array        $parameters Hook metadatas (context, etc...)
      * @param  CommonObject $object     Current object
-     * @param  string       $action     Current action
+     * @param  string|null  $action     Current action
      * @return int                      0 < on error, 0 on success, 1 to replace standard code
      * @throws Exception
      */
-    public function saturneBuildDoc(array $parameters, CommonObject $object, string $action): int
+    public function saturneBuildDoc(array $parameters, CommonObject $object, ?string $action): int
     {
         global $conf, $langs;
 
