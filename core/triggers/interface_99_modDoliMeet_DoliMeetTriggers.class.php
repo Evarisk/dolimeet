@@ -58,7 +58,7 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
         $this->family      = 'demo';
         $this->description = 'DoliMeet triggers.';
         $this->version     = '23.2.0';
-        $this->picto       = 'dolimeet@dolimeet';
+        $this->picto       = 'dolimeet_color@dolimeet';
     }
 
     /**
