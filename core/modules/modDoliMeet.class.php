@@ -806,7 +806,15 @@ class modDoliMeet extends DolibarrModules
         // insert_cronjobs() keeps an existing job as it is: the survey reminder would keep the /custom/ path it was first declared with
         $sql[] = 'UPDATE ' . MAIN_DB_PREFIX . "cronjob SET classesname = '/dolimeet/class/dolimeetsurveyreminder.class.php' WHERE classesname = '/custom/dolimeet/class/dolimeetsurveyreminder.class.php'";
 
-        return $this->_init($sql, $options);
+        $result = $this->_init($sql, $options);
+
+        // Files of the sessions validated while they stayed under (PROVn) : moved back once the module is enabled, from
+        // Home > Modules as well, where nothing else does it (Saturne#1939). A Saturne without the function leaves them
+        if ($result > 0 && function_exists('saturne_recover_prov_directories')) {
+            saturne_recover_prov_directories($this->name);
+        }
+
+        return $result;
     }
 
     /**
