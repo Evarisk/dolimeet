@@ -35,7 +35,7 @@ class modDoliMeet extends DolibarrModules
     /**
      * @var int[] Minimum version of Saturne required by module, same format as need_dolibarr_version: checked by init() and by the Saturne index page
      */
-    public $need_saturne_version = [23, 8, 0];
+    public $need_saturne_version = [23, 9, 1];
 
     /**
      * Constructor. Define names, constants, directories, boxes, permissions.
@@ -83,7 +83,7 @@ class modDoliMeet extends DolibarrModules
         $this->editor_url  = 'https://evarisk.com';
 
         // Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'.
-        $this->version = '23.2.0';
+        $this->version = '23.2.1';
 
         // Url to the file with your last numberversion of this module.
         //$this->url_last_version = 'http://www.example.com/versionmodule.txt';
@@ -806,7 +806,15 @@ class modDoliMeet extends DolibarrModules
         // insert_cronjobs() keeps an existing job as it is: the survey reminder would keep the /custom/ path it was first declared with
         $sql[] = 'UPDATE ' . MAIN_DB_PREFIX . "cronjob SET classesname = '/dolimeet/class/dolimeetsurveyreminder.class.php' WHERE classesname = '/custom/dolimeet/class/dolimeetsurveyreminder.class.php'";
 
-        return $this->_init($sql, $options);
+        $result = $this->_init($sql, $options);
+
+        // Files of the sessions validated while they stayed under (PROVn) : moved back once the module is enabled, from
+        // Home > Modules as well, where nothing else does it (Saturne#1939). A Saturne without the function leaves them
+        if ($result > 0 && function_exists('saturne_recover_prov_directories')) {
+            saturne_recover_prov_directories($this->name);
+        }
+
+        return $result;
     }
 
     /**
