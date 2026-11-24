@@ -100,6 +100,13 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
             return 0; // If module is not enabled, we do nothing
         }
 
+        // Every event of the instance comes through here, also those another module sends with an object that is not
+        // a CommonObject (ExternalAccess passes its Context on externalAccessInitController): none of them concerns
+        // DoliMeet, and the event prepared below reads an id, element, module and ref that such an object may lack
+        if (!($object instanceof CommonObject)) {
+            return 0;
+        }
+
         // Data and type of action are stored into $object and $action
         dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . '. id=' . $object->id);
 
@@ -107,7 +114,8 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
 
         $actionComm = new ActionComm($this->db);
 
-        $triggerType = dol_ucfirst(dol_strtolower(explode('_', $action)[1]));
+        // An action code without "_" (externalAccessInitController, for instance) carries no trigger type
+        $triggerType = dol_ucfirst(dol_strtolower(explode('_', $action)[1] ?? ''));
 
         // A validation trigger runs before the object takes its final ref, kept meanwhile in newref, as in Dolibarr core:
         // the event is labelled with it, not with the (PROVn) one
