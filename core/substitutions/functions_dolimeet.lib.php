@@ -134,5 +134,11 @@ function dolimeet_completesubstitutionarray(array &$substitutionarray, Translate
         }
     }
 
-    $substitutionarray['__DOLIMEET_PUBLIC_INTERFACE_CONTACT_URL__'] = dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id;
+    // Link of the public page where the customer adds the trainees: training contracts only, with the key of the contract
+    $substitutionarray['__DOLIMEET_PUBLIC_INTERFACE_CONTACT_URL__'] = '';
+    if ($object->element == 'contrat' && !empty($object->array_options['options_trainingsession_type'])) {
+        require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
+
+        $substitutionarray['__DOLIMEET_PUBLIC_INTERFACE_CONTACT_URL__'] = dolimeet_get_public_contact_url($object);
+    }
 }

@@ -262,3 +262,62 @@ function set_public_note(CommonObject $object, ?Propal $propal = null, $triggerK
         }
     }
 }
+
+/**
+ * Secret key of a DoliMeet public link
+ *
+ * Keyed hash (HMAC-SHA256) of the purpose of the link, the entity and the ID of the object, with the unique ID of the
+ * instance as key: it cannot be worked out from the object ID, needs no storage, and each generation of the link
+ * (button, email template substitution) gives the same one
+ *
+ * @param  string $purpose  Purpose of the link, so that the key of one public page does not open another one
+ * @param  int    $objectId Object ID
+ * @param  int    $entity   Entity of the object
+ * @return string           Key, empty when the instance has no unique ID to derive it from
+ */
+function dolimeet_get_public_link_key(string $purpose, int $objectId, int $entity): string
+{
+    global $conf;
+
+    $instanceKey = (string) ($conf->file->instance_unique_id ?? '');
+    if ($objectId <= 0 || $entity <= 0 || $instanceKey === '') {
+        return '';
+    }
+
+    return hash_hmac('sha256', 'dolimeet|' . $purpose . '|' . $entity . '|' . $objectId, $instanceKey);
+}
+
+/**
+ * Whether the key given to a DoliMeet public page is the one of its object
+ *
+ * @param  string $purpose  Purpose of the link, as given to dolimeet_get_public_link_key()
+ * @param  int    $objectId Object ID
+ * @param  int    $entity   Entity of the object
+ * @param  string $key      Key received by the public page
+ * @return bool             True if the key opens this object
+ */
+function dolimeet_check_public_link_key(string $purpose, int $objectId, int $entity, string $key): bool
+{
+    $expectedKey = dolimeet_get_public_link_key($purpose, $objectId, $entity);
+
+    return $expectedKey !== '' && hash_equals($expectedKey, $key);
+}
+
+/**
+ * URL of the public page where the customer adds the trainees of a training contract
+ *
+ * @param  CommonObject $contract Training contract, fetched
+ * @return string                 URL, empty when no key can be made
+ */
+function dolimeet_get_public_contact_url(CommonObject $contract): string
+{
+    global $conf;
+
+    $entity = (int) (!empty($contract->entity) ? $contract->entity : $conf->entity);
+    $key    = dolimeet_get_public_link_key('contact', (int) $contract->id, $entity);
+    if ($key === '') {
+        return '';
+    }
+
+    return dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . ((int) $contract->id) . '&entity=' . $entity . '&securekey=' . $key;
+}
