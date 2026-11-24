@@ -986,6 +986,65 @@ class ActionsDolimeet
     }
 
     /**
+     * Overloading the createFrom function : replacing the parent's function with the one below
+     *
+     * Training contract created from a proposal: the trigger CONTRACT_CREATE has added the training contract
+     * and rules of procedure services at positions 1 and 50, then Dolibarr has added the proposal lines from
+     * position 0 or 1, hence a line at position 0 and duplicates (#1025). Lines are numbered again from 1:
+     * training contract first, rules of procedure last.
+     *
+     * @param  array        $parameters Hook metadata (context, etc...)
+     * @param  CommonObject $object     Contract created
+     * @param  string|null  $action     Current action
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function createFrom(array $parameters, $object, ?string $action): int
+    {
+        if (strpos($parameters['context'], 'contractcard') === false || $object->element != 'contrat') {
+            return 0;
+        }
+        if ($object->id <= 0) {
+            return 0;
+        }
+        if (GETPOST('options_trainingsession_type', 'int') <= 0) {
+            return 0;
+        }
+
+        $firstProductId = getDolGlobalInt('DOLIMEET_SERVICE_TRAINING_CONTRACT');
+        $lastProductId  = getDolGlobalInt('DOLIMEET_SERVICE_RULES_OF_PROCEDURE');
+        $firstLines     = [];
+        $otherLines     = [];
+        $lastLines      = [];
+
+        $sql   = 'SELECT rowid, fk_product FROM ' . MAIN_DB_PREFIX . 'contratdet';
+        $sql  .= ' WHERE fk_contrat = ' . ((int) $object->id) . ' ORDER BY rang ASC, rowid ASC';
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->errors[] = $this->db->lasterror();
+            return -1;
+        }
+        while ($obj = $this->db->fetch_object($resql)) {
+            if ($firstProductId > 0 && $obj->fk_product == $firstProductId) {
+                $firstLines[] = (int) $obj->rowid;
+            } elseif ($lastProductId > 0 && $obj->fk_product == $lastProductId) {
+                $lastLines[] = (int) $obj->rowid;
+            } else {
+                $otherLines[] = (int) $obj->rowid;
+            }
+        }
+        $this->db->free($resql);
+
+        foreach (array_merge($firstLines, $otherLines, $lastLines) as $key => $lineId) {
+            if ($object->updateRangOfLine($lineId, $key + 1) < 0) {
+                $this->errors[] = $this->db->lasterror();
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * Overloading the beforePDFCreation function : replacing the parent's function with the one below
      *
      * @param  array  $parameters Hook metadata (context, etc...)
