@@ -94,7 +94,9 @@ if ($type == 'proposal') {
     $securekeyseed = getDolGlobalString(strtoupper($type).'_ONLINE_SIGNATURE_SECURITY_TOKEN');
 }
 
-if (empty($SECUREKEY) || !dol_verifyHash($securekeyseed . $type . $ref . (!isModEnabled('multicompany') ? '' : $entity), $SECUREKEY, '0')) {
+// No key is valid while the token of the document is not set
+$securekeychain = $securekeyseed . $type . $ref . (!isModEnabled('multicompany') ? '' : $entity);
+if ($securekeyseed === '' || empty($SECUREKEY) || !dol_verifyHash($securekeychain, $SECUREKEY, '0')) {
     httponly_accessforbidden('Bad value for securitykey. Value provided ' . dol_escape_htmltag($SECUREKEY) . ' does not match expected value for ref=' . dol_escape_htmltag($ref), 403);
 }
 
