@@ -381,6 +381,21 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     require_once __DIR__ . '/../../lib/dolimeet_function.lib.php';
                     require_once __DIR__ . '/../../lib/dolibarr_lib.php';
 
+                    // One training contract per proposal: each creation below is validated right away, with its
+                    // reference and its sessions, so a creation sent again (page reloaded, form resubmitted) made
+                    // one more each time (50 in 4 minutes, #1042). Refused here, Contrat::create() rolls it back.
+                    if (!empty($object->linked_objects['propal'])) {
+                        $propalIds           = $object->linked_objects['propal'];
+                        $contractId          = (int) $object->id;
+                        $existingContractRef = dolimeet_get_training_contract_from_propal($propalIds, $contractId);
+                        if ($existingContractRef !== '') {
+                            $langs->load('dolimeet@dolimeet');
+                            $errorKey       = 'ErrorTrainingContractAlreadyCreatedFromPropal';
+                            $this->errors[] = $langs->transnoentities($errorKey, $existingContractRef);
+                            return -1;
+                        }
+                    }
+
                     $propal       = new Propal($this->db);
                     $product      = new Product($this->db);
                     $contratLigne = new ContratLigne($this->db);
