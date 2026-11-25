@@ -814,7 +814,71 @@ class modDoliMeet extends DolibarrModules
             saturne_recover_prov_directories($this->name);
         }
 
+        // DoliMeet turns CONTRACT_ALLOW_ONLINESIGN on, the key of the signature links needs its token too
+        if ($result > 0 && $this->initContractOnlineSignatureToken() < 0) {
+            $result = -1;
+        }
+
         return $result;
+    }
+
+    /**
+     * Give a random CONTRACT_ONLINE_SIGNATURE_SECURITY_TOKEN to each entity where DoliMeet is enabled and that has none
+     *
+     * The key of an online signature link of a contract is a hash of this token, the contract ref and its entity.
+     * The core sets the token of proposals when their module is enabled, never the one of contracts.
+     * A token already set is kept.
+     *
+     * @return int 1 if OK, -1 if KO
+     */
+    private function initContractOnlineSignatureToken(): int
+    {
+        global $conf;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/security.lib.php';
+
+        $tokenName = 'CONTRACT_ONLINE_SIGNATURE_SECURITY_TOKEN';
+        $entities  = [(int) $conf->entity];
+
+        $sql   = 'SELECT DISTINCT entity FROM ' . MAIN_DB_PREFIX . 'const';
+        $sql  .= ' WHERE name = ' . $this->db->encrypt($this->const_name) . ' AND entity > 0';
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+        while ($obj = $this->db->fetch_object($resql)) {
+            $entities[] = (int) $obj->entity;
+        }
+
+        $tokens = [];
+        foreach (array_unique($entities) as $entity) {
+            // Token seen by this entity: its own row, else the one shared by all entities (entity 0)
+            $sql   = 'SELECT ' . $this->db->decrypt('value') . ' AS value FROM ' . MAIN_DB_PREFIX . 'const';
+            $sql  .= ' WHERE name = ' . $this->db->encrypt($tokenName) . ' AND entity IN (0, ' . $entity . ')';
+            $sql  .= ' ORDER BY entity DESC';
+            $resql = $this->db->query($sql);
+            if (!$resql) {
+                $this->error = $this->db->lasterror();
+                return -1;
+            }
+            $obj   = $this->db->fetch_object($resql);
+            $token = $obj ? (string) dolDecrypt((string) $obj->value) : '';
+
+            if ($token === '') {
+                $token = bin2hex(random_bytes(32));
+                if (dolibarr_set_const($this->db, $tokenName, $token, 'chaine', 0, '', $entity) <= 0) {
+                    $this->error = $this->db->lasterror();
+                    return -1;
+                }
+            }
+            $tokens[$entity] = $token;
+        }
+
+        // dolibarr_set_const() puts the value in the running configuration whatever its entity: back to the current one
+        $conf->global->$tokenName = $tokens[(int) $conf->entity];
+
+        return 1;
     }
 
     /**
