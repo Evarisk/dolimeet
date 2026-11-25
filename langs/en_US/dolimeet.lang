@@ -274,6 +274,13 @@ ContractInvoicing                     = Invoicing
 ContractPayment                       = Payment
 
 #
+# Public interface
+#
+
+# Data
+PublicAddContactInvalidLink = This link is not valid or no longer valid. Ask your training organisation for a new link.
+
+#
 # Error
 #
 
