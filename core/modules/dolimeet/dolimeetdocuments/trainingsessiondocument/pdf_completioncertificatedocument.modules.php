@@ -181,15 +181,72 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         return $top_shift;
     }
 
+    /**
+     * Complete the data of a preview with a sample trainee and training
+     *
+     * The preview hands an unsaved object and no trainee. Its ref stays empty: the specimen is filed under the
+     * directory of the document type, where Setup > Documents looks for it.
+     *
+     * @param  array $moreParam More parameters of the generation, 'object' included
+     * @return array            The same parameters, completed
+     */
+    protected function fillSpecimen(array $moreParam): array
+    {
+        if (empty($moreParam['attendant'])) {
+            $attendant               = new stdClass();
+            $attendant->lastname     = 'DOLIBARR';
+            $attendant->firstname    = 'SPECIMEN';
+            $attendant->element_type = 'user';
+            $attendant->element_id   = 0;
+            $moreParam['attendant']  = $attendant;
+        }
+
+        $object = $moreParam['object'] ?? new stdClass();
+        if (!isset($object->ref)) {
+            $object->ref = '';
+        }
+        if (empty($object->formationLabel)) {
+            $object->formationLabel = 'SPECIMEN';
+        }
+        if (empty($object->date_start)) {
+            $object->date_start = dol_now();
+        }
+        if (empty($object->date_end)) {
+            $object->date_end = $object->date_start;
+        }
+        if (empty($object->duration)) {
+            $object->duration = 7 * 3600;
+        }
+        if (empty($object->array_options['options_trainingsession_type'])) {
+            $trainingSessionDicts = saturne_fetch_dictionary('c_trainingsession_type');
+
+            $firstType = '';
+            if (is_array($trainingSessionDicts) && !empty($trainingSessionDicts)) {
+                $firstType = (string) array_key_first($trainingSessionDicts);
+            }
+            $object->array_options['options_trainingsession_type'] = $firstType;
+        }
+        $moreParam['object'] = $object;
+
+        return $moreParam;
+    }
+
     public function write_file($objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
     {
         global $action, $conf, $hookmanager, $langs, $mysoc, $user;
 
         $moreParam = self::getMoreParam($objectDocument, $moreParam);
 
-        $object = $moreParam['object'];
+        // The preview of Setup > Documents hands an unsaved object and no trainee
+        if (!empty($moreParam['specimen'])) {
+            $moreParam = $this->fillSpecimen($moreParam);
+        }
 
-        $attendantFullname = dol_strtoupper($moreParam['attendant']->lastname) . ' ' . dol_ucfirst($moreParam['attendant']->firstname);
+        $object    = $moreParam['object'];
+        $attendant = $moreParam['attendant'] ?? new stdClass();
+
+        $attendantFullname = dol_strtoupper($attendant->lastname ?? '');
+        $attendantFullname .= ' ' . dol_ucfirst($attendant->firstname ?? '');
         if (!empty($moreParam['attendant'])) {
             $moreParam['documentName'] = $attendantFullname . '_';
         } else {
@@ -246,23 +303,56 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
         }
 
         $trainingSessionDicts = saturne_fetch_dictionary('c_trainingsession_type');
+        if (!is_array($trainingSessionDicts)) {
+            $trainingSessionDicts = [];
+        }
+
+        // The training label and the nature of the action are on the contract: the session card hands the session
+        $contract = $object;
+        if (!($object instanceof Contrat) && !empty($object->fk_contrat)) {
+            $contract = new Contrat($this->db);
+            if ($contract->fetch((int) $object->fk_contrat) > 0) {
+                if (empty($object->formationLabel)) {
+                    require_once __DIR__ . '/../../../../../lib/dolimeet_trainingsession.lib.php';
+                    $object->formationLabel = get_formation_label($contract);
+                }
+            } else {
+                $contract = $object;
+            }
+        }
+        $trainingSessionType = $contract->array_options['options_trainingsession_type'] ?? '';
 
         // Certificate variables
         $companyName    = $mysoc->name;
-        $formationLabel = $object->formationLabel;
-        $contractRef    = $object->ref;
+        $formationLabel = $object->formationLabel ?? '';
+        $contractRef    = (string) $object->ref;
+        if ($contractRef === '' && !empty($moreParam['specimen'])) {
+            $contractRef = 'SPECIMEN';
+        }
         $trainingStart  = dol_print_date($object->date_start, 'day', 'tzuserrel');
         $trainingEnd    = dol_print_date($object->date_end, 'day', 'tzuserrel');
         $totalHours     = convertSecondToTime($object->duration, 'allhourmin');
-        $actionName     = $langs->trans($trainingSessionDicts[$object->array_options['options_trainingsession_type']]->label);
         $issuerName     = $userTmp->firstname . ' ' . $userTmp->lastname;
 
-        if ($moreParam['attendant']->element_type == 'user') {
+        if (($attendant->element_type ?? '') == 'user') {
             $attendantCompany = $companyName;
         } else {
-            $thirdparty = new Societe($this->db);
-            $thirdparty->fetch($moreParam['attendant']->socid);
-            $attendantCompany = $thirdparty->name;
+            // A trainee signatory of a session carries its contact, not the thirdparty of the contact
+            $attendantSocId = (int) ($attendant->socid ?? 0);
+            if ($attendantSocId <= 0 && !empty($attendant->element_id)) {
+                $contact = new Contact($this->db);
+                if ($contact->fetch((int) $attendant->element_id) > 0) {
+                    $attendantSocId = (int) $contact->socid;
+                }
+            }
+
+            $attendantCompany = '';
+            if ($attendantSocId > 0) {
+                $thirdparty = new Societe($this->db);
+                if ($thirdparty->fetch($attendantSocId) > 0) {
+                    $attendantCompany = $thirdparty->name;
+                }
+            }
         }
 
         $defaultHeightCell = 6;
@@ -347,7 +437,7 @@ class pdf_completioncertificatedocument extends SaturneDocumentModel
 
         $pdf->SetFont('helvetica', '', $defaultFontSize);
         foreach ($trainingSessionDicts as $trainingSessionDictKey => $trainingSessionDict) {
-            $checkBox = ($trainingSessionDictKey == $object->array_options['options_trainingsession_type'] ? '[X]' : '[ ]');
+            $checkBox = ($trainingSessionDictKey == $trainingSessionType ? '[X]' : '[ ]');
             $sup      = '';
             if ($trainingSessionDictKey == 1) {
                 $sup = '<sup>1</sup>';
