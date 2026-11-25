@@ -1297,7 +1297,13 @@ class ActionsDolimeet
                 }
 
                 if (getDolGlobalInt('DOLIMEET_CONTACT_PUBLIC_INTERFACE_ENABLED') > 0) {
-                    $moreHtmlStatus .= '<a href="' . dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . $object->id . '&token=' . currentToken() . '" target="_blank" class="butAction no-load">Interface Publique</a>';
+                    require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+
+                    // The link is copied and sent to the customer: it carries its own key, never the session token of the user
+                    $publicContactUrl = dolimeet_get_public_contact_url($object);
+                    if ($publicContactUrl !== '') {
+                        $moreHtmlStatus .= '<a href="' . dol_escape_htmltag($publicContactUrl) . '" target="_blank" rel="noopener" class="butAction no-load">Interface Publique</a>';
+                    }
                 }
 
                 $this->resprints = $moreHtmlStatus;
