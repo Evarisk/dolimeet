@@ -321,3 +321,41 @@ function dolimeet_get_public_contact_url(CommonObject $contract): string
 
     return dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . ((int) $contract->id) . '&entity=' . $entity . '&securekey=' . $key;
 }
+
+/**
+ * Reference of a training contract already created from one of these proposals, other than the given contract
+ *
+ * A training contract is the one with a training session type (extrafield trainingsession_type). Its link to the
+ * proposal is the one Contrat::create() adds from the origin: source propal, target contrat.
+ *
+ * @param  int|int[] $propalIds  Proposal ID(s) the contract is created from
+ * @param  int       $contractId Contract being created, ignored
+ * @return string                Reference of the first training contract found, empty when there is none
+ */
+function dolimeet_get_training_contract_from_propal($propalIds, int $contractId): string
+{
+    global $db;
+
+    $propalIds = array_filter(array_map('intval', (array) $propalIds));
+    if (empty($propalIds)) {
+        return '';
+    }
+
+    $sql  = 'SELECT c.ref FROM ' . MAIN_DB_PREFIX . 'element_element AS ee';
+    $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'contrat AS c ON c.rowid = ee.fk_target';
+    $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'contrat_extrafields AS cef ON cef.fk_object = c.rowid';
+    $sql .= " WHERE ee.sourcetype = 'propal' AND ee.targettype = 'contrat'";
+    $sql .= ' AND ee.fk_source IN (' . $db->sanitize(implode(',', $propalIds)) . ')';
+    $sql .= ' AND c.rowid <> ' . $contractId;
+    $sql .= ' AND cef.trainingsession_type > 0';
+    $sql .= ' ORDER BY c.rowid ASC';
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ' ' . $db->lasterror(), LOG_ERR);
+        return '';
+    }
+    $obj = $db->fetch_object($resql);
+
+    return $obj ? (string) $obj->ref : '';
+}
