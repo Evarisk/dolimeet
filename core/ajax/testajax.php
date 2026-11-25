@@ -18,16 +18,19 @@
  */
 
 /**
- *       \file      htdocs/core/ajax/objectonoff.php
- *       \brief     File to set status for an object. Called when ajax_object_onoff() is used.
- *       			This Ajax service is often called when option MAIN_DIRECT_STATUS_UPDATE is set.
- *       			TODO Rename into updatestatus.php
+ * \file    core/ajax/testajax.php
+ * \ingroup dolimeet
+ * \brief   Switch "Mandatory signature" of a contact of an object (llx_element_contact.mandatory_signature), set from the
+ *          contacts tab of the object
  */
 
 ob_start();
 
 if (!defined('NOTOKENRENEWAL')) {
     define('NOTOKENRENEWAL', '1'); // Disables token renewal
+}
+if (!defined('CSRFCHECK_WITH_TOKEN')) {
+    define('CSRFCHECK_WITH_TOKEN', '1'); // Token is required even in GET mode, whatever the setup of the CSRF protection
 }
 if (!defined('NOREQUIREMENU')) {
     define('NOREQUIREMENU', '1');
@@ -60,6 +63,29 @@ $value = GETPOST('value', 'int');
 
 $rowid = GETPOSTINT('rowid');
 
+// The line links a contact to an object, whose type is the one of the contact type: the object is found back to check
+// the rights on it, as the core does for its own switches (core/ajax/objectonoff.php)
+$object = 0;
+$resql  = $db->query('SELECT ec.element_id, tc.element FROM ' . $db->prefix() . 'element_contact as ec INNER JOIN ' . $db->prefix() . 'c_type_contact as tc ON tc.rowid = ec.fk_c_type_contact WHERE ec.rowid = ' . ((int) $rowid));
+if ($resql && ($line = $db->fetch_object($resql))) {
+    $object = fetchObjectByElement((int) $line->element_id, (string) $line->element);
+}
+if (!is_object($object)) {
+    httponly_accessforbidden('Contact line not found.');
+}
+
+// An external user only reaches the objects of its own third party
+if (!empty($user->socid) && !empty($object->socid) && $user->socid != $object->socid) {
+    httponly_accessforbidden('Access on object not allowed for this external user.');
+}
+
+// Right to edit the object, checked by restrictedArea() because $action is 'set'
+$usesublevelpermission = ($object->module != $object->element ? $object->element : '');
+if ($usesublevelpermission && !$user->hasRight($object->module, $object->element)) {
+    $usesublevelpermission = '';
+}
+restrictedArea($user, $object->module, $object, $object->table_element, $usesublevelpermission);
+
 /*
  * View
  */
@@ -69,7 +95,7 @@ top_httphead();
 print '<!-- Ajax page called with url '.dol_escape_htmltag($_SERVER["PHP_SELF"]).'?'.dol_escape_htmltag($_SERVER["QUERY_STRING"]).' -->'."\n";
 
 // Registering new values
-if (($action == 'set')) {	// Test on permission already done in header according to object and field.
+if (($action == 'set')) {	// Rights on the object of the line already checked above
     $contact = new Contact($db);
     $result = $contact->setValueFrom('mandatory_signature', $value, 'element_contact', $rowid, 'int', '', $user, '', '');
 
