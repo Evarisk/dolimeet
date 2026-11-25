@@ -399,7 +399,6 @@ class InterfaceDoliMeetTriggers extends DolibarrTriggers
                     $propal       = new Propal($this->db);
                     $product      = new Product($this->db);
                     $contratLigne = new ContratLigne($this->db);
-                    $project      = new Project($this->db);
 
                     $langs->load('propal');
 
