@@ -188,6 +188,10 @@ class ActionsDolimeet
             return 0;
         }
 
+        // Les blocs propale et produit plus bas s'en servent aussi, pas seulement la boucle des metadonnees
+        $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+        $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
             dol_include_once('/saturne/lib/object.lib.php');
             $objectsMetadata                = saturne_get_objects_metadata();
@@ -201,8 +205,6 @@ class ActionsDolimeet
                 continue;
             }
             if (strpos($parameters['context'], $objectMetadata['hook_name_card']) !== false) {
-                $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
                 $extraFieldsNames = ['trainingsession_type', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
                 foreach ($extraFieldsNames as $extraFieldsName) {
                     if (isset($extrafields->attributes[$object->table_element]['label'][$extraFieldsName])) {
@@ -237,10 +239,13 @@ class ActionsDolimeet
             <?php
         }
 
-        if (strpos($parameters['context'], 'productcard')) {
+        // initHooks() met les contextes de la page en tete : sans !== false, la fiche produit elle-meme n'entrait jamais ici
+        if (strpos($parameters['context'], 'productcard') !== false) {
             global $extrafields, $object;
 
-            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
+            if (isset($extrafields->attributes['product']['label']['syllabus'])) {
+                $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
+            }
 
             if ($object->type == $object::TYPE_PRODUCT) {
                 $extrafields->attributes['product']['list']['syllabus'] = 0;
