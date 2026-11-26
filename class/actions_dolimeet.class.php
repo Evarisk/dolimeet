@@ -882,6 +882,7 @@ class ActionsDolimeet
                 $moduleName          = 'DoliMeet';
                 $moduleNameLowerCase = strtolower($moduleName);
                 $upload_dir          = $conf->dolimeet->multidir_output[$conf->entity ?? 1];
+                $permissiontoadd     = $user->hasRight('dolimeet', 'trainingsession', 'write');
 
                 // Action to generate pdf from odt file
                 require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
