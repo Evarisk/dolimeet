@@ -188,7 +188,8 @@ class ActionsDolimeet
             return 0;
         }
 
-        // Les blocs propale et produit plus bas s'en servent aussi, pas seulement la boucle des metadonnees
+        // Le bloc produit plus bas s'en sert aussi : sans le module Produits (Services seul), Saturne ne declare
+        // pas de metadonnees product et la boucle ne le definissait pas
         $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
         $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
 
@@ -214,14 +215,8 @@ class ActionsDolimeet
             }
         }
 
+        // Le picto des libelles de la propale est pose par la boucle des metadonnees : le reposer ici le doublait
         if (strpos($parameters['context'], 'propalcard') !== false) {
-            $propalExtraFieldsNames = ['trainingsession_type', 'trainingsession_location'];
-            foreach ($propalExtraFieldsNames as $propalExtraFieldsName) {
-                if (isset($extrafields->attributes['propal']['label'][$propalExtraFieldsName])) {
-                    $extrafields->attributes['propal']['label'][$propalExtraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label'][$propalExtraFieldsName]);
-                }
-            }
-
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
             } ?>
