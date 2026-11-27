@@ -94,9 +94,6 @@ function dolimeet_survey_has_contact(int $surveyID, int $sheetID, int $contactID
 
     static $signatory = null;
 
-    // Load DigiQuali libraries
-    dol_include_once('/digiquali/class/survey.class.php');
-
     // Load Saturne libraries
     dol_include_once('/saturne/class/saturnesignature.class.php');
 
@@ -104,7 +101,8 @@ function dolimeet_survey_has_contact(int $surveyID, int $sheetID, int $contactID
         $signatory = new SaturneSignature($db, 'digiquali', 'survey');
     }
 
-    $filter = ' AND e.fk_sheet = ' . $sheetID . ' AND e.status > ' . Survey::STATUS_DELETED;
+    // Not deleted: the deleted status of a DigiQuali survey (Survey::STATUS_DELETED) is -1
+    $filter = ' AND e.fk_sheet = ' . $sheetID . ' AND e.status >= 0';
     foreach (['Attendant', 'ExtSocietyAttendant'] as $role) {
         if ($signatory->checkSignatoryHasObject($surveyID, 'digiquali_survey', $contactID, $signatoryType, $filter, $role) > 0) {
             return true;
