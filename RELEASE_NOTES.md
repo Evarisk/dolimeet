@@ -1,34 +1,38 @@
-# [DoliMeet] [23.2.3] - Signature en ligne des contrats plus sûre - Certificat de réalisation complet
+# [DoliMeet] [23.2.4] - Un seul contrat de formation par proposition - Conversion PDF soumise au droit de générer le document
 
-Description : la signature en ligne des contrats de formation s'appuie maintenant sur une clé propre à l'instance, la case « Signature obligatoire » des contacts demande le droit de modifier l'objet, et le certificat de réalisation produit depuis une session est complet. **Mise à jour recommandée pour toutes les instances.**
+Description : un contrat de formation ne se crée plus en double depuis la même proposition commerciale, la création d'un contrat hors de sa fiche ne s'arrête plus sur une erreur, et la conversion en PDF depuis la fiche contrat demande le droit de générer le document.
 
-**Cette version demande Saturne 23.10.0 ou supérieur.**
+**Cette version demande Saturne 23.10.1 ou supérieur.**
 
-**À savoir avant de mettre à jour : les liens de signature en ligne des contrats envoyés avant cette version ne fonctionnent plus.** Renvoyez le lien depuis la fiche du contrat ou depuis votre modèle d'e-mail : il est produit avec la nouvelle clé.
+**À installer avant Saturne 23.11.0, ou en même temps.** Avec une version antérieure de DoliMeet, Saturne 23.11.0 refuserait la conversion en PDF sur la fiche contrat.
 
 ## Améliorations & corrections
 
-### Signature en ligne des contrats : contrôles renforcés
+### Contrats de formation
 
-* Le lien de signature en ligne d'un contrat porte une clé propre à l'instance, créée à la mise à jour du module dans chaque entité où il est actif.
-* La page de signature en ligne de DoliMeet refuse tout lien tant que cette clé n'existe pas.
+* Un second contrat de formation demandé depuis la même proposition commerciale est refusé. Auparavant, il était créé et validé d'office à chaque fois, ce qui pouvait produire des dizaines de contrats identiques.
+* Créer un contrat hors de sa fiche (script, API, autre module) ne s'arrête plus sur une erreur fatale.
 
-### Contacts des objets
+### Documents
 
-* La case « Signature obligatoire » d'un contact ne se modifie plus qu'avec le droit de modifier l'objet.
+* La conversion en PDF d'un document depuis la fiche contrat demande le droit de générer ce document, comme le bouton « Générer ».
 
-### Certificat de réalisation
+### Affichage
 
-* Le certificat produit depuis une session indique l'entreprise du stagiaire, l'intitulé de la formation et la nature de l'action, comme celui produit depuis le contrat.
-* L'aperçu du modèle, dans Administration > Documents, s'affiche avec un stagiaire et une formation d'exemple, sans avertissement.
+* Les libellés DoliMeet des fiches proposition commerciale et produit n'affichent plus leur pictogramme en double, et ne laissent plus d'avertissement dans le journal PHP.
+* Après une mise à jour de DoliMeet ou de Saturne, les pages chargent les nouveaux styles et scripts : plus besoin de vider le cache du navigateur (Ctrl+F5).
+* Si Saturne est absent, DoliMeet affiche un message clair au lieu d'une erreur.
 
 ## Testez les nouveautés maintenant
 
-**Allez tester un contrat de formation et son certificat de réalisation sur la démo : [https://demodoli.digirisk.com/](https://demodoli.digirisk.com/)**
+**Allez tester un contrat de formation créé depuis une proposition commerciale sur la démo : [https://demodoli.digirisk.com/](https://demodoli.digirisk.com/)**
 
-## Comparaison des versions [23.2.2](https://github.com/Evarisk/dolimeet/compare/23.2.2...23.2.3) et 23.2.3
+## Comparaison des versions [23.2.3](https://github.com/Evarisk/dolimeet/compare/23.2.3...23.2.4) et 23.2.4
 
-* [Contrat] fix: la page de signature en ligne de DoliMeet refuse toute clé sans jeton [`cde06c4b`](https://github.com/Evarisk/dolimeet/commit/cde06c4b)
-* [#1034] [Document] fix: certificat de réalisation PDF complet dans l'aperçu et depuis une session [`86345926`](https://github.com/Evarisk/dolimeet/commit/86345926)
-* [Contrat] fix: jeton de la signature en ligne des contrats initialisé à l'activation [`d2fb01f6`](https://github.com/Evarisk/dolimeet/commit/d2fb01f6)
-* [Contact] fix: case « Signature obligatoire » modifiable seulement avec le droit d'écriture sur l'objet [`ff8dbe58`](https://github.com/Evarisk/dolimeet/commit/ff8dbe58)
+* [#1048] [Hooks] fix: picto en double sur les libellés DoliMeet de la propale [`561db296`](https://github.com/Evarisk/dolimeet/commit/561db296)
+* [#1048] [Hooks] fix: $picto défini avant les blocs propale et produit de formObjectOptions [`56a079ef`](https://github.com/Evarisk/dolimeet/commit/56a079ef)
+* [#1047] [Assets] fix: version the assets printed by hand through saturne_asset_full_url [`a1f28fea`](https://github.com/Evarisk/dolimeet/commit/a1f28fea)
+* [Documents] fix: génération PDF manuelle soumise au droit de générer le document [`3c373249`](https://github.com/Evarisk/dolimeet/commit/3c373249)
+* [#1044] [Contrat] fix: remove the unused new Project in the CONTRACT_CREATE trigger (fatal error outside the contract card) [`d4b434cb`](https://github.com/Evarisk/dolimeet/commit/d4b434cb)
+* [#1042] [Contrat] fix: un second contrat de formation depuis la même propale est refusé, plus validé d'office à chaque fois [`b36c0774`](https://github.com/Evarisk/dolimeet/commit/b36c0774)
+* [#1040] [Saturne] fix: message explicite quand l'amorçage ne trouve pas Saturne [`7ba90bf2`](https://github.com/Evarisk/dolimeet/commit/7ba90bf2)
