@@ -191,6 +191,11 @@ class ActionsDolimeet
             return 0;
         }
 
+        // Le bloc produit plus bas s'en sert aussi : sans le module Produits (Services seul), Saturne ne declare
+        // pas de metadonnees product et la boucle ne le definissait pas
+        $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+        $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
             dol_include_once('/saturne/lib/object.lib.php');
             $objectsMetadata                = saturne_get_objects_metadata();
@@ -204,8 +209,6 @@ class ActionsDolimeet
                 continue;
             }
             if (strpos($parameters['context'], $objectMetadata['hook_name_card']) !== false) {
-                $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
                 $extraFieldsNames = ['trainingsession_type', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
                 foreach ($extraFieldsNames as $extraFieldsName) {
                     if (isset($extrafields->attributes[$object->table_element]['label'][$extraFieldsName])) {
@@ -215,14 +218,8 @@ class ActionsDolimeet
             }
         }
 
+        // Le picto des libelles de la propale est pose par la boucle des metadonnees : le reposer ici le doublait
         if (strpos($parameters['context'], 'propalcard') !== false) {
-            $propalExtraFieldsNames = ['trainingsession_type', 'trainingsession_location'];
-            foreach ($propalExtraFieldsNames as $propalExtraFieldsName) {
-                if (isset($extrafields->attributes['propal']['label'][$propalExtraFieldsName])) {
-                    $extrafields->attributes['propal']['label'][$propalExtraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label'][$propalExtraFieldsName]);
-                }
-            }
-
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
             } ?>
@@ -240,10 +237,13 @@ class ActionsDolimeet
             <?php
         }
 
-        if (strpos($parameters['context'], 'productcard')) {
+        // initHooks() met les contextes de la page en tete : sans !== false, la fiche produit elle-meme n'entrait jamais ici
+        if (strpos($parameters['context'], 'productcard') !== false) {
             global $extrafields, $object;
 
-            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
+            if (isset($extrafields->attributes['product']['label']['syllabus'])) {
+                $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
+            }
 
             if ($object->type == $object::TYPE_PRODUCT) {
                 $extrafields->attributes['product']['list']['syllabus'] = 0;
