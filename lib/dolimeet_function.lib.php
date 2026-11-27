@@ -24,6 +24,8 @@
 /**
  * Set satisfaction survey
  *
+ * A contact gets one survey per sheet on the object: when one, not deleted, is already there, nothing is created.
+ *
  * @param  CommonObject $object        Object
  * @param  string       $contactCode   Contact code from c_type_contact
  * @param  int          $contactID     Contact ID : user or socpeople
@@ -38,13 +40,26 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
     dol_include_once('/digiquali/class/survey.class.php');
     dol_include_once('/digiquali/lib/digiquali_sheet.lib.php');
 
-    $survey = new Survey($db);
+    // Load Saturne libraries
+    dol_include_once('/saturne/class/saturnesignature.class.php');
+
+    $survey        = new Survey($db);
+    $signatoryType = $contactSource == 'internal' ? 'user' : 'socpeople';
 
     $confName                  = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
     $satisfactionSurveySheetId = getDolGlobalInt($confName);
     if ($satisfactionSurveySheetId <= 0) {
         setEventMessages('MissingSatisfactionSurveyConfig', [], 'errors');
         return;
+    }
+
+    // A contact added again to the contract, a second click on the "+" button or the same sheet set for two roles of
+    // the contact made one more survey each time: the survey this contact already has on this sheet is kept
+    $object->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
+    foreach ($object->linkedObjectsIds['digiquali_survey'] ?? [] as $linkedSurveyID) {
+        if (dolimeet_survey_has_contact((int) $linkedSurveyID, $satisfactionSurveySheetId, $contactID, $signatoryType)) {
+            return;
+        }
     }
 
     $survey->ref          = $survey->getNextNumRef();
@@ -54,12 +69,47 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
     $surveyID = $survey->create($user);
 
     if ($surveyID > 0) {
-        // Load Saturne libraries
-        dol_include_once('/saturne/class/saturnesignature.class.php');
-
         $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
-        $signatory->setSignatory($surveyID, $survey->element, $contactSource == 'internal' ? 'user' : 'socpeople', [$contactID], 'Attendant', 1);
+        $signatory->setSignatory($surveyID, $survey->element, $signatoryType, [$contactID], 'Attendant', 1);
     }
+}
+
+/**
+ * Is this survey, built from this sheet and not deleted, the one of this contact?
+ *
+ * The signatories of the surveys made before DigiQuali 23.1.0 keep the DoliSMQ role ExtSocietyAttendant until the update
+ * of DigiQuali converts it to Attendant: both roles count, otherwise the survey of the contact is not seen and one more is
+ * made.
+ *
+ * @param  int    $surveyID      Survey ID
+ * @param  int    $sheetID       Sheet the survey must be built from
+ * @param  int    $contactID     Contact ID : user or socpeople
+ * @param  string $signatoryType Signatory type : user or socpeople
+ * @return bool                  True if the contact attends this survey
+ * @throws Exception
+ */
+function dolimeet_survey_has_contact(int $surveyID, int $sheetID, int $contactID, string $signatoryType): bool
+{
+    global $db;
+
+    static $signatory = null;
+
+    // Load Saturne libraries
+    dol_include_once('/saturne/class/saturnesignature.class.php');
+
+    if ($signatory === null) {
+        $signatory = new SaturneSignature($db, 'digiquali', 'survey');
+    }
+
+    // Not deleted: the deleted status of a DigiQuali survey (Survey::STATUS_DELETED) is -1
+    $filter = ' AND e.fk_sheet = ' . $sheetID . ' AND e.status >= 0';
+    foreach (['Attendant', 'ExtSocietyAttendant'] as $role) {
+        if ($signatory->checkSignatoryHasObject($surveyID, 'digiquali_survey', $contactID, $signatoryType, $filter, $role) > 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -320,4 +370,42 @@ function dolimeet_get_public_contact_url(CommonObject $contract): string
     }
 
     return dol_buildpath('/dolimeet/public/contact/add_contact.php', 3) . '?id=' . ((int) $contract->id) . '&entity=' . $entity . '&securekey=' . $key;
+}
+
+/**
+ * Reference of a training contract already created from one of these proposals, other than the given contract
+ *
+ * A training contract is the one with a training session type (extrafield trainingsession_type). Its link to the
+ * proposal is the one Contrat::create() adds from the origin: source propal, target contrat.
+ *
+ * @param  int|int[] $propalIds  Proposal ID(s) the contract is created from
+ * @param  int       $contractId Contract being created, ignored
+ * @return string                Reference of the first training contract found, empty when there is none
+ */
+function dolimeet_get_training_contract_from_propal($propalIds, int $contractId): string
+{
+    global $db;
+
+    $propalIds = array_filter(array_map('intval', (array) $propalIds));
+    if (empty($propalIds)) {
+        return '';
+    }
+
+    $sql  = 'SELECT c.ref FROM ' . MAIN_DB_PREFIX . 'element_element AS ee';
+    $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'contrat AS c ON c.rowid = ee.fk_target';
+    $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'contrat_extrafields AS cef ON cef.fk_object = c.rowid';
+    $sql .= " WHERE ee.sourcetype = 'propal' AND ee.targettype = 'contrat'";
+    $sql .= ' AND ee.fk_source IN (' . $db->sanitize(implode(',', $propalIds)) . ')';
+    $sql .= ' AND c.rowid <> ' . $contractId;
+    $sql .= ' AND cef.trainingsession_type > 0';
+    $sql .= ' ORDER BY c.rowid ASC';
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ' ' . $db->lasterror(), LOG_ERR);
+        return '';
+    }
+    $obj = $db->fetch_object($resql);
+
+    return $obj ? (string) $obj->ref : '';
 }
