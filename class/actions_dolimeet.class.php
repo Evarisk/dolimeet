@@ -143,6 +143,9 @@ class ActionsDolimeet
      */
     public function addHtmlHeader(array $parameters): int
     {
+        // saturne_asset_full_url() for the assets printed below: without a version, the browser keeps serving the previous release
+        dol_include_once('/saturne/lib/asset.lib.php');
+
         if (preg_match('/productcard|contractcard|contractcontactcard/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/saturne/css/saturne.min.css',
@@ -150,9 +153,9 @@ class ActionsDolimeet
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';
-            $out .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath($resourcesRequired['css'], 1) . '">';
+            $out .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url($resourcesRequired['css']) . '">';
             $out .= '<!-- Includes JS added by module saturne -->';
-            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+            $out .= '<script src="' . saturne_asset_full_url($resourcesRequired['js']) . '"></script>';
 
             $this->resprints = $out;
         }
@@ -163,7 +166,7 @@ class ActionsDolimeet
             ];
 
             $out = '<!-- Includes JS added by module saturne -->';
-            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+            $out .= '<script src="' . saturne_asset_full_url($resourcesRequired['js']) . '"></script>';
 
             $this->resprints = $out;
         }
@@ -551,7 +554,8 @@ class ActionsDolimeet
 
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
-            print '<script src="' . dol_buildpath('/dolimeet/js/dolimeet.js', 1) . '"></script>';
+            dol_include_once('/saturne/lib/asset.lib.php');
+            print '<script src="' . saturne_asset_full_url('/dolimeet/js/dolimeet.js') . '"></script>';
         } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
             dol_include_once('/saturne/lib/object.lib.php');
 
