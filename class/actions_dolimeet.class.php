@@ -143,6 +143,9 @@ class ActionsDolimeet
      */
     public function addHtmlHeader(array $parameters): int
     {
+        // saturne_asset_full_url() for the assets printed below: without a version, the browser keeps serving the previous release
+        dol_include_once('/saturne/lib/asset.lib.php');
+
         if (preg_match('/productcard|contractcard|contractcontactcard/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/saturne/css/saturne.min.css',
@@ -150,9 +153,9 @@ class ActionsDolimeet
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';
-            $out .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath($resourcesRequired['css'], 1) . '">';
+            $out .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url($resourcesRequired['css']) . '">';
             $out .= '<!-- Includes JS added by module saturne -->';
-            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+            $out .= '<script src="' . saturne_asset_full_url($resourcesRequired['js']) . '"></script>';
 
             $this->resprints = $out;
         }
@@ -163,7 +166,7 @@ class ActionsDolimeet
             ];
 
             $out = '<!-- Includes JS added by module saturne -->';
-            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+            $out .= '<script src="' . saturne_asset_full_url($resourcesRequired['js']) . '"></script>';
 
             $this->resprints = $out;
         }
@@ -188,6 +191,11 @@ class ActionsDolimeet
             return 0;
         }
 
+        // Le bloc produit plus bas s'en sert aussi : sans le module Produits (Services seul), Saturne ne declare
+        // pas de metadonnees product et la boucle ne le definissait pas
+        $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
+        $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
+
         if (!isset($conf->cache['objectsMetadata']) || empty($conf->cache['objectsMetadata'])) {
             dol_include_once('/saturne/lib/object.lib.php');
             $objectsMetadata                = saturne_get_objects_metadata();
@@ -201,8 +209,6 @@ class ActionsDolimeet
                 continue;
             }
             if (strpos($parameters['context'], $objectMetadata['hook_name_card']) !== false) {
-                $pictoPath = dol_buildpath('/dolimeet/img/dolimeet_color.png', 1);
-                $picto     = img_picto('', $pictoPath, '', 1, 0, 0, '', 'pictoModule');
                 $extraFieldsNames = ['trainingsession_type', 'trainingsession_location', 'trainingsession_opco_financing', 'syllabus'];
                 foreach ($extraFieldsNames as $extraFieldsName) {
                     if (isset($extrafields->attributes[$object->table_element]['label'][$extraFieldsName])) {
@@ -212,14 +218,8 @@ class ActionsDolimeet
             }
         }
 
+        // Le picto des libelles de la propale est pose par la boucle des metadonnees : le reposer ici le doublait
         if (strpos($parameters['context'], 'propalcard') !== false) {
-            $propalExtraFieldsNames = ['trainingsession_type', 'trainingsession_location'];
-            foreach ($propalExtraFieldsNames as $propalExtraFieldsName) {
-                if (isset($extrafields->attributes['propal']['label'][$propalExtraFieldsName])) {
-                    $extrafields->attributes['propal']['label'][$propalExtraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['propal']['label'][$propalExtraFieldsName]);
-                }
-            }
-
             if (empty(GETPOST('options_trainingsession_type', 'int'))) {
                 $extrafields->attributes['propal']['hidden']['trainingsession_location'] = 1;
             } ?>
@@ -237,10 +237,13 @@ class ActionsDolimeet
             <?php
         }
 
-        if (strpos($parameters['context'], 'productcard')) {
+        // initHooks() met les contextes de la page en tete : sans !== false, la fiche produit elle-meme n'entrait jamais ici
+        if (strpos($parameters['context'], 'productcard') !== false) {
             global $extrafields, $object;
 
-            $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
+            if (isset($extrafields->attributes['product']['label']['syllabus'])) {
+                $extrafields->attributes['product']['label']['syllabus'] = $picto . $langs->transnoentities($extrafields->attributes['product']['label']['syllabus']);
+            }
 
             if ($object->type == $object::TYPE_PRODUCT) {
                 $extrafields->attributes['product']['list']['syllabus'] = 0;
@@ -423,10 +426,12 @@ class ActionsDolimeet
                 // Load DigiQuali libraries
                 dol_include_once('/digiquali/class/survey.class.php');
 
+                // Load DoliMeet libraries
+                require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+
                 saturne_load_langs();
 
-                $survey    = new Survey($this->db);
-                $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
+                $survey = new Survey($this->db);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
                 $contactsCodeWanted = ['SESSIONTRAINER', 'TRAINEE', 'CUSTOMER', 'BILLING'];
@@ -444,11 +449,10 @@ class ActionsDolimeet
                                 foreach ($surveyIDs as $surveyID) {
                                     $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
                                     if (getDolGlobalInt($confName) > 0) {
-                                        // Restrict to the survey built from the sheet configured for this contact role, otherwise a contact holding several roles shows the same survey on each of its rows
-                                        $filter = ' AND e.fk_sheet = ' . getDolGlobalInt($confName);
-                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
+                                        // Restrict to the survey built from the sheet configured for this contact role, otherwise a contact holding several roles shows the same survey on each of its rows.
+                                        // Same test as the creation of the survey: what the row shows is what the "+" button would not create again
+                                        if (dolimeet_survey_has_contact((int) $surveyID, getDolGlobalInt($confName), (int) $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople')) {
                                             $survey->fetch($surveyID);
-                                            $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
                                             $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $survey->getStatus();
 
@@ -551,7 +555,8 @@ class ActionsDolimeet
 
         // Do something only for the current context
         if (preg_match('/categoryindex/', $parameters['context'])) {
-            print '<script src="' . dol_buildpath('/dolimeet/js/dolimeet.js', 1) . '"></script>';
+            dol_include_once('/saturne/lib/asset.lib.php');
+            print '<script src="' . saturne_asset_full_url('/dolimeet/js/dolimeet.js') . '"></script>';
         } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER['PHP_SELF'])) {
             dol_include_once('/saturne/lib/object.lib.php');
 
@@ -882,6 +887,7 @@ class ActionsDolimeet
                 $moduleName          = 'DoliMeet';
                 $moduleNameLowerCase = strtolower($moduleName);
                 $upload_dir          = $conf->dolimeet->multidir_output[$conf->entity ?? 1];
+                $permissiontoadd     = $user->hasRight('dolimeet', 'trainingsession', 'write');
 
                 // Action to generate pdf from odt file
                 require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
