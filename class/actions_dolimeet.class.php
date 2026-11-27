@@ -426,10 +426,12 @@ class ActionsDolimeet
                 // Load DigiQuali libraries
                 dol_include_once('/digiquali/class/survey.class.php');
 
+                // Load DoliMeet libraries
+                require_once __DIR__ . '/../lib/dolimeet_function.lib.php';
+
                 saturne_load_langs();
 
-                $survey    = new Survey($this->db);
-                $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
+                $survey = new Survey($this->db);
 
                 $contacts           = array_merge($object->liste_contact(-1, 'internal'), $object->liste_contact(-1));
                 $contactsCodeWanted = ['SESSIONTRAINER', 'TRAINEE', 'CUSTOMER', 'BILLING'];
@@ -447,11 +449,10 @@ class ActionsDolimeet
                                 foreach ($surveyIDs as $surveyID) {
                                     $confName = 'DOLIMEET_' . $contact['code'] . '_SATISFACTION_SURVEY_SHEET';
                                     if (getDolGlobalInt($confName) > 0) {
-                                        // Restrict to the survey built from the sheet configured for this contact role, otherwise a contact holding several roles shows the same survey on each of its rows
-                                        $filter = ' AND e.fk_sheet = ' . getDolGlobalInt($confName);
-                                        if ($signatory->checkSignatoryHasObject($surveyID, $survey->table_element, $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople', $filter)) {
+                                        // Restrict to the survey built from the sheet configured for this contact role, otherwise a contact holding several roles shows the same survey on each of its rows.
+                                        // Same test as the creation of the survey: what the row shows is what the "+" button would not create again
+                                        if (dolimeet_survey_has_contact((int) $surveyID, getDolGlobalInt($confName), (int) $contact['id'], $contact['source'] == 'internal' ? 'user' : 'socpeople')) {
                                             $survey->fetch($surveyID);
-                                            $signatory->fetch($signatory->id);
                                             $outputLine[$contact['rowid']] = '<td class="tdoverflowmax200">';
                                             $outputLine[$contact['rowid']] .= $survey->getNomUrl(1) . ' ' .  $survey->getStatus();
 
