@@ -24,6 +24,8 @@
 /**
  * Set satisfaction survey
  *
+ * A contact gets one survey per sheet on the object: when one, not deleted, is already there, nothing is created.
+ *
  * @param  CommonObject $object        Object
  * @param  string       $contactCode   Contact code from c_type_contact
  * @param  int          $contactID     Contact ID : user or socpeople
@@ -38,13 +40,26 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
     dol_include_once('/digiquali/class/survey.class.php');
     dol_include_once('/digiquali/lib/digiquali_sheet.lib.php');
 
-    $survey = new Survey($db);
+    // Load Saturne libraries
+    dol_include_once('/saturne/class/saturnesignature.class.php');
+
+    $survey        = new Survey($db);
+    $signatoryType = $contactSource == 'internal' ? 'user' : 'socpeople';
 
     $confName                  = 'DOLIMEET_' . dol_strtoupper($contactCode) . '_SATISFACTION_SURVEY_SHEET';
     $satisfactionSurveySheetId = getDolGlobalInt($confName);
     if ($satisfactionSurveySheetId <= 0) {
         setEventMessages('MissingSatisfactionSurveyConfig', [], 'errors');
         return;
+    }
+
+    // A contact added again to the contract, a second click on the "+" button or the same sheet set for two roles of
+    // the contact made one more survey each time: the survey this contact already has on this sheet is kept
+    $object->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
+    foreach ($object->linkedObjectsIds['digiquali_survey'] ?? [] as $linkedSurveyID) {
+        if (dolimeet_survey_has_contact((int) $linkedSurveyID, $satisfactionSurveySheetId, $contactID, $signatoryType)) {
+            return;
+        }
     }
 
     $survey->ref          = $survey->getNextNumRef();
@@ -54,12 +69,49 @@ function set_satisfaction_survey(CommonObject $object, string $contactCode, int 
     $surveyID = $survey->create($user);
 
     if ($surveyID > 0) {
-        // Load Saturne libraries
-        dol_include_once('/saturne/class/saturnesignature.class.php');
-
         $signatory = new SaturneSignature($db, 'digiquali', $survey->element);
-        $signatory->setSignatory($surveyID, $survey->element, $contactSource == 'internal' ? 'user' : 'socpeople', [$contactID], 'Attendant', 1);
+        $signatory->setSignatory($surveyID, $survey->element, $signatoryType, [$contactID], 'Attendant', 1);
     }
+}
+
+/**
+ * Is this survey, built from this sheet and not deleted, the one of this contact?
+ *
+ * The signatories of the surveys made before DigiQuali 23.1.0 keep the DoliSMQ role ExtSocietyAttendant until the update
+ * of DigiQuali converts it to Attendant: both roles count, otherwise the survey of the contact is not seen and one more is
+ * made.
+ *
+ * @param  int    $surveyID      Survey ID
+ * @param  int    $sheetID       Sheet the survey must be built from
+ * @param  int    $contactID     Contact ID : user or socpeople
+ * @param  string $signatoryType Signatory type : user or socpeople
+ * @return bool                  True if the contact attends this survey
+ * @throws Exception
+ */
+function dolimeet_survey_has_contact(int $surveyID, int $sheetID, int $contactID, string $signatoryType): bool
+{
+    global $db;
+
+    static $signatory = null;
+
+    // Load DigiQuali libraries
+    dol_include_once('/digiquali/class/survey.class.php');
+
+    // Load Saturne libraries
+    dol_include_once('/saturne/class/saturnesignature.class.php');
+
+    if ($signatory === null) {
+        $signatory = new SaturneSignature($db, 'digiquali', 'survey');
+    }
+
+    $filter = ' AND e.fk_sheet = ' . $sheetID . ' AND e.status > ' . Survey::STATUS_DELETED;
+    foreach (['Attendant', 'ExtSocietyAttendant'] as $role) {
+        if ($signatory->checkSignatoryHasObject($surveyID, 'digiquali_survey', $contactID, $signatoryType, $filter, $role) > 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
